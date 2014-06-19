@@ -1,6 +1,2666 @@
-2014-06-19 14:03:58,809 - [INFO] - from play in pool-4-thread-5 
+2014-06-19 14:40:03,089 - [INFO] - from play in pool-7-thread-4 
 Listening for HTTP on /0:0:0:0:0:0:0:0:9000
 
-2014-06-19 14:04:06,683 - [INFO] - from play in play-internal-execution-context-1 
+2014-06-19 14:54:49,428 - [ERROR] - from application in New I/O worker #1 
+
+
+! @6ii5d4p18 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[could not find implicit value for parameter tm: scala.slick.ast.TypedType[org.joda.time.DateTime]]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 14:54:49,518 - [WARN] - from play in New I/O worker #1 
+No application found at invoker init
+
+2014-06-19 14:56:49,671 - [ERROR] - from application in New I/O worker #1 
+
+
+! @6ii5dbkp0 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[You do not have an implicit Application in scope. If you want to bring the current running Application into context, just add import play.api.Play.current]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 14:57:09,624 - [ERROR] - from application in New I/O worker #1 
+
+
+! @6ii5dcoce - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[inferred type arguments [Boolean] do not conform to method where's type parameter bounds [T <: scala.slick.lifted.Column[_]]]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 14:57:39,632 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 14:57:40,752 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 14:57:40,923 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 14:58:16,108 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 14:58:16,112 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 14:58:16,112 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 14:58:16,118 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 14:58:16,118 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 14:58:16,205 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 14:58:16,280 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 14:58:16,285 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 15:04:56,911 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:04:57,680 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:04:57,682 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:04:57,682 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:04:57,684 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:04:57,684 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:04:57,841 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:04:58,356 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:04:58,357 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:04:58,357 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:04:58,359 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:04:58,359 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:04:58,795 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:04:59,542 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:04:59.307)
+
+2014-06-19 15:04:59,559 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:04:59,560 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:04:59,561 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:04:59,564 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:04:59,564 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:04:59,739 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:21:56,045 - [ERROR] - from application in New I/O worker #2 
+
+
+! @6ii5gjd8f - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[You do not have an implicit Application in scope. If you want to bring the current running Application into context, just add import play.api.Play.current]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 15:22:11,605 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 15:22:11,606 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:22:11,606 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:22:11,609 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 15:22:11,609 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 15:22:11,656 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:22:11,708 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 15:22:12,036 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 15:22:12,055 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:22:12.05'} NOT NULL)
+
+2014-06-19 15:22:12,160 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:22:12.141)
+
+2014-06-19 15:22:12,161 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 15:34:09,384 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:10,415 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:10,426 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:10.422'} NOT NULL)
+
+2014-06-19 15:34:10,510 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:10.492)
+
+2014-06-19 15:34:10,560 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:34:10,561 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:10,561 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:10,563 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:34:10,563 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:34:10,620 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:10,694 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:10,699 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:10.697'} NOT NULL)
+
+2014-06-19 15:34:10,714 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:10.713)
+
+2014-06-19 15:34:11,139 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:34:11,140 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:11,140 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:11,141 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:34:11,141 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:34:11,432 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:11,508 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:11,513 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:11.511'} NOT NULL)
+
+2014-06-19 15:34:11,524 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:11.524)
+
+2014-06-19 15:34:11,532 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:11.529)
+
+2014-06-19 15:34:11,543 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:34:11,543 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:11,544 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:11,546 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:34:11,547 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:34:11,694 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:11,748 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:11,751 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:11.75'} NOT NULL)
+
+2014-06-19 15:34:11,767 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:11.767)
+
+2014-06-19 15:34:48,445 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:49,496 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:49,504 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:49.5'} NOT NULL)
+
+2014-06-19 15:34:49,593 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:49.573)
+
+2014-06-19 15:34:49,634 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:34:49,643 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:49,643 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:49,646 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:34:49,646 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:34:49,708 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:49,783 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:49,787 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:49.786'} NOT NULL)
+
+2014-06-19 15:34:49,804 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:49.803)
+
+2014-06-19 15:34:50,146 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:34:50,148 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:50,148 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:50,149 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:34:50,149 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:34:50,517 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:50,587 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:50,592 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:50.591'} NOT NULL)
+
+2014-06-19 15:34:50,608 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:50.608)
+
+2014-06-19 15:34:52,645 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:34:52,708 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:34:52,712 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:34:52.711'} NOT NULL)
+
+2014-06-19 15:34:52,726 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:34:52.725)
+
+2014-06-19 15:34:52,733 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','admin','y','1.1.1.1',2014-06-19 15:34:52.73)
+
+2014-06-19 15:34:52,734 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:34:52,735 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:52,735 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:34:52,738 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:34:52,738 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:35:37,642 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:35:38,730 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:35:38,738 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:35:38.734'} NOT NULL)
+
+2014-06-19 15:35:38,819 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:35:38.802)
+
+2014-06-19 15:35:38,863 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:35:38,864 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:35:38,864 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:35:38,865 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:35:38,866 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:35:38,925 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:35:38,995 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:35:39,000 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:35:38.998'} NOT NULL)
+
+2014-06-19 15:35:39,013 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:35:39.013)
+
+2014-06-19 15:35:39,397 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:35:39,398 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:35:39,398 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:35:39,399 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:35:39,399 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:35:39,744 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:35:39,812 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:35:39,817 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:35:39.815'} NOT NULL)
+
+2014-06-19 15:35:39,832 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:35:39.832)
+
+2014-06-19 15:35:41,899 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:35:41,963 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:35:41,967 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:35:41.966'} NOT NULL)
+
+2014-06-19 15:35:41,984 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:35:41.983)
+
+2014-06-19 15:35:41,993 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','admin','y','1.1.1.1',2014-06-19 15:35:41.99)
+
+2014-06-19 15:35:41,994 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:35:41,995 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:35:41,995 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:35:41,998 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:35:41,998 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:35:59,708 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:36:00,745 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:36:00,753 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:36:00.749'} NOT NULL)
+
+2014-06-19 15:36:00,846 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:36:00.827)
+
+2014-06-19 15:36:00,860 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','admin','y','1.1.1.1',2014-06-19 15:36:00.856)
+
+2014-06-19 15:36:00,874 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:36:00,875 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:36:00,875 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:36:00,878 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:36:00,878 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:36:54,469 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:36:55,509 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:36:55,516 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:36:55.512'} NOT NULL)
+
+2014-06-19 15:36:55,603 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:36:55.585)
+
+2014-06-19 15:36:55,618 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:36:55.615)
+
+2014-06-19 15:36:55,634 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:36:55,635 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:36:55,635 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:36:55,637 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:36:55,637 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:38:10,251 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:38:11,315 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:38:11,325 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:38:11.318'} NOT NULL)
+
+2014-06-19 15:38:11,412 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:38:11.396)
+
+2014-06-19 15:38:11,423 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:38:11.42)
+
+2014-06-19 15:38:11,437 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:38:11,438 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:38:11,438 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:38:11,439 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:38:11,440 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:38:11,501 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:38:11,577 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:38:11,581 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:38:11.58'} NOT NULL)
+
+2014-06-19 15:38:11,599 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:38:11.598)
+
+2014-06-19 15:38:11,604 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:38:11.601)
+
+2014-06-19 15:38:11,795 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:38:11,824 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:38:11,824 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:38:11,824 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:38:11,825 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:38:11,825 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:39:45,347 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:39:47,082 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:39:47,092 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:39:47.085'} NOT NULL)
+
+2014-06-19 15:39:47,185 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:39:47.163)
+
+2014-06-19 15:39:47,203 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:39:47.198)
+
+2014-06-19 15:39:47,227 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:39:47,229 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:39:47,229 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:39:47,231 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:39:47,232 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:39:47,318 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:39:47,417 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:39:47,422 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:39:47.42'} NOT NULL)
+
+2014-06-19 15:39:47,437 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:39:47.436)
+
+2014-06-19 15:39:47,442 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:39:47.44)
+
+2014-06-19 15:39:47,627 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:39:47,629 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:39:47,630 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:39:47,630 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:39:47,632 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:39:47,632 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:39:47,676 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:39:47,790 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:39:47,795 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:39:47.793'} NOT NULL)
+
+2014-06-19 15:39:47,808 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:39:47.807)
+
+2014-06-19 15:39:47,816 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:39:47.813)
+
+2014-06-19 15:39:47,853 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from `app_user` x2 where x2.`job_no` = 'of556'
+
+2014-06-19 15:39:47,911 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:39:47,913 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:39:47,913 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:39:47,916 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:39:47,916 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:40:21,431 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:40:22,477 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:40:22,486 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:40:22.48'} NOT NULL)
+
+2014-06-19 15:40:22,574 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:40:22.555)
+
+2014-06-19 15:40:22,587 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:40:22.584)
+
+2014-06-19 15:40:22,600 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:40:22,601 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:40:22,601 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:40:22,602 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:40:22,603 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:40:22,665 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:40:22,735 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:40:22,740 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:40:22.738'} NOT NULL)
+
+2014-06-19 15:40:22,754 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:40:22.753)
+
+2014-06-19 15:40:22,759 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:40:22.756)
+
+2014-06-19 15:40:22,928 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:40:22,931 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:40:22,932 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:40:22,932 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:40:22,933 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:40:22,933 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:40:22,967 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:40:23,029 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:40:23,032 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:40:23.031'} NOT NULL)
+
+2014-06-19 15:40:23,044 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:40:23.043)
+
+2014-06-19 15:40:23,047 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:40:23.045)
+
+2014-06-19 15:40:23,071 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from `app_user` x2 where x2.`job_no` = 'of556'
+
+2014-06-19 15:40:23,113 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:40:23,113 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:40:23,114 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:40:23,115 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:40:23,115 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:41:14,041 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:41:15,067 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:41:15,081 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:41:15.075'} NOT NULL)
+
+2014-06-19 15:41:15,180 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:41:15.161)
+
+2014-06-19 15:41:15,213 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:41:15.209)
+
+2014-06-19 15:41:15,239 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:41:15,240 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:41:15,240 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:41:15,242 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:41:15,242 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:41:15,311 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:41:15,381 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:41:15,391 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:41:15.389'} NOT NULL)
+
+2014-06-19 15:41:15,422 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:41:15.422)
+
+2014-06-19 15:41:15,439 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:41:15.436)
+
+2014-06-19 15:41:15,585 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:41:15,592 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:41:15,592 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:41:15,592 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:41:15,594 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:41:15,594 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:41:15,633 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:41:15,694 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:41:15,708 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:41:15.707'} NOT NULL)
+
+2014-06-19 15:41:15,731 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:41:15.731)
+
+2014-06-19 15:41:15,746 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1','[SQL NULL of type 93]')
+
+2014-06-19 15:41:15,775 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from `app_user` x2 where x2.`job_no` = 'of556'
+
+2014-06-19 15:41:15,813 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:41:15,814 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:41:15,814 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:41:15,816 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:41:15,816 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:42:48,329 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:42:49,175 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:42:49,176 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:42:49,176 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:42:49,178 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:42:49,178 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:42:49,235 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:42:49,300 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:42:49,301 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:42:49,301 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:42:49,302 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:42:49,302 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:42:49,339 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:42:49,392 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:42:49,393 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:42:49,393 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:42:49,395 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:42:49,395 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:44:47,479 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:44:48,462 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:44:48,469 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:44:48.464'} NOT NULL)
+
+2014-06-19 15:44:48,544 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:44:48.527)
+
+2014-06-19 15:44:48,556 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:44:48.553)
+
+2014-06-19 15:44:48,574 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:44:48,575 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:44:48,575 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:44:48,577 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:44:48,577 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:44:48,633 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:44:48,694 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:44:48,699 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:44:48.697'} NOT NULL)
+
+2014-06-19 15:44:48,712 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:44:48.711)
+
+2014-06-19 15:44:48,718 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:44:48.716)
+
+2014-06-19 15:44:48,846 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:44:48,848 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:44:48,849 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:44:48,849 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:44:48,850 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:44:48,850 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:44:48,880 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:44:48,935 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:44:48,938 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:44:48.937'} NOT NULL)
+
+2014-06-19 15:44:48,949 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:44:48.949)
+
+2014-06-19 15:44:48,963 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:44:48,964 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:44:48,964 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:44:48,965 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:44:48,966 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:45:14,408 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:45:15,328 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:45:15,336 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:45:15.332'} NOT NULL)
+
+2014-06-19 15:45:15,416 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:45:15.397)
+
+2014-06-19 15:45:15,431 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:45:15.427)
+
+2014-06-19 15:45:15,444 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:45:15,445 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:15,445 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:15,447 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:45:15,447 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:45:15,524 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:45:15,592 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:45:15,596 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:45:15.595'} NOT NULL)
+
+2014-06-19 15:45:15,611 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:45:15.61)
+
+2014-06-19 15:45:15,615 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:45:15.613)
+
+2014-06-19 15:45:15,803 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:45:15,806 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:45:15,807 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:15,807 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:15,808 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:45:15,808 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:45:15,843 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:45:15,904 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:45:15,908 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:45:15.907'} NOT NULL)
+
+2014-06-19 15:45:15,924 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:45:15.92)
+
+2014-06-19 15:45:15,942 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:45:15,943 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:15,943 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:15,944 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:45:15,945 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:45:35,584 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:45:36,581 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:45:36,589 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:45:36.584'} NOT NULL)
+
+2014-06-19 15:45:36,663 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:45:36.644)
+
+2014-06-19 15:45:36,672 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:45:36.67)
+
+2014-06-19 15:45:36,689 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:45:36,690 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:36,690 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:36,692 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:45:36,692 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:45:36,747 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:45:36,827 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:45:36,831 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:45:36.829'} NOT NULL)
+
+2014-06-19 15:45:36,852 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:45:36.851)
+
+2014-06-19 15:45:36,857 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:45:36.854)
+
+2014-06-19 15:45:37,031 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:45:37,037 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:45:37,038 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:37,038 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:37,040 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:45:37,040 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:45:37,078 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:45:37,141 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:45:37,145 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:45:37.144'} NOT NULL)
+
+2014-06-19 15:45:37,160 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:45:37.16)
+
+2014-06-19 15:45:37,175 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:45:37,176 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:37,176 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:45:37,177 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:45:37,178 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:47:01,635 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:47:02,587 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:47:02,595 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:47:02.59'} NOT NULL)
+
+2014-06-19 15:47:02,675 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:47:02.661)
+
+2014-06-19 15:47:02,685 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:47:02.682)
+
+2014-06-19 15:47:02,697 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:47:02,698 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:47:02,698 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:47:02,700 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:47:02,700 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:47:02,755 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:47:02,818 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:47:02,822 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:47:02.821'} NOT NULL)
+
+2014-06-19 15:47:02,836 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:47:02.836)
+
+2014-06-19 15:47:02,841 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:47:02.838)
+
+2014-06-19 15:47:02,994 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:47:02,996 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:47:02,997 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:47:02,997 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:47:02,998 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:47:02,998 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:47:03,029 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:47:03,085 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:47:03,088 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:47:03.087'} NOT NULL)
+
+2014-06-19 15:47:03,103 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:47:03.102)
+
+2014-06-19 15:47:03,107 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 15:47:03,130 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from `app_user` x2 where x2.`job_no` = 'of556'
+
+2014-06-19 15:47:03,164 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:47:03,165 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:47:03,165 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:47:03,166 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:47:03,166 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:26,592 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:27,467 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:27,474 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:27.47'} NOT NULL)
+
+2014-06-19 15:48:27,555 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:27.537)
+
+2014-06-19 15:48:27,566 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:48:27.563)
+
+2014-06-19 15:48:27,583 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:27,584 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:27,584 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:27,586 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:27,586 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:27,644 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:27,710 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:27,714 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:27.713'} NOT NULL)
+
+2014-06-19 15:48:27,731 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:27.73)
+
+2014-06-19 15:48:27,735 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:48:27.733)
+
+2014-06-19 15:48:27,888 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:48:27,890 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:27,898 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:27,898 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:27,899 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:27,900 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:27,937 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:27,995 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:27,998 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:27.997'} NOT NULL)
+
+2014-06-19 15:48:28,012 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:28.011)
+
+2014-06-19 15:48:28,014 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:48:28.013)
+
+2014-06-19 15:48:28,031 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+update `app_user` set `job_no` = 'of556', `name` = 'soko', `role` = 'user', `locked` = 'n', `last_ip` = '2.2.1.1', `last_visit` = 2014-06-19 15:48:28.015 where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:48:28,043 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:28,044 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:28,044 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:28,045 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:28,045 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:28,077 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:28,129 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:28,132 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:28.131'} NOT NULL)
+
+2014-06-19 15:48:28,146 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:28.145)
+
+2014-06-19 15:48:28,149 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 15:48:28,173 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from `app_user` x2 where x2.`job_no` = 'of556'
+
+2014-06-19 15:48:28,201 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:28,202 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:28,202 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:28,203 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:28,203 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:55,738 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:56,741 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:56,747 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:56.744'} NOT NULL)
+
+2014-06-19 15:48:56,820 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:56.804)
+
+2014-06-19 15:48:56,833 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:48:56.831)
+
+2014-06-19 15:48:56,851 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:56,852 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:56,852 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:56,854 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:56,854 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:56,916 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:56,985 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:56,989 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:56.988'} NOT NULL)
+
+2014-06-19 15:48:57,005 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:57.004)
+
+2014-06-19 15:48:57,010 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:48:57.007)
+
+2014-06-19 15:48:57,146 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+delete from `app_user` where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:48:57,149 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:57,149 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:57,149 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:57,150 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:57,151 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:57,186 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:57,240 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:57,249 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:57.248'} NOT NULL)
+
+2014-06-19 15:48:57,264 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:57.263)
+
+2014-06-19 15:48:57,266 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2014-06-19 15:48:57.265)
+
+2014-06-19 15:48:57,282 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+update `app_user` set `job_no` = 'of556', `name` = 'test', `role` = 'user', `locked` = 'n', `last_ip` = '2.2.1.1', `last_visit` = 2014-06-19 15:48:57.267 where `app_user`.`job_no` = 'of556'
+
+2014-06-19 15:48:57,288 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:57,289 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:57,289 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:57,290 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:57,290 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:48:57,317 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:48:57,371 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 15:48:57,386 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:48:57.384'} NOT NULL)
+
+2014-06-19 15:48:57,403 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:48:57.402)
+
+2014-06-19 15:48:57,407 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of556','li','user','n','2.2.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 15:48:57,431 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from `app_user` x2 where x2.`job_no` = 'of556'
+
+2014-06-19 15:48:57,460 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 15:48:57,461 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:57,461 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:48:57,462 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 15:48:57,462 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 15:55:48,393 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 15:55:48,393 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:55:48,393 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:55:48,397 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 15:55:48,397 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 15:55:48,455 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:55:48,503 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 15:55:48,537 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 15:55:48,551 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:55:48.55'} NOT NULL)
+
+2014-06-19 15:55:48,570 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:55:48.569)
+
+2014-06-19 15:55:48,576 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 15:58:21,721 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 15:58:21,722 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:58:21,722 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 15:58:21,724 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 15:58:21,724 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 15:58:21,754 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 15:58:21,801 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 15:58:21,825 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 15:58:21,828 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 15:58:21.827'} NOT NULL)
+
+2014-06-19 15:58:21,849 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 15:58:21.848)
+
+2014-06-19 15:58:21,850 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 16:16:36,503 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 16:16:36,504 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:16:36,504 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:16:36,506 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 16:16:36,506 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 16:16:36,532 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:16:36,578 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 16:16:36,610 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 16:16:36,623 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:16:36.622'} NOT NULL)
+
+2014-06-19 16:16:36,646 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:16:36.646)
+
+2014-06-19 16:16:36,647 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 16:29:54,118 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:29:55,301 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 16:29:55,320 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:29:55.314'} NOT NULL)
+
+2014-06-19 16:29:55,417 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:29:55.401)
+
+2014-06-19 16:29:55,441 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `project` (`name`,`dev_user`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 16:29:55,461 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 16:29:55,462 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:29:55,462 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:29:55,463 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 16:29:55,463 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 16:31:35,431 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:31:36,454 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 16:31:36,465 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:31:36.46'} NOT NULL)
+
+2014-06-19 16:31:36,548 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:31:36.534)
+
+2014-06-19 16:31:36,566 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `project` (`name`,`dev_user`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 16:31:36,585 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 16:31:36,586 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:31:36,586 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:31:36,588 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 16:31:36,588 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 16:31:53,070 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 16:31:53,071 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:31:53,071 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:31:53,075 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 16:31:53,075 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 16:31:53,128 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:31:53,167 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 16:31:53,182 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 16:31:53,184 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:31:53.183'} NOT NULL)
+
+2014-06-19 16:31:53,203 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:31:53.203)
+
+2014-06-19 16:31:53,204 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 16:32:04,361 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:32:05,289 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 16:32:05,295 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:32:05.291'} NOT NULL)
+
+2014-06-19 16:32:05,358 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:32:05.344)
+
+2014-06-19 16:32:05,374 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `project` (`name`,`dev_user`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 16:32:05,391 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 16:32:05,392 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:32:05,392 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:32:05,393 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 16:32:05,393 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 16:34:16,024 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:34:17,029 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 16:34:17,037 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:34:17.032'} NOT NULL)
+
+2014-06-19 16:34:17,110 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:34:17.094)
+
+2014-06-19 16:34:17,129 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qm',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 16:34:17,148 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 16:34:17,150 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:34:17,150 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:34:17,152 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 16:34:17,152 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 16:34:43,361 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 16:34:44,483 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `app_user`
+
+2014-06-19 16:34:44,491 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 16:34:44.486'} NOT NULL)
+
+2014-06-19 16:34:44,570 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 16:34:44.554)
+
+2014-06-19 16:34:44,580 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+drop table `project`
+
+2014-06-19 16:34:44,589 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 16:34:44.587'} NOT NULL)
+
+2014-06-19 16:34:44,605 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 16:34:44,622 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 16:34:44,636 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in main 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qm',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 16:34:44,651 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Shutting down connection pool...
+
+2014-06-19 16:34:44,652 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:34:44,652 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 16:34:44,653 - [INFO] - from com.jolbox.bonecp.BoneCP in main 
+Connection pool has been shutdown.
+
+2014-06-19 16:34:44,653 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in main 
+Connection pool has been shut down
+
+2014-06-19 17:36:44,277 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68bi4b - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:36:59,312 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68ceaj - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:37:00,709 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68cgcd - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:37:01,848 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68ci47 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:37:03,130 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68ck1f - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:37:49,133 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68fa2o - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:37:50,618 - [ERROR] - from application in New I/O worker #5 
+
+
+! @6ii68fc81 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Option[Int]], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 17:38:01,293 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 17:38:01,294 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 17:38:01,294 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 17:38:01,297 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 17:38:01,297 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 17:38:01,329 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 17:38:01,374 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 17:38:01,407 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 17:38:01,421 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 17:38:01.42'} NOT NULL)
+
+2014-06-19 17:38:01,444 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 17:38:01.443)
+
+2014-06-19 17:38:01,466 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-06-19 17:38:01,474 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 17:38:01.473'} NOT NULL)
+
+2014-06-19 17:38:01,490 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 17:38:01,505 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 17:38:01,506 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 19:47:56,680 - [ERROR] - from application in New I/O worker #15 
+
+
+! @6ii6phfj5 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[String], scala.slick.lifted.Column[String])
+   Unpacked type: (String, Option[String])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 19:49:02,375 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 19:49:02,376 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 19:49:02,376 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 19:49:02,382 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 19:49:02,382 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 19:49:02,414 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 19:49:02,453 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 19:49:02,493 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 19:49:02,513 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 19:49:02.512'} NOT NULL)
+
+2014-06-19 19:49:02,540 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 19:49:02.539)
+
+2014-06-19 19:49:02,578 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-06-19 19:49:02,593 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 19:49:02.592'} NOT NULL)
+
+2014-06-19 19:49:02,608 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 19:49:02,625 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 19:49:02,631 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 19:51:32,412 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 19:51:32,413 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 19:51:32,413 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 19:51:32,415 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 19:51:32,415 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 19:51:32,441 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 19:51:32,475 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 19:51:32,500 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 19:51:32,504 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 19:51:32.502'} NOT NULL)
+
+2014-06-19 19:51:32,531 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 19:51:32.531)
+
+2014-06-19 19:51:32,536 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-06-19 19:51:32,539 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 19:51:32.538'} NOT NULL)
+
+2014-06-19 19:51:32,556 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 19:51:32,577 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 19:51:32,577 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 20:06:47,687 - [ERROR] - from application in New I/O worker #6 
+
+
+! @6ii723olb - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[type arguments [models.conf.SubPConf] conform to the bounds of none of the overloaded alternatives of
+ value apply: [E <: scala.slick.lifted.AbstractTable[_]]=> scala.slick.lifted.TableQuery[E] <and> [E <: scala.slick.lifted.AbstractTable[_]](cons: scala.slick.lifted.Tag => E)scala.slick.lifted.TableQuery[E]]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:08:34,615 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 20:08:34,617 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 20:08:34,617 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 20:08:34,637 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 20:08:34,637 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 20:08:34,671 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 20:08:34,736 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 20:08:34,770 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 20:08:34,776 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 20:08:34.773'} NOT NULL)
+
+2014-06-19 20:08:34,800 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 20:08:34.798)
+
+2014-06-19 20:08:34,808 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-06-19 20:08:34,811 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 20:08:34.81'} NOT NULL)
+
+2014-06-19 20:08:34,831 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 20:08:34,850 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 20:08:34,851 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 20:33:45,578 - [ERROR] - from application in New I/O worker #14 
+
+
+! @6ii75i041 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[String]], scala.slick.lifted.Column[Option[org.joda.time.DateTime]])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:34:59,033 - [ERROR] - from application in New I/O worker #14 
+
+
+! @6ii75m4l5 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[String]], scala.slick.lifted.Column[org.joda.time.DateTime])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:35:00,552 - [ERROR] - from application in New I/O worker #14 
+
+
+! @6ii75m71h - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[String]], scala.slick.lifted.Column[org.joda.time.DateTime])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:35:01,610 - [ERROR] - from application in New I/O worker #14 
+
+
+! @6ii75m8g9 - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[String]], scala.slick.lifted.Column[org.joda.time.DateTime])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:35:02,631 - [ERROR] - from application in New I/O worker #14 
+
+
+! @6ii75ma3g - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[String]], scala.slick.lifted.Column[org.joda.time.DateTime])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:35:03,515 - [ERROR] - from application in New I/O worker #14 
+
+
+! @6ii75mbbf - Internal server error, for (GET) [/] ->
+
+play.PlayExceptions$CompilationException: Compilation error[No matching Shape found.
+Slick does not know how to map the given types.
+Possible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).
+  Required level: scala.slick.lifted.ShapeLevel.Flat
+     Source type: (scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[Int], scala.slick.lifted.Column[String], scala.slick.lifted.Column[Option[String]], scala.slick.lifted.Column[org.joda.time.DateTime])
+   Unpacked type: (Int, Int, String, Option[org.joda.time.DateTime])
+     Packed type: Any
+]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14$$anonfun$apply$16.apply(PlayReloader.scala:304) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:304) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2$$anonfun$apply$14.apply(PlayReloader.scala:298) ~[na:na]
+	at scala.Option.map(Option.scala:145) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:298) ~[na:na]
+	at play.PlayReloader$$anon$1$$anonfun$reload$2.apply(PlayReloader.scala:296) ~[na:na]
+	at scala.util.Either$LeftProjection.map(Either.scala:377) ~[scala-library-2.10.4.jar:na]
+	at play.PlayReloader$$anon$1.reload(PlayReloader.scala:296) ~[na:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:104) ~[play_2.10.jar:2.2.2]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10.jar:2.2.2]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library-2.10.4.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library-2.10.4.jar:na]
+
+2014-06-19 20:41:57,315 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 20:41:57,315 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 20:41:57,315 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 20:41:57,319 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 20:41:57,319 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 20:41:57,337 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 20:41:57,366 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 20:41:57,380 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 20:41:57,382 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 20:41:57.382'} NOT NULL)
+
+2014-06-19 20:41:57,400 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 20:41:57.399)
+
+2014-06-19 20:41:57,404 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-06-19 20:41:57,406 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 20:41:57.405'} NOT NULL)
+
+2014-06-19 20:41:57,420 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 20:41:57,438 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 20:41:57,438 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-06-19 21:38:06,478 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
+
+2014-06-19 21:38:06,479 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 21:38:06,479 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
+
+2014-06-19 21:38:06,481 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
+
+2014-06-19 21:38:06,481 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
+
+2014-06-19 21:38:06,507 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
+
+2014-06-19 21:38:06,538 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8
+
+2014-06-19 21:38:06,569 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-06-19 21:38:06,590 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40) NOT NULL,`last_visit` TIMESTAMP DEFAULT {ts '2014-06-19 21:38:06.589'} NOT NULL)
+
+2014-06-19 21:38:06,611 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `app_user` (`job_no`,`name`,`role`,`locked`,`last_ip`,`last_visit`) VALUES ('of546','li','admin','y','1.1.1.1',2014-06-19 21:38:06.611)
+
+2014-06-19 21:38:06,628 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-06-19 21:38:06,636 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`last_version` VARCHAR(254) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-19 21:38:06.635'} NOT NULL)
+
+2014-06-19 21:38:06,652 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-06-19 21:38:06,667 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+INSERT INTO `project` (`name`,`type_id`,`last_version`,`last_updated`) VALUES ('qianmi',1,'1.1.1',2012-12-04 00:00:00.0)
+
+2014-06-19 21:38:06,673 - [INFO] - from play in play-internal-execution-context-1 
 Application started (Dev)
 
