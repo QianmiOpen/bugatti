@@ -13,12 +13,32 @@ import scala.slick.jdbc.meta.MTable
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
+
     app.configuration.getBoolean("sql.not.init").getOrElse(
       AppDB.db.withSession { implicit session =>
-        AppData.userScript
-        AppData.projectScript
+        TableQuery[SubPConfLogContentTable] ::
+        TableQuery[SubPConfLogTable] ::
+        TableQuery[SubPConfContentTable] ::
+        TableQuery[SubPConfTable] ::
+        TableQuery[SubProjectTable] ::
+        TableQuery[PermissionTable] ::
+        TableQuery[EnvironmentTable] ::
+        TableQuery[MemberTable] ::
+        TableQuery[ProjectTable] ::
+        TableQuery[UserTable] ::
+        Nil foreach { table =>
+          if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
+          table.ddl.create
+        }
+
+//        AppData.userScript
+//        AppData.projectScript
+//        AppData.memberScript
+//        AppData.environmentScript
+//        AppData.permissionScript
       }
     )
+
   }
 
 }
@@ -37,6 +57,26 @@ object AppData {
     val q = TableQuery[ProjectTable]
     if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
     q.ddl.create
-    q.insert(Project(Some(1), "qianmi", 1, Some("1.1.1"), Some(new DateTime(2012, 12, 4, 0, 0, 0, 0))))
+  }
+
+  // 成员
+  def memberScript(implicit session: Session) = {
+    val q = TableQuery[MemberTable]
+    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
+    q.ddl.create
+  }
+
+  // 环境
+  def environmentScript(implicit session: Session) = {
+    val q = TableQuery[EnvironmentTable]
+    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
+    q.ddl.create
+  }
+
+  // 权限
+  def permissionScript(implicit session: Session) = {
+    val q = TableQuery[PermissionTable]
+    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
+    q.ddl.create
   }
 }

@@ -6,18 +6,13 @@ import models.PlayCache
 import scala.slick.driver.MySQLDriver.simple._
 
 /**
- * 配置文件修改记录内容
+ * 子项目配置文件修改记录内容
  *
- * CREATE TABLE `sub_project_conf_log_content` (
- *  `id` INT            COMMENT '主键id',
- *  `content` TEXT      COMMENT '内容',
- *  PRIMARY KEY (`id`)
- * )
- *
+ * @author of546
  */
 case class SubPConfLogContent(id: Int, content: String)
 class SubPConfLogContentTable(tag: Tag) extends Table[SubPConfLogContent](tag, "sub_project_conf_log_content") {
-  def id = column[Int]("id", O.PrimaryKey)
+  def id = column[Int]("id", O.PrimaryKey) // 子项目配置文件修改记录编号
   def content = column[String]("content", O.DBType("text"))
 
   override def * = (id, content) <> (SubPConfLogContent.tupled, SubPConfLogContent.unapply _)

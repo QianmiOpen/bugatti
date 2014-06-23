@@ -5,11 +5,13 @@ import models.PlayCache
 
 import scala.slick.driver.MySQLDriver.simple._
 /**
- * 配置文件内容
+ * 子项目配置文件内容
+ *
+ * @author of546
  */
 case class SubPConfContent(id: Int, content: String)
 class SubPConfContentTable(tag: Tag) extends Table[SubPConfContent](tag, "sub_project_conf_content") {
-  def id = column[Int]("id", O.PrimaryKey)
+  def id = column[Int]("id", O.PrimaryKey) // 子项目配置文件编号
   def content = column[String]("content", O.DBType("text"))
 
   override def * = (id, content) <> (SubPConfContent.tupled, SubPConfContent.unapply _)

@@ -9,12 +9,14 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 
 /**
  * 子项目
+ *
+ * @author of546
  */
 case class SubProject(id: Int, pid: Int, version: String, updated: Option[DateTime])
 class SubProjectTable(tag: Tag) extends Table[SubProject](tag, "sub_project"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def pid = column[Int]("pid", O.NotNull)
-  def version = column[String]("version", O.NotNull)
+  def pid = column[Int]("pid", O.NotNull)   // 项目编号
+  def version = column[String]("version", O.NotNull) // 当前版本
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
   override def * = (id, pid, version, updated.?) <> (SubProject.tupled, SubProject.unapply _)

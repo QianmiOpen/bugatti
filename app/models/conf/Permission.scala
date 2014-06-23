@@ -6,6 +6,8 @@ import models.PlayCache
 import scala.slick.driver.MySQLDriver.simple._
 /**
  * 权限
+ *
+ * @author of546
  */
 case class Permission(jobNo: String, functions: Option[String])
 

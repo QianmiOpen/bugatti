@@ -9,12 +9,15 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 
 /**
  * 项目
+ * 项目为综合型，通过类型标示不同
+ *
+ * @author of546
  */
 case class Project(id: Option[Int], name: String, typeId: Int, lastVersion: Option[String], lastUpdated: Option[DateTime])
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name", O.NotNull)
-  def typeId = column[Int]("type_id", O.NotNull)
+  def typeId = column[Int]("type_id", O.NotNull)  // 项目类型
   def lastVersion = column[String]("last_version")
   def lastUpdated= column[DateTime]("last_updated", O.Default(DateTime.now()))
 

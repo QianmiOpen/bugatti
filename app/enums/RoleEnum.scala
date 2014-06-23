@@ -2,12 +2,14 @@ package enums
 
 import scala.slick.driver.MySQLDriver.simple._
 /**
- * 角色
+ * 用户角色
+ *
+ * @author of546
  */
 object RoleEnum extends Enumeration {
   type Role = Value
-  val admin = Value("admin")
-  val user = Value("user")
+  val admin = Value("admin") // 管理员
+  val user = Value("user")   // 普通用户
 
   // implicit val enumMapper = MappedColumnType.base[role, Int](_.id, this.apply)
   //  implicit val enumMapper = MappedColumnType.base[role, String](r => r.toString, i => this.withName(i))
