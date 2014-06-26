@@ -1,5 +1,6 @@
 package enums
 
+import play.api.libs.json._
 import scala.slick.driver.MySQLDriver.simple._
 /**
  * 用户角色
@@ -14,4 +15,9 @@ object RoleEnum extends Enumeration {
   // implicit val enumMapper = MappedColumnType.base[role, Int](_.id, this.apply)
   //  implicit val enumMapper = MappedColumnType.base[role, String](r => r.toString, i => this.withName(i))
   implicit val enumMapper = MappedColumnType.base[Role, String](_.toString, this.withName(_))
+
+
+  implicit val enumReads: Reads[Role] = EnumUtils.enumReads(RoleEnum)
+
+  implicit def enumWrites: Writes[Role] = EnumUtils.enumWrites
 }

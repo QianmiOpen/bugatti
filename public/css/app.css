@@ -1,0 +1,255 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    /* Move down content because we have a fixed navbar that is 50px tall */
+    padding-top: 50px;
+}
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+#footer-button {
+    position: absolute;
+    bottom: 0;
+    /* Set the fixed height of the footer here */
+    margin-bottom: 60px;
+    padding-top: 50px;
+
+}
+
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container {
+    padding: 60px 15px 0;
+}
+.container .text-muted {
+    margin: 20px 0;
+}
+
+#footer > .container {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+code {
+    font-size: 80%;
+}
+
+.m0 {
+    margin: 0;
+}
+.mt-16 {
+    margin-top: -16px;
+}
+
+.table-fixed {
+    table-layout: fixed;
+}
+
+.table-fixed>tbody>tr>td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table-fixed .show {
+    overflow: visible;
+}
+
+.horizonal{
+    width: 100%;
+    vertical-align: top;
+    letter-spacing: -4px;
+    padding-left: 0;
+}
+.horizonal > li{
+    display: inline-block;
+    width: 20%;
+    letter-spacing: 0;
+    margin: 1px;
+}
+.dropdown-menu {
+    max-height: 300px;
+    overflow: auto;
+}
+
+/*.overflow-true{*/
+    /*overflow: scroll;*/
+/*}*/
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+
+
+/*
+ * Sidebar
+ */
+
+/* Hide for mobile, show later */
+.sidebar {
+    display: none;
+}
+.page-sum {
+    display: none;
+}
+@media (min-width: 768px) {
+    .page-sum {
+        display: block;
+    }
+    .sidebar {
+        position: fixed;
+        top: 51px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding: 20px;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        background-color: #f5f5f5;
+        border-right: 1px solid #eee;
+    }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+    margin-right: -21px; /* 20px padding + 1px border */
+    margin-bottom: 20px;
+    margin-left: -20px;
+}
+.nav-sidebar > li > a {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+.nav-sidebar > .active > a {
+    color: #fff;
+    background-color: #428bca;
+}
+.nav-sidebar > .active > a:hover {
+    color: #fff;
+    background-color: #428bca;
+}
+
+/*
+ * Main content
+ */
+
+.main {
+    padding: 20px;
+}
+@media (min-width: 768px) {
+    .main {
+        padding-right: 40px;
+        padding-left: 40px;
+    }
+}
+.main .page-header {
+    margin-top: 0;
+}
+.main .my-wrapper-div {
+    border: solid red 0px;
+    overflow: auto;
+    height:500px;
+}
+
+/*
+ * Placeholder dashboard ideas
+ */
+
+.placeholders {
+    margin-bottom: 30px;
+    text-align: center;
+}
+.placeholders h4 {
+    margin-bottom: 0;
+}
+.placeholder {
+    margin-bottom: 20px;
+}
+.placeholder img {
+    display: inline-block;
+    border-radius: 50%;
+}
+
+/* custom */
+.border-less>tbody>tr>td,
+.border-less>tfoot>tr>td{
+    border-top: none;
+}
+
+.pagination>li>a {
+    cursor: pointer;
+}
+.pagination>pre {
+    padding: 6px 12px;line-height: 20px;
+}
+.msg,.errmsg{padding:3px 24px 3px;*padding:5px 24px 4px;color:#fff;height:20px;line-height:18px;border-radius:3px}.msg{background:#68af02;*border-bottom:2px solid #68af02;z-index:99}.errmsg{background:#ef8f00;*border-bottom:2px solid #ef8f00;z-index:99}.errmsg a{color:#FFF}.errmsg a:link,.errmsg a:visited,.errmsg a:active,.errmsg a:hover{color:#FFF}
+
+/* Have to set height explicity on ui-view to prevent collapsing during animation*/
+.well[ui-view]{
+    height: 65px;
+}
+
+.ui-view-container {
+    position: relative;
+}
+
+[ui-view].ng-enter, [ui-view].ng-leave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    -webkit-transition:all .5s ease-in-out;
+    -moz-transition:all .5s ease-in-out;
+    -o-transition:all .5s ease-in-out;
+    transition:all .5s ease-in-out;
+}
+
+[ui-view].ng-enter {
+    opacity: 0;
+    -webkit-transform:scale3d(0.5, 0.5, 0.5);
+    -moz-transform:scale3d(0.5, 0.5, 0.5);
+    transform:scale3d(0.5, 0.5, 0.5);
+}
+
+[ui-view].ng-enter-active {
+    opacity: 1;
+    -webkit-transform:scale3d(1, 1, 1);
+    -moz-transform:scale3d(1, 1, 1);
+    transform:scale3d(1, 1, 1);
+}
+
+[ui-view].ng-leave {
+    opacity: 1;
+    -webkit-transform:translate3d(0, 0, 0);
+    -moz-transform:translate3d(0, 0, 0);
+    transform:translate3d(0, 0, 0);
+}
+
+[ui-view].ng-leave-active {
+    opacity: 0;
+    -webkit-transform:translate3d(100px, 0, 0);
+    -moz-transform:translate3d(100px, 0, 0);
+    transform:translate3d(100px, 0, 0);
+}

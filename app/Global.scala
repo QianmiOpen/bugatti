@@ -30,12 +30,6 @@ object Global extends GlobalSettings {
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
         }
-
-//        AppData.userScript
-//        AppData.projectScript
-//        AppData.memberScript
-//        AppData.environmentScript
-//        AppData.permissionScript
       }
     )
 
@@ -49,7 +43,7 @@ object AppData {
     val q = TableQuery[UserTable]
     if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
     q.ddl.create
-    q.insert(User("of546", Some("li"), Some(RoleEnum.admin), Some(true), Some("1.1.1.1"), Some(DateTime.now())))
+    q.insert(User("of546", "li", RoleEnum.admin, true, Some("1.1.1.1"), Some(DateTime.now())))
   }
 
   // 项目表初始化
@@ -78,5 +72,6 @@ object AppData {
     val q = TableQuery[PermissionTable]
     if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
     q.ddl.create
+    q.insert(Permission("of111", List(enums.FuncEnum.user, enums.FuncEnum.project)))
   }
 }

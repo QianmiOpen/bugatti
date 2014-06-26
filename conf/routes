@@ -2,8 +2,23 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
+# Enable webjar based resources to be returned
+GET         /webjars/*file                  controllers.WebJarAssets.at(file)
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+# Home page
+GET         /                               controllers.Application.index
+
+# User
+GET         /user                           controllers.conf.UserController.index(page: Int ?=0, pageSize: Int ?=10)
+GET         /user/count                     controllers.conf.UserController.count
+GET         /user/:jobNo                    controllers.conf.UserController.show(jobNo: String)
+GET         /user/:jobNo/permissions        controllers.conf.UserController.permissions(jobNo: String)
+DELETE      /user/:jobNo                    controllers.conf.UserController.delete(jobNo: String)
+POST        /user                           controllers.conf.UserController.save
+PUT         /user/:jobNo                    controllers.conf.UserController.update(jobNo: String)
+
+
+GET         /javascriptRoutes               controllers.Application.javascriptRoutes
+
+# Map static resources from the /public folder to the / URL path, webjar
+GET         /*file                          controllers.Assets.at(path="/public", file)
