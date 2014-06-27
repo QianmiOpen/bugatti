@@ -15,6 +15,7 @@ import utils.DateFormatter._
  * @author of546
  */
 object UserController extends Controller {
+
   implicit val userWrites = Json.writes[User]
   implicit val permissionWrites = Json.writes[Permission]
 

@@ -9,14 +9,16 @@ define(['angular'], function(angular) {
         // 环境
         $stateProvider.state('conf.env', {
             url: "/env",
-            templateUrl: "partials/conf/env/env-index.html"
+            templateUrl: "partials/conf/env/env-index.html",
+            controller: "EnvCtrl"
         });
 
         $stateProvider.state('conf.env.create', {
             url: "/create",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/env/env-new.html"
+                    templateUrl: "partials/conf/env/env-new.html",
+                    controller: "EnvCreateCtrl"
                 }
             }
         });
@@ -25,7 +27,8 @@ define(['angular'], function(angular) {
             url: "/:id/edit",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/env/env-new.html"
+                    templateUrl: "partials/conf/env/env-new.html",
+                    controller: "EnvUpdateCtrl"
                 }
             }
         });
@@ -34,7 +37,8 @@ define(['angular'], function(angular) {
             url: "/:id",
             views: {
                 "@conf": {
-                    templateUrl:"partials/conf/env/env-show.html"
+                    templateUrl:"partials/conf/env/env-show.html",
+                    controller: "EnvShowCtrl"
                 }
             }
         });

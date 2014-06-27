@@ -22,7 +22,15 @@ object Application extends Controller with Security {
         conf.routes.javascript.UserController.permissions,
         conf.routes.javascript.UserController.save,
         conf.routes.javascript.UserController.update,
-        conf.routes.javascript.UserController.delete
+        conf.routes.javascript.UserController.delete,
+
+        // env
+        conf.routes.javascript.EnvController.index,
+        conf.routes.javascript.EnvController.count,
+        conf.routes.javascript.EnvController.show,
+        conf.routes.javascript.EnvController.save,
+        conf.routes.javascript.EnvController.update,
+        conf.routes.javascript.EnvController.delete
       )
     ).as(JAVASCRIPT)
   }

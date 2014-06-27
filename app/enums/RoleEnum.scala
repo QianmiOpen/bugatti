@@ -16,7 +16,6 @@ object RoleEnum extends Enumeration {
   //  implicit val enumMapper = MappedColumnType.base[role, String](r => r.toString, i => this.withName(i))
   implicit val enumMapper = MappedColumnType.base[Role, String](_.toString, this.withName(_))
 
-
   implicit val enumReads: Reads[Role] = EnumUtils.enumReads(RoleEnum)
 
   implicit def enumWrites: Writes[Role] = EnumUtils.enumWrites

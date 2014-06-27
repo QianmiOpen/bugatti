@@ -74,7 +74,6 @@ define(['angular'], function(angular) {
                 });
                 $scope.user.functions = func.join(",");
                 UserService.save(angular.toJson(user), function(data) {
-                    console.log('data=' + angular.toJson(data));
                     if (data.r === 2) {
                         $state.go('^');
                     } else if (data.r == 'exist') {

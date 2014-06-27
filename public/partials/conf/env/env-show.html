@@ -1,0 +1,34 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button></td>
+    <h1 class="pull-left m0">环境详情</h1>
+</div>
+
+<table class="table table-striped border-less m0">
+    <tbody>
+    <tr>
+        <td class="text-right col-sm-3">编号：</td>
+        <td>{{env.id}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">环境：</td>
+        <td>{{env.name}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">nfs服务：</td>
+        <td>{{env.nfServer}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">ip范围：</td>
+        <td>{{env.ipRange}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">备注：</td>
+        <td>{{env.remark}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">级别：</td>
+        <td>{{env.level}}</td>
+    </tr>
+    </tbody>
+
+</table>

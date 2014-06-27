@@ -17,7 +17,10 @@ class EnvironmentTable(tag: Tag) extends Table[Environment](tag, "environment") 
   def ipRange = column[String]("ip_range", O.Nullable, O.DBType("VARCHAR(300)"))
   def remark = column[String]("remark", O.Nullable)
   def level = column[Level]("level", O.NotNull, O.Default(LevelEnum.unsafe)) // 项目安全级别，默认为公共的。
+
   override def * = (id.?, name, remark.?, nfServer.?, ipRange.?, level) <> (Environment.tupled, Environment.unapply _)
+
+  def idx = index("idx_name", name, unique = true)
 }
 object EnvironmentHelper {
 
@@ -29,17 +32,30 @@ object EnvironmentHelper {
     qEnvironment.where(_.id is id).firstOption
   }
 
+  def findByName(name: String) = db withSession { implicit session =>
+    qEnvironment.where(_.name is name).firstOption
+  }
+
+  def count: Int = db withSession { implicit session =>
+    Query(qEnvironment.length).first
+  }
+
+  def all(page: Int, pageSize: Int): List[Environment] = db withSession { implicit session =>
+    val offset = pageSize * page
+    qEnvironment.drop(offset).take(pageSize).list
+  }
+
   def create(environment: Environment) = db withSession { implicit session =>
     qEnvironment.insert(environment)
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qEnvironment.where(_.id === id).delete
+    qEnvironment.where(_.id is id).delete
   }
 
   def update(id: Int, env: Environment) = db withSession { implicit session =>
     val envToUpdate = env.copy(Some(id))
-    qEnvironment.where(_.id === id).update(envToUpdate)
+    qEnvironment.where(_.id is id).update(envToUpdate)
   }
 
 }
