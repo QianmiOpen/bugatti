@@ -16,7 +16,8 @@ define(['angular'], function(angular) {
             url: "/create",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/project/project-new.html"
+                    templateUrl: "partials/conf/project/project-new.html",
+                    controller: "ProjectCreateCtrl"
                 }
             }
         });

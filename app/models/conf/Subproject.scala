@@ -21,6 +21,7 @@ class SubProjectTable(tag: Tag) extends Table[SubProject](tag, "sub_project"){
 
   override def * = (id, pid, version, updated.?) <> (SubProject.tupled, SubProject.unapply _)
   def idx = index("idx_pid", pid)
+  def idxv = index("idx_pid_version", (pid, version), unique = true)
 }
 object SubProjectHelper extends PlayCache {
 

@@ -25,6 +25,11 @@ DELETE        /env/:id                        controllers.conf.EnvController.del
 POST          /env                            controllers.conf.EnvController.save
 PUT           /env/:id                        controllers.conf.EnvController.update(id: Int)
 
+# Project
+GET           /project:id                     controllers.conf.ProjectController.show(id: Int)
+POST          /project                        controllers.conf.ProjectController.save
+
+GET           /types                          controllers.conf.ProjectController.types
 
 
 GET           /javascriptRoutes               controllers.Application.javascriptRoutes

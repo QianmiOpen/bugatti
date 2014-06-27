@@ -87,6 +87,13 @@ code {
     max-height: 300px;
     overflow: auto;
 }
+.col-centered {
+    margin: 0 auto;
+    float: none;
+}
+.a-underline {
+    text-decoration: underline;
+}
 
 /*.overflow-true{*/
     /*overflow: scroll;*/

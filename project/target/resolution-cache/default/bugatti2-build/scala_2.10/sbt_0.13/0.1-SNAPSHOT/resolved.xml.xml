@@ -4,8 +4,8 @@
 		module="bugatti2-build"
 		revision="0.1-SNAPSHOT"
 		status="integration"
-		publication="20140623100724"
-		e:scalaVersion="2.10" e:sbtVersion="0.13"
+		publication="20140627091413"
+		e:sbtVersion="0.13" e:scalaVersion="2.10"
 	>
 		<description>
 		bugatti2-build
@@ -33,15 +33,9 @@
 		<artifact name="bugatti2-build" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 	</publications>
 	<dependencies>
-		<dependency org="org.scala-lang" name="scala-compiler" rev="2.10.2" conf="scala-tool->default,optional(default)"/>
-		<dependency org="org.scala-lang" name="scala-library" rev="2.10.2" conf="scala-tool->default,optional(default);provided->default(compile)"/>
+		<dependency org="org.scala-lang" name="scala-compiler" rev="2.10.3" conf="scala-tool->default,optional(default)"/>
+		<dependency org="org.scala-lang" name="scala-library" rev="2.10.3" conf="scala-tool->default,optional(default);provided->default(compile)"/>
 		<dependency org="org.scala-sbt" name="sbt" rev="0.13.0" conf="provided->default(compile)"/>
-		<dependency org="default" name="global-plugins" rev="0.0" conf="compile->default(compile)" e:scalaVersion="2.10" e:sbtVersion="0.13">
-			<artifact name="global-plugins" type="pom" ext="pom" conf="pom"/>
-			<artifact name="global-plugins" type="jar" ext="jar" conf="compile"/>
-			<artifact name="global-plugins" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="global-plugins" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="com.typesafe.play" name="sbt-plugin" rev="2.2.2" conf="compile->default(compile)" e:scalaVersion="2.10" e:sbtVersion="0.13"/>
+		<dependency org="com.typesafe.play" name="sbt-plugin" rev="2.2.2" conf="compile->default(compile)" e:sbtVersion="0.13" e:scalaVersion="2.10"/>
 	</dependencies>
 </ivy-module>

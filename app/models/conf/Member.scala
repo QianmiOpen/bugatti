@@ -6,20 +6,22 @@ import enums.LevelEnum
 import enums.LevelEnum.Level
 
 import scala.slick.driver.MySQLDriver.simple._
+import scala.slick.jdbc.JdbcBackend
 
 /**
  * 资源成员
  *
  * @author of546
  */
-case class Member(id: Int, pid: Int, level: Level, job_no: String)
+case class Member(id: Option[Int], pid: Int, level: Level, job_no: String)
 class MemberTable(tag: Tag) extends Table[Member](tag, "member") {
-  def id = column[Int]("id", O.PrimaryKey)
+  def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def pid = column[Int]("pid", O.NotNull) // 项目编号
   def level = column[Level]("level", O.NotNull, O.Default(LevelEnum.unsafe)) // 成员级别(对应环境级别)
   def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
 
-  override def * = (id, pid, level, jobNo) <> (Member.tupled, Member.unapply _)
+  override def * = (id.?, pid, level, jobNo) <> (Member.tupled, Member.unapply _)
+  def idx = index("idx_pid_no", (pid, jobNo), unique = true)
 }
 object MemberHelper extends PlayCache {
 
@@ -32,7 +34,11 @@ object MemberHelper extends PlayCache {
   }
 
   def create(member: Member) = db withSession { implicit session =>
-    qMember.insert(member)
+    create_(member)
+  }
+
+  def create_(member: Member)(implicit session: JdbcBackend#Session) = {
+    qMember.insert(member)(session)
   }
 
   def delete(id: Int) = db withSession { implicit session =>
@@ -40,7 +46,7 @@ object MemberHelper extends PlayCache {
   }
 
   def update(id: Int, member: Member) = db withSession { implicit session =>
-    val member2update = member.copy(id)
+    val member2update = member.copy(Some(id))
     qMember.where(_.id is id).update(member2update)
   }
 

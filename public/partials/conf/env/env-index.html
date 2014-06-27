@@ -20,7 +20,7 @@
         <tr ng-repeat="env in envs">
             <td><input type="checkbox" ng-model="ids[env.id]" ng-checked="master" ng-change="checked(env.id, ids[env.id])"></td>
             <td><a ui-sref="conf.env.detail({id: env.id})">{{env.name}}</a></td>
-            <td>{{env.level}}</td>
+            <td>{{env.level | level}}</td>
             <td>{{env.nfServer}}</td>
             <td>{{env.ipRange}}</td>
             <td>{{env.remark}}</td>

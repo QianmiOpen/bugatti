@@ -25,6 +25,7 @@ object Global extends GlobalSettings {
         TableQuery[EnvironmentTable] ::
         TableQuery[MemberTable] ::
         TableQuery[ProjectTable] ::
+        TableQuery[ProjectTypeTable] ::
         TableQuery[UserTable] ::
         Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
@@ -74,4 +75,5 @@ object AppData {
     q.ddl.create
     q.insert(Permission("of111", List(enums.FuncEnum.user, enums.FuncEnum.project)))
   }
+
 }

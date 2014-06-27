@@ -19,7 +19,6 @@ class EnvironmentTable(tag: Tag) extends Table[Environment](tag, "environment") 
   def level = column[Level]("level", O.NotNull, O.Default(LevelEnum.unsafe)) // 项目安全级别，默认为公共的。
 
   override def * = (id.?, name, remark.?, nfServer.?, ipRange.?, level) <> (Environment.tupled, Environment.unapply _)
-
   def idx = index("idx_name", name, unique = true)
 }
 object EnvironmentHelper {

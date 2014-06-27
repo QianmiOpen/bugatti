@@ -30,7 +30,12 @@ object Application extends Controller with Security {
         conf.routes.javascript.EnvController.show,
         conf.routes.javascript.EnvController.save,
         conf.routes.javascript.EnvController.update,
-        conf.routes.javascript.EnvController.delete
+        conf.routes.javascript.EnvController.delete,
+
+        // project
+        conf.routes.javascript.ProjectController.show,
+        conf.routes.javascript.ProjectController.save,
+        conf.routes.javascript.ProjectController.types
       )
     ).as(JAVASCRIPT)
   }

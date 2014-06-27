@@ -8,7 +8,7 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.directives', []);
 
-    /* 用户权限 */
+    /* 用户权限列表展示 */
     app.directive('permission', ['UserService', function(UserService) {
         return {
             restrict: 'E',
