@@ -35,7 +35,9 @@ object Application extends Controller with Security {
         // project
         conf.routes.javascript.ProjectController.show,
         conf.routes.javascript.ProjectController.save,
-        conf.routes.javascript.ProjectController.types
+        conf.routes.javascript.ProjectController.types,
+        conf.routes.javascript.ProjectController.index,
+        conf.routes.javascript.ProjectController.count
       )
     ).as(JAVASCRIPT)
   }

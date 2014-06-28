@@ -47,8 +47,17 @@ object ProjectController extends Controller {
     )
   }
 
+  // 项目所有类型
   def types = Action { implicit request =>
     Ok(Json.toJson(ProjectTypeHelper.all))
+  }
+
+  def index(page: Int, pageSize: Int, search: Option[String]) = Action {
+    Ok(Json.toJson(ProjectHelper.all(page, pageSize)))
+  }
+
+  def count(search: Option[String]) = Action {
+    Ok(Json.toJson(ProjectHelper.count))
   }
 
 }

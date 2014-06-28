@@ -9,6 +9,12 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.show(id)).success(callback);
             },
+            getPage: function(page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.index(page, pageSize)).success(callback);
+            },
+            count: function(callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.count()).success(callback);
+            },
             save: function(project, callback) {
                 $http.post(PlayRoutes.controllers.conf.ProjectController.save().url, project).success(callback)
             },

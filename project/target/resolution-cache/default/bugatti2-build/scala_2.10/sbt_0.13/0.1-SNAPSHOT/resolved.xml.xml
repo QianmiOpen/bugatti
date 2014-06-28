@@ -4,7 +4,7 @@
 		module="bugatti2-build"
 		revision="0.1-SNAPSHOT"
 		status="integration"
-		publication="20140627091413"
+		publication="20140628093638"
 		e:sbtVersion="0.13" e:scalaVersion="2.10"
 	>
 		<description>

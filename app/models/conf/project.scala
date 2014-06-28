@@ -44,6 +44,15 @@ object ProjectHelper extends PlayCache {
     qProject.where(_.name is name).firstOption
   }
 
+  def count: Int = db withSession { implicit session =>
+    Query(qProject.length).first
+  }
+
+  def all(page: Int, pageSize: Int): List[Project] = db withSession { implicit session =>
+    val offset = pageSize * page
+    qProject.drop(offset).take(pageSize).list
+  }
+
   def create(project: Project) = db withSession { implicit session =>
     qProject.insert(project)
   }

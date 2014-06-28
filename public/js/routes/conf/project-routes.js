@@ -9,7 +9,8 @@ define(['angular'], function(angular) {
         // 项目
         $stateProvider.state('conf.project', {
             url: "/project",
-            templateUrl: "partials/conf/project/project-index.html"
+            templateUrl: "partials/conf/project/project-index.html",
+            controller: "ProjectCtrl"
         });
 
         $stateProvider.state('conf.project.create', {

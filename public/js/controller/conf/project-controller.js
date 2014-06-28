@@ -7,7 +7,24 @@ define(['angular'], function(angular) {
     app.controller('ProjectCtrl', ['$scope', '$modal', 'ProjectService', function($scope, $modal, ProjectService) {
         $scope.currentPage = 1;
         $scope.pageSize = 10;
-        
+
+        // count
+        ProjectService.count(function(data) {
+            $scope.totalItems = data;
+        });
+
+        // list
+        ProjectService.getPage(0, $scope.pageSize, function(data) {
+            $scope.projects = data;
+        });
+
+        // page
+        $scope.setPage = function (pageNo) {
+            ProjectService.getPage(pageNo - 1, $scope.pageSize, function(data) {
+                $scope.projects = data;
+            });
+        };
+
     }]);
 
 
@@ -23,7 +40,6 @@ define(['angular'], function(angular) {
         function($scope, $stateParams, $state, ProjectService) {
 
             $scope.saveOrUpdate = function(project) {
-
                 ProjectService.save(angular.toJson(project), function(data) {
                     if (data.r === 1) {
                         $state.go('^');

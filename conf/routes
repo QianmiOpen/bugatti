@@ -26,6 +26,8 @@ POST          /env                            controllers.conf.EnvController.sav
 PUT           /env/:id                        controllers.conf.EnvController.update(id: Int)
 
 # Project
+GET           /project                        controllers.conf.ProjectController.index(page: Int ?=0, pageSize: Int ?=10, search: Option[String])
+GET           /project/count                  controllers.conf.ProjectController.count(search: Option[String])
 GET           /project:id                     controllers.conf.ProjectController.show(id: Int)
 POST          /project                        controllers.conf.ProjectController.save
 

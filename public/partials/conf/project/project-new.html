@@ -21,9 +21,12 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">类型：</label>
         <div class="col-sm-3">
-            <select class="form-control" ng-model="project.typeId" ng-options="o.id as o.name for o in types">
+            <select name="typeId" id="typeId" class="form-control" ng-model="project.typeId" ng-options="o.id as o.name for o in types" required>
                 <option value="">-- 选择类型 --</option>
             </select>
+        </div>
+        <div ng-show="form.typeId.$dirty && form.typeId.$invalid" class="has-error">
+            <span ng-show="form.typeId.$error.required" class="control-label">请选择项目类型</span>
         </div>
     </div>
 
