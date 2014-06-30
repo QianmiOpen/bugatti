@@ -25,6 +25,7 @@ object Global extends GlobalSettings {
         TableQuery[EnvironmentTable] ::
         TableQuery[MemberTable] ::
         TableQuery[ProjectTable] ::
+        TableQuery[AttributeTable] ::
         TableQuery[ProjectTypeTable] ::
         TableQuery[UserTable] ::
         Nil foreach { table =>

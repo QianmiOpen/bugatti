@@ -41,6 +41,16 @@ define(['angular'], function(angular) {
             }
         });
 
+        // 子项目
+        $stateProvider.state('conf.project.sub', {
+            url: "/:id/sub",
+            views: {
+                "@conf": {
+                    templateUrl: "partials/conf/project/sub-index.html"
+                }
+            }
+        });
+
     }]);
 
 });

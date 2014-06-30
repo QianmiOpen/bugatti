@@ -28,4 +28,5 @@ define(['angular'], function(angular) {
             return input === 'safe' ? '\u5b89\u5168' : '\u666e\u901a'
         };
     });
+
 });
