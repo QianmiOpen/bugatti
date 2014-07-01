@@ -33,7 +33,8 @@ GET           /project/count                   controllers.conf.ProjectControlle
 GET           /project:id                      controllers.conf.ProjectController.show(id: Int)
 POST          /project                         controllers.conf.ProjectController.save
 
-GET           /tempaltes                      controllers.conf.TemplateController.all
+# Project
+GET           /tempaltes                       controllers.conf.TemplateController.all
 
 #Task
 POST          /task/lastStatus                 controllers.task.TaskController.findLastTaskStatus

@@ -14,17 +14,17 @@ class MemberSpec extends Specification {
 
   "Member Test" should {
     "insert success return 1" in new WithApplication {
-      MemberHelper.create(Member(1, 1, LevelEnum.unsafe, "job_no")) === 1
+      MemberHelper.create(Member(Some(1), 1, LevelEnum.unsafe, "job_no")) === 1
     }
 
     "delete success return 1" in new WithApplication {
-      MemberHelper.create(Member(1, 1, LevelEnum.unsafe, "job_no"))
+      MemberHelper.create(Member(Some(1), 1, LevelEnum.unsafe, "job_no"))
       MemberHelper.delete(1) === 1
     }
 
     "update success return 1" in new WithApplication {
       val testLevel = LevelEnum.safe
-      MemberHelper.create(Member(1, 1, LevelEnum.unsafe, "job_no"))
+      MemberHelper.create(Member(Some(1), 1, LevelEnum.unsafe, "job_no"))
       val member = MemberHelper.findById(1).get
       MemberHelper.update(1, member.copy(level = testLevel))
       val member2 = MemberHelper.findById(1).get

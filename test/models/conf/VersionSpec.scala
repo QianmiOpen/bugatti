@@ -9,11 +9,11 @@ import play.api.test._
  * Created by li on 14-6-20.
  */
 @RunWith(classOf[JUnitRunner])
-class SubPConfLogContentSpec extends Specification {
+class VersionSpec extends Specification {
 
-  "Sub project conf log content" should {
+  "Sub project" should {
     "insert success return 1" in new WithApplication {
-      SubPConfLogContentHelper.create(SubPConfLogContent(1, "测试")) === 1
+      VersionHelper.create(Version(1, 1, "1.1.1", Some(DateTime.now()))) === 1
     }
   }
 

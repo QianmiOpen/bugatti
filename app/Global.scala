@@ -17,11 +17,11 @@ object Global extends GlobalSettings {
 
     app.configuration.getBoolean("sql.not.init").getOrElse(
       AppDB.db.withSession { implicit session =>
-        TableQuery[SubPConfLogContentTable] ::
-        TableQuery[SubPConfLogTable] ::
-        TableQuery[SubPConfContentTable] ::
-        TableQuery[SubPConfTable] ::
-        TableQuery[SubProjectTable] ::
+        TableQuery[ConfLogContentTable] ::
+        TableQuery[ConfLogTable] ::
+        TableQuery[ConfContentTable] ::
+        TableQuery[ConfTable] ::
+        TableQuery[VersionTable] ::
         TableQuery[PermissionTable] ::
         TableQuery[EnvironmentTable] ::
         TableQuery[MemberTable] ::

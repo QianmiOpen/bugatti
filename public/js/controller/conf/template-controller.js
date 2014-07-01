@@ -10,22 +10,23 @@ define(['angular'], function(angular) {
     }]);
 
     app.controller('TemplateCreateCtrl', ['$scope', '$stateParams', '$state', 'TemplateService', function($scope, $stateParams, $state, TemplateService) {
-        $scope.template = { attrs: [] };
+        $scope.template = { items: [] };
 
         $scope.add = function() {
-            $scope.template.attrs.push({
-                key: "",
-                value: ""
+            $scope.template.items.push({
+                name: "",
+                desc: "",
+                order: 0
             });
         };
         $scope.remove = function(index) {
-            $scope.template.attrs.splice(index, 1);
+            $scope.template.items.splice(index, 1);
         }
 
         // insert
-        $scope.saveOrUpdate = function(template, attrs) {
+        $scope.saveOrUpdate = function(template, items) {
             console.log(angular.toJson(template))
-            console.log(angular.toJson(attrs))
+            console.log(angular.toJson(items))
         };
 
     }]);

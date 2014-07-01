@@ -9,11 +9,11 @@ import play.api.test._
  * Created by li on 14-6-20.
  */
 @RunWith(classOf[JUnitRunner])
-class SubPConfLogSpec extends Specification {
+class ConfLogSpec extends Specification {
 
   "Sub project conf log" should {
     "insert success return 1"  in new WithApplication {
-      SubPConfLogHelper.create(SubPConfLog(1, 1, 1, 1, "jdbc.properties", "/temp1/jdbc.properties", Some("remark"), Some(DateTime.now()))) === 1
+      ConfLogHelper.create(ConfLog(1, 1, 1, 1, "jdbc.properties", "/temp1/jdbc.properties", Some("remark"), Some(DateTime.now()))) === 1
     }
   }
 

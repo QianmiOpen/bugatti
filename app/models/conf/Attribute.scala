@@ -5,15 +5,15 @@ import play.api.Play.current
 /**
  * 项目属性
  */
-case class Attribute(id: Option[Int], pid: Int, key: String, value: String)
+case class Attribute(id: Option[Int], pid: Int, name: String, value: String)
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def pid = column[Int]("pid", O.NotNull)   // 项目编号
-  def key = column[String]("key", O.NotNull)
-  def value = column[String]("value", O.NotNull)
+  def name = column[String]("name", O.NotNull)   // 属性名称（同TemplateInfo.itemName)
+  def value = column[String]("value", O.NotNull) // 属性值
 
-  override def * = (id.?, pid, key, value) <> (Attribute.tupled, Attribute.unapply _)
+  override def * = (id.?, pid, name, value) <> (Attribute.tupled, Attribute.unapply _)
   def idx = index("idx_pid", pid)
 }
 
@@ -26,7 +26,7 @@ object AttributeHelper {
   }
 
   def exists(typeId: Int, name: String): Boolean = {
-    findByPid(typeId).filter(_.key == name).isEmpty
+    findByPid(typeId).filter(_.name == name).isEmpty
   }
 
   def create(attr: Attribute) = db withSession { implicit session =>

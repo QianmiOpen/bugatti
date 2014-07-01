@@ -1,12 +1,12 @@
 <div class="page-header clearfix">
     <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button>
-    <h1 class="pull-left m0">项目类型添加</h1>
+    <h1 class="pull-left m0">项目模板添加</h1>
 </div>
 
 <form name="form" class="form-horizontal" novalidate>
 
     <div class="form-group">
-        <label for="name" class="col-sm-3 control-label">类型名称：</label>
+        <label for="name" class="col-sm-3 control-label">模板名称：</label>
         <div class="col-sm-4">
             <input type="text" class="form-control" ng-model="template.name" name="name" id="name" ng-maxlength="8" placeholder="必填，唯一" required>
         </div>
@@ -18,11 +18,14 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-3 control-label">类型属性：</label>
-        <div class="col-sm-5">
-            <div ng-repeat="attr in template.attrs">
-                <input type="text" placeholder="属性名" ng-model="attr.key" required>
-                <input type="text" placeholder="属性值" ng-model="attr.value" required>
+        <label class="col-sm-3 control-label">模板属性：</label>
+        <div class="col-sm-8">
+            <div ng-repeat="item in template.items">
+                <input type="text" placeholder="属性名称" ng-model="item.name" required>
+                <input type="text" placeholder="属性描述" ng-model="item.desc">
+                <select ng-model="item.order" ng-options="n for n in [] | range:0:9" required>
+                    <option value="">顺序</option>
+                </select>
                 <a href="" ng-click="remove($index)">X</a>
             </div>
             <button ng-click="add()">+ 属性</button>
@@ -31,7 +34,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-5">
-            <button class="btn btn-success" ng-click="saveOrUpdate(template, attrs)" ng-disabled="form.$invalid"> 保 存 </button>
+            <button class="btn btn-success" ng-click="saveOrUpdate(template, items)" ng-disabled="form.$invalid"> 保 存 </button>
         </div>
     </div>
 </form>
