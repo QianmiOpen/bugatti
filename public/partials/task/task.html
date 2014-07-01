@@ -32,21 +32,22 @@
                         </div>
                     </div>
                 </td>
+                <!-- ========================================操作======================================== -->
                 <td class="show">
                     <div class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="" ng-click="deploy()" title="部署"><span class="glyphicon glyphicon-import"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="" ng-click="showVersion(pro.id)" title="部署"><span class="glyphicon glyphicon-import"></span></a>
                         <ul class="dropdown-menu">
-                            <li ng-repeat="ope in operates">
-                                <a ng-click="shortcut(ope.id, task.task.id)">{{ope.name}}</a>
+                            <li ng-repeat="vs in versions">
+                                <a ng-click="deploy(pro.id, vs)">{{vs}}</a>
+                            </li>
+                            <li>
+                                <a ng-click="">more ...</a>
                             </li>
                         </ul>
-                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="执行日志"><span class="glyphicon glyphicon-film"></span></a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="" title="快捷任务"><span class="glyphicon glyphicon-list"></span></a>
-                        <ul class="dropdown-menu">
-                            <li ng-repeat="ope in operates">
-                                <a ng-click="shortcut(ope.id, task.task.id)">{{ope.name}}</a>
-                            </li>
-                        </ul>
+                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="启动"><span class="glyphicon glyphicon-play"></span></a>
+                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="关闭"><span class="glyphicon glyphicon-stop"></span></a>
+                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="重启"><span class="glyphicon glyphicon-repeat"></span></a>
+                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="nfs"><span class="glyphicon glyphicon-folder-open"></span></a>
                     </div>
                 </td>
             </tr>

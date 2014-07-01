@@ -38,6 +38,18 @@ object TaskController extends Controller {
 
   val httpURLSNAP = "http://nexus.dev.ofpay.com/nexus/content/repositories/snapshots/"
 
+  /**
+   * 根据项目id获取最近的5个版本号，按照时间倒序
+   * 在线上环境会过滤掉SNAPSHOT版本号
+   * @param projectId
+   * @param envId
+   * @return
+   */
+  def getVersions(projectId: Int, envId: Int) = Action{
+    val list = VersionHelper.findByPidAndEid(projectId, envId)
+    Ok(Json.toJson(list.reverse.drop(list.length - 5).reverse))
+  }
+
   def findVersionsByProjects = Action(parse.json){implicit request =>
     request.body match {
       case JsObject(fields) => {
@@ -122,5 +134,6 @@ object TaskController extends Controller {
 
   implicit val projectWrites = Json.writes[Project]
   implicit val taskWrites = Json.writes[Task]
+  implicit val versionWrites = Json.writes[Version]
 
 }

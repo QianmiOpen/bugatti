@@ -50,9 +50,10 @@ object Application extends Controller with Security {
         conf.routes.javascript.TemplateController.items,
 
         //task
-        task.routes.javascript.TaskController.findLastTaskStatus
-        ,task.routes.javascript.TaskController.joinProcess
-        ,task.routes.javascript.TaskController.createNewTaskQueue
+        task.routes.javascript.TaskController.findLastTaskStatus,
+        task.routes.javascript.TaskController.joinProcess,
+        task.routes.javascript.TaskController.getVersions,
+        task.routes.javascript.TaskController.createNewTaskQueue
       )
     ).as(JAVASCRIPT)
   }

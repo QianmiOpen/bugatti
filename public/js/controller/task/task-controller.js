@@ -8,6 +8,8 @@ define(['angular'], function(angular) {
 //=====================================变量========================================
         $scope.projectStatus = []
 
+        $scope.versions = []
+
 //=====================================环境========================================
         //环境列表
         EnvService.getAll(function(data){
@@ -170,11 +172,23 @@ define(['angular'], function(angular) {
             return true
         }
 //=====================================新建任务 （部署 + 启动 + 关闭 + 重启）========================================
-        $scope.deploy = function(){
+        $scope.showVersion = function(pid){
+            console.log(pid)
+
+            $scope.versions = []
+            TaskService.getVersions(pid, $scope.activeEnv, function(data){
+                for(var dIndex in data) {
+                    $scope.versions.push(data[dIndex].version)
+                }
+                console.log($scope.versions)
+            })
+        }
+
+        $scope.deploy = function(projectId, version){
             $scope.taskQueue = {}
             $scope.taskQueue.envId = $scope.activeEnv
-            $scope.taskQueue.projectId = 1
-            $scope.taskQueue.version = "1.6.3-RELEASE"
+            $scope.taskQueue.projectId = projectId
+            $scope.taskQueue.version = version
             $scope.taskQueue.templateId = 1
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
 
