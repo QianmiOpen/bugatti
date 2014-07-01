@@ -33,8 +33,13 @@ GET           /project/count                   controllers.conf.ProjectControlle
 GET           /project:id                      controllers.conf.ProjectController.show(id: Int)
 POST          /project                         controllers.conf.ProjectController.save
 
-# Project
-GET           /tempaltes                       controllers.conf.TemplateController.all
+# Template
+GET           /tempalte/all                    controllers.conf.TemplateController.all
+GET           /tempalte/:id                    controllers.conf.TemplateController.show(id: Int)
+GET           /tempalte/:tid/items             controllers.conf.TemplateController.items(tid: Int)
+DELETE        /tempalte/:id                    controllers.conf.TemplateController.delete(id: Int)
+POST          /template                        controllers.conf.TemplateController.save
+PUT           /template/:id                    controllers.conf.TemplateController.update(id: Int)
 
 #Task
 POST          /task/lastStatus                 controllers.task.TaskController.findLastTaskStatus

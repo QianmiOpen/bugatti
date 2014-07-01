@@ -40,8 +40,14 @@ define(['angular'], function(angular) {
         function($scope, $stateParams, $state, ProjectService, TemplateService) {
 
             $scope.saveOrUpdate = function(project) {
+
+                project.items = [];
+                angular.forEach($scope.items, function(item) {
+                    project.items.push({name: item.itemName, value: item.value})
+                });
+
                 ProjectService.save(angular.toJson(project), function(data) {
-                    if (data.r === 1) {
+                    if (data.r >= 0) {
                         $state.go('^');
                     } else if (data.r == 'exist') {
                         $scope.form.name.$invalid = true;
@@ -50,9 +56,21 @@ define(['angular'], function(angular) {
                 });
             };
 
+            // load template all
             TemplateService.all(function(data) {
                 $scope.templates = data;
             });
+
+            // template change
+            $scope.change = function(x) {
+                $scope.items = [];
+                if(typeof x === 'undefined') {
+                    return;
+                }
+                TemplateService.items(x, function(data) {
+                    $scope.items = data;
+                });
+            }
     }]);
 
 });

@@ -9,7 +9,8 @@ define(['angular'], function(angular) {
         // 项目
         $stateProvider.state('conf.template', {
             url: "/template",
-            templateUrl: "partials/conf/template/template-index.html"
+            templateUrl: "partials/conf/template/template-index.html",
+            controller: 'TemplateCtrl'
         });
 
         $stateProvider.state('conf.template.create', {
@@ -26,7 +27,8 @@ define(['angular'], function(angular) {
             url: "/:id/edit",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/template/template-new.html"
+                    templateUrl: "partials/conf/template/template-edit.html",
+                    controller: 'TemplateUpdateCtrl'
                 }
             }
         });
@@ -35,7 +37,8 @@ define(['angular'], function(angular) {
             url: "/:id",
             views: {
                 "@conf": {
-                    templateUrl:"partials/conf/template/template-show.html"
+                    templateUrl:"partials/conf/template/template-show.html",
+                    controller: 'TemplateShowCtrl'
                 }
             }
         });

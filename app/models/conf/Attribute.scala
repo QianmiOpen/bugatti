@@ -2,18 +2,21 @@ package models.conf
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
+
+import scala.slick.jdbc.JdbcBackend
+
 /**
  * 项目属性
  */
-case class Attribute(id: Option[Int], pid: Int, name: String, value: String)
+case class Attribute(id: Option[Int], pid: Option[Int], name: String, value: Option[String])
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def pid = column[Int]("pid", O.NotNull)   // 项目编号
   def name = column[String]("name", O.NotNull)   // 属性名称（同TemplateInfo.itemName)
-  def value = column[String]("value", O.NotNull) // 属性值
+  def value = column[String]("value", O.Nullable) // 属性值
 
-  override def * = (id.?, pid, name, value) <> (Attribute.tupled, Attribute.unapply _)
+  override def * = (id.?, pid.?, name, value.?) <> (Attribute.tupled, Attribute.unapply _)
   def idx = index("idx_pid", pid)
 }
 
@@ -31,6 +34,11 @@ object AttributeHelper {
 
   def create(attr: Attribute) = db withSession { implicit session =>
     qAttribute.insert(attr)
+  }
+
+  // batch
+  def create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
+    qAttribute.insertAll(attr: _*)(session)
   }
 
   def delete(id: Int) = db withSession { implicit session =>

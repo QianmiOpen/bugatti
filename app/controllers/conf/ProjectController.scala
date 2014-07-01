@@ -23,8 +23,16 @@ object ProjectController extends Controller {
       "templateId" -> number,
       "subTotal" -> ignored(0),
       "lastVersion" -> optional(text),
-      "lastUpdated" -> optional(jodaDate)
-    )(Project.apply)(Project.unapply)
+      "lastUpdated" -> optional(jodaDate),
+      "items" -> list(
+        mapping(
+          "id" -> optional(number),
+          "tid" -> optional(number),
+          "name" -> nonEmptyText,
+          "value" -> optional(text)
+        )(Attribute.apply)(Attribute.unapply)
+      )
+    )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
   def index(page: Int, pageSize: Int, search: Option[String]) = Action {

@@ -37,9 +37,11 @@
         </thead>
         <tbody>
         <tr ng-repeat="project in projects">
-            <td><a ui-sref="conf.project.sub({id: project.id})">{{project.id}}</a></td>
+            <td><a ui-sref="conf.project.version({id: project.id})">{{project.id}}</a></td>
             <td><a ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
-            <td>{{project.templateId}}</td>
+            <td>
+                <template-show tid="{{project.templateId}}"></template-show>
+            </td>
             <td class="show">{{project.lastVersion}}
                 <a href="#" class="a-underline">1.1.1</a>
                 &nbsp;

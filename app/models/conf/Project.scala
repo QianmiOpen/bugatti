@@ -17,6 +17,10 @@ import scala.slick.jdbc.JdbcBackend
  * @author of546
  */
 case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVersion: Option[String], lastUpdated: Option[DateTime])
+case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVersion: Option[String], lastUpdated: Option[DateTime], items: List[Attribute]) {
+  def toProject = Project(id, name, templateId, subTotal, lastVersion, lastUpdated)
+}
+
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name", O.NotNull)
@@ -44,6 +48,11 @@ object ProjectHelper extends PlayCache {
     qProject.where(_.name is name).firstOption
   }
 
+  // templateId
+  def countByTid(tid: Int) = db withSession { implicit session =>
+    Query(qProject.where(_.templateId is tid).length).first
+  }
+
   def count: Int = db withSession { implicit session =>
     Query(qProject.length).first
   }
@@ -65,10 +74,13 @@ object ProjectHelper extends PlayCache {
     qProject.returning(qProject.map(_.id)).insert(project)(session)
   }
 
-  def create(project: Project, jobNo: String) = db withTransaction { implicit session =>
-    val pid = create_(project)
-    val member = Member(None, pid, LevelEnum.safe, jobNo)
-    MemberHelper.create_(member)
+  def create(projectForm: ProjectForm, jobNo: String) = db withTransaction { implicit session =>
+    val pid = create_(projectForm.toProject)
+    val attrs = projectForm.items.map(item =>
+      Attribute(None, Some(pid), item.name, item.value)
+    )
+    AttributeHelper.create(attrs)
+    MemberHelper.create_(Member(None, pid, LevelEnum.safe, jobNo))
   }
 
   def delete(id: Int) = db withSession { implicit session =>

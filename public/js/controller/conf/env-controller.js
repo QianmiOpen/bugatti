@@ -97,4 +97,5 @@ define(['angular'], function(angular) {
             $scope.reset();
         });
     }]);
+
 });

@@ -1,6 +1,6 @@
 <div class="page-header clearfix">
     <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button>
-    <h1 class="pull-left m0">项目模板添加</h1>
+    <h1 class="pull-left m0">项目模板修改</h1>
 </div>
 
 <form name="form" class="form-horizontal" novalidate>
@@ -35,6 +35,8 @@
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-5">
             <button class="btn btn-success" ng-click="saveOrUpdate(template)" ng-disabled="form.$invalid"> 保 存 </button>
+            &nbsp;
+            <button class="btn btn-link" ng-click="reset()" ng-disabled="isUnchanged(template)" >重置</button>
         </div>
     </div>
 </form>

@@ -27,7 +27,7 @@ object Global extends GlobalSettings {
         TableQuery[MemberTable] ::
         TableQuery[ProjectTable] ::
         TableQuery[AttributeTable] ::
-        TableQuery[TemplateInfoTable] ::
+        TableQuery[TemplateItemTable] ::
         TableQuery[TemplateTable] ::
         TableQuery[UserTable] ::
         TableQuery[TaskTemplateTable] ::
@@ -155,7 +155,7 @@ object AppData {
     template.ddl.create
 
     val projectTypeSeq = Seq(
-      Template(1, "webapi")
+      Template(Some(1), "webapi")
     )
     template.insertAll(projectTypeSeq: _*)
   }

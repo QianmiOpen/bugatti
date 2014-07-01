@@ -42,6 +42,12 @@ object Application extends Controller with Security {
 
         // template
         conf.routes.javascript.TemplateController.all,
+        conf.routes.javascript.TemplateController.save,
+        conf.routes.javascript.TemplateController.delete,
+        conf.routes.javascript.TemplateController.show,
+        conf.routes.javascript.TemplateController.update,
+        // template item
+        conf.routes.javascript.TemplateController.items,
 
         //task
         task.routes.javascript.TaskController.findLastTaskStatus

@@ -8,7 +8,7 @@
     <div class="form-group">
         <label for="name" class="col-sm-3 control-label">项目名称：</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" ng-model="project.name" name="name" id="name" ng-maxlength="30" placeholder="必填，中英文和数字" required>
+            <input type="text" class="form-control" ng-model="project.name" name="name" id="name" ng-maxlength="200" placeholder="必填，中英文和数字" required>
         </div>
         <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
             <span ng-show="form.name.$error.required" class="control-label">请输入项目名称</span>
@@ -21,12 +21,22 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">模板：</label>
         <div class="col-sm-3">
-            <select name="templateId" id="templateId" class="form-control" ng-model="project.templateId" ng-options="o.id as o.name for o in templates" required>
+            <select ng-change="change(project.templateId)" name="templateId" id="templateId" class="form-control" ng-model="project.templateId" ng-options="o.id as o.name for o in templates" required>
                 <option value="">-- 选择模板 --</option>
             </select>
         </div>
         <div ng-show="form.templateId.$dirty && form.templateId.$invalid" class="has-error">
             <span ng-show="form.templateId.$error.required" class="control-label">请选择项目模板</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="items">
+        <label class="col-sm-3 control-label">模板属性：</label>
+        <div class="col-sm-5">
+            <div class="input-group" ng-repeat="item in items">
+                <div class="input-group-addon" >{{item.itemName}}</div>
+                <input class="form-control" ng-model="item.value">
+            </div>
         </div>
     </div>
 

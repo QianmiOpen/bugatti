@@ -42,11 +42,11 @@ define(['angular'], function(angular) {
         });
 
         // 子项目
-        $stateProvider.state('conf.project.sub', {
-            url: "/:id/sub",
+        $stateProvider.state('conf.project.version', {
+            url: "/:id/version",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/project/sub-index.html"
+                    templateUrl: "partials/conf/project/version-index.html"
                 }
             }
         });

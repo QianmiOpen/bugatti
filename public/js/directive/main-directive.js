@@ -24,6 +24,21 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    // 模板名称显示
+    app.directive('templateShow', ['TemplateService', function(TemplateService) {
+        return {
+            restrict: 'E',
+            scope: {
+                tid: '@'
+            },
+            template: '<span>{{template.name}}</span>',
+            link: function($scope, element, attrs) {
+                TemplateService.get($scope.tid, function(data) {
+                    $scope.template = data;
+                });
+            }
+        }
+    }]);
 
 
 
