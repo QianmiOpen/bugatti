@@ -8,7 +8,7 @@
     <div class="form-group">
         <label for="name" class="col-sm-3 control-label">类型名称：</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="ptype.name" name="name" id="name" ng-maxlength="8" placeholder="必填，重复加序号" required>
+            <input type="text" class="form-control" ng-model="template.name" name="name" id="name" ng-maxlength="8" placeholder="必填，唯一" required>
         </div>
         <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
             <span ng-show="form.name.$error.required" class="control-label">请输入姓名</span>
@@ -20,9 +20,9 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">类型属性：</label>
         <div class="col-sm-5">
-            <div ng-repeat="item in items">
-                <input type="text" placeholder="属性名" ng-model="item.key">
-                <input type="text" placeholder="属性值" ng-model="item.value">
+            <div ng-repeat="attr in template.attrs">
+                <input type="text" placeholder="属性名" ng-model="attr.key" required>
+                <input type="text" placeholder="属性值" ng-model="attr.value" required>
                 <a href="" ng-click="remove($index)">X</a>
             </div>
             <button ng-click="add()">+ 属性</button>
@@ -31,7 +31,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-5">
-            <button class="btn btn-success" ng-click="saveOrUpdate(ptype)" ng-disabled="form.$invalid"> 保 存 </button>
+            <button class="btn btn-success" ng-click="saveOrUpdate(template, attrs)" ng-disabled="form.$invalid"> 保 存 </button>
         </div>
     </div>
 </form>

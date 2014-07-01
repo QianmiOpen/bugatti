@@ -36,8 +36,8 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'ProjectService',
-        function($scope, $stateParams, $state, ProjectService) {
+    app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'ProjectService', 'TemplateService',
+        function($scope, $stateParams, $state, ProjectService, TemplateService) {
 
             $scope.saveOrUpdate = function(project) {
                 ProjectService.save(angular.toJson(project), function(data) {
@@ -50,8 +50,8 @@ define(['angular'], function(angular) {
                 });
             };
 
-            ProjectService.types(function(data) {
-                $scope.types = data;
+            TemplateService.all(function(data) {
+                $scope.templates = data;
             });
     }]);
 

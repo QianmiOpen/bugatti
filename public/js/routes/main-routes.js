@@ -6,7 +6,7 @@ define(['angular',
     './conf/user-routes',
     './conf/env-routes',
     './conf/project-routes',
-    './conf/ptype-routes',
+    './conf/template-routes',
     './conf/relation-routes'
 ], function(angular) {
 
@@ -18,7 +18,7 @@ define(['angular',
         'bugattiApp.route.conf.userModule',
         'bugattiApp.route.conf.envModule',
         'bugattiApp.route.conf.projectModule',
-        'bugattiApp.route.conf.ptypeModule',
+        'bugattiApp.route.conf.templateModule',
         'bugattiApp.route.conf.relationModule'
     ]);
 

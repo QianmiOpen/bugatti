@@ -1,0 +1,38 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ui-sref="conf.template.create">新增</button></td>
+    <h1 class="pull-left m0">项目类型</h1>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-fixed">
+        <thead>
+        <tr>
+            <th width="30"><input type="checkbox" ng-model="master"></th>
+            <th width="20%">名称</th>
+            <th width="10%">图标</th>
+            <th width="20%">属性</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="template in templates">
+            <td><input type="checkbox" ng-model="ids[template.id]" ng-checked="master" ng-change="checked(template.id, ids[template.id])"></td>
+            <td><a ui-sref="conf.template.detail({id: template.id})">{{template.name}}</a></td>
+            <td>{{template.level | level}}</td>
+            <td>{{template.remark}}</td>
+            <td>
+                <a ui-sref="conf.template.edit({id: template.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ng-click="delete(template.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="5">&nbsp;</td>
+        </tr>
+        </tfoot>
+    </table>
+
+    <ng-include src="'partials/page.html'"></ng-include>
+
+</div>

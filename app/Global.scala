@@ -26,7 +26,8 @@ object Global extends GlobalSettings {
         TableQuery[MemberTable] ::
         TableQuery[ProjectTable] ::
         TableQuery[AttributeTable] ::
-        TableQuery[ProjectTypeTable] ::
+        TableQuery[TemplateInfoTable] ::
+        TableQuery[TemplateTable] ::
         TableQuery[UserTable] ::
         Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop

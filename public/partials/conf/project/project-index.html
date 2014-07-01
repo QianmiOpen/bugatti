@@ -29,7 +29,7 @@
             <tr>
                 <th width="10%">编号</th>
                 <th width="20%">名称</th>
-                <th width="10%">类型</th>
+                <th width="10%">模板</th>
                 <th width="25%">最近版本</th>
                 <th width="25%">最近更新时间</th>
                 <th>操作</th>
@@ -39,7 +39,7 @@
         <tr ng-repeat="project in projects">
             <td><a ui-sref="conf.project.sub({id: project.id})">{{project.id}}</a></td>
             <td><a ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
-            <td>{{project.typeId}}</td>
+            <td>{{project.templateId}}</td>
             <td class="show">{{project.lastVersion}}
                 <a href="#" class="a-underline">1.1.1</a>
                 &nbsp;

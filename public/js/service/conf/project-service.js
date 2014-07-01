@@ -17,9 +17,6 @@ define(['angular'], function(angular) {
             },
             save: function(project, callback) {
                 $http.post(PlayRoutes.controllers.conf.ProjectController.save().url, project).success(callback)
-            },
-            types: function(callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.types()).success(callback);
             }
         }
     });

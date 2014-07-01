@@ -1,168 +1,243 @@
-2014-06-30 16:34:40,383 - [INFO] - from play in pool-7-thread-6 
+2014-07-01 11:10:29,176 - [INFO] - from play in pool-7-thread-4 
 Listening for HTTP on /0:0:0:0:0:0:0:0:9000
 
-2014-06-30 16:51:11,400 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+2014-07-01 11:10:52,096 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
 JDBC URL = jdbc:mysql://localhost:3306/bugatti2?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
 
-2014-06-30 16:51:11,783 - [INFO] - from play in play-internal-execution-context-1 
+2014-07-01 11:10:52,520 - [INFO] - from play in play-internal-execution-context-1 
 database [default] connected at jdbc:mysql://localhost:3306/bugatti2?characterEncoding=utf8
 
-2014-06-30 16:51:12,279 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `sub_project_conf_log_content`
-
-2014-06-30 16:51:12,285 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:52,965 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create table `sub_project_conf_log_content` (`id` INTEGER NOT NULL PRIMARY KEY,`content` text NOT NULL)
 
-2014-06-30 16:51:12,307 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `sub_project_conf_log`
+2014-07-01 11:10:52,986 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project_conf_log` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`scid` INTEGER NOT NULL,`eid` INTEGER NOT NULL,`spid` INTEGER NOT NULL,`name` VARCHAR(50) NOT NULL,`path` VARCHAR(500) NOT NULL,`remark` VARCHAR(500) NOT NULL,`updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:10:52.983'} NOT NULL)
 
-2014-06-30 16:51:12,311 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `sub_project_conf_log` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`scid` INTEGER NOT NULL,`eid` INTEGER NOT NULL,`spid` INTEGER NOT NULL,`name` VARCHAR(50) NOT NULL,`path` VARCHAR(500) NOT NULL,`remark` VARCHAR(500) NOT NULL,`updated` TIMESTAMP DEFAULT {ts '2014-06-30 16:51:12.309'} NOT NULL)
-
-2014-06-30 16:51:12,334 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `sub_project_conf_content`
-
-2014-06-30 16:51:12,336 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,007 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create table `sub_project_conf_content` (`id` INTEGER NOT NULL PRIMARY KEY,`content` text NOT NULL)
 
-2014-06-30 16:51:12,356 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `sub_project_conf`
+2014-07-01 11:10:53,026 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project_conf` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`eid` INTEGER NOT NULL,`pid` INTEGER NOT NULL,`spid` INTEGER NOT NULL,`name` VARCHAR(50) NOT NULL,`path` VARCHAR(500) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:10:53.022'} NOT NULL)
 
-2014-06-30 16:51:12,359 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `sub_project_conf` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`eid` INTEGER NOT NULL,`pid` INTEGER NOT NULL,`spid` INTEGER NOT NULL,`name` VARCHAR(50) NOT NULL,`path` VARCHAR(500) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-06-30 16:51:12.358'} NOT NULL)
-
-2014-06-30 16:51:12,374 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,034 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create index `idx_espid` on `sub_project_conf` (`eid`,`spid`)
 
-2014-06-30 16:51:12,391 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `sub_project`
+2014-07-01 11:10:53,048 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`version` VARCHAR(254) NOT NULL,`updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:10:53.046'} NOT NULL)
 
-2014-06-30 16:51:12,394 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `sub_project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`version` VARCHAR(254) NOT NULL,`updated` TIMESTAMP DEFAULT {ts '2014-06-30 16:51:12.392'} NOT NULL)
-
-2014-06-30 16:51:12,406 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,074 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create index `idx_pid` on `sub_project` (`pid`)
 
-2014-06-30 16:51:12,421 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,087 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create unique index `idx_pid_version` on `sub_project` (`pid`,`version`)
 
-2014-06-30 16:51:12,435 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `permission`
-
-2014-06-30 16:51:12,437 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,100 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create table `permission` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`functions` text NOT NULL)
 
-2014-06-30 16:51:12,453 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `environment`
-
-2014-06-30 16:51:12,457 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,113 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create table `environment` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(30) NOT NULL,`remark` VARCHAR(254),`nfs_server` VARCHAR(30),`ip_range` VARCHAR(300),`level` INTEGER DEFAULT 0 NOT NULL)
 
-2014-06-30 16:51:12,488 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,123 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create unique index `idx_name` on `environment` (`name`)
 
-2014-06-30 16:51:12,506 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `member`
-
-2014-06-30 16:51:12,508 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,139 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create table `member` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`level` INTEGER DEFAULT 0 NOT NULL,`job_no` VARCHAR(16) NOT NULL)
 
-2014-06-30 16:51:12,518 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,149 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create unique index `idx_pid_no` on `member` (`pid`,`job_no`)
 
-2014-06-30 16:51:12,534 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `project`
+2014-07-01 11:10:53,179 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`template_id` INTEGER NOT NULL,`sub_total` INTEGER DEFAULT 0 NOT NULL,`last_version` VARCHAR(254),`last_updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:10:53.178'} NULL)
 
-2014-06-30 16:51:12,537 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`type_id` INTEGER NOT NULL,`sub_total` INTEGER DEFAULT 0 NOT NULL,`last_version` VARCHAR(254),`last_updated` TIMESTAMP DEFAULT {ts '2014-06-30 16:51:12.536'} NULL)
-
-2014-06-30 16:51:12,548 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+2014-07-01 11:10:53,190 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
 create unique index `idx_name` on `project` (`name`)
 
-2014-06-30 16:51:12,564 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create index `idx_type` on `project` (`type_id`)
+2014-07-01 11:10:53,206 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_template` on `project` (`template_id`)
 
-2014-06-30 16:51:12,582 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `attribute`
+2014-07-01 11:10:53,219 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `attribute` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`key` VARCHAR(254) NOT NULL,`value` VARCHAR(254) NOT NULL)
 
-2014-06-30 16:51:12,584 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `attribute` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`type_id` INTEGER NOT NULL,`name` VARCHAR(254) NOT NULL,`value` VARCHAR(254) NOT NULL)
+2014-07-01 11:10:53,231 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_pid` on `attribute` (`pid`)
 
-2014-06-30 16:51:12,598 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create index `idx_type_id` on `attribute` (`type_id`)
+2014-07-01 11:10:53,246 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `template` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL)
 
-2014-06-30 16:51:12,613 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create unique index `idx_tid_key` on `attribute` (`type_id`,`name`)
+2014-07-01 11:10:53,255 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `template` (`name`)
 
-2014-06-30 16:51:12,630 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `project_type`
+2014-07-01 11:10:53,271 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40),`last_visit` TIMESTAMP DEFAULT {ts '2014-07-01 11:10:53.269'} NULL)
 
-2014-06-30 16:51:12,633 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `project_type` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL)
-
-2014-06-30 16:51:12,645 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create unique index `idx_name` on `project_type` (`name`)
-
-2014-06-30 16:51:12,662 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-drop table `app_user`
-
-2014-06-30 16:51:12,665 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
-create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40),`last_visit` TIMESTAMP DEFAULT {ts '2014-06-30 16:51:12.663'} NULL)
-
-2014-06-30 16:51:12,687 - [INFO] - from play in play-internal-execution-context-1 
+2014-07-01 11:10:53,288 - [INFO] - from play in play-internal-execution-context-1 
 Application started (Dev)
 
-2014-06-30 16:58:36,519 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-8 
-select x2.`id`, x2.`name`, x2.`remark`, x2.`nfs_server`, x2.`ip_range`, x2.`level` from (select x3.`id` as `id`, x3.`nfs_server` as `nfs_server`, x3.`name` as `name`, x3.`ip_range` as `ip_range`, x3.`remark` as `remark`, x3.`level` as `level` from `environment` x3 limit 10) x2
+2014-07-01 11:10:54,955 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-5 
+select x2.`id`, x2.`name` from `template` x2
 
-2014-06-30 16:58:36,519 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-5 
+2014-07-01 11:10:56,728 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-6 
+select x2.`id`, x2.`name` from `template` x2
+
+2014-07-01 11:10:58,989 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-6 
+select x2.x3 from (select count(1) as x3 from (select x4.`template_id` as `template_id`, x4.`last_version` as `last_version`, x4.`id` as `id`, x4.`name` as `name`, x4.`sub_total` as `sub_total`, x4.`last_updated` as `last_updated` from `project` x4) x5) x2
+
+2014-07-01 11:10:59,008 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-3 
+select x2.`id`, x2.`name`, x2.`template_id`, x2.`sub_total`, x2.`last_version`, x2.`last_updated` from (select x3.`template_id` as `template_id`, x3.`last_version` as `last_version`, x3.`id` as `id`, x3.`name` as `name`, x3.`sub_total` as `sub_total`, x3.`last_updated` as `last_updated` from `project` x3 limit 10) x2
+
+2014-07-01 11:10:59,445 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-3 
 select x2.x3 from (select count(1) as x3 from (select x4.`id` as `id`, x4.`nfs_server` as `nfs_server`, x4.`name` as `name`, x4.`ip_range` as `ip_range`, x4.`remark` as `remark`, x4.`level` as `level` from `environment` x4) x5) x2
 
-2014-06-30 16:59:42,129 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
+2014-07-01 11:10:59,453 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-5 
+select x2.`id`, x2.`name`, x2.`remark`, x2.`nfs_server`, x2.`ip_range`, x2.`level` from (select x3.`id` as `id`, x3.`nfs_server` as `nfs_server`, x3.`name` as `name`, x3.`ip_range` as `ip_range`, x3.`remark` as `remark`, x3.`level` as `level` from `environment` x3 limit 10) x2
+
+2014-07-01 11:10:59,949 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-5 
 select x2.x3 from (select count(1) as x3 from (select x4.`last_ip` as `last_ip`, x4.`last_visit` as `last_visit`, x4.`job_no` as `job_no`, x4.`name` as `name`, x4.`locked` as `locked`, x4.`role` as `role` from `app_user` x4) x5) x2
 
-2014-06-30 16:59:42,134 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-10 
+2014-07-01 11:10:59,955 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-6 
 select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from (select x3.`last_ip` as `last_ip`, x3.`last_visit` as `last_visit`, x3.`job_no` as `job_no`, x3.`name` as `name`, x3.`locked` as `locked`, x3.`role` as `role` from `app_user` x3 limit 10) x2
 
-2014-06-30 16:59:42,868 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-10 
-select x2.x3 from (select count(1) as x3 from (select x4.`id` as `id`, x4.`nfs_server` as `nfs_server`, x4.`name` as `name`, x4.`ip_range` as `ip_range`, x4.`remark` as `remark`, x4.`level` as `level` from `environment` x4) x5) x2
+2014-07-01 11:11:08,100 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-5 
+select x2.x3 from (select count(1) as x3 from (select x4.`template_id` as `template_id`, x4.`last_version` as `last_version`, x4.`id` as `id`, x4.`name` as `name`, x4.`sub_total` as `sub_total`, x4.`last_updated` as `last_updated` from `project` x4) x5) x2
 
-2014-06-30 16:59:42,885 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.`id`, x2.`name`, x2.`remark`, x2.`nfs_server`, x2.`ip_range`, x2.`level` from (select x3.`id` as `id`, x3.`nfs_server` as `nfs_server`, x3.`name` as `name`, x3.`ip_range` as `ip_range`, x3.`remark` as `remark`, x3.`level` as `level` from `environment` x3 limit 10) x2
+2014-07-01 11:11:08,113 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-4 
+select x2.`id`, x2.`name`, x2.`template_id`, x2.`sub_total`, x2.`last_version`, x2.`last_updated` from (select x3.`template_id` as `template_id`, x3.`last_version` as `last_version`, x3.`id` as `id`, x3.`name` as `name`, x3.`sub_total` as `sub_total`, x3.`last_updated` as `last_updated` from `project` x3 limit 10) x2
 
-2014-06-30 16:59:43,435 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-10 
-select x2.x3 from (select count(1) as x3 from (select x4.`last_ip` as `last_ip`, x4.`last_visit` as `last_visit`, x4.`job_no` as `job_no`, x4.`name` as `name`, x4.`locked` as `locked`, x4.`role` as `role` from `app_user` x4) x5) x2
+2014-07-01 11:11:10,897 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-5 
+select x2.`id`, x2.`name` from `template` x2
 
-2014-06-30 16:59:43,451 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from (select x3.`last_ip` as `last_ip`, x3.`last_visit` as `last_visit`, x3.`job_no` as `job_no`, x3.`name` as `name`, x3.`locked` as `locked`, x3.`role` as `role` from `app_user` x3 limit 10) x2
+2014-07-01 11:11:42,163 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Shutting down connection pool...
 
-2014-06-30 16:59:44,000 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-10 
-select x2.x3 from (select count(1) as x3 from (select x4.`id` as `id`, x4.`nfs_server` as `nfs_server`, x4.`name` as `name`, x4.`ip_range` as `ip_range`, x4.`remark` as `remark`, x4.`level` as `level` from `environment` x4) x5) x2
+2014-07-01 11:11:42,165 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
 
-2014-06-30 16:59:44,015 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.`id`, x2.`name`, x2.`remark`, x2.`nfs_server`, x2.`ip_range`, x2.`level` from (select x3.`id` as `id`, x3.`nfs_server` as `nfs_server`, x3.`name` as `name`, x3.`ip_range` as `ip_range`, x3.`remark` as `remark`, x3.`level` as `level` from `environment` x3 limit 10) x2
+2014-07-01 11:11:42,165 - [DEBUG] - from com.jolbox.bonecp.PoolWatchThread in BoneCP-pool-watch-thread 
+Terminating pool watch thread
 
-2014-06-30 16:59:44,886 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.x3 from (select count(1) as x3 from (select x4.`last_version` as `last_version`, x4.`id` as `id`, x4.`name` as `name`, x4.`sub_total` as `sub_total`, x4.`last_updated` as `last_updated`, x4.`type_id` as `type_id` from `project` x4) x5) x2
+2014-07-01 11:11:42,171 - [INFO] - from com.jolbox.bonecp.BoneCP in play-internal-execution-context-1 
+Connection pool has been shutdown.
 
-2014-06-30 16:59:44,893 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-11 
-select x2.`id`, x2.`name`, x2.`type_id`, x2.`sub_total`, x2.`last_version`, x2.`last_updated` from (select x3.`last_version` as `last_version`, x3.`id` as `id`, x3.`name` as `name`, x3.`sub_total` as `sub_total`, x3.`last_updated` as `last_updated`, x3.`type_id` as `type_id` from `project` x3 limit 10) x2
+2014-07-01 11:11:42,171 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+Connection pool has been shut down
 
-2014-06-30 16:59:45,401 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.x3 from (select count(1) as x3 from (select x4.`id` as `id`, x4.`nfs_server` as `nfs_server`, x4.`name` as `name`, x4.`ip_range` as `ip_range`, x4.`remark` as `remark`, x4.`level` as `level` from `environment` x4) x5) x2
+2014-07-01 11:11:42,238 - [DEBUG] - from com.jolbox.bonecp.BoneCPDataSource in play-internal-execution-context-1 
+JDBC URL = jdbc:mysql://localhost:3306/bugatti2?characterEncoding=utf8, Username = root, partitions = 2, max (per partition) = 50, min (per partition) = 5, idle max age = 10 min, idle test period = 5 min, strategy = DEFAULT
 
-2014-06-30 16:59:45,417 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-11 
-select x2.`id`, x2.`name`, x2.`remark`, x2.`nfs_server`, x2.`ip_range`, x2.`level` from (select x3.`id` as `id`, x3.`nfs_server` as `nfs_server`, x3.`name` as `name`, x3.`ip_range` as `ip_range`, x3.`remark` as `remark`, x3.`level` as `level` from `environment` x3 limit 10) x2
+2014-07-01 11:11:42,303 - [INFO] - from play in play-internal-execution-context-1 
+database [default] connected at jdbc:mysql://localhost:3306/bugatti2?characterEncoding=utf8
 
-2014-06-30 16:59:45,869 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.x3 from (select count(1) as x3 from (select x4.`last_ip` as `last_ip`, x4.`last_visit` as `last_visit`, x4.`job_no` as `job_no`, x4.`name` as `name`, x4.`locked` as `locked`, x4.`role` as `role` from `app_user` x4) x5) x2
+2014-07-01 11:11:42,374 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `sub_project_conf_log_content`
 
-2014-06-30 16:59:45,881 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.`job_no`, x2.`name`, x2.`role`, x2.`locked`, x2.`last_ip`, x2.`last_visit` from (select x3.`last_ip` as `last_ip`, x3.`last_visit` as `last_visit`, x3.`job_no` as `job_no`, x3.`name` as `name`, x3.`locked` as `locked`, x3.`role` as `role` from `app_user` x3 limit 10) x2
+2014-07-01 11:11:42,378 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project_conf_log_content` (`id` INTEGER NOT NULL PRIMARY KEY,`content` text NOT NULL)
 
-2014-06-30 16:59:48,161 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-11 
-select x2.x3 from (select count(1) as x3 from (select x4.`id` as `id`, x4.`nfs_server` as `nfs_server`, x4.`name` as `name`, x4.`ip_range` as `ip_range`, x4.`remark` as `remark`, x4.`level` as `level` from `environment` x4) x5) x2
+2014-07-01 11:11:42,396 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `sub_project_conf_log`
 
-2014-06-30 16:59:48,177 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-9 
-select x2.`id`, x2.`name`, x2.`remark`, x2.`nfs_server`, x2.`ip_range`, x2.`level` from (select x3.`id` as `id`, x3.`nfs_server` as `nfs_server`, x3.`name` as `name`, x3.`ip_range` as `ip_range`, x3.`remark` as `remark`, x3.`level` as `level` from `environment` x3 limit 10) x2
+2014-07-01 11:11:42,399 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project_conf_log` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`scid` INTEGER NOT NULL,`eid` INTEGER NOT NULL,`spid` INTEGER NOT NULL,`name` VARCHAR(50) NOT NULL,`path` VARCHAR(500) NOT NULL,`remark` VARCHAR(500) NOT NULL,`updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:11:42.398'} NOT NULL)
+
+2014-07-01 11:11:42,419 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `sub_project_conf_content`
+
+2014-07-01 11:11:42,422 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project_conf_content` (`id` INTEGER NOT NULL PRIMARY KEY,`content` text NOT NULL)
+
+2014-07-01 11:11:42,439 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `sub_project_conf`
+
+2014-07-01 11:11:42,442 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project_conf` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`eid` INTEGER NOT NULL,`pid` INTEGER NOT NULL,`spid` INTEGER NOT NULL,`name` VARCHAR(50) NOT NULL,`path` VARCHAR(500) NOT NULL,`last_updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:11:42.441'} NOT NULL)
+
+2014-07-01 11:11:42,455 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_espid` on `sub_project_conf` (`eid`,`spid`)
+
+2014-07-01 11:11:42,468 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `sub_project`
+
+2014-07-01 11:11:42,470 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `sub_project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`version` VARCHAR(254) NOT NULL,`updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:11:42.469'} NOT NULL)
+
+2014-07-01 11:11:42,479 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_pid` on `sub_project` (`pid`)
+
+2014-07-01 11:11:42,493 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_pid_version` on `sub_project` (`pid`,`version`)
+
+2014-07-01 11:11:42,508 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `permission`
+
+2014-07-01 11:11:42,510 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `permission` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`functions` text NOT NULL)
+
+2014-07-01 11:11:42,523 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `environment`
+
+2014-07-01 11:11:42,525 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `environment` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(30) NOT NULL,`remark` VARCHAR(254),`nfs_server` VARCHAR(30),`ip_range` VARCHAR(300),`level` INTEGER DEFAULT 0 NOT NULL)
+
+2014-07-01 11:11:42,537 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `environment` (`name`)
+
+2014-07-01 11:11:42,556 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `member`
+
+2014-07-01 11:11:42,558 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `member` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`level` INTEGER DEFAULT 0 NOT NULL,`job_no` VARCHAR(16) NOT NULL)
+
+2014-07-01 11:11:42,567 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_pid_no` on `member` (`pid`,`job_no`)
+
+2014-07-01 11:11:42,582 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `project`
+
+2014-07-01 11:11:42,585 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `project` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL,`template_id` INTEGER NOT NULL,`sub_total` INTEGER DEFAULT 0 NOT NULL,`last_version` VARCHAR(254),`last_updated` TIMESTAMP DEFAULT {ts '2014-07-01 11:11:42.584'} NULL)
+
+2014-07-01 11:11:42,594 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `project` (`name`)
+
+2014-07-01 11:11:42,609 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_template` on `project` (`template_id`)
+
+2014-07-01 11:11:42,621 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `attribute`
+
+2014-07-01 11:11:42,623 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `attribute` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`pid` INTEGER NOT NULL,`key` VARCHAR(254) NOT NULL,`value` VARCHAR(254) NOT NULL)
+
+2014-07-01 11:11:42,637 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_pid` on `attribute` (`pid`)
+
+2014-07-01 11:11:42,653 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `template_info` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`tid` INTEGER NOT NULL,`item_name` VARCHAR(254) NOT NULL,`item_desc` VARCHAR(254) NOT NULL)
+
+2014-07-01 11:11:42,661 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create index `idx_tid` on `template_info` (`tid`)
+
+2014-07-01 11:11:42,675 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `template_info` (`tid`,`item_name`)
+
+2014-07-01 11:11:42,687 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `template`
+
+2014-07-01 11:11:42,689 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `template` (`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,`name` VARCHAR(254) NOT NULL)
+
+2014-07-01 11:11:42,701 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create unique index `idx_name` on `template` (`name`)
+
+2014-07-01 11:11:42,717 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+drop table `app_user`
+
+2014-07-01 11:11:42,720 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-internal-execution-context-1 
+create table `app_user` (`job_no` VARCHAR(16) NOT NULL PRIMARY KEY,`name` VARCHAR(20),`role` ENUM('admin', 'user') DEFAULT 'user' NOT NULL,`locked` ENUM('y', 'n') DEFAULT 'n' NOT NULL,`last_ip` VARCHAR(40),`last_visit` TIMESTAMP DEFAULT {ts '2014-07-01 11:11:42.719'} NULL)
+
+2014-07-01 11:11:42,729 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2014-07-01 11:11:43,640 - [DEBUG] - from com.jolbox.bonecp.PreparedStatementHandle in play-akka.actor.default-dispatcher-2 
+select x2.`id`, x2.`name` from `template` x2
 

@@ -31,7 +31,7 @@ GET           /project/count                  controllers.conf.ProjectController
 GET           /project:id                     controllers.conf.ProjectController.show(id: Int)
 POST          /project                        controllers.conf.ProjectController.save
 
-GET           /types                          controllers.conf.ProjectController.types
+GET           /tempaltes                      controllers.conf.TemplateController.all
 
 
 GET           /javascriptRoutes               controllers.Application.javascriptRoutes

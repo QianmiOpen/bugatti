@@ -6,7 +6,7 @@ define(['angular',
     './conf/user-service',
     './conf/env-service',
     './conf/project-service',
-    './conf/ptype-service'
+    './conf/template-service'
 ], function(angular) {
 
     /* Services */
@@ -17,7 +17,7 @@ define(['angular',
         'bugattiApp.service.conf.userModule',
         'bugattiApp.service.conf.envModule',
         'bugattiApp.service.conf.projectModule',
-        'bugattiApp.service.conf.ptypeModule'
+        'bugattiApp.service.conf.templateModule'
     ]);
 
     app.value('version', '0.1');

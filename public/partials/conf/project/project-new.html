@@ -19,14 +19,14 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-3 control-label">类型：</label>
+        <label class="col-sm-3 control-label">模板：</label>
         <div class="col-sm-3">
-            <select name="typeId" id="typeId" class="form-control" ng-model="project.typeId" ng-options="o.id as o.name for o in types" required>
-                <option value="">-- 选择类型 --</option>
+            <select name="templateId" id="templateId" class="form-control" ng-model="project.templateId" ng-options="o.id as o.name for o in templates" required>
+                <option value="">-- 选择模板 --</option>
             </select>
         </div>
-        <div ng-show="form.typeId.$dirty && form.typeId.$invalid" class="has-error">
-            <span ng-show="form.typeId.$error.required" class="control-label">请选择项目类型</span>
+        <div ng-show="form.templateId.$dirty && form.templateId.$invalid" class="has-error">
+            <span ng-show="form.templateId.$error.required" class="control-label">请选择项目模板</span>
         </div>
     </div>
 

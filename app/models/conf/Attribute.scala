@@ -3,31 +3,30 @@ package models.conf
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 /**
- * 项目类型属性
+ * 项目属性
  */
-case class Attribute(id: Option[Int], typeId: Int, key: String, value: String)
+case class Attribute(id: Option[Int], pid: Int, key: String, value: String)
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def typeId = column[Int]("type_id", O.NotNull)  // 项目类型编号
-  def key = column[String]("name", O.NotNull)
+  def pid = column[Int]("pid", O.NotNull)   // 项目编号
+  def key = column[String]("key", O.NotNull)
   def value = column[String]("value", O.NotNull)
 
-  override def * = (id.?, typeId, key, value) <> (Attribute.tupled, Attribute.unapply _)
-  def idx = index("idx_type_id", typeId)
-  def keyx = index("idx_tid_key", (typeId, key), unique = true)
+  override def * = (id.?, pid, key, value) <> (Attribute.tupled, Attribute.unapply _)
+  def idx = index("idx_pid", pid)
 }
 
 object AttributeHelper {
   import models.AppDB._
   val qAttribute = TableQuery[AttributeTable]
 
-  def findByTypeId(typeId: Int): List[Attribute] = db withSession { implicit session =>
-    qAttribute.sortBy(_.id).where(_.typeId is typeId).list
+  def findByPid(pid: Int): List[Attribute] = db withSession { implicit session =>
+    qAttribute.sortBy(_.id).where(_.pid is pid).list
   }
 
   def exists(typeId: Int, name: String): Boolean = {
-    findByTypeId(typeId).filter(_.key == name).isEmpty
+    findByPid(typeId).filter(_.key == name).isEmpty
   }
 
   def create(attr: Attribute) = db withSession { implicit session =>
