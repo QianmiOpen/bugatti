@@ -6,7 +6,8 @@ define(['angular',
     './conf/user-service',
     './conf/env-service',
     './conf/project-service',
-    './conf/template-service'
+    './conf/template-service',
+    './task/task-service'
 ], function(angular) {
 
     /* Services */
@@ -17,7 +18,8 @@ define(['angular',
         'bugattiApp.service.conf.userModule',
         'bugattiApp.service.conf.envModule',
         'bugattiApp.service.conf.projectModule',
-        'bugattiApp.service.conf.templateModule'
+        'bugattiApp.service.conf.templateModule',
+        'bugattiApp.service.task.taskModule'
     ]);
 
     app.value('version', '0.1');

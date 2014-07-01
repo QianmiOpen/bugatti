@@ -9,6 +9,9 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.EnvController.show(id)).success(callback);
             },
+            getAll: function(callback) {
+                $http(PlayRoutes.controllers.conf.EnvController.all()).success(callback);
+            },
             getPage: function(page, pageSize, callback) {
                 $http(PlayRoutes.controllers.conf.EnvController.index(page, pageSize)).success(callback);
             },

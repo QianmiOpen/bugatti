@@ -26,6 +26,7 @@ object Application extends Controller with Security {
 
         // env
         conf.routes.javascript.EnvController.index,
+        conf.routes.javascript.EnvController.all,
         conf.routes.javascript.EnvController.count,
         conf.routes.javascript.EnvController.show,
         conf.routes.javascript.EnvController.save,
@@ -34,12 +35,18 @@ object Application extends Controller with Security {
 
         // project
         conf.routes.javascript.ProjectController.show,
+        conf.routes.javascript.ProjectController.all,
         conf.routes.javascript.ProjectController.save,
         conf.routes.javascript.ProjectController.index,
         conf.routes.javascript.ProjectController.count,
 
         // template
-        conf.routes.javascript.TemplateController.all
+        conf.routes.javascript.TemplateController.all,
+
+        //task
+        task.routes.javascript.TaskController.findLastTaskStatus
+        ,task.routes.javascript.TaskController.joinProcess
+        ,task.routes.javascript.TaskController.createNewTaskQueue
       )
     ).as(JAVASCRIPT)
   }

@@ -6,7 +6,8 @@ define(['angular',
     './conf/user-controller',
     './conf/env-controller',
     './conf/project-controller',
-    './conf/template-controller'
+    './conf/template-controller',
+    './task/task-controller'
 ], function(angular) {
 
     /* Controllers */
@@ -14,7 +15,8 @@ define(['angular',
         'bugattiApp.controller.conf.userModule',
         'bugattiApp.controller.conf.envModule',
         'bugattiApp.controller.conf.projectModule',
-        'bugattiApp.controller.conf.templateModule'
+        'bugattiApp.controller.conf.templateModule',
+        'bugattiApp.controller.task.taskModule'
     ]);
 
     // Auth

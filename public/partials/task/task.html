@@ -1,0 +1,56 @@
+<div class="col-md-offset-0 main">
+    <div class="page-header clearfix">
+        <h1 class="pull-left" style="margin: 0;">任务管理</h1>
+    </div>
+
+    <div class="tabs">
+        <ul class="nav nav-tabs">
+            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env.id)" ng-repeat="env in envs"><a>{{env.name}}</a></li>
+        </ul>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-fixed">
+            <thead>
+            <tr>
+                <th width="15%">项目名称</th>
+                <th width="70%">状态</th>
+                <th width="15%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr ng-repeat="pro in projectStatus">
+                <td>{{pro.name}}</td>
+                <td style="padding:10px 0px 0px 0px;">
+                    <a ng-show="showHref(pro.status.status)" ui-sref="task.info({taskId:task.task.id, envId: envId, proId: proId, envName: envName, proName: proName})">{{pro.status.endTime}}  {{pro.status.statusTip}}</a>
+                    <div>
+                        <span ng-show="showProgress(pro.status.status)" >{{pro.status.statusTip}} : {{pro.status.sls}}</span>
+                    </div>
+                    <div ng-show="showProgress(pro.status.status)" class="progress progress-mb">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{pro.status.currentNum*100/pro.status.totalNum}}%;">
+                        </div>
+                    </div>
+                </td>
+                <td class="show">
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="" ng-click="deploy()" title="部署"><span class="glyphicon glyphicon-import"></span></a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="ope in operates">
+                                <a ng-click="shortcut(ope.id, task.task.id)">{{ope.name}}</a>
+                            </li>
+                        </ul>
+                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="执行日志"><span class="glyphicon glyphicon-film"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="" title="快捷任务"><span class="glyphicon glyphicon-list"></span></a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="ope in operates">
+                                <a ng-click="shortcut(ope.id, task.task.id)">{{ope.name}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

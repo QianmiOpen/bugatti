@@ -34,6 +34,10 @@ object EnvController extends Controller {
     Ok(Json.toJson(EnvironmentHelper.all(page, pageSize)))
   }
 
+  def all = Action {
+    Ok(Json.toJson(EnvironmentHelper.all()))
+  }
+
   def count = Action {
     Ok(Json.toJson(EnvironmentHelper.count))
   }

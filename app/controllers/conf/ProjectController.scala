@@ -53,6 +53,10 @@ object ProjectController extends Controller {
     )
   }
 
+  def all = Action {
+    Ok(Json.toJson(ProjectHelper.all()))
+  }
+
   // 子项目
 
 }
