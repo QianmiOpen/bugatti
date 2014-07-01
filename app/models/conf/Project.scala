@@ -53,6 +53,10 @@ object ProjectHelper extends PlayCache {
     qProject.drop(offset).take(pageSize).list
   }
 
+  def all(): List[Project] = db withSession { implicit session =>
+    qProject.list
+  }
+
   def create(project: Project) = db withSession { implicit session =>
     qProject.insert(project)
   }

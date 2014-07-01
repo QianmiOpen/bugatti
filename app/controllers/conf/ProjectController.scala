@@ -52,6 +52,10 @@ object ProjectController extends Controller {
     Ok(Json.toJson(ProjectTypeHelper.all))
   }
 
+  def all = Action {
+    Ok(Json.toJson(ProjectHelper.all()))
+  }
+
   def index(page: Int, pageSize: Int, search: Option[String]) = Action {
     Ok(Json.toJson(ProjectHelper.all(page, pageSize)))
   }

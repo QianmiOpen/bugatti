@@ -87,6 +87,13 @@ code {
     max-height: 300px;
     overflow: auto;
 }
+
+.progress-mb{
+    margin-bottom: 0;
+    width:90%;
+    height:3px;
+}
+
 .col-centered {
     margin: 0 auto;
     float: none;

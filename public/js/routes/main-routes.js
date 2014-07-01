@@ -7,7 +7,8 @@ define(['angular',
     './conf/env-routes',
     './conf/project-routes',
     './conf/ptype-routes',
-    './conf/relation-routes'
+    './conf/relation-routes',
+    './task/task-route'
 ], function(angular) {
 
     /* Services */
@@ -19,7 +20,8 @@ define(['angular',
         'bugattiApp.route.conf.envModule',
         'bugattiApp.route.conf.projectModule',
         'bugattiApp.route.conf.ptypeModule',
-        'bugattiApp.route.conf.relationModule'
+        'bugattiApp.route.conf.relationModule',
+        'bugattiApp.route.task.taskModule'
     ]);
 
     app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider) {
@@ -35,6 +37,13 @@ define(['angular',
             templateUrl: "partials/conf.html"
         });
 
+        $stateProvider.state('task', {
+            url: "/task",
+            templateUrl: "partials/task/task.html",
+            controller: "TaskCtrl"
+//            ,
+//            data: {access: permission.task}
+        });
 
     }]);
 
