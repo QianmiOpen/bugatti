@@ -52,6 +52,7 @@ object Global extends GlobalSettings {
         AppData.taskCommandScript
         AppData.taskQueueScript
         AppData.taskSchemeScript
+        AppData.versionScript
       }
 
 
@@ -82,6 +83,19 @@ object AppData {
       ,Project(None, "qianmi1", 1, 5, Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
       ,Project(None, "qianmi2", 1, 5, Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
       ,Project(None, "qianmi3", 1, 5, Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
+    )
+    q.insertAll(seq: _*)
+  }
+  //版本初始化
+  def versionScript(implicit session: Session) = {
+    val q = TableQuery[VersionTable]
+    val seq = Seq(
+      Version(None, 1, "1.6.4-SNAPSHOT", Option(new DateTime(2014, 6, 30, 7, 31))),
+      Version(None, 1, "1.6.3-RELEASE", Option(new DateTime(2014, 6, 29, 7, 31))),
+      Version(None, 1, "1.6.3-SNAPSHOT", Option(new DateTime(2014, 6, 28, 7, 31))),
+      Version(None, 1, "1.6.2-RELEASE", Option(new DateTime(2014, 6, 28, 7, 31))),
+      Version(None, 1, "1.6.2-SNAPSHOT", Option(new DateTime(2014, 6, 27, 7, 31))),
+      Version(None, 1, "1.6.1-RELEASE", Option(new DateTime(2014, 6, 26, 7, 31)))
     )
     q.insertAll(seq: _*)
   }
