@@ -134,10 +134,15 @@ object TaskController extends Controller {
     val tq = fieldsJson \ "taskQueue"
     val envId = (tq \ "envId").toString.toInt
     val projectId = (tq \ "projectId").toString.toInt
-    val version = (tq \ "version").toString
+    val version = trimQuotes((tq \ "version").toString)
+    Logger.info(s"version ==> ${version}")
     val templateId = (tq \ "templateId").toString.toInt
     val taskQueue = TaskQueue(None, envId, projectId, version, templateId, 0, new DateTime, None, 1)
     TaskProcess.createNewTask(taskQueue)
+  }
+
+  def trimQuotes(s: String): String = {
+    s.trim.stripPrefix("\"").stripSuffix("\"").trim
   }
 
   implicit val projectWrites = Json.writes[Project]

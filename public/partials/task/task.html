@@ -23,7 +23,7 @@
             <tr ng-repeat="pro in projectStatus">
                 <td>{{pro.name}}</td>
                 <td style="padding:10px 0px 0px 0px;">
-                    <a ng-show="showHref(pro.status.status)" ui-sref="task.info({taskId:task.task.id, envId: envId, proId: proId, envName: envName, proName: proName})">{{pro.status.endTime}}  {{pro.status.statusTip}}</a>
+                    <a ng-show="showHref(pro.status.status)" ui-sref="task.info({taskId:task.task.id, envId: envId, proId: proId, envName: envName, proName: proName})">{{pro.task.endTime}}  {{pro.status.statusTip}}!   版本号：{{pro.task.version}}   任务: {{pro.status.taskName}}</a>
                     <div>
                         <span ng-show="showProgress(pro.status.status)" >{{pro.status.statusTip}} : {{pro.status.sls}}</span>
                     </div>
