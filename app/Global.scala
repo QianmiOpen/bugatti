@@ -53,6 +53,7 @@ object Global extends GlobalSettings {
         AppData.taskQueueScript
         AppData.taskSchemeScript
         AppData.versionScript
+        AppData.attributeScript
       }
 
 
@@ -83,6 +84,15 @@ object AppData {
       ,Project(None, "qianmi1", 1, 5, Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
       ,Project(None, "qianmi2", 1, 5, Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
       ,Project(None, "qianmi3", 1, 5, Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
+    )
+    q.insertAll(seq: _*)
+  }
+
+  def attributeScript(implicit session: Session) = {
+    val q = TableQuery[AttributeTable]
+    val seq = Seq(
+      Attribute(None, Option(1), "groupId", Option("com.ofpay")),
+      Attribute(None, Option(1), "artifactId", Option("cardserverimpl"))
     )
     q.insertAll(seq: _*)
   }

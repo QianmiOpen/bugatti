@@ -32,6 +32,10 @@ object AttributeHelper {
     findByPid(typeId).filter(_.name == name).isEmpty
   }
 
+  def getValue(pid: Int, name: String): String = {
+    findByPid(pid).filter(_.name == name)(0).value.get
+  }
+
   def create(attr: Attribute) = db withSession { implicit session =>
     qAttribute.insert(attr)
   }

@@ -184,6 +184,12 @@ define(['angular'], function(angular) {
             })
         }
 
+        $scope.showNexusVersion = function(pid){
+            TaskService.getNexusVersions(pid, function(data){
+                console.log(data)
+            })
+        }
+
         $scope.deploy = function(projectId, version){
             $scope.taskQueue = {}
             $scope.taskQueue.envId = $scope.activeEnv
