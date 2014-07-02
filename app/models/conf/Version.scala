@@ -45,12 +45,13 @@ object VersionHelper extends PlayCache {
     //1、获取环境的level
     val level: Level = EnvironmentHelper.findById(eid).get.level
     Logger.info(level.toString)
+    val list = findByPid(pid)
     if(level == LevelEnum.unsafe){//开发&测试
       Logger.info("unsafe")
-      findByPid(pid)
+      list
     } else {//线上环境
       Logger.info("safe")
-      qVersion.where(_.pid is pid).sortBy(_.updated.desc).list.filterNot(t => TaskTools.isSnapshot(t.version))
+      list.filterNot(t => TaskTools.isSnapshot(t.version))
     }
   }
 
