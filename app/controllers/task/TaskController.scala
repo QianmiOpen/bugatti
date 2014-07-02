@@ -34,10 +34,45 @@ object TaskController extends Controller {
 
   val templateDir = "/srv/sls"
 
-  val httpURL = "http://nexus.dev.ofpay.com/nexus/content/repositories/releases/"
+  val httpURLBase = "http://nexus.dev.ofpay.com/nexus/content/repositories"
 
-  val httpURLSNAP = "http://nexus.dev.ofpay.com/nexus/content/repositories/snapshots/"
+  def getNexusVersions(pid: Int) = Action{
+    //1、根据projectId获取项目attribute中的groupId、artifactId
+    val groupId = AttributeHelper.getValue(pid, "groupId").replaceAll("\\.", "/")
+    val artifactId = AttributeHelper.getValue(pid, "artifactId")
+    Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
+    //2、查询release、snapshot版本
+    val listRelease = versions(groupId, artifactId, false)
+    val listSnapshot = versions(groupId, artifactId, true)
+    //3、拼接版本号，按照版本号逆序
+    val result = listRelease ::: listSnapshot
+    Logger.info(result.sorted.reverse.toString())
+    Ok(Json.toJson(result.sorted.reverse))
+  }
 
+  def versions(groupId: String, artifactId: String, isSnapshot: Boolean): List[String] = {
+    var list = mutable.LinkedList[String]()
+    var branch = "releases"
+    if(isSnapshot){
+      branch = "snapshots"
+    }
+    val url = s"${httpURLBase}/${branch}/${groupId}/${artifactId}"
+    Logger.info(url)
+    try{
+      val source = Source.fromURL(url)
+      val htmlSource = source.mkString
+      val reg = """<a href=".+">([^/]+)/</a>""".r
+      val regMatchs = reg.findAllMatchIn(htmlSource)
+      for(regMatch <- regMatchs){
+        list = list :+ regMatch.group(1).toString
+      }
+      source.close
+    }catch{
+      case ex: Exception => Logger.error("version error : " + ex.toString)
+    }
+    Logger.info("versions==>" + list)
+    list.toList
+  }
   /**
    * 根据项目id获取最近的5个版本号，按照时间倒序
    * 在线上环境会过滤掉SNAPSHOT版本号
@@ -50,45 +85,18 @@ object TaskController extends Controller {
     Ok(Json.toJson(list.reverse.drop(list.length - 5).reverse))
   }
 
-  def findVersionsByProjects = Action(parse.json){implicit request =>
-    request.body match {
-      case JsObject(fields) => {
-        Ok(Json.toJson(findVersions(fields)))
-      }
-      case _ => Ok(Json.toJson(0))
-    }
-  }
-
-  def findVersions(fields: Seq[(String, JsValue)]): List[Project] = {
-    null
-  }
-
-  def lastVersions(fields: Seq[(String, JsValue)], isSnapshot: Boolean, num: Int) ={
-    val projects: JsArray = Json.arr(Json.toJson(fields.toMap) \ "projects")
-    for(fieldsJson <- projects.value){
-      val groupName = (fieldsJson \ "groupId").toString.replaceAll("\\.", "/").replace("\"","")
-      val projectName = (fieldsJson \ "artifactId").toString.replaceAll("\\.", "/").replace("\"","")
-      var list = mutable.LinkedList[String]()
-      var url = httpURL +groupName + File.separator + projectName
-      if(isSnapshot){
-        url = httpURLSNAP +groupName + File.separator + projectName
-      }
-      try{
-        val source = Source.fromURL(url)
-        val htmlSource = source.mkString
-        val reg = """<a href=".+">([^/]+)/</a>""".r
-        val regMatchs = reg.findAllMatchIn(htmlSource)
-        for(regMatch <- regMatchs){
-          list = list :+ regMatch.group(1).toString
-        }
-        source.close
-      }catch{
-        case ex: Exception => Logger.error("version error : " + ex.toString)
-      }
-      Logger.info("versions==>" + list)
-      list.toList
-    }
-  }
+//  def findVersionsByProjects = Action(parse.json){implicit request =>
+//    request.body match {
+//      case JsObject(fields) => {
+//        Ok(Json.toJson(findVersions(fields)))
+//      }
+//      case _ => Ok(Json.toJson(0))
+//    }
+//  }
+//
+//  def findVersions(fields: Seq[(String, JsValue)]): List[Project] = {
+//    null
+//  }
 
   def findLastTaskStatus = Action(parse.json){implicit request =>
     request.body match {
@@ -126,10 +134,15 @@ object TaskController extends Controller {
     val tq = fieldsJson \ "taskQueue"
     val envId = (tq \ "envId").toString.toInt
     val projectId = (tq \ "projectId").toString.toInt
-    val version = (tq \ "version").toString
+    val version = trimQuotes((tq \ "version").toString)
+    Logger.info(s"version ==> ${version}")
     val templateId = (tq \ "templateId").toString.toInt
     val taskQueue = TaskQueue(None, envId, projectId, version, templateId, 0, new DateTime, None, 1)
     TaskProcess.createNewTask(taskQueue)
+  }
+
+  def trimQuotes(s: String): String = {
+    s.trim.stripPrefix("\"").stripSuffix("\"").trim
   }
 
   implicit val projectWrites = Json.writes[Project]

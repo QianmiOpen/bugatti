@@ -35,6 +35,10 @@ object TaskTemplateHelper{
     qTaskTemplate.list()
   }
 
+  def getById(tid: Int) = db withSession {implicit session =>
+    qTaskTemplate.where(_.id === tid).first
+  }
+
   def insertTemplates(templates: Seq[TaskTemplate]) = db withSession {implicit session =>
     qTaskTemplate.insertAll(templates: _*)
   }

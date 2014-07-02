@@ -64,6 +64,7 @@ object Application extends Controller with Security {
         task.routes.javascript.TaskController.findLastTaskStatus,
         task.routes.javascript.TaskController.joinProcess,
         task.routes.javascript.TaskController.getVersions,
+        task.routes.javascript.TaskController.getNexusVersions,
         task.routes.javascript.TaskController.createNewTaskQueue
       )
     ).as(JAVASCRIPT)

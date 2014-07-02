@@ -53,10 +53,11 @@ POST          /porject/version                   controllers.conf.VersionControl
 PUT           /project/version/:id               controllers.conf.VersionController.update(id: Int)
 
 #Task
-POST          /task/lastStatus                   controllers.task.TaskController.findLastTaskStatus
-GET           /task/joinProcess/:taskId          controllers.task.TaskController.joinProcess(taskId: Int)
-POST          /task/newTaskQueue                 controllers.task.TaskController.createNewTaskQueue
-POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
+POST          /task/lastStatus                 controllers.task.TaskController.findLastTaskStatus
+GET           /task/joinProcess/:taskId        controllers.task.TaskController.joinProcess(taskId: Int)
+POST          /task/newTaskQueue               controllers.task.TaskController.createNewTaskQueue
+POST          /task/version                    controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
+GET           /task/nexusVersion               controllers.task.TaskController.getNexusVersions(projectId: Int)
 
 
 

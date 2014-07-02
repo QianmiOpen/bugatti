@@ -44,20 +44,14 @@ define(['angular'], function(angular) {
             //查询任务表task 返回 projectId, status, string, taskId
             TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                 $scope.lastTasks = data
+                console.log(data)
                 console.table($scope.projectStatus)
                 $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
                 console.table($scope.projectStatus)
                 //过滤正在执行任务的项目集 -> 使用websocket
                 $scope.wsInvoke()
             })
-            //获取项目的版本号（最近的5个RELEASE,3个SNAPSHOT）
-            $scope.getVersionsByProject()
         });
-
-        $scope.getVersionsByProject = function(){
-            //获取项目列表
-            console.log($scope.pros)
-        }
 
         $scope.randomKey = function(min, max) {
             var num = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -97,7 +91,9 @@ define(['angular'], function(angular) {
                             p.status.currentNum = projectObj.currentNum
                             p.status.totalNum = projectObj.totalNum
                             p.status.sls = projectObj.sls
+                            p.status.taskName = projectObj.taskName
                             p.status.status = projectObj.status
+                            p.task = projectObj.task
                         }
                     }
                     $scope.projectStatus = $scope.projectStatus.map($scope.addStatusTip)
@@ -181,6 +177,12 @@ define(['angular'], function(angular) {
                     $scope.versions.push(data[dIndex].version)
                 }
                 console.log($scope.versions)
+            })
+        }
+
+        $scope.showNexusVersion = function(pid){
+            TaskService.getNexusVersions(pid, function(data){
+                console.log(data)
             })
         }
 
