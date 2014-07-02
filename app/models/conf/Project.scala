@@ -16,9 +16,9 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVersion: Option[String], lastUpdated: Option[DateTime])
-case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVersion: Option[String], lastUpdated: Option[DateTime], items: List[Attribute]) {
-  def toProject = Project(id, name, templateId, subTotal, lastVersion, lastUpdated)
+case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime])
+case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], items: List[Attribute]) {
+  def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated)
 }
 
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
@@ -26,10 +26,11 @@ class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def name = column[String]("name", O.NotNull)
   def templateId = column[Int]("template_id", O.NotNull)  // 项目模板编号
   def subTotal = column[Int]("sub_total", O.NotNull, O.Default(0)) // 子项目数量
+  def lastVid = column[Int]("last_vid", O.Nullable)
   def lastVersion = column[String]("last_version", O.Nullable)
   def lastUpdated= column[DateTime]("last_updated", O.Nullable, O.Default(DateTime.now()))
 
-  override def * = (id.?, name, templateId, subTotal, lastVersion.?, lastUpdated.?) <> (Project.tupled, Project.unapply _)
+  override def * = (id.?, name, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?) <> (Project.tupled, Project.unapply _)
   def idx = index("idx_name", name, unique = true)
   def idx_template = index("idx_template", templateId)
 }
@@ -87,9 +88,18 @@ object ProjectHelper extends PlayCache {
     qProject.where(_.id is id).delete
   }
 
-  def update(id: Int, project: Project) = db withSession { implicit session =>
+  def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
+    AttributeHelper.deleteByPid_(id)
+    val attrs = projectForm.items.map(item =>
+      Attribute(None, Some(id), item.name, item.value)
+    )
+    AttributeHelper.create(attrs)
+    update_(id, projectForm.toProject)
+  }
+
+  def update_(id: Int, project: Project)(implicit session: JdbcBackend#Session) = {
     val project2update = project.copy(Some(id))
-    qProject.where(_.id is id).update(project2update)
+    qProject.where(_.id is id).update(project2update)(session)
   }
 
 }

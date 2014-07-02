@@ -19,7 +19,7 @@
             <td>{{user.role | role}}</td>
             <td>{{user.locked | lock}}</td>
             <td>{{user.lastIp}}</td>
-            <td>{{user.lastVisit}}</td>
+            <td>{{user.lastVisit | date:'yyyy-MM-dd HH:mm:ss'}}</td>
             <td>
                 <a ui-sref="conf.user.edit({id: user.jobNo})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(user.jobNo, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>

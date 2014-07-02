@@ -40,6 +40,22 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    // 项目名称显示
+    app.directive('projectShow', ['ProjectService', function(ProjectService) {
+        return {
+            restrict: 'E',
+            scope: {
+                pid: '@'
+            },
+            template: '<span>{{project.name}}</span>',
+            link: function($scope, element, attrs) {
+                ProjectService.get($scope.pid, function(data) {
+                    $scope.project = data;
+                });
+            }
+        }
+    }]);
+
 
 
 });

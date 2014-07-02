@@ -13,8 +13,9 @@ class VersionSpec extends Specification {
 
   "Sub project" should {
     "insert success return 1" in new WithApplication {
-      VersionHelper.create(Version(1, 1, "1.1.1", Some(DateTime.now()))) === 1
+      VersionHelper.create(Version(Some(1), 1, "1.1.1", Some(DateTime.now()))) === 1
     }
+
   }
 
 }

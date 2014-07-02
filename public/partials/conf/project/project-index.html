@@ -27,11 +27,11 @@
     <table class="table table-striped table-hover table-fixed">
         <thead>
             <tr>
-                <th width="10%">编号</th>
-                <th width="20%">名称</th>
-                <th width="10%">模板</th>
+                <th width="10%">项目编号</th>
+                <th width="20%">项目名称</th>
+                <th width="10%">项目模板</th>
                 <th width="25%">最近版本</th>
-                <th width="25%">最近更新时间</th>
+                <th width="25%">最近版本时间</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -42,22 +42,19 @@
             <td>
                 <template-show tid="{{project.templateId}}"></template-show>
             </td>
-            <td class="show">{{project.lastVersion}}
-                <a href="#" class="a-underline">1.1.1</a>
+            <td class="show">
+                <a href="#{{project.lastVid}}" class="a-underline">{{project.lastVersion}}</a>
                 &nbsp;
                 <div class="btn-group" ng-if="project.subTotal > 0">
-                    <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                    <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" ng-click="vs_all(project.id)">
                         All ({{project.subTotal}}) <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">1.2.0-RELEASE</a></li>
-                        <li><a href="#">1.3.0-RELEASE</a></li>
-                        <li><a href="#">1.4.0-RELEASE</a></li>
-                        <li><a href="#">1.5.0-RELEASE</a></li>
+                        <li ng-repeat="version in versions"><a href="#{{version.id}}">{{version.vs}}</a></li>
                     </ul>
                 </div>
             </td>
-            <td>{{project.lastUpdated}}</td>
+            <td>{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
             <td>
                 <a ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>

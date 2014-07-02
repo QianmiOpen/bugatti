@@ -2,12 +2,10 @@ package controllers.conf
 
 import enums.RoleEnum
 import models.conf._
-import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
 import play.api.libs.json._
-import utils.DateFormatter._
 
 /**
  * 用户管理

@@ -2,6 +2,7 @@ package controllers.conf
 
 import enums.LevelEnum
 import models.conf.{Environment, EnvironmentHelper}
+import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.data._
@@ -63,7 +64,12 @@ object EnvController extends Controller {
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       env =>
-        Ok(Json.obj("r" -> Json.toJson(EnvironmentHelper.update(id, env))))
+        EnvironmentHelper.findByName(env.name).find(_.id != Some(id)) match {
+          case Some(_) =>
+            Ok(Json.obj("r" -> "exist"))
+          case None =>
+            Ok(Json.obj("r" -> Json.toJson(EnvironmentHelper.update(id, env))))
+        }
     )
   }
 

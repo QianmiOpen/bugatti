@@ -39,6 +39,8 @@ object Application extends Controller with Security {
         conf.routes.javascript.ProjectController.save,
         conf.routes.javascript.ProjectController.index,
         conf.routes.javascript.ProjectController.count,
+        conf.routes.javascript.ProjectController.update,
+        conf.routes.javascript.ProjectController.atts,
 
         // template
         conf.routes.javascript.TemplateController.all,
@@ -48,6 +50,15 @@ object Application extends Controller with Security {
         conf.routes.javascript.TemplateController.update,
         // template item
         conf.routes.javascript.TemplateController.items,
+
+        // version
+        conf.routes.javascript.VersionController.index,
+        conf.routes.javascript.VersionController.count,
+        conf.routes.javascript.VersionController.show,
+        conf.routes.javascript.VersionController.delete,
+        conf.routes.javascript.VersionController.save,
+        conf.routes.javascript.VersionController.update,
+        conf.routes.javascript.VersionController.all,
 
         //task
         task.routes.javascript.TaskController.findLastTaskStatus,

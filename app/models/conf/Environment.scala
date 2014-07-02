@@ -31,7 +31,7 @@ object EnvironmentHelper {
     qEnvironment.where(_.id is id).firstOption
   }
 
-  def findByName(name: String) = db withSession { implicit session =>
+  def findByName(name: String): Option[Environment] = db withSession { implicit session =>
     qEnvironment.where(_.name is name).firstOption
   }
 

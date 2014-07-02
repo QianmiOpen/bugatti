@@ -24,7 +24,8 @@ class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
 
   override def * = (id, eid, pid, vid, name, path, lastUpdated.?) <> (Conf.tupled, Conf.unapply _)
 
-  def idx = index("idx_vid", (eid, vid))
+  def idx_vid = index("idx_vid", vid)
+  def idx = index("idx_eid_vid", (eid, vid))
 }
 
 object ConfHelper extends PlayCache {
@@ -37,8 +38,12 @@ object ConfHelper extends PlayCache {
     qConf.where(_.id is id).firstOption
   }
 
-  def findByPid(pid: Int) = db withSession { implicit session =>
+  def findByPid(pid: Int): List[Conf] = db withSession { implicit session =>
     qConf.where(_.pid is pid).list
+  }
+
+  def findByVid(vid: Int): List[Conf] = db withSession { implicit session =>
+    qConf.where(_.vid is vid).list
   }
 
   def create(conf: Conf) = db withSession { implicit session =>

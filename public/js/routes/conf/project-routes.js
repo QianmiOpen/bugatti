@@ -27,7 +27,8 @@ define(['angular'], function(angular) {
             url: "/:id/edit",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/project/project-new.html"
+                    templateUrl: "partials/conf/project/project-edit.html",
+                    controller: "ProjectUpdateCtrl"
                 }
             }
         });
@@ -41,15 +42,40 @@ define(['angular'], function(angular) {
             }
         });
 
+        // ===================================================================
         // 子项目
+        // ===================================================================
         $stateProvider.state('conf.project.version', {
             url: "/:id/version",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/project/version-index.html"
+                    templateUrl: "partials/conf/project/version-index.html",
+                    controller: 'VersionCtrl'
                 }
             }
         });
+
+
+        $stateProvider.state('conf.project.version.create', {
+            url: "/create",
+            views: {
+                "@conf": {
+                    templateUrl: "partials/conf/project/version-new.html",
+                    controller: "VersionCreateCtrl"
+                }
+            }
+        });
+
+        $stateProvider.state('conf.project.version.edit', {
+            url: "/:vid/edit",
+            views: {
+                "@conf": {
+                    templateUrl: "partials/conf/project/version-edit.html",
+                    controller: "VersionUpdateCtrl"
+                }
+            }
+        });
+
 
     }]);
 

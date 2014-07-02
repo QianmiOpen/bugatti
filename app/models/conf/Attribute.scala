@@ -45,6 +45,10 @@ object AttributeHelper {
     qAttribute.where(_.id is id).delete
   }
 
+  def deleteByPid_(pid: Int)(implicit session: JdbcBackend#Session) = {
+    qAttribute.where(_.pid is pid).delete
+  }
+
   def update(id: Int, attr: Attribute) = db withSession { implicit session =>
     val attr2update = attr.copy(Some(id))
     qAttribute.where(_.id is id).update(attr2update)
