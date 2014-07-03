@@ -1,5 +1,7 @@
 package models.task
 
+import java.io.File
+
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -146,6 +148,8 @@ object TaskProcess {
  */
 class TaskProcess extends Actor {
 
+  val baseLogPath = "/Users/jinwei/bugatti/saltlogs"
+
   implicit val taskWrites = Json.writes[Task]
 
   def receive = {
@@ -165,7 +169,7 @@ class TaskProcess extends Actor {
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
-        if(executeCommand(commandList, envId, projectId, taskName)){
+        if(executeCommand(commandList, envId, projectId, taskId, taskName)){
           //任务执行成功
           TaskHelper.changeStatus(taskId, 1)
         }
@@ -195,31 +199,81 @@ class TaskProcess extends Actor {
     }
   }
 
-  def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskName: String): Boolean = {
+  def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskId: Int, taskName: String): Boolean = {
     val totalNum = commandList.size
     var result = true
+    val baseDir = s"${baseLogPath}/${taskId}"
+    val path = s"${baseLogPath}/${taskId}/execute.log"
+    val resultLogPath = s"${baseLogPath}/${taskId}/result.log"
+    val logDir = new File(baseDir)
+    if(!logDir.exists){
+      logDir.mkdirs()
+    }
+
     for(command <- commandList){
       //修改内存状态
       val currentNum = command.orderNum
-      Logger.info("executeCommand currentNum==>" + currentNum)
-      Logger.info("executeCommand totalNum==>" + totalNum)
       TaskProcess.changeAllStatus(TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.command, 3, taskName))
       //修改数据库状态(task_command)
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, 3)
       //推送状态
       TaskProcess.pushStatus
       //调用salt命令
-      Logger.info(command.command + " -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log")
-      command.command + " -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log" !!
+      val cmd = command.command + s" -v --out-file=${path}"
+      Logger.info(cmd)
+      (cmd !!)
 //      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
-      //查看日志
 
+      //合并日志
+      val dir = new File(baseDir)
+      val file = new File(resultLogPath)
+      mergeLog(path, file, cmd, false)
+
+      //查看日志 失败的命令再次执行一次
+      if(!checkLog(path)){
+        (cmd !!)
+        //合并日志
+        mergeLog(path, file, cmd, true)
+        if(!checkLog(path)){
+          result = false
+          return result
+        }
+      }
       //更新数据库状态
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, 1)
       //根据最后一次任务的状态判断整个任务是否成功
       result = true
     }
     Logger.info(result.toString)
+    result
+  }
+
+  def mergeLog(path: String, file: File, cmd: String, again: Boolean) = {
+    var executeAgain = ""
+    if(again){
+      executeAgain = "[execute again] "
+    }
+
+    Seq("echo", "=====================================华丽分割线=====================================") #>> file lines
+
+    Seq("echo", s"${executeAgain} command: ${cmd}\n") #>> file lines
+
+    Seq("cat", path) #>> file lines
+  }
+
+  def checkLog(path: String): Boolean = {
+    var result = true
+    val row = (s"tail -n3 ${path}" !!).split("\n")(0)
+    if(row.split(":").length>1){
+      val failedNum = row.split(":")(1).trim().toInt
+      if(failedNum == 0){
+        result = true
+      }else {
+        result = false
+      }
+    }else {
+      result = false
+    }
     result
   }
 

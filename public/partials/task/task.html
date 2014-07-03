@@ -14,7 +14,8 @@
             <thead>
             <tr>
                 <th width="15%">项目名称</th>
-                <th width="70%">状态</th>
+                <th width="10%"></th>
+                <th width="60%">状态</th>
                 <th width="15%">操作</th>
             </tr>
             </thead>
@@ -23,7 +24,14 @@
             <tr ng-repeat="pro in projectStatus">
                 <td>
                     {{pro.name}}
-                    <a><span class="glyphicon glyphicon-time" style="float: right">1</span></a>
+                </td>
+                <td>
+                    <a>
+                        <span class="glyphicon glyphicon-random" style="float: right">&nbsp;1&nbsp;</span>
+                    </a>
+                    <a>
+                        <span class="glyphicon glyphicon-time" style="float: right">&nbsp;0&nbsp;</span>
+                    </a>
                 </td>
                 <td style="padding:10px 0px 0px 0px;">
                     <a ng-show="showHref(pro.status.status)" ui-sref="task.info({taskId:task.task.id, envId: envId, proId: proId, envName: envName, proName: proName})">{{pro.task.endTime}}  {{pro.status.statusTip}}!   版本号：{{pro.task.version}}   任务: {{pro.status.taskName}}</a>

@@ -64,7 +64,7 @@ object VersionHelper extends PlayCache {
       list
     } else {//线上环境
       Logger.info("safe")
-      list.filterNot(t => TaskTools.isSnapshot(t.version))
+      list.filterNot(t => TaskTools.isSnapshot(t.vs))
     }
   }
 
