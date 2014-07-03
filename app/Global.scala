@@ -165,10 +165,9 @@ object AppData {
     taskTemplateStep.ddl.create
 
     val taskTemplateSeq = Seq(
-      TaskTemplateStep(Option(1), 1, "java.install", 0)
-      ,TaskTemplateStep(Option(2), 1, "tomcat.install", 1)
-      ,TaskTemplateStep(Option(3), 1, "webapp.install", 2)
-      ,TaskTemplateStep(Option(4), 1, "conf.install", 3)
+      TaskTemplateStep(Option(1), 1, "salt {{machine}} state.sls java.install", 1)
+      ,TaskTemplateStep(Option(2), 1, "salt {{machine}} state.sls tomcat.install", 2)
+      ,TaskTemplateStep(Option(3), 1, """salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}""", 3)
     )
     taskTemplateStep.insertAll(taskTemplateSeq: _*)
   }

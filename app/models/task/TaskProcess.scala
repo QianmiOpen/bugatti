@@ -3,13 +3,16 @@ package models.task
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import models.conf.{EnvironmentHelper, AttributeHelper}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import utils.TaskTools
 
 import scala.concurrent.duration._
 import utils.DateFormatter._
+import sys.process._
 
 /**
  * Created by jinwei on 20/6/14.
@@ -157,7 +160,8 @@ class TaskProcess extends Actor {
         val taskId = TaskHelper.addByTaskQueue(taskQueue)
         //3.3、依次执行命令(insert命令列表，依次执行，修改数据库状态，修改内存状态)；
         val params = TaskProcess.getAllParams
-        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue.taskTemplateId, params)
+        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
+        Logger.info(commandList.toString)
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
@@ -205,8 +209,11 @@ class TaskProcess extends Actor {
       //推送状态
       TaskProcess.pushStatus
       //调用salt命令
+      Logger.info(command.command + " -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log")
+      command.command + " -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log" !!
+//      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
       //查看日志
-      Thread.sleep(2000)
+
       //更新数据库状态
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, 1)
       //根据最后一次任务的状态判断整个任务是否成功
@@ -219,23 +226,48 @@ class TaskProcess extends Actor {
   /**
    * 生成命令集合
    * @param taskId
-   * @param taskTemplateId
+   * @param taskQueue
    * @param jsValue
    * @return
    */
-  def generateCommands(taskId: Int, taskTemplateId: Int, jsValue: JsValue): Seq[TaskCommand]={
-    val templateCommands = TaskTemplateStepHelper.getStepsByTemplateId(taskTemplateId).map{ step =>
-      //参数替换，更改sls命令
-      fillSls(step, taskId, jsValue)
+  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue): Seq[TaskCommand]={
+    //1、envId , projectId -> machines, nfsServer
+    val machines: List[String] = List("t-minion")
+    val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
+
+    //2、projectId -> groupId, artifactId
+    val groupId = AttributeHelper.getValue(taskQueue.projectId, "groupId")
+    val artifactId = AttributeHelper.getValue(taskQueue.projectId, "artifactId")
+
+    //3、version -> version, repository
+    val version = taskQueue.version
+    var repository = "releases"
+    if(TaskTools.isSnapshot(version)){
+      repository = "snapshots"
     }
+
+    val paramsJson = Json.obj(
+      "nfsServer" -> nfsServer
+      ,"groupId" -> groupId
+      ,"artifactId" -> artifactId
+      ,"version" -> version
+      ,"repository" -> repository
+    )
+
+
+    val templateCommands = TaskTemplateStepHelper.getStepsByTemplateId(taskQueue.taskTemplateId).map{ step =>
+      //参数替换，更改sls命令
+      fillSls(step, taskId, paramsJson)
+    }
+
     //获取机器，遍历机器&模板命令
-    val machines: List[String] = List("t-minion1","t-minion2")
     var count = 0
     for{machine <- machines
       c <- templateCommands
     } yield {
       count += 1
-      c.copy(command = s"${machine}:${c.command}").copy(orderNum = count)
+      val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine)
+      c.copy(command = command).copy(orderNum = count).copy(machine = s"${machine}")
     }
   }
 
@@ -243,51 +275,32 @@ class TaskProcess extends Actor {
    * 填写命令参数
    * @param sls
    * @param taskId
-   * @param jsValue
+   * @param paramsJson
    * @return
    */
-  def fillSls(sls: TaskTemplateStep, taskId: Int, jsValue: JsValue): TaskCommand = {
+  def fillSls(sls: TaskTemplateStep, taskId: Int, paramsJson: JsValue): TaskCommand = {
+    val keys: Set[String] = paramsJson match{
+      case JsObject(fields) =>{
+        fields.toMap.keySet
+      }
+      case _ =>{
+        Set.empty[String]
+      }
+    }
     //sls.sls需要被填充
-    TaskCommand(None, taskId, sls.sls, 0, sls.orderNum)
+    TaskCommand(None, taskId, replaceSls(sls, paramsJson, keys), "machine", "sls", 0, sls.orderNum)
+  }
+
+  def replaceSls(sls: TaskTemplateStep, paramsJson: JsValue, keys: Set[String]): String = {
+    var result = sls.sls
+    keys.map{
+      key =>
+        result = result.replaceAll("\\{\\{" + key + "\\}\\}", (paramsJson \ key).toString)
+    }
+    result
   }
 }
 
-/**
- * 处理所有的websocket
- */
-//class SocketActor extends Actor {
-//
-//  val (out, channel) = Concurrent.broadcast[JsValue]
-//
-//  def receive = {
-//    case JoinProcess(js) => {
-//      sender ! ConnectedSocket(out)
-//      notifyAllSocket(js)
-//    }
-//    case QuitProcess() => {
-//      Logger.info("有一个客户端关闭了连接")
-//    }
-//    case AllTaskStatus() => {
-//      notifyAllSocket(TaskProcess.getAllStatus)
-//    }
-//  }
-//
-//  def notifyAllSocket(js: JsValue) {
-//    Logger.info(js.toString())
-//    Thread.sleep(100)
-//    channel.push(js)
-//  }
-//}
-//
-//case class JoinProcess(js: JsValue)
-//
-//case class AllTaskStatus()
-//
-//case class ConnectedSocket(out: Enumerator[JsValue])
-//
-//case class CannotConnect(msg: String)
-//
-//case class QuitProcess()
 
 case class ExecuteOneByOne(envId: Int, projectId: Int)
 

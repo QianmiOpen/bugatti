@@ -21,16 +21,21 @@
             <tbody>
 
             <tr ng-repeat="pro in projectStatus">
-                <td>{{pro.name}}</td>
+                <td>
+                    {{pro.name}}
+                    <a><span class="glyphicon glyphicon-time" style="float: right">1</span></a>
+                </td>
                 <td style="padding:10px 0px 0px 0px;">
                     <a ng-show="showHref(pro.status.status)" ui-sref="task.info({taskId:task.task.id, envId: envId, proId: proId, envName: envName, proName: proName})">{{pro.task.endTime}}  {{pro.status.statusTip}}!   版本号：{{pro.task.version}}   任务: {{pro.status.taskName}}</a>
                     <div>
                         <span ng-show="showProgress(pro.status.status)" >{{pro.status.statusTip}} : {{pro.status.sls}}</span>
+
                     </div>
                     <div ng-show="showProgress(pro.status.status)" class="progress progress-mb">
                         <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{pro.status.currentNum*100/pro.status.totalNum}}%;">
                         </div>
                     </div>
+
                 </td>
                 <!-- ========================================操作======================================== -->
                 <td class="show">
