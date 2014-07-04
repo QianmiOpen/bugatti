@@ -5,6 +5,7 @@ import java.io.File
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import enums.TaskEnum
 import models.conf.{EnvironmentHelper, AttributeHelper}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
@@ -67,7 +68,7 @@ object TaskProcess {
     val result = Json.obj("currentNum" -> (status \ "currentNum").toString.toInt
       , "totalNum" -> (status \ "totalNum").toString.toInt
       , "sls" -> (status \ "sls").toString
-      , "status" -> (task \ "status").toString.toInt
+      , "status" -> (task \ "status")
       , "endTime" -> (task \ "endTime").toString
       , "taskName" -> taskName
       , "task" -> task
@@ -171,11 +172,11 @@ class TaskProcess extends Actor {
         //3.5、更改statusMap状态 & 推送任务状态；
         if(executeCommand(commandList, envId, projectId, taskId, taskName)){
           //任务执行成功
-          TaskHelper.changeStatus(taskId, 1)
+          TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskSuccess)
         }
         else {
           //任务执行失败
-          TaskHelper.changeStatus(taskId, 2)
+          TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskFailed)
         }
         //删除队列taskQueue相应记录
         TaskQueueHelper.remove(taskQueue)
@@ -215,7 +216,7 @@ class TaskProcess extends Actor {
       val currentNum = command.orderNum
       TaskProcess.changeAllStatus(TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.command, 3, taskName))
       //修改数据库状态(task_command)
-      TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, 3)
+      TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
       TaskProcess.pushStatus
       //调用salt命令
@@ -240,7 +241,7 @@ class TaskProcess extends Actor {
         }
       }
       //更新数据库状态
-      TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, 1)
+      TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
       //根据最后一次任务的状态判断整个任务是否成功
       result = true
     }
@@ -342,7 +343,7 @@ class TaskProcess extends Actor {
       }
     }
     //sls.sls需要被填充
-    TaskCommand(None, taskId, replaceSls(sls, paramsJson, keys), "machine", "sls", 0, sls.orderNum)
+    TaskCommand(None, taskId, replaceSls(sls, paramsJson, keys), "machine", "sls", TaskEnum.TaskWait, sls.orderNum)
   }
 
   def replaceSls(sls: TaskTemplateStep, paramsJson: JsValue, keys: Set[String]): String = {

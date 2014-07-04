@@ -1,5 +1,7 @@
 package models.task
 
+import enums.TaskEnum._
+
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 import org.joda.time._
@@ -9,17 +11,14 @@ import play.api.libs.json._
 
 import play.api.libs.functional.syntax._
 import play.api.Logger
-//import enums.{TaskEnum, SourceTypeEnum}
 import play.api.libs.json.JsSuccess
-import scala.Some
-//import enums.SourceTypeEnum.SourceType
 
 /**
  * 任务
  * @author of729
  * @author of546
  */
-case class Task(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: Int, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
+case class Task(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
 
 case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -27,7 +26,7 @@ case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def projectId = column[Int]("project_id", O.NotNull)
   def version = column[String]("version", O.NotNull, O.DBType("VARCHAR(64)"))
   def taskTemplateId = column[Int]("task_template_id",O.NotNull)
-  def status = column[Int]("status", O.NotNull)
+  def status = column[TaskStatus]("status", O.NotNull)
   def startTime = column[DateTime]("start_time", O.Nullable, O.DBType("DATETIME"))
   def endTime = column[DateTime]("end_time", O.Nullable, O.DBType("DATETIME"))
   def operatorId = column[Int]("operator_id", O.NotNull)
@@ -45,51 +44,14 @@ object TaskHelper {
     (JsPath \ "projectId").read[Int] and
     (JsPath \ "version").read[String] and
     (JsPath \ "taskTemplateId").read[Int] and
-    (JsPath \ "status").read[Int] and
+    (JsPath \ "status").read[TaskStatus] and
     (JsPath \ "startTime").readNullable[DateTime] and
     (JsPath \ "endTime").readNullable[DateTime] and
     (JsPath \ "operatorId").read[Int]
   )(Task.apply _)
 
-//  implicit val taskAttributeReads: Reads[TaskAttribute] = (
-//    (JsPath \ "key").read[String] and
-//    (JsPath \ "value").readNullable[String]
-//  )(TaskAttribute.apply _)
-
-//  implicit val attributeReads: Reads[Attribute]= (
-//    (JsPath \ "sourceId").readNullable[Int] and
-//    (JsPath \ "sourceType").read[SourceType] and
-//    (JsPath \ "key").read[String] and
-//    (JsPath \ "value").readNullable[String]
-//  )(Attribute.apply _)
-
-//  implicit val taskPropertiesReads: Reads[TaskProperties] = (
-//    (JsPath \ "task").read[Task] and
-//    (JsPath \ "taskAttribute").read[Seq[Attribute]] and
-//    (JsPath \ "taskMachine").read[Seq[TaskMachine]]
-//  )(TaskProperties.apply _)
-
-
-//  implicit val TaskReads = new Reads[Task]{
-//    def reads(js: JsValue): Task = {
-//      Task(
-//        (js \ "id").asOpt[Int]
-//        ,(js \ "envId").as[Int]
-//        ,(js \ "projectId").as[Int]
-//        ,(js \ "version").as[String]
-//        ,(js \ "taskType").as[Int]
-//        ,(js \ "status").as[Int]
-//        ,(js \ "startTime").asOpt[DateTime]
-//        ,(js \ "endTime").asOpt[DateTime]
-//      )
-//    }
-//  }
-
-//  def unapply(fieldsJson: JsValue): Task = {
-//    Task(None, fieldsJson.get("envId").get.toString().toInt, fieldsJson.get("projectId").get.toString().toInt, fieldsJson.get("version").get.toString(), fieldsJson.get("taskType").get.toString().toInt, fieldsJson.get("status").get.toString().toInt, Option(new DateTime()), None)
-//  }
-
   import models.AppDB._
+
   val qTask = TableQuery[TaskTable]
   val qEnvironment = TableQuery[EnvironmentTable]
   val qProject = TableQuery[ProjectTable]
@@ -119,7 +81,7 @@ object TaskHelper {
   }
 
   implicit def taskQueue2Task(tq: TaskQueue): Task ={
-    Task(None, tq.envId, tq.projectId, tq.version, tq.taskTemplateId, 3, Option(new DateTime()), None, 1)
+    Task(None, tq.envId, tq.projectId, tq.version, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
   }
 
   def addByTaskQueue(tq: TaskQueue): Int = db withSession { implicit session =>
@@ -130,7 +92,7 @@ object TaskHelper {
     taskId
   }
 
-  def changeStatus(taskId: Int, status: Int) = db withSession { implicit session =>
+  def changeStatus(taskId: Int, status: TaskStatus) = db withSession { implicit session =>
     val task = qTask.where(_.id === taskId).first
     val taskUpdate = task.copy(status = status, endTime = Some(new DateTime()))
     qTask.where(_.id === taskId).update(taskUpdate)
