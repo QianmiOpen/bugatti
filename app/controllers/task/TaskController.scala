@@ -138,7 +138,7 @@ object TaskController extends Controller {
     val version = TaskTools.trimQuotes((tq \ "version").toString)
     Logger.info(s"version ==> ${version}")
     val templateId = (tq \ "templateId").toString.toInt
-    val taskQueue = TaskQueue(None, envId, projectId, version, templateId, 0, new DateTime, None, 1)
+    val taskQueue = TaskQueue(None, envId, projectId, version, templateId, 0, new DateTime, None, None, 1)
     TaskProcess.createNewTask(taskQueue)
   }
 
