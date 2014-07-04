@@ -1,5 +1,7 @@
 package models.task
 
+import enums.TaskEnum
+import enums.TaskEnum.TaskStatus
 import org.joda.time._
 import play.api.Logger
 import play.api.libs.json.{JsPath, Reads}
@@ -11,7 +13,7 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 /**
  * Created by jinwei on 18/6/14.
  */
-case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: Int, importTime: DateTime, taskId: Option[Int], schemeId: Option[Int], operatorId: Int)
+case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: TaskStatus, importTime: DateTime, taskId: Option[Int], schemeId: Option[Int], operatorId: Int)
 
 case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -19,7 +21,7 @@ case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") 
   def projectId = column[Int]("project_id", O.NotNull)
   def version = column[String]("version", O.NotNull, O.DBType("VARCHAR(64)"))
   def taskTemplateId = column[Int]("task_template_id",O.NotNull)
-  def status = column[Int]("status", O.NotNull)
+  def status = column[TaskStatus]("status", O.NotNull)
   def importTime = column[DateTime]("import_time", O.NotNull, O.DBType("DATETIME"))
   def taskId = column[Int]("task_id", O.Nullable)
   def schemeId = column[Int]("scheme_id", O.Nullable)
@@ -39,7 +41,7 @@ object TaskQueueHelper{
     (JsPath \ "projectId").read[Int] and
     (JsPath \ "version").read[String] and
     (JsPath \ "taskTemplateId").read[Int] and
-    (JsPath \ "status").read[Int] and
+    (JsPath \ "status").read[TaskStatus] and
     (JsPath \ "importTime").read[DateTime] and
     (JsPath \ "taskId").readNullable[Int] and
     (JsPath \ "schemeId").readNullable[Int] and
@@ -66,7 +68,7 @@ object TaskQueueHelper{
   }
 
   def updateStatus(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
-    qTaskQueue.where(_.id === tq.id).update(tq.copy(status = 3).copy(taskId = Option(taskId)))
+    qTaskQueue.where(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
   }
 
   def add(tq: TaskQueue): Int = db withSession{ implicit session =>

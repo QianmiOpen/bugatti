@@ -27,4 +27,9 @@ object EnumUtils {
     Format(enumReads(enum), enumWrites)
   }
 
+  def enumWritesNumber[E <: Enumeration]: Writes[E#Value] =
+    new Writes[E#Value] {
+      def writes(v: E#Value): JsValue = JsNumber(v.id)
+    }
+
 }
