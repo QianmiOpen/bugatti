@@ -13,7 +13,7 @@ case class TaskTemplateStep (id: Option[Int], templateId: Int, sls: String, orde
 class TaskTemplateStepTable(tag: Tag) extends Table[TaskTemplateStep](tag, "task_template_step"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def templateId = column[Int]("template_id", O.NotNull)
-  def sls = column[String]("sls", O.NotNull, O.DBType("VARCHAR(100)"))
+  def sls = column[String]("sls", O.NotNull, O.DBType("VARCHAR(2000)"))
   def orderNum = column[Int]("order_num", O.NotNull)
 
   override def * = (id.?, templateId, sls, orderNum) <> (TaskTemplateStep.tupled, TaskTemplateStep.unapply _)

@@ -174,7 +174,7 @@ define(['angular'], function(angular) {
             $scope.versions = []
             TaskService.getVersions(pid, $scope.activeEnv, function(data){
                 for(var dIndex in data) {
-                    $scope.versions.push(data[dIndex].version)
+                    $scope.versions.push(data[dIndex].vs)
                 }
                 console.log($scope.versions)
             })

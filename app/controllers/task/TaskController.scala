@@ -8,6 +8,7 @@ import utils.DateFormatter._
 import play.api.Logger
 import models.conf._
 import play.api.mvc._
+import utils.TaskTools
 import sys.process._
 import scala.io.Source
 import scala.collection.{mutable, Seq}
@@ -134,15 +135,11 @@ object TaskController extends Controller {
     val tq = fieldsJson \ "taskQueue"
     val envId = (tq \ "envId").toString.toInt
     val projectId = (tq \ "projectId").toString.toInt
-    val version = trimQuotes((tq \ "version").toString)
+    val version = TaskTools.trimQuotes((tq \ "version").toString)
     Logger.info(s"version ==> ${version}")
     val templateId = (tq \ "templateId").toString.toInt
     val taskQueue = TaskQueue(None, envId, projectId, version, templateId, 0, new DateTime, None, 1)
     TaskProcess.createNewTask(taskQueue)
-  }
-
-  def trimQuotes(s: String): String = {
-    s.trim.stripPrefix("\"").stripSuffix("\"").trim
   }
 
   implicit val projectWrites = Json.writes[Project]
