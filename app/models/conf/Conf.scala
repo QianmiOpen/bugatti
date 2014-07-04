@@ -22,13 +22,14 @@ class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def pid = column[Int]("pid", O.NotNull)   // 主项目编号
   def vid = column[Int]("vid", O.NotNull)   // 子项目编号
   def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
-  def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(500)"))
+  def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(200)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
   override def * = (id.?, eid, pid, vid, name, path, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
 
   def idx_vid = index("idx_vid", vid)
+  def idx_path = index("idx_path", (vid, path), unique = true)
   def idx = index("idx_eid_vid", (eid, vid, updated))
 }
 

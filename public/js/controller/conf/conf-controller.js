@@ -48,10 +48,17 @@ define(['angular'], function(angular) {
         'ConfService', 'EnvService', 'ProjectService', 'VersionService',
         function($scope, $state, $stateParams, $modal, ConfService, EnvService, ProjectService, VersionService) {
             $scope.conf = {pid: $stateParams.id, vid: $stateParams.vid};
+
             $scope.cancel = function() {
-//                if($scope.conf.content == undefined) {
-//                    $state.go('^')
-//                }
+
+                $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+
+//                $scope.$on('$locationChangeStart', function( event ) {
+//                    var answer = confirm("Are you sure you want to leave this page?")
+//                    if (!answer) {
+//                        event.preventDefault();
+//                    }
+//                });
             };
 
             $scope.save = function() {
@@ -95,8 +102,6 @@ define(['angular'], function(angular) {
                     }
                 });
             };
-
-
     }]);
 
     app.controller('ConfEditCtrl', ['$scope', '$state', '$stateParams', '$modal',
@@ -112,9 +117,7 @@ define(['angular'], function(angular) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });
             };
-
     }]);
-
 
 
 });

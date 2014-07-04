@@ -1,13 +1,13 @@
 <form name="form" class="form-horizontal" novalidate>
-    <p class="navbar-text">
-        / <input ng-model="conf.path" name="path" id="path" required maxlength="500"/>
+    <p class="navbar-text col-sm-12" style="padding-left:0px;">
+        / <input ng-model="conf.path" class="form-control" style="width:40%;display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：temp1/conf/jdbc.properties"/>
         &nbsp; or &nbsp;
         <a href="" class="navbar-link" ng-click="cancel()">cancel</a>
     </p>
 
     <div class="clearfix"></div>
 
-    <div class="form-group">
+    <div>
         <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
@@ -17,13 +17,15 @@
         }" ng-model="conf.content"></div>
     </div>
 
-    <div class="form-group">
+    <div style="margin-top: 15px;">
         <label class="col-sm-1 control-label">描述：</label>
         <div class="col-sm-11">
             <textarea ng-model="conf.remark" class="form-control" rows="3" placeholder="备注" maxlength="500"></textarea>
         </div>
     </div>
-    <div class="form-group">
+
+    <div class="clearfix"></div>
+    <div style="margin-top: 15px;">
         <div class="text-right">
             <div ng-show="form.path.$dirty && form.path.$invalid" class="has-error">
                 <span ng-show="form.path.$error.required" class="control-label">请输入文件（路径）名称</span>
