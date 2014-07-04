@@ -56,7 +56,9 @@ PUT           /project/version/:id               controllers.conf.VersionControl
 # Conf
 GET           /conf/all                          controllers.conf.ConfController.all(eid: Int, vid: Int)
 GET           /conf/:id                          controllers.conf.ConfController.show(id: Int)
+DELETE        /conf/:id                          controllers.conf.ConfController.delete(id: Int)
 POST          /conf                              controllers.conf.ConfController.save
+PUT           /conf/:id                          controllers.conf.ConfController.update(id: Int)
 
 #Task
 POST          /task/lastStatus                   controllers.task.TaskController.findLastTaskStatus

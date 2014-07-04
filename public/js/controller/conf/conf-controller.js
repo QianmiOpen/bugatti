@@ -42,7 +42,7 @@ define(['angular'], function(angular) {
             ConfService.getAll($stateParams.eid, $stateParams.vid, function(data) {
                 $scope.confs = data;
             });
-        }]);
+    }]);
 
     app.controller('ConfCreateCtrl', ['$scope', '$state', '$stateParams', '$modal',
         'ConfService', 'EnvService', 'ProjectService', 'VersionService',
@@ -66,10 +66,55 @@ define(['angular'], function(angular) {
     app.controller('ConfShowCtrl', ['$scope', '$state', '$stateParams', '$modal',
         'ConfService',
         function($scope, $state, $stateParams, $modal, ConfService) {
+
             ConfService.get($stateParams.cid, function(data) {
                 $scope.conf = data.conf;
                 $scope.conf.content = data.content.content;
             });
 
-        }]);
+            // remove
+            $scope.delete = function(cid) {
+                var modalInstance = $modal.open({
+                    templateUrl: 'partials/modal.html',
+                    controller: function ($scope, $modalInstance) {
+                        $scope.ok = function () {
+                            ConfService.remove(cid, function(state) {
+                                $modalInstance.close(state);
+                            });
+                        };
+                        $scope.cancel = function () {
+                            $modalInstance.dismiss('cancel');
+                        };
+                    }
+                });
+                modalInstance.result.then(function(state) {
+                    if (state !== '0') {
+                        $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+                    } else {
+                        alert('删除失败！')
+                    }
+                });
+            };
+
+
+    }]);
+
+    app.controller('ConfEditCtrl', ['$scope', '$state', '$stateParams', '$modal',
+        'ConfService',
+        function($scope, $state, $stateParams, $modal, ConfService) {
+            ConfService.get($stateParams.cid, function(data) {
+                $scope.conf = data.conf;
+                $scope.conf.content = data.content.content;
+            });
+
+            $scope.update = function() {
+                ConfService.update($stateParams.cid, angular.toJson($scope.conf), function(data) {
+                    $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+                });
+            };
+
+    }]);
+
+
+
 });

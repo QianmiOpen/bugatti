@@ -1,9 +1,9 @@
 
 <p class="navbar-text">{{conf.path}}
 <p class="navbar-text navbar-right btn-group btn-group-xs">
-    <button type="button" class="btn btn-default">编辑</button>
+    <button ui-sref="conf.project.version.conf.edit({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">编辑</button>
     <button type="button" class="btn btn-default">历史</button>
-    <button type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
+    <button ng-click="delete(conf.id)" type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
 </p>
 </p>
 
@@ -15,3 +15,6 @@
           onLoad: aceLoaded,
           onChange: aceChanged
         }" ng-model="conf.content" readonly="true"></div>
+
+<br/>
+备注：<pre>{{conf.remark}}</pre>

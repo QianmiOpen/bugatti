@@ -56,12 +56,15 @@ object ConfHelper extends PlayCache {
     ConfContentHelper.create_(content)
   }
 
-  def delete(id: Int) = db withSession { implicit session =>
+  def delete(id: Int) = db withTransaction { implicit session =>
     qConf.where(_.id is id).delete
+    ConfContentHelper.delete_(id)
   }
 
-  def update(id: Int, conf: Conf) = db withSession { implicit session =>
-    val conf2update = conf.copy(Some(id))
+  def update(id: Int, confForm: ConfForm) = db withSession { implicit session =>
+    val conf2update = confForm.toConf.copy(Some(id))
     qConf.where(_.id is id).update(conf2update)
+    ConfContentHelper.update_(id, ConfContent(None, confForm.content))
   }
+
 }

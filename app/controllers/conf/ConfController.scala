@@ -42,11 +42,24 @@ object ConfController extends Controller {
     Ok(Json.toJson(ConfHelper.findByEid_Vid(eid, vid)))
   }
 
+  def delete(id: Int) = Action {
+    Ok(Json.toJson(ConfHelper.delete(id)))
+  }
+
   def save = Action { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm))))
+      }
+    )
+  }
+
+  def update(id: Int) = Action { implicit request =>
+    confForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      confForm => {
+        Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm))))
       }
     )
   }

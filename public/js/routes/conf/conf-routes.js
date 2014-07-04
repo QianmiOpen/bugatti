@@ -47,6 +47,15 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('conf.project.version.conf.edit', {
+            url: "/:cid/edit",
+            views: {
+                "conf-info@conf.project.version.conf": {
+                    templateUrl: "partials/conf/project/uiview/conf-edit.html",
+                    controller: "ConfEditCtrl"
+                }
+            }
+        });
 
 
     }]);
