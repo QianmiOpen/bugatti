@@ -28,7 +28,7 @@ class SocketActor extends Actor {
   }
 
   def notifyAllSocket(js: JsValue) {
-    Logger.info(js.toString())
+    Logger.info("notifyAllSocket==>" + js.toString())
     Thread.sleep(100)
     channel.push(js)
   }

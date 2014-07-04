@@ -10,7 +10,7 @@ import models.conf.{EnvironmentHelper, AttributeHelper}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
-import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import play.api.libs.json._
 import utils.TaskTools
 
 import scala.concurrent.duration._
@@ -59,21 +59,15 @@ object TaskProcess {
     statusMap
   }
 
-  def generateStatusJson(envId: Int, projectId: Int, currentNum: Int, totalNum: Int, sls: String, status: Int, taskName: String): JsObject = {
-    Json.obj(s"${envId}_${projectId}" -> Json.obj("currentNum" -> currentNum, "totalNum" -> totalNum, "sls" -> sls, "status" -> status, "taskName" -> taskName))
+  def generateStatusJson(envId: Int, projectId: Int, currentNum: Int, totalNum: Int, sls: String, status: Int, taskName: String) = {
+    val key = s"${envId}_${projectId}"
+    val json = Json.obj("currentNum" -> currentNum, "totalNum" -> totalNum, "sls" -> sls, "status" -> status, "taskName" -> taskName)
+    generateJson(key, json)
   }
 
-  def generateTaskStatusJson(envId: Int, projectId: Int, task: JsValue, taskName: String): JsValue = {
-    val status = statusMap \ s"${envId}_${projectId}"
-    val result = Json.obj("currentNum" -> (status \ "currentNum").toString.toInt
-      , "totalNum" -> (status \ "totalNum").toString.toInt
-      , "sls" -> (status \ "sls").toString
-      , "status" -> (task \ "status")
-      , "endTime" -> (task \ "endTime").toString
-      , "taskName" -> taskName
-      , "task" -> task
-    )
-    changeAllStatus(Json.obj(s"${envId}_${projectId}" -> result))
+  def generateTaskStatusJson(envId: Int, projectId: Int, task: JsValue, taskName: String) = {
+    val key = s"${envId}_${projectId}"
+    generateJson(key, Json.obj("taskName" -> taskName, "task" -> task, "status" -> task \ "status", "endTime" -> (task \ "endTime").toString))
   }
 
   def changeAllStatus(js: JsObject): JsValue = {
@@ -94,12 +88,40 @@ object TaskProcess {
   //新建任务,insert队列表
   def createNewTask(tq: TaskQueue): Int = {
     val taskQueueId = TaskQueueHelper.add(tq)
+    //更新队列任务信息
+    checkQueueNum(tq)
     //发送到指定 actor mailbox
     executeTasks(tq.envId, tq.projectId)
     taskQueueId
   }
 
-  //推送任务状态
+  def checkQueueNum(tq: TaskQueue) = {
+    //1、获取队列中等待执行TaskWait的任务个数
+    val waitNum = TaskQueueHelper.findQueueNum(tq)
+    Logger.info(s"waitNum ==> ${waitNum}")
+    //2、更改任务状态
+    generateQueueNumJson(tq, waitNum)
+    //3、推送任务状态
+    pushStatus()
+  }
+
+  def generateQueueNumJson(tq: TaskQueue, num: Int){
+    val key = s"${tq.envId}_${tq.projectId}"
+    generateJson(key, Json.obj("queueNum" -> num))
+  }
+
+  def generateJson(key: String, json: JsObject){
+    val status = (statusMap \ key).asOpt[JsObject]
+    if(status != None){
+      val result = status.get ++ json
+      changeAllStatus(Json.obj(key -> result))
+      Logger.info(s"status ==> ${result.toString()}")
+    }
+    else{
+      changeAllStatus(Json.obj(key -> json))
+      Logger.info(s"status ==> ${json}")
+    }
+  }
 
   def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     val js: JsValue = getAllStatus
@@ -158,11 +180,12 @@ class TaskProcess extends Actor {
       //3.1、队列表中获取最先执行的任务；
       var taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
       var taskName = ""
-
       while(taskQueue != null){
         taskName = TaskTemplateHelper.getById(taskQueue.taskTemplateId).name
         //3.2、insert到任务表 & 命令表；
         val taskId = TaskHelper.addByTaskQueue(taskQueue)
+        //更新队列任务信息
+        TaskProcess.checkQueueNum(taskQueue)
         //3.3、依次执行命令(insert命令列表，依次执行，修改数据库状态，修改内存状态)；
         val params = TaskProcess.getAllParams
         val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
@@ -214,7 +237,7 @@ class TaskProcess extends Actor {
     for(command <- commandList){
       //修改内存状态
       val currentNum = command.orderNum
-      TaskProcess.changeAllStatus(TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.command, 3, taskName))
+      TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.command, 3, taskName)
       //修改数据库状态(task_command)
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
@@ -237,11 +260,15 @@ class TaskProcess extends Actor {
         mergeLog(path, file, cmd, true)
         if(!checkLog(path)){
           result = false
-          return result
         }
       }
       //更新数据库状态
-      TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
+      if(result){
+        TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
+      } else {
+        TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskFailed)
+        return result
+      }
       //根据最后一次任务的状态判断整个任务是否成功
       result = true
     }
