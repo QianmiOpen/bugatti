@@ -49,6 +49,22 @@ object ProjectController extends Controller {
     Ok(Json.toJson(ProjectHelper.findById(id)))
   }
 
+  def delete(id: Int) = Action {
+    ProjectHelper.findById(id) match {
+      case Some(project) =>
+        // todo permission
+        project.subTotal match {
+          case 0 =>
+            Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
+          case _ =>
+            Ok(Json.obj("r" -> "exist"))
+        }
+      case None =>
+        Ok(Json.obj("r" -> "none"))
+    }
+
+  }
+
   def save = Action { implicit request =>
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),

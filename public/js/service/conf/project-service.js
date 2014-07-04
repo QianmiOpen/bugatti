@@ -24,6 +24,9 @@ define(['angular'], function(angular) {
             update: function(id, project, callback) {
                 $http.put(PlayRoutes.controllers.conf.ProjectController.update(id).url, project).success(callback)
             },
+            remove: function(id, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.delete(id)).success(callback);
+            },
             atts: function(pid, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.atts(pid)).success(callback);
             }

@@ -37,13 +37,14 @@ define(['angular'], function(angular) {
             url: "/:id",
             views: {
                 "@conf": {
-                    templateUrl:"partials/conf/project/project-show.html"
+                    templateUrl:"partials/conf/project/project-show.html",
+                    controller: "ProjectShowCtrl"
                 }
             }
         });
 
         // ===================================================================
-        // 子项目
+        // 子项目,项目下版本
         // ===================================================================
         $stateProvider.state('conf.project.version', {
             url: "/:id/version",

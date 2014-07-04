@@ -1,0 +1,48 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button></td>
+    <h1 class="pull-left m0">项目详情</h1>
+</div>
+
+<table class="table table-striped border-less m0">
+    <tbody>
+    <tr>
+        <td class="text-right col-sm-3">项目编号：</td>
+        <td>{{project.id}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">项目名称：</td>
+        <td>{{project.name}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">项目模板：</td>
+        <td ng-if="project.templateId">
+            <template-show tid="{{project.templateId}}"></template-show>
+        </td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">版本数：</td>
+        <td><a ui-sref="conf.project.version({id: project.id})">{{project.subTotal}}</a></td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">最近版本：</td>
+        <td>{{project.lastVersion}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">最近版本时间：</td>
+        <td>{{project.lastUpdated | date: 'yyyy-MM-dd hh:mm:ss'}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">
+            项目属性：
+        </td>
+        <td>
+            <div class="input-group  col-sm-6" ng-repeat="att in atts">
+                <span class="input-group-addon">{{att.name}}</span>
+                <input type="text" class="form-control" value="{{att.value}}" readonly>
+            </div>
+
+        </td>
+    </tr>
+    </tbody>
+
+</table>

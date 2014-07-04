@@ -32,6 +32,36 @@ define(['angular'], function(angular) {
             })
         };
 
+
+        // remove
+        $scope.delete = function(id, index) {
+            var modalInstance = $modal.open({
+                templateUrl: 'partials/modal.html',
+                controller: function ($scope, $modalInstance) {
+                    $scope.ok = function () {
+                        ProjectService.remove(id, function(state) {
+                            $modalInstance.close(state);
+                        });
+                    };
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            });
+            modalInstance.result.then(function(data) {
+                if (data.r >= 0) {
+                    $scope.projects.splice(index, 1);
+                    ProjectService.count(function(num) {
+                        $scope.totalItems = num;
+                    });
+                } else if (data.r == 'exist') {
+                    alert('还有版本存在该项目，请删除后再操作。。。')
+                } else if (data.r == 'none') {
+                    alert('不存在的项目？')
+                }
+            });
+        };
+
     }]);
 
 
@@ -39,6 +69,10 @@ define(['angular'], function(angular) {
         function($scope, $stateParams, $modal, ProjectService) {
             ProjectService.get($stateParams.id, function(data) {
                 $scope.project = data;
+            });
+
+            ProjectService.atts($stateParams.id, function(data) {
+                $scope.atts = data;
             });
 
     }]);
@@ -187,12 +221,16 @@ define(['angular'], function(angular) {
                         };
                     }
                 });
-                modalInstance.result.then(function(state) {
-                    if (state !== '0') {
+                modalInstance.result.then(function(data) {
+                    if (data.r >= 0) {
                         $scope.versions.splice(index, 1);
                         VersionService.count($stateParams.id, function(num) {
                             $scope.totalItems = num;
                         });
+                    } else if (data.r == 'exist') {
+                        alert('还有配置在使用该版本，请删除后再操作。。。')
+                    } else if (data.r == 'none') {
+                        alert('不存在的版本？')
                     }
                 });
             };

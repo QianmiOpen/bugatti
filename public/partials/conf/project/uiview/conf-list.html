@@ -1,0 +1,21 @@
+
+<p class="navbar-text" ng-if="envs">
+    <a ui-sref="conf.project.version.conf.create({id: $stateParams.id, vid: $stateParams.vid})" class="navbar-link">/ +</a>
+    &nbsp; or &nbsp;
+    <a href="#" class="navbar-link">一键拷贝</a>
+</p>
+
+<div class="clearfix"></div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">资源文件：</div>
+    <table class="table table-striped table-fixed">
+        <tbody>
+        <tr class="active" ng-repeat="conf in confs">
+            <td width="25%"><a ui-sref="conf.project.version.conf.detail({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})">{{conf.name}}</a></td>
+            <td class="text-muted">{{conf.path}}</td>
+            <td class="text-muted" width="15%">{{conf.updated | timeago }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

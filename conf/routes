@@ -31,7 +31,8 @@ GET           /project                           controllers.conf.ProjectControl
 GET           /project/all                       controllers.conf.ProjectController.all
 GET           /project/count                     controllers.conf.ProjectController.count(search: Option[String])
 GET           /project/atts                      controllers.conf.ProjectController.atts(pid: Int)
-GET           /project:id                        controllers.conf.ProjectController.show(id: Int)
+GET           /project/:id                       controllers.conf.ProjectController.show(id: Int)
+DELETE        /project/:id                       controllers.conf.ProjectController.delete(id: Int)
 POST          /project                           controllers.conf.ProjectController.save
 PUT           /project/:id                       controllers.conf.ProjectController.update(id: Int)
 
@@ -52,12 +53,17 @@ DELETE        /project/version/:id               controllers.conf.VersionControl
 POST          /porject/version                   controllers.conf.VersionController.save
 PUT           /project/version/:id               controllers.conf.VersionController.update(id: Int)
 
+# Conf
+GET           /conf/all                          controllers.conf.ConfController.all(eid: Int, vid: Int)
+GET           /conf/:id                          controllers.conf.ConfController.show(id: Int)
+POST          /conf                              controllers.conf.ConfController.save
+
 #Task
-POST          /task/lastStatus                 controllers.task.TaskController.findLastTaskStatus
-GET           /task/joinProcess/:taskId        controllers.task.TaskController.joinProcess(taskId: Int)
-POST          /task/newTaskQueue               controllers.task.TaskController.createNewTaskQueue
-POST          /task/version                    controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
-GET           /task/nexusVersion               controllers.task.TaskController.getNexusVersions(projectId: Int)
+POST          /task/lastStatus                   controllers.task.TaskController.findLastTaskStatus
+GET           /task/joinProcess/:taskId          controllers.task.TaskController.joinProcess(taskId: Int)
+POST          /task/newTaskQueue                 controllers.task.TaskController.createNewTaskQueue
+POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
+GET           /task/nexusVersion                 controllers.task.TaskController.getNexusVersions(projectId: Int)
 
 
 

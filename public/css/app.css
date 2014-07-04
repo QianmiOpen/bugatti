@@ -101,6 +101,7 @@ code {
 .a-underline {
     text-decoration: underline;
 }
+.ace_editor { height: 400px; }
 
 /*.overflow-true{*/
     /*overflow: scroll;*/

@@ -64,15 +64,15 @@ object VersionHelper extends PlayCache {
       list
     } else {//线上环境
       Logger.info("safe")
-      list.filterNot(t => TaskTools.isSnapshot(t.version))
+      list.filterNot(t => TaskTools.isSnapshot(t.vs))
     }
   }
 
   def create(version: Version) = db withTransaction { implicit session =>
     val vid = qVersion.returning(qVersion.map(_.id)).insert(version)
     ProjectHelper.findById(version.pid) match {
-      case Some(p) => {
-        ProjectHelper.update_(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
+        case Some(p) => {
+          ProjectHelper.update_(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
       }
     }
     vid

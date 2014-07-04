@@ -7,6 +7,7 @@ define(['angular',
     './conf/env-controller',
     './conf/project-controller',
     './conf/template-controller',
+    './conf/conf-controller',
     './task/task-controller'
 ], function(angular) {
 
@@ -16,6 +17,7 @@ define(['angular',
         'bugattiApp.controller.conf.envModule',
         'bugattiApp.controller.conf.projectModule',
         'bugattiApp.controller.conf.templateModule',
+        'bugattiApp.controller.conf.confModule',
         'bugattiApp.controller.task.taskModule'
     ]);
 

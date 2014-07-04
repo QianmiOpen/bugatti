@@ -12,7 +12,7 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  *
  * @author of546
  */
-case class ConfLog(id: Int, cid: Int, eid: Int, vid: Int, name: String, path: String, remark: Option[String], updated: Option[DateTime])
+case class ConfLog(id: Int, cid: Int, eid: Int, vid: Int, name: String, path: String, remark: Option[String], updated: DateTime)
 
 class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -21,10 +21,10 @@ class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def vid = column[Int]("vid", O.NotNull)   // 子项目编号
   def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
   def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(500)"))
-  def remark = column[String]("remark", O.NotNull, O.DBType("VARCHAR(500)")) // 回复的备注内容
+  def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
-  override def * = (id, cid, eid, vid, name, path, remark.?, updated.?) <> (ConfLog.tupled, ConfLog.unapply _)
+  override def * = (id, cid, eid, vid, name, path, remark.?, updated) <> (ConfLog.tupled, ConfLog.unapply _)
 }
 object ConfLogHelper extends PlayCache {
 

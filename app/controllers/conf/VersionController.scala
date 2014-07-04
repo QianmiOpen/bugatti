@@ -44,10 +44,16 @@ object VersionController extends Controller {
   def delete(id: Int) = Action {
     VersionHelper.findById(id) match {
       case Some(version) =>
-        // todo fix version permission, return Forbidden
-        Ok(Json.toJson(VersionHelper.delete(version)))
+        // todo  version permission, return Forbidden
+
+        ConfHelper.findByVid(id).isEmpty match {
+          case true =>
+            Ok(Json.obj("r" -> Json.toJson(VersionHelper.delete(version))))
+          case false =>
+            Ok(Json.obj("r" -> "exist"))
+        }
       case None =>
-        NotFound
+        Ok(Json.obj("r" -> "none"))
     }
   }
 
