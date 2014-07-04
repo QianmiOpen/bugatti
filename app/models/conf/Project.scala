@@ -41,7 +41,7 @@ object ProjectHelper extends PlayCache {
 
   val qProject = TableQuery[ProjectTable]
 
-  def findById(id: Int) = db withSession { implicit session =>
+  def findById(id: Int): Option[Project] = db withSession { implicit session =>
     qProject.where(_.id is id).firstOption
   }
 

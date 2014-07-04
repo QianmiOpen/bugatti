@@ -71,18 +71,18 @@ object VersionHelper extends PlayCache {
   def create(version: Version) = db withTransaction { implicit session =>
     val vid = qVersion.returning(qVersion.map(_.id)).insert(version)
     ProjectHelper.findById(version.pid) match {
-        case Some(p) => {
+        case Some(p) =>
           ProjectHelper.update_(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
-      }
+        case None =>
     }
     vid
   }
 
   def delete(version: Version): Int = db withTransaction { implicit session =>
     ProjectHelper.findById(version.pid) match {
-      case Some(p) => {
+      case Some(p) =>
         ProjectHelper.update_(version.pid, Project(p.id, p.name, p.templateId, p.subTotal - 1, p.lastVid, p.lastVersion, p.lastUpdated))
-      }
+      case None =>
     }
     qVersion.where(_.id is version.id).delete
   }
