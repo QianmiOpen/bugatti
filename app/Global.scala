@@ -79,7 +79,7 @@ object AppData {
     // 创建template关联的item
     val templateItems = template.get("items").asInstanceOf[JList[JMap[String, String]]].asScala
     templateItems.zipWithIndex.foreach { case (x: JMap[String, String], index) =>
-      TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), index))
+      TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), Some(x.get("default")), index))
     }
 
     // 创建template关联的actions

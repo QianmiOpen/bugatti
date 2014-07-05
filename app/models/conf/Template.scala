@@ -49,7 +49,7 @@ object TemplateHelper extends PlayCache {
     val tid = create_(template)
 
     items.map{ item =>
-      val ti = TemplateItem(None, Some(tid), item.itemName, item.itemDesc, item.order)
+      val ti = TemplateItem(None, Some(tid), item.itemName, item.itemDesc, item.default, item.order)
       TemplateItemHelper.create_(ti)
     }.size
   }
@@ -72,7 +72,7 @@ object TemplateHelper extends PlayCache {
     TemplateItemHelper.deleteByTid_(id) // 删除该项目下所有属性
 
     items.map{ item =>  // 插入新属性
-      val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.order)
+      val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.default, item.order)
       TemplateItemHelper.create_(ti)
     }.size
 

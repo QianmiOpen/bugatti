@@ -25,6 +25,7 @@ object TemplateController extends Controller {
           "tid" -> optional(number),
           "itemName" -> nonEmptyText,
           "itemDesc" -> optional(text),
+          "default" -> optional(text),
           "order" -> number
         )(TemplateItem.apply)(TemplateItem.unapply)
       )

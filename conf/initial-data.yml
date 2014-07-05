@@ -32,7 +32,7 @@ templates:
         itemDesc: artifactId
       - itemName: unpacked
         itemDesc: 自动解压
-        itemDefault: False
+        default: False
     actions:
       - 安装:
         - 安装java: salt {{machine}} state.sls java.install
