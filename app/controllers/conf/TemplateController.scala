@@ -18,6 +18,7 @@ object TemplateController extends Controller {
     mapping(
       "id" -> optional(number),
       "name" -> nonEmptyText,
+      "remark" -> optional(text),
       "items" -> list(
         mapping(
           "id" -> optional(number),

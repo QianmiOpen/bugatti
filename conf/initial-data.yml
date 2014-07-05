@@ -1,0 +1,49 @@
+templates:
+  - name: webapi
+    remark: 用于dubbo项目的自动部署，即api类项目
+    items:
+      - itemName: groupId
+        itemDesc: groupId
+      - itemName: artifactId
+        itemDesc: artifactId
+      - itemName: unpacked
+        itemDesc: 自动解压
+        itemDefault: False
+    actions:
+      - 安装:
+        - 安装java: salt {{machine}} state.sls java.install
+        - 安装tomcat: salt {{machine}} state.sls tomcat.install
+        - 部署war包: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
+        - 拷贝配置文件: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
+        - 启动应用: salt {{machine}} state.sls tomcat.startup
+      - 重启:
+        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
+        - 启动应用: salt {{machine}} state.sls tomcat.startup
+      - 启动:
+        - 启动应用: salt {{machine}} state.sls tomcat.startup
+      - 停止:
+        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
+  - name: webui
+    remark: 用于前端web项目的自动部署，即web类项目
+    items:
+      - itemName: groupId
+        itemDesc: groupId
+      - itemName: artifactId
+        itemDesc: artifactId
+      - itemName: unpacked
+        itemDesc: 自动解压
+        itemDefault: False
+    actions:
+      - 安装:
+        - 安装java: salt {{machine}} state.sls java.install
+        - 安装tomcat: salt {{machine}} state.sls tomcat.install
+        - 部署war包: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
+        - 拷贝配置文件: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
+        - 启动应用: salt {{machine}} state.sls tomcat.startup
+      - 重启:
+        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
+        - 启动应用: salt {{machine}} state.sls tomcat.startup
+      - 启动:
+        - 启动应用: salt {{machine}} state.sls tomcat.startup
+      - 停止:
+        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
