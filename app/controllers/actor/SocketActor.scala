@@ -1,9 +1,10 @@
-package models.task
+package controllers.actor
 
 import akka.actor._
+import controllers.actor.TaskProcess
+import play.api.Logger
 import play.api.libs.iteratee._
 import play.api.libs.json.JsValue
-import play.api.Logger
 
 
 /**
