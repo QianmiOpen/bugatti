@@ -1,12 +1,18 @@
+import java.io.{File, FileInputStream}
+
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
 import models.conf._
 import models.task._
 import org.joda.time.DateTime
+import org.yaml.snakeyaml.Yaml
 import play.api._
 import play.api.Play.current
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
+import scala.collection.JavaConverters._
+
+import java.util.{List => JList, Map => JMap}
 
 /**
  * Created by li on 14-6-19.
@@ -18,25 +24,25 @@ object Global extends GlobalSettings {
     app.configuration.getBoolean("sql.not.init").getOrElse(
       AppDB.db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
-        TableQuery[ConfLogTable] ::
-        TableQuery[ConfContentTable] ::
-        TableQuery[ConfTable] ::
-        TableQuery[VersionTable] ::
-        TableQuery[PermissionTable] ::
-        TableQuery[EnvironmentTable] ::
-        TableQuery[MemberTable] ::
-        TableQuery[ProjectTable] ::
-        TableQuery[AttributeTable] ::
-        TableQuery[TemplateItemTable] ::
-        TableQuery[TemplateTable] ::
-        TableQuery[UserTable] ::
-        TableQuery[TaskTemplateTable] ::
-        TableQuery[TaskTemplateStepTable] ::
-        TableQuery[TaskCommandTable] ::
-        TableQuery[TaskQueueTable] ::
-        TableQuery[TaskSchemeTable] ::
-        TableQuery[TaskTable] ::
-        Nil foreach { table =>
+          TableQuery[ConfLogTable] ::
+          TableQuery[ConfContentTable] ::
+          TableQuery[ConfTable] ::
+          TableQuery[VersionTable] ::
+          TableQuery[PermissionTable] ::
+          TableQuery[EnvironmentTable] ::
+          TableQuery[MemberTable] ::
+          TableQuery[ProjectTable] ::
+          TableQuery[AttributeTable] ::
+          TableQuery[TemplateItemTable] ::
+          TableQuery[TemplateTable] ::
+          TableQuery[UserTable] ::
+          TableQuery[TaskTemplateTable] ::
+          TableQuery[TaskTemplateStepTable] ::
+          TableQuery[TaskCommandTable] ::
+          TableQuery[TaskQueueTable] ::
+          TableQuery[TaskSchemeTable] ::
+          TableQuery[TaskTable] ::
+          Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
         }
@@ -46,23 +52,50 @@ object Global extends GlobalSettings {
         AppData.environmentScript
         AppData.permissionScript
         AppData.taskScript
-        AppData.taskTemplateScript
-        AppData.taskTemplateStepScript
-        AppData.templateScript
         AppData.taskCommandScript
         AppData.taskQueueScript
         AppData.taskSchemeScript
         AppData.versionScript
         AppData.attributeScript
+        AppData.initFromYaml
       }
 
 
     )
+  }
+}
 
+object AppData {
+  def initFromYaml(implicit session: Session) = {
+    val yaml = new Yaml()
+    val io = new FileInputStream(new File("conf/initial-data.yml"))
+    val templates = yaml.load(io).asInstanceOf[JMap[String, AnyRef]].get("templates").asInstanceOf[JList[JMap[String, AnyRef]]].asScala
+    templates.foreach(_initTemplate)
   }
 
-}
-object AppData {
+  def _initTemplate(template: JMap[String, AnyRef]) = {
+    val templateId = TemplateHelper.create(Template(None, template.get("name").asInstanceOf[String], Some(template.get("remark").asInstanceOf[String])))
+
+    // 创建template关联的item
+    val templateItems = template.get("items").asInstanceOf[JList[JMap[String, String]]].asScala
+    templateItems.zipWithIndex.foreach { case (x: JMap[String, String], index) =>
+      TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), Some(x.get("default")), index))
+    }
+
+    // 创建template关联的actions
+    val actionList = template.get("actions").asInstanceOf[JList[JMap[String, JList[JMap[String, String]]]]].asScala
+    actionList.zipWithIndex.foreach { case (x, index) =>
+      val node = x.entrySet().iterator().next()
+      val taskTempName = node.getKey
+
+      val taskId = TaskTemplateHelper.create(TaskTemplate(None, taskTempName, templateId, index))
+      val actions = node.getValue.asScala
+      actions.zipWithIndex.foreach { case (y, index) =>
+        val action = y.entrySet().iterator().next()
+        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, action.getKey, action.getValue, index))
+      }
+    }
+  }
 
   // 用户表初始化
   def userScript(implicit session: Session) = {
@@ -79,11 +112,11 @@ object AppData {
     q.ddl.create
 
     val seq = Seq(
-      Project(None, "cardbase-master", 1, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
-      ,Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
-      ,Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
-      ,Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
-      ,Project(None, "qianmi3", 1, 5, Option(5), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
+      Project(None, "cardbase-master", 1, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi3", 1, 5, Option(5), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
     )
     q.insertAll(seq: _*)
   }
@@ -96,6 +129,7 @@ object AppData {
     )
     q.insertAll(seq: _*)
   }
+
   //版本初始化
   def versionScript(implicit session: Session) = {
     val q = TableQuery[VersionTable]
@@ -125,7 +159,7 @@ object AppData {
 
     val seq = Seq(
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe)
-      ,Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe)
+      , Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe)
     )
     q.insertAll(seq: _*)
   }
@@ -137,68 +171,32 @@ object AppData {
     q.ddl.create
     q.insert(Permission("of111", List(enums.FuncEnum.user, enums.FuncEnum.project)))
   }
+
   // 任务
-  def taskScript(implicit session:Session) = {
+  def taskScript(implicit session: Session) = {
     val task = TableQuery[TaskTable]
     if (!MTable.getTables(task.baseTableRow.tableName).list.isEmpty) task.ddl.drop
     task.ddl.create
   }
-  //任务模板表
-  def taskTemplateScript(implicit session: Session) = {
-    val taskTemplate = TableQuery[TaskTemplateTable]
-    if(!MTable.getTables(taskTemplate.baseTableRow.tableName).list.isEmpty) taskTemplate.ddl.drop
-    taskTemplate.ddl.create
 
-    val TaskTemplateSeq = Seq(
-      TaskTemplate(Option(1), "install", 1, 0)
-      , TaskTemplate(Option(2), "restart", 1, 1)
-      , TaskTemplate(Option(3), "start", 1, 2)
-      , TaskTemplate(Option(4), "stop", 1, 3)
-      , TaskTemplate(Option(5), "status", 1, 4)
-    )
-    taskTemplate.insertAll(TaskTemplateSeq: _*)
-  }
-  //任务模板步骤
-  def taskTemplateStepScript(implicit session: Session) = {
-    val taskTemplateStep = TableQuery[TaskTemplateStepTable]
-    if(!MTable.getTables(taskTemplateStep.baseTableRow.tableName).list.isEmpty) taskTemplateStep.ddl.drop
-    taskTemplateStep.ddl.create
-
-    val taskTemplateSeq = Seq(
-      TaskTemplateStep(Option(1), 1, "salt {{machine}} state.sls java.install", 1)
-      ,TaskTemplateStep(Option(2), 1, "salt {{machine}} state.sls tomcat.install", 2)
-      ,TaskTemplateStep(Option(3), 1, """salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}""", 3)
-    )
-    taskTemplateStep.insertAll(taskTemplateSeq: _*)
-  }
-  //项目类型
-  def templateScript(implicit session: Session) ={
-    val template = TableQuery[TemplateTable]
-    if(!MTable.getTables(template.baseTableRow.tableName).list.isEmpty) template.ddl.drop
-    template.ddl.create
-
-    val projectTypeSeq = Seq(
-      Template(Some(1), "webapi")
-    )
-    template.insertAll(projectTypeSeq: _*)
-  }
-  
   //任务命令关联表
   def taskCommandScript(implicit session: Session) = {
     val taskCommand = TableQuery[TaskCommandTable]
-    if(!MTable.getTables(taskCommand.baseTableRow.tableName).list.isEmpty) taskCommand.ddl.drop
+    if (!MTable.getTables(taskCommand.baseTableRow.tableName).list.isEmpty) taskCommand.ddl.drop
     taskCommand.ddl.create
   }
+
   //任务队列表
   def taskQueueScript(implicit session: Session) = {
     val taskQueue = TableQuery[TaskQueueTable]
-    if(!MTable.getTables(taskQueue.baseTableRow.tableName).list.isEmpty) taskQueue.ddl.drop
+    if (!MTable.getTables(taskQueue.baseTableRow.tableName).list.isEmpty) taskQueue.ddl.drop
     taskQueue.ddl.create
   }
+
   //定时任务表
   def taskSchemeScript(implicit session: Session) = {
     val taskScheme = TableQuery[TaskSchemeTable]
-    if(!MTable.getTables(taskScheme.baseTableRow.tableName).list.isEmpty) taskScheme.ddl.drop
+    if (!MTable.getTables(taskScheme.baseTableRow.tableName).list.isEmpty) taskScheme.ddl.drop
     taskScheme.ddl.create
   }
 

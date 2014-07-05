@@ -90,6 +90,10 @@ define(['angular'], function(angular) {
                         if(projectObj != undefined){
                             p.status.currentNum = projectObj.currentNum
                             p.status.totalNum = projectObj.totalNum
+//                            if(projectObj.queueNum == undefined){
+//                             projectObj.queueNum = 0
+//                            }
+                            p.status.queueNum = projectObj.queueNum
                             p.status.sls = projectObj.sls
                             p.status.taskName = projectObj.taskName
                             p.status.status = projectObj.status
@@ -121,6 +125,7 @@ define(['angular'], function(angular) {
                     data.status = p
                 }
             }
+            data.status.queueNum = 0
             return data
         }
         //增加状态描述

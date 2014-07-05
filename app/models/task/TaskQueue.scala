@@ -82,4 +82,9 @@ object TaskQueueHelper{
     qTaskQueue.where(_.id === tq.id).delete
   }
 
+  def findQueueNum(tq: TaskQueue): Int = db withSession {implicit session =>
+//    Query(qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length).first
+    qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length.run
+  }
+
 }

@@ -18,12 +18,14 @@ object TemplateController extends Controller {
     mapping(
       "id" -> optional(number),
       "name" -> nonEmptyText,
+      "remark" -> optional(text),
       "items" -> list(
         mapping(
           "id" -> optional(number),
           "tid" -> optional(number),
           "itemName" -> nonEmptyText,
           "itemDesc" -> optional(text),
+          "default" -> optional(text),
           "order" -> number
         )(TemplateItem.apply)(TemplateItem.unapply)
       )

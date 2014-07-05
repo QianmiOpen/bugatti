@@ -1,9 +1,9 @@
-package models.task
+package controllers.actor
 
 import akka.actor._
+import play.api.Logger
 import play.api.libs.iteratee._
 import play.api.libs.json.JsValue
-import play.api.Logger
 
 
 /**
@@ -28,7 +28,7 @@ class SocketActor extends Actor {
   }
 
   def notifyAllSocket(js: JsValue) {
-    Logger.info(js.toString())
+    Logger.info("notifyAllSocket==>" + js.toString())
     Thread.sleep(100)
     channel.push(js)
   }

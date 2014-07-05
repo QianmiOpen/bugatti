@@ -11,15 +11,16 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class Template(id: Option[Int], name: String)
-case class TemplateFrom(id: Option[Int], name: String, items: List[TemplateItem]) {
-  def toTemplate = Template(id, name)
+case class Template(id: Option[Int], name: String, remark: Option[String])
+case class TemplateFrom(id: Option[Int], name: String, remark: Option[String], items: List[TemplateItem]) {
+  def toTemplate = Template(id, name, remark)
 }
 class TemplateTable(tag: Tag) extends Table[Template](tag, "template") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name", O.NotNull)
+  def remark = column[String]("remark", O.Nullable)
 
-  override def *  = (id.?, name) <> (Template.tupled, Template.unapply _)
+  override def *  = (id.?, name, remark.?) <> (Template.tupled, Template.unapply _)
   def idx = index("idx_name", name, unique = true)
 }
 object TemplateHelper extends PlayCache {
@@ -41,17 +42,16 @@ object TemplateHelper extends PlayCache {
   }
 
   def create(template: Template) = db withSession { implicit session =>
-    qTemplate.insert(template)
+    create_(template)
   }
 
-  def create(template: Template, items: List[TemplateItem]) = db withTransaction { implicit session =>
+  def create(template: Template, items: Seq[TemplateItem]) = db withTransaction { implicit session =>
     val tid = create_(template)
 
     items.map{ item =>
-      val ti = TemplateItem(None, Some(tid), item.itemName, item.itemDesc, item.order)
+      val ti = TemplateItem(None, Some(tid), item.itemName, item.itemDesc, item.default, item.order)
       TemplateItemHelper.create_(ti)
     }.size
-
   }
 
   def create_(template: Template)(implicit session: JdbcBackend#Session) = {
@@ -72,7 +72,7 @@ object TemplateHelper extends PlayCache {
     TemplateItemHelper.deleteByTid_(id) // 删除该项目下所有属性
 
     items.map{ item =>  // 插入新属性
-      val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.order)
+      val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.default, item.order)
       TemplateItemHelper.create_(ti)
     }.size
 
