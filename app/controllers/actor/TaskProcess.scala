@@ -1,4 +1,4 @@
-package models.task
+package controllers.actor
 
 import java.io.File
 
@@ -6,16 +6,17 @@ import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
 import enums.TaskEnum
-import models.conf.{EnvironmentHelper, AttributeHelper}
+import models.conf.{AttributeHelper, EnvironmentHelper}
+import models.task._
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
+import utils.DateFormatter._
 import utils.TaskTools
 
 import scala.concurrent.duration._
-import utils.DateFormatter._
-import sys.process._
+import scala.sys.process._
 
 /**
  * Created by jinwei on 20/6/14.
