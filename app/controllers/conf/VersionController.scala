@@ -2,6 +2,7 @@ package controllers.conf
 
 import models.conf._
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
@@ -75,6 +76,7 @@ object VersionController extends Controller {
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
+        Logger.info(versionForm.toString)
         VersionHelper.findByPid(versionForm.pid)
           .filterNot(_.id == versionForm.id) // Some(id)
           .find(_.vs == versionForm.vs) match {

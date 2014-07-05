@@ -1,13 +1,13 @@
 <form name="form" class="form-horizontal" novalidate>
-    <p class="navbar-text col-sm-12" style="padding-left:0px;">
-        / <input ng-model="conf.path" class="form-control" style="width:40%;display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：temp1/conf/jdbc.properties"/>
+    <div class="navbar-text col-sm-10" style="padding-left:0px;">
+        / <input ng-model="conf.path" class="form-control" style="width:45%;display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
         &nbsp; or &nbsp;
         <a href="" class="navbar-link" ng-click="cancel()">cancel</a>
-    </p>
+    </div>
 
     <div class="clearfix"></div>
 
-    <div class="">
+    <div class="col-sm-10">
         <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
@@ -17,22 +17,21 @@
         }" ng-model="conf.content"></div>
     </div>
 
-    <div style="margin-top: 15px;">
-        <label class="col-sm-1 control-label">描述：</label>
-        <div class="col-sm-11">
-            <textarea ng-model="conf.remark" class="form-control" rows="3" placeholder="备注" maxlength="500"></textarea>
+    <div class="col-sm-10 mt15 clearfix">
+        <label class="col-sm-2 control-label">描述：</label>
+        <div class="col-sm-8">
+            <textarea ng-model="conf.remark" class="form-control" rows="3" placeholder="对文件的备注内容，选填。" maxlength="500"></textarea>
         </div>
     </div>
 
-    <div class="clearfix"></div>
-    <div style="margin-top: 15px;">
+    <div class="col-sm-10 mt15">
         <div class="text-right">
-            <div ng-show="form.path.$dirty && form.path.$invalid" class="has-error">
+            <button class="btn btn-success col-sm-2 navbar-right" ng-click="update()" ng-disabled="form.$invalid"> 修改文件 </button>
+            <div ng-show="form.path.$dirty && form.path.$invalid" class="has-error col-sm-8 navbar-right">
                 <span ng-show="form.path.$error.required" class="control-label">请输入文件（路径）名称</span>
                 <span ng-show="form.path.$error.maxlength" class="control-label">（路径）名称超过长度</span>
                 <span ng-show="form.path.$error.pattern" class="control-label">无效的（路径）名称</span>
             </div>
-            <button class="btn btn-success" ng-click="update()" ng-disabled="form.$invalid"> 修改文件 </button>
         </div>
     </div>
 </form>

@@ -24,7 +24,7 @@ class VersionTable(tag: Tag) extends Table[Version](tag, "version"){
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
   override def * = (id.?, pid, vs, updated) <> (Version.tupled, Version.unapply _)
-  def idx = index("idx_pid", pid)
+  def idx = index("idx_pid", (pid, updated))
   def idx_vs = index("idx_pid_vs", (pid, vs), unique = true)
 }
 object VersionHelper extends PlayCache {
@@ -38,7 +38,7 @@ object VersionHelper extends PlayCache {
   }
 
   def findByPid(pid: Int): List[Version] = db withSession { implicit session =>
-    qVersion.where(_.pid is pid).sortBy(_.updated.desc).list
+    qVersion.where(_.pid is pid).sortBy(_.updated desc).list
   }
 
   def count(pid: Int) = db withSession { implicit session =>
@@ -47,11 +47,11 @@ object VersionHelper extends PlayCache {
 
   def all(pid: Int, page: Int, pageSize: Int): List[Version] = db withSession { implicit session =>
     val offset = pageSize * page
-    qVersion.where(_.pid is pid).drop(offset).take(pageSize).list
+    qVersion.sortBy(_.updated desc).where(_.pid is pid).drop(offset).take(pageSize).list
   }
 
   def all(pid: Int, top: Int): List[Version] = db withSession { implicit session =>
-    qVersion.where(_.pid is pid).sortBy(_.id desc).take(top).list
+    qVersion.where(_.pid is pid).sortBy(_.updated desc).take(top).list
   }
 
   def findByPidAndEid(pid: Int, eid: Int): List[Version] = db withSession {implicit session =>

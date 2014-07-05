@@ -24,4 +24,19 @@ define(['angular'], function(angular) {
         }
     });
 
+    // logs
+    app.factory('LogService', function($http) {
+        return {
+            get: function(id, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.log(id)).success(callback);
+            },
+            getPage: function(cid, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.logs(cid, page, pageSize)).success(callback);
+            },
+            count: function(cid, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.logsCount(cid)).success(callback);
+            }
+        }
+    });
+
 });

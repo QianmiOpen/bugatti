@@ -68,6 +68,11 @@ object Application extends Controller with Security {
         conf.routes.javascript.ConfController.delete,
         conf.routes.javascript.ConfController.update,
 
+        // conf logs
+        conf.routes.javascript.ConfController.logs,
+        conf.routes.javascript.ConfController.logsCount,
+        conf.routes.javascript.ConfController.log,
+
         //task
         task.routes.javascript.TaskController.findLastTaskStatus,
         task.routes.javascript.TaskController.joinProcess,

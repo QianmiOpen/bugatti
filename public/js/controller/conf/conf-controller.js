@@ -28,25 +28,73 @@ define(['angular'], function(angular) {
             // 环境选择
             $scope.envChange = function(e) {
                 $scope.env = e;
-                // 根据环境和版本动态加载配置文件
-//                ConfService.getAll($scope.env.id, $stateParams.vid, function(data) {
-//                    $scope.confs = data;
-//                });
                 $state.go('conf.project.version.conf.list', {eid: e.id})
             };
+
+            // ----------------------------------------------------
+            // 一键拷贝
+            // ----------------------------------------------------
+
+            VersionService.top($stateParams.id, function(data) {
+                $scope.versions = data;
+            });
+
+            $scope.openModal = function(curr_eid, curr_vid) {
+                var modalInstance = $modal.open({
+                    templateUrl: 'modalCopy.html',
+                    windowClass: 'modal-copy',
+                    controller: ModalInstanceCtrl,
+                    resolve: {
+                        envs: function () {
+                            return $scope.envs;
+                        },
+                        versions : function() {
+                            return $scope.versions;
+                        },
+                        eid: function () {
+                            return curr_eid;
+                        },
+                        vid: function() {
+                            return curr_vid;
+                        }
+                    }
+                });
+
+            }
     }]);
+
+    var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, eid, vid) {
+
+        $scope.envs = envs;
+        $scope.env = $scope.envs[0].id;
+
+        $scope.versions = versions;
+        $scope.version = $scope.versions[0].id;
+
+        $scope.override = false;
+
+        $scope.ok = function () {
+            $modalInstance.close($scope.env);
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    };
 
     app.controller('ConfListCtrl', ['$scope', '$state', '$stateParams', '$modal',
         'ConfService',
         function($scope, $state, $stateParams, $modal, ConfService) {
-            ConfService.getAll($stateParams.eid, $stateParams.vid, function(data) {
-                $scope.confs = data;
-            });
+            if ($stateParams.eid) { // project index forward 'eid:null' error
+                ConfService.getAll($stateParams.eid, $stateParams.vid, function(data) {
+                    $scope.confs = data;
+                });
+            }
     }]);
 
-    app.controller('ConfCreateCtrl', ['$scope', '$state', '$stateParams', '$modal',
+    app.controller('ConfCreateCtrl', ['$scope', '$filter', '$state', '$stateParams', '$modal',
         'ConfService', 'EnvService', 'ProjectService', 'VersionService',
-        function($scope, $state, $stateParams, $modal, ConfService, EnvService, ProjectService, VersionService) {
+        function($scope, $filter, $state, $stateParams, $modal, ConfService, EnvService, ProjectService, VersionService) {
             $scope.conf = {pid: $stateParams.id, vid: $stateParams.vid};
 
             $scope.cancel = function() {
@@ -63,6 +111,7 @@ define(['angular'], function(angular) {
 
             $scope.save = function() {
                 $scope.conf.eid = $scope.env.id;
+                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
                 ConfService.save(angular.toJson($scope.conf), function(data) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });
@@ -95,7 +144,7 @@ define(['angular'], function(angular) {
                     }
                 });
                 modalInstance.result.then(function(state) {
-                    if (state !== '0') {
+                    if (state >= 0) {
                         $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                     } else {
                         alert('删除失败！')
@@ -104,20 +153,64 @@ define(['angular'], function(angular) {
             };
     }]);
 
-    app.controller('ConfEditCtrl', ['$scope', '$state', '$stateParams', '$modal',
+    app.controller('ConfEditCtrl', ['$scope', '$state', '$filter', '$stateParams', '$modal',
         'ConfService',
-        function($scope, $state, $stateParams, $modal, ConfService) {
+        function($scope, $state, $filter, $stateParams, $modal, ConfService) {
             ConfService.get($stateParams.cid, function(data) {
                 $scope.conf = data.conf;
                 $scope.conf.content = data.content.content;
             });
 
             $scope.update = function() {
+                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
                 ConfService.update($stateParams.cid, angular.toJson($scope.conf), function(data) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });
             };
+
+            $scope.cancel = function() {
+                $state.go('conf.project.version.conf.detail', {cid: $stateParams.cid})
+            };
     }]);
 
+    // ------------------------------------------------------
+    // 配置文件历史记录
+    // ------------------------------------------------------
+    app.controller('ConfLogCtrl', ['$scope', '$state', '$stateParams', '$modal',
+        'ConfService', 'LogService',
+        function($scope, $state, $stateParams, $modal, ConfService, LogService) {
+
+            ConfService.get($stateParams.cid, function(data) {
+                $scope.conf = data.conf;
+            });
+
+            $scope.currentPage = 1;
+            $scope.pageSize = 10;
+
+            // count
+            LogService.count($stateParams.cid, function(data) {
+                $scope.totalItems = data;
+            });
+
+            // list
+            LogService.getPage($stateParams.cid, 0, $scope.pageSize, function(data) {
+                $scope.logs = data;
+            });
+    }]);
+
+    app.controller('ConfLogShowCtrl', ['$scope', '$state', '$stateParams', '$modal',
+        'ConfService', 'LogService',
+        function($scope, $state, $stateParams, $modal, ConfService, LogService) {
+
+            LogService.get($stateParams.lid, function(data) {
+                console.log('log='+angular.toJson(data))
+            })
+
+            ConfService.get($stateParams.cid, function(data) {
+                console.log('conf='+angular.toJson(data))
+            });
+
+
+        }]);
 
 });

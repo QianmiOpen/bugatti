@@ -95,7 +95,7 @@ define(['angular'], function(angular) {
             }
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
-    })
+    });
 
 
 });
