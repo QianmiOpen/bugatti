@@ -14,7 +14,7 @@ class TaskTemplateStepTable(tag: Tag) extends Table[TaskTemplateStep](tag, "task
   def templateId = column[Int]("template_id", O.NotNull)
   def name = column[String]("name", O.NotNull)
   def sls = column[String]("sls", O.NotNull, O.DBType("VARCHAR(2000)"))
-  def seconds = column[Int]("seconds", O.NotNull, O.Default(5))
+  def seconds = column[Int]("seconds", O.NotNull, O.Default(3))
   def orderNum = column[Int]("order_num", O.NotNull)
 
   override def * = (id.?, templateId,name, sls, seconds, orderNum) <>(TaskTemplateStep.tupled, TaskTemplateStep.unapply _)

@@ -16,10 +16,10 @@ templates:
         steps:
           - name: 安装java
             sls: salt {{machine}} state.sls java.install
-            seconds: 17
+            seconds: 10
           - name: 安装tomcat
             sls: salt {{machine}} state.sls tomcat.install
-            seconds: 8
+            seconds: 6
           - name: 部署war包
             sls: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
           - name: 拷贝配置文件
@@ -60,10 +60,10 @@ templates:
         steps:
           - name: 安装java
             sls: salt {{machine}} state.sls java.install
-            seconds: 17
+            seconds: 10
           - name: 安装tomcat
             sls: salt {{machine}} state.sls tomcat.install
-            seconds: 8
+            seconds: 6
           - name: 部署war包
             sls: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
           - name: 拷贝配置文件

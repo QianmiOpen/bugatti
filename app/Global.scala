@@ -92,7 +92,7 @@ object AppData {
       val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
       steps.zipWithIndex.foreach { case (step, index) =>
         val seconds = step.get("seconds").asInstanceOf[Int]
-        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 5 else seconds, index + 1))
+        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1))
       }
     }
   }
