@@ -47,7 +47,7 @@ object UserHelper extends PlayCache {
     Query(qUser.length).first
   }
 
-  def all(page: Int, pageSize: Int): List[User] = db withSession { implicit session =>
+  def all(page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
     val offset = pageSize * page
     qUser.drop(offset).take(pageSize).list
   }

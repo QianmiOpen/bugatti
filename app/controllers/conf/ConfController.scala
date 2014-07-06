@@ -1,5 +1,6 @@
 package controllers.conf
 
+import models.conf
 import models.conf._
 import org.joda.time.DateTime
 import play.api.Logger
@@ -91,6 +92,29 @@ object ConfController extends Controller {
     val log = ConfLogHelper.findById(id)
     val logContent = ConfLogContentHelper.findById(id)
     Ok(Json.toJson(log, logContent))
+  }
+
+  // 一键拷贝, todo
+  def copy(target_eid: Int, target_vid: Int, eid: Int, vid: Int, ovr: Boolean) = Action {
+    if (target_eid == eid && target_vid == vid)
+      Ok(Json.obj("r" -> "exist"))
+    val targetConfs = ConfHelper.findByEid_Vid(target_eid, target_vid)
+    val currConfs = ConfHelper.findByEid_Vid(eid, vid)
+    val confs = ovr match {
+      case true =>
+        // delete exist
+        targetConfs.filter(t => currConfs.map(_.path).contains(t.path)) foreach( c => ConfHelper.delete(c))
+        targetConfs // return target
+      case false =>
+        targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path))
+    }
+    // insert all
+    confs.foreach { c =>
+      val content = ConfContentHelper.findById(c.id.get)
+      val confForm = ConfForm(c.id, c.eid, c.pid, c.vid, c.jobNo, Some(c.name), c.path, if (content != None) content.get.content else "", c.remark, c.updated)
+      ConfHelper.create(confForm)
+    }
+    Ok(Json.obj("r" -> "success"))
   }
 
 }

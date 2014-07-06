@@ -39,7 +39,7 @@ object EnvironmentHelper {
     Query(qEnvironment.length).first
   }
 
-  def all(page: Int, pageSize: Int): List[Environment] = db withSession { implicit session =>
+  def all(page: Int, pageSize: Int): Seq[Environment] = db withSession { implicit session =>
     val offset = pageSize * page
     qEnvironment.drop(offset).take(pageSize).list
   }

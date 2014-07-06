@@ -37,7 +37,7 @@ object VersionHelper extends PlayCache {
     qVersion.where(_.id is id).firstOption
   }
 
-  def findByPid(pid: Int): List[Version] = db withSession { implicit session =>
+  def findByPid(pid: Int): Seq[Version] = db withSession { implicit session =>
     qVersion.where(_.pid is pid).sortBy(_.updated desc).list
   }
 
@@ -45,16 +45,16 @@ object VersionHelper extends PlayCache {
     Query(qVersion.where(_.pid is pid).length).first
   }
 
-  def all(pid: Int, page: Int, pageSize: Int): List[Version] = db withSession { implicit session =>
+  def all(pid: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
     val offset = pageSize * page
     qVersion.sortBy(_.updated desc).where(_.pid is pid).drop(offset).take(pageSize).list
   }
 
-  def all(pid: Int, top: Int): List[Version] = db withSession { implicit session =>
+  def all(pid: Int, top: Int): Seq[Version] = db withSession { implicit session =>
     qVersion.where(_.pid is pid).sortBy(_.updated desc).take(top).list
   }
 
-  def findByPidAndEid(pid: Int, eid: Int): List[Version] = db withSession {implicit session =>
+  def findByPidAndEid(pid: Int, eid: Int): Seq[Version] = db withSession {implicit session =>
     //1、获取环境的level
     val level: Level = EnvironmentHelper.findById(eid).get.level
     Logger.info(level.toString)

@@ -31,7 +31,7 @@ object TemplateItemHelper extends PlayCache {
     qItem.where(_.id is id).firstOption
   }
 
-  def findByTid(tid: Int): List[TemplateItem] = db withSession { implicit session =>
+  def findByTid(tid: Int): Seq[TemplateItem] = db withSession { implicit session =>
     qItem.where(_.tid is tid).list
   }
 

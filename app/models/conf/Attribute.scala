@@ -24,7 +24,7 @@ object AttributeHelper {
   import models.AppDB._
   val qAttribute = TableQuery[AttributeTable]
 
-  def findByPid(pid: Int): List[Attribute] = db withSession { implicit session =>
+  def findByPid(pid: Int): Seq[Attribute] = db withSession { implicit session =>
     qAttribute.sortBy(_.id).where(_.pid is pid).list
   }
 
@@ -41,7 +41,7 @@ object AttributeHelper {
   }
 
   // batch
-  def create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
+  def create_(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
     qAttribute.insertAll(attr: _*)(session)
   }
 

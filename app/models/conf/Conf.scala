@@ -30,7 +30,7 @@ class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   override def * = (id.?, eid, pid, vid, jobNo, name, path, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
 
   def idx_vid = index("idx_vid", vid)
-  def idx_path = index("idx_path", (vid, path), unique = true)
+  def idx_path = index("idx_path", (eid, vid, path), unique = true)
   def idx = index("idx_eid_vid", (eid, vid, updated))
 }
 
@@ -44,11 +44,11 @@ object ConfHelper extends PlayCache {
     qConf.where(_.id is id).firstOption
   }
 
-  def findByVid(vid: Int): List[Conf] = db withSession { implicit session =>
+  def findByVid(vid: Int): Seq[Conf] = db withSession { implicit session =>
     qConf.where(_.vid is vid).list
   }
 
-  def findByEid_Vid(eid: Int, vid: Int): List[Conf] = db withSession { implicit session =>
+  def findByEid_Vid(eid: Int, vid: Int): Seq[Conf] = db withSession { implicit session =>
     qConf.sortBy(_.updated desc).where(c => c.eid === eid && c.vid === vid).list
   }
 
@@ -60,6 +60,11 @@ object ConfHelper extends PlayCache {
     val id = qConf.returning(qConf.map(_.id)).insert(confForm.toConf)
     val content = ConfContent(Some(id), confForm.content)
     ConfContentHelper.create_(content)
+  }
+
+  def delete(conf: Conf) = db withTransaction { implicit session =>
+    qConf.where(_.id is conf.id).delete
+    ConfContentHelper.delete_(conf.id.get)
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>

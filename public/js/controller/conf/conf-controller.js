@@ -51,19 +51,26 @@ define(['angular'], function(angular) {
                         versions : function() {
                             return $scope.versions;
                         },
-                        eid: function () {
+                        curr_eid: function () {
                             return curr_eid;
                         },
-                        vid: function() {
+                        curr_vid: function() {
                             return curr_vid;
                         }
                     }
                 });
 
+                modalInstance.result.then(function (curr_eid) {
+                    console.log('vid='+angular.toJson($stateParams.vid))
+                }, function () {
+                    console.info('Modal dismissed at: ' + new Date());
+                });
+
             }
     }]);
 
-    var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, eid, vid) {
+    // 一键拷贝弹出框
+    var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, curr_eid, curr_vid) {
 
         $scope.envs = envs;
         $scope.env = $scope.envs[0].id;
@@ -74,7 +81,8 @@ define(['angular'], function(angular) {
         $scope.override = false;
 
         $scope.ok = function () {
-            $modalInstance.close($scope.env);
+
+            $modalInstance.close(curr_eid);
         };
 
         $scope.cancel = function () {
@@ -203,11 +211,12 @@ define(['angular'], function(angular) {
         function($scope, $state, $stateParams, $modal, ConfService, LogService) {
 
             LogService.get($stateParams.lid, function(data) {
-                console.log('log='+angular.toJson(data))
-            })
+                $scope.log = data.log;
+                $scope.log.content = data.logContent;
+            });
 
             ConfService.get($stateParams.cid, function(data) {
-                console.log('conf='+angular.toJson(data))
+//                console.log('conf='+angular.toJson(data))
             });
 
 

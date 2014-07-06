@@ -58,12 +58,12 @@ object ProjectHelper extends PlayCache {
     Query(qProject.length).first
   }
 
-  def all(page: Int, pageSize: Int): List[Project] = db withSession { implicit session =>
+  def all(page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
     val offset = pageSize * page
     qProject.drop(offset).take(pageSize).list
   }
 
-  def all(): List[Project] = db withSession { implicit session =>
+  def all(): Seq[Project] = db withSession { implicit session =>
     qProject.list
   }
 
@@ -80,7 +80,7 @@ object ProjectHelper extends PlayCache {
     val attrs = projectForm.items.map(item =>
       Attribute(None, Some(pid), item.name, item.value)
     )
-    AttributeHelper.create(attrs)
+    AttributeHelper.create_(attrs)
     MemberHelper.create_(Member(None, pid, LevelEnum.safe, jobNo))
   }
 
@@ -93,7 +93,7 @@ object ProjectHelper extends PlayCache {
     val attrs = projectForm.items.map(item =>
       Attribute(None, Some(id), item.name, item.value)
     )
-    AttributeHelper.create(attrs)
+    AttributeHelper.create_(attrs)
     update_(id, projectForm.toProject)
   }
 

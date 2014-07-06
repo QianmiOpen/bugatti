@@ -67,7 +67,7 @@ object TemplateHelper extends PlayCache {
     qTemplate.where(_.id is id).update(template2update)(session)
   }
 
-  def update(id: Int, template: Template, items: List[TemplateItem]) = db withTransaction { implicit session =>
+  def update(id: Int, template: Template, items: Seq[TemplateItem]) = db withTransaction { implicit session =>
     update_(id, template) // 更新项目
     TemplateItemHelper.deleteByTid_(id) // 删除该项目下所有属性
 

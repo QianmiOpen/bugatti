@@ -1,1 +1,52 @@
-22
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ui-sref="configure.relation.create">新增</button></td>
+    <h1 class="pull-left m0">关系配置</h1>
+</div>
+
+<form class="form-inline" role="form" >
+    <div class="form-group">
+        <select class="form-control" ng-change="select()" ng-model="env" ng-options="e.name for e in envs">
+            <option value="">-- 选择环境 --</option>
+        </select>
+    </div>
+    <div class="form-group">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="form-group">
+        <select class="form-control" ng-change="select()" ng-model="project" ng-options="p.name for p in projects">
+            <option value="">-- 选择项目 --</option>
+        </select>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-fixed">
+        <thead>
+        <tr>
+            <th width="30"><input type="checkbox" ng-model="master"></th>
+            <th width="20%">环境</th>
+            <th width="30%">项目</th>
+            <th width="30%">机器IP&名称</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="rel in relations">
+            <td><input type="checkbox" ng-model="ids[rel.relation.id]" ng-checked="master" ng-change="checked(rel.relation.id, ids[rel.relation.id])"></td>
+            <!--<td><a ui-sref="configure.relation.detail({id: rel.relation.id})">{{rel.env}}</a></td>-->
+            <td>{{rel.env}}</td>
+            <td>{{rel.project}}</td>
+            <td>{{rel.relation.ip}},{{rel.relation.name}}</td>
+            <td>
+                <a ng-click="delete(rel.relation.id, $index)" href title="删除"><span class="glyphicon glyphicon-remove"></span></a>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td><a ng-click="deleteBatch()" href="" ng-show="!isEmpty(ids)"><span class="glyphicon glyphicon-trash"></span> </a></td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        </tfoot>
+    </table>
+
+    <ng-include src="'partials/page.html'"></ng-include>
+</div>
