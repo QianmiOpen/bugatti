@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import play.api._
 import play.api.Play.current
-import utils.GitHelp
+import utils.{SaltTools, GitHelp}
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
 import scala.collection.JavaConverters._
@@ -44,6 +44,7 @@ object Global extends GlobalSettings {
           TableQuery[TaskSchemeTable] ::
           TableQuery[TaskTable] ::
           TableQuery[AreaTable] ::
+          TableQuery[EnvironmentProjectRelTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
@@ -65,6 +66,7 @@ object Global extends GlobalSettings {
     }
 
     GitHelp.checkGitWorkDir(app)
+    SaltTools.refreshHostList(app)
   }
 }
 
@@ -155,15 +157,11 @@ object AppData {
 
   // 环境
   def environmentScript(implicit session: Session) = {
-    val q = TableQuery[EnvironmentTable]
-    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
-    q.ddl.create
-
-    val seq = Seq(
-      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe)
-      , Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe)
-    )
-    q.insertAll(seq: _*)
+    Seq(
+      //Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.19.3.1/24"), LevelEnum.unsafe),
+      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
+      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe)
+    ).foreach(EnvironmentHelper.create)
   }
 
   // 权限
@@ -207,5 +205,4 @@ object AppData {
       Area(None, "测试", "t-syndic", "")
     }.foreach(AreaHelper.create)
   }
-
 }
