@@ -18,20 +18,20 @@ import play.api.libs.json.JsSuccess
  * @author of729
  * @author of546
  */
-case class Task(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
+case class Task(id: Option[Int], envId: Int, projectId: Int, versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
 
 case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id", O.NotNull)
   def projectId = column[Int]("project_id", O.NotNull)
-  def version = column[String]("version", O.NotNull, O.DBType("VARCHAR(64)"))
+  def versionId = column[Int]("version_id", O.Nullable)
   def taskTemplateId = column[Int]("task_template_id",O.NotNull)
   def status = column[TaskStatus]("status", O.NotNull)
   def startTime = column[DateTime]("start_time", O.Nullable, O.DBType("DATETIME"))
   def endTime = column[DateTime]("end_time", O.Nullable, O.DBType("DATETIME"))
   def operatorId = column[Int]("operator_id", O.NotNull)
 
-  override def * = (id.?, envId, projectId, version, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
+  override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
 
 
 }
@@ -42,7 +42,7 @@ object TaskHelper {
     (JsPath \ "id").readNullable[Int] and
     (JsPath \ "envId").read[Int] and
     (JsPath \ "projectId").read[Int] and
-    (JsPath \ "version").read[String] and
+    (JsPath \ "versionId").readNullable[Int] and
     (JsPath \ "taskTemplateId").read[Int] and
     (JsPath \ "status").read[TaskStatus] and
     (JsPath \ "startTime").readNullable[DateTime] and
@@ -81,7 +81,7 @@ object TaskHelper {
   }
 
   implicit def taskQueue2Task(tq: TaskQueue): Task ={
-    Task(None, tq.envId, tq.projectId, tq.version, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
+    Task(None, tq.envId, tq.projectId, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
   }
 
   def addByTaskQueue(tq: TaskQueue): Int = db withSession { implicit session =>

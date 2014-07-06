@@ -29,7 +29,7 @@ class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
 
   override def * = (id.?, cid, eid, vid, jobNo, name, path, remark.?, updated) <> (ConfLog.tupled, ConfLog.unapply _)
 
-  def idx = index("idx_cid", cid)
+  def idx = index("idx_cid", (cid, updated))
 }
 object ConfLogHelper extends PlayCache {
 
@@ -41,9 +41,9 @@ object ConfLogHelper extends PlayCache {
     qLog.where(_.id is id).firstOption
   }
 
-  def allByCid(cid: Int, page: Int, pageSize: Int): List[ConfLog] = db withSession { implicit session =>
+  def allByCid(cid: Int, page: Int, pageSize: Int): Seq[ConfLog] = db withSession { implicit session =>
     val offset = pageSize * page
-    qLog.where(_.cid is cid).drop(offset).take(pageSize).list
+    qLog.sortBy(_.updated desc).where(_.cid is cid).drop(offset).take(pageSize).list
   }
 
   def countByCid(cid: Int) = db withSession { implicit session =>

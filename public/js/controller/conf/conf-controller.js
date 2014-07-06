@@ -21,8 +21,14 @@ define(['angular'], function(angular) {
                     return;
                 }
                 $scope.envs = data;
-                // default select first
-                $scope.envChange(data[0])
+
+                if ($stateParams.eid) {
+                    EnvService.get($stateParams.eid, function(e) {
+                        $scope.envChange(e)
+                    });
+                } else { // default select first
+                    $scope.envChange(data[0])
+                }
             });
 
             // 环境选择
@@ -51,19 +57,31 @@ define(['angular'], function(angular) {
                         versions : function() {
                             return $scope.versions;
                         },
-                        eid: function () {
+                        curr_eid: function () {
                             return curr_eid;
                         },
-                        vid: function() {
+                        curr_vid: function() {
                             return curr_vid;
                         }
                     }
                 });
 
+                modalInstance.result.then(function (param) {
+                    var thisEid = param.eid;
+                    ConfService.copy(angular.toJson(param), function(data) {
+                        if (data.r === 'ok') {
+                            $state.go('conf.project.version.conf', {eid: thisEid}, {reload: true})
+                        }
+                    });
+                }, function () {
+                    console.info('Modal dismissed at: ' + new Date());
+                });
+
             }
     }]);
 
-    var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, eid, vid) {
+    // 一键拷贝弹出框
+    var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, curr_eid, curr_vid) {
 
         $scope.envs = envs;
         $scope.env = $scope.envs[0].id;
@@ -73,8 +91,8 @@ define(['angular'], function(angular) {
 
         $scope.override = false;
 
-        $scope.ok = function () {
-            $modalInstance.close($scope.env);
+        $scope.ok = function (selEnv, selVer, selOver) {
+            $modalInstance.close({target_eid: selEnv, target_vid: selVer, eid: curr_eid, vid: curr_vid, ovr: selOver});
         };
 
         $scope.cancel = function () {
@@ -203,11 +221,12 @@ define(['angular'], function(angular) {
         function($scope, $state, $stateParams, $modal, ConfService, LogService) {
 
             LogService.get($stateParams.lid, function(data) {
-                console.log('log='+angular.toJson(data))
-            })
+                $scope.log = data.log;
+                $scope.log.content = data.logContent;
+            });
 
             ConfService.get($stateParams.cid, function(data) {
-                console.log('conf='+angular.toJson(data))
+//                console.log('conf='+angular.toJson(data))
             });
 
 

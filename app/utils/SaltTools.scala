@@ -10,7 +10,7 @@ import models.conf._
  * Created by mind on 7/6/14.
  */
 object SaltTools {
-  def refreshHostList(app: Application) = {
+  def refreshHostList(app: Application) {
     if (app.configuration.getBoolean("salt.init").getOrElse(false)) {
       refreshHostList
     }

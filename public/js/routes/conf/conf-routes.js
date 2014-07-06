@@ -8,7 +8,7 @@ define(['angular'], function(angular) {
 
         // 项目版本下的配置
         $stateProvider.state('conf.project.version.conf', {
-            url: "/:vid/conf",
+            url: "/:vid/conf?eid",
             views: {
                 "@conf": {
                     templateUrl: "partials/conf/project/conf-index.html",
@@ -18,7 +18,7 @@ define(['angular'], function(angular) {
         });
 
         $stateProvider.state('conf.project.version.conf.list', {
-            url: "/list?eid",
+            url: "/list",
             views: {
                 "conf-info@conf.project.version.conf": {
                     templateUrl: "partials/conf/project/uiview/conf-list.html",

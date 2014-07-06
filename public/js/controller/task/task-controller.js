@@ -176,7 +176,7 @@ define(['angular'], function(angular) {
             $scope.versions = []
             TaskService.getVersions(pid, $scope.activeEnv, function(data){
                 for(var dIndex in data) {
-                    $scope.versions.push(data[dIndex].vs)
+                    $scope.versions.push(data[dIndex])
                 }
                 console.log($scope.versions)
             })
@@ -188,11 +188,11 @@ define(['angular'], function(angular) {
             })
         }
 
-        $scope.deploy = function(projectId, version){
+        $scope.deploy = function(projectId, versionId){
             $scope.taskQueue = {}
             $scope.taskQueue.envId = $scope.activeEnv
             $scope.taskQueue.projectId = projectId
-            $scope.taskQueue.version = version
+            $scope.taskQueue.versionId = versionId
             $scope.taskQueue.templateId = 1
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
 
@@ -210,7 +210,11 @@ define(['angular'], function(angular) {
         $scope.restart = function(){
 
         }
-
+//=====================================页面跳转========================================
+        $scope.goTaskQueue = function(envId, projectId){
+            console.log(envId + ", " + projectId)
+            $state.go('.queue', {envId: envId, projectId: projectId})
+        }
 
 
     }]);
@@ -338,12 +342,11 @@ define(['angular'], function(angular) {
         $scope.envId_search = $stateParams.envId
         $scope.projectId_search = $stateParams.projectId
 
-        //1、创建socket连接
-        $scope.wsInvoke()
-
-//        $scope.returnList = function(){
-//            $state.go('^.^.task',{'envId': $scope.envId_search, 'proId': $scope.proId_search, 'envName': $scope.envName_search, 'proName': $scope.proName_search})
-//        }
+        $scope.randomKey = function(min, max) {
+            var num = Math.floor(Math.random() * (max - min + 1)) + min;
+            console.log("num:" + num)
+            return num
+        }
 
         $scope.wsInvoke = function(){
             var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
@@ -354,8 +357,9 @@ define(['angular'], function(angular) {
         }
 
         $scope.receiveEvent = function(event){
-            $scope.data = JSON.parse(event.data)
-            console.log("Data received, Message is =>" + $scope.data.message)
+            $scope.taskQueues = []
+            $scope.tsData = JSON.parse(event.data)
+            console.log("Data received, Message is =>" + $scope.tsData.message)
             if(event.data.error){
                 console.log("there is errors:"+event.data.error)
             }else{
@@ -364,18 +368,59 @@ define(['angular'], function(angular) {
                     console.log(tsData)
 
                     var key = $scope.envId_search + "_" + $scope.projectId_search
+                    console.log("key==>" + key)
                     var taskQueues = tsData[key]
 
-                    $scope.taskQueues = taskQueues.queue
+                    $scope.taskQueues = taskQueues.queues.map($scope.addStatusTip)
                     console.table($scope.taskQueues)
                 })
             }
         }
 
-        $scope.removeQueue = function(id){
+        //1、创建socket连接
+        $scope.wsInvoke()
+
+        $scope.removeQueue = function(qid){
             TaskService.removeTaskQueue(qid, function(data){
                 //如果删除的任务在一瞬间刚好变为正在执行，应告知
             })
         }
+
+        $scope.addStatusTip = function(data){
+            if(!$scope.isObjEmpty(data)){
+                data.statusName = $scope.explainStatus(data.status)
+            } else {
+                data.status.statusTip = "N/A"
+            }
+            return data
+        }
+
+        $scope.explainStatus = function(status){
+            switch(status){
+                //等待执行
+                case 0 : return "等待执行"
+                //执行成功
+                case 1 : return "执行成功"
+                //执行失败
+                case 2 : return "执行失败"
+                //正在执行
+                case 3 : return "正在执行"
+            }
+        }
+
+        //判断对象是否为空
+        $scope.isObjEmpty = function(obj){
+            for (var name in obj)
+            {
+                return false
+            }
+            return true
+        }
+
+        $scope.returnList = function(){
+            $state.go('^.^.task',{'envId': $scope.envId_search})
+        }
+
+
     }]);
 });

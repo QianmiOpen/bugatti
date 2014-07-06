@@ -35,7 +35,7 @@
             <div class="form-group">
                 <label for="selectVersion" class="col-sm-4 control-label">版本选择：</label>
                 <div class="col-sm-8">
-                    <select ng-change="selChange()" id="selectVersion" class="form-control" ng-model="version" ng-options="v.id as v.vs for v in versions"></select>
+                    <select id="selectVersion" class="form-control" ng-model="version" ng-options="v.id as v.vs for v in versions"></select>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">确认</button>
+        <button class="btn btn-primary" ng-click="ok(env, version, override)">确认</button>
         &nbsp;&nbsp;
         <button class="btn btn-default" ng-click="cancel()">取消</button>
     </div>

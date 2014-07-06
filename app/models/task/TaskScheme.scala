@@ -11,19 +11,19 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 /**
  * Created by jinwei on 18/6/14.
  */
-case class TaskScheme(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: TaskStatus, startTime: DateTime, operatorId: Int)
+case class TaskScheme(id: Option[Int], envId: Int, projectId: Int, versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, startTime: DateTime, operatorId: Int)
 
 class TaskSchemeTable(tag: Tag) extends Table[TaskScheme](tag, "task_scheme") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id", O.NotNull)
   def projectId = column[Int]("project_id", O.NotNull)
-  def version = column[String]("version", O.NotNull, O.DBType("VARCHAR(64)"))
+  def versionId = column[Int]("version_id", O.Nullable)
   def taskTemplateId = column[Int]("task_template_id",O.NotNull)
   def status = column[TaskStatus]("status", O.NotNull)
   def startTime = column[DateTime]("start_time", O.NotNull, O.DBType("DATETIME"))
   def operatorId = column[Int]("operator_id", O.NotNull)
 
-  override def * = (id.?, envId, projectId, version, taskTemplateId, status, startTime, operatorId) <> (TaskScheme.tupled, TaskScheme.unapply _)
+  override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, startTime, operatorId) <> (TaskScheme.tupled, TaskScheme.unapply _)
 
 }
 

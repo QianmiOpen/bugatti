@@ -135,12 +135,12 @@ object TaskController extends Controller {
   def addTaskQueue(fields: Seq[(String, JsValue)]): Int = {
     val fieldsJson = Json.toJson(fields.toMap)
     val tq = fieldsJson \ "taskQueue"
-    val envId = (tq \ "envId").toString.toInt
-    val projectId = (tq \ "projectId").toString.toInt
-    val version = TaskTools.trimQuotes((tq \ "version").toString)
-    Logger.info(s"version ==> ${version}")
-    val templateId = (tq \ "templateId").toString.toInt
-    val taskQueue = TaskQueue(None, envId, projectId, version, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
+    val envId = (tq \ "envId").as[Int]
+    val projectId = (tq \ "projectId").as[Int]
+    val versionId = (tq \ "versionId").asOpt[Int]
+    Logger.info(s"version ==> ${versionId}")
+    val templateId = (tq \ "templateId").as[Int]
+    val taskQueue = TaskQueue(None, envId, projectId, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
     TaskProcess.createNewTask(taskQueue)
   }
 

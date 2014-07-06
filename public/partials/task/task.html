@@ -26,7 +26,7 @@
                     {{pro.name}}
                 </td>
                 <td>
-                    <a title="查看任务队列" ui-sref="task.queue({envId: pro.envId, projectId: pro.projectId})">
+                    <a title="查看任务队列" ng-click="goTaskQueue(activeEnv, pro.id)" href="">
                         <span class="glyphicon glyphicon-random" style="float: right">&nbsp;{{pro.status.queueNum}}&nbsp;</span>
                     </a>
                     <a>
@@ -51,7 +51,7 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="" ng-click="showVersion(pro.id)" title="部署"><span class="glyphicon glyphicon-import"></span></a>
                         <ul class="dropdown-menu">
                             <li ng-repeat="vs in versions">
-                                <a ng-click="deploy(pro.id, vs)">{{vs}}</a>
+                                <a ng-click="deploy(pro.id, vs.id)">{{vs.vs}}</a>
                             </li>
                             <li>
                                 <a ng-click="">more ...</a>

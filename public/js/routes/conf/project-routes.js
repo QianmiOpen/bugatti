@@ -8,7 +8,7 @@ define(['angular'], function(angular) {
 
         // 项目
         $stateProvider.state('conf.project', {
-            url: "/project",
+            url: "/project?search_text",
             templateUrl: "partials/conf/project/project-index.html",
             controller: "ProjectCtrl"
         });

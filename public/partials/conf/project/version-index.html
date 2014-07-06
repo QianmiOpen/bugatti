@@ -3,21 +3,7 @@
     <h1 class="pull-left m0">项目版本</h1>
 </div>
 
-<div class="row">
-    <div class="col-sm-6 col-centered">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="输入项目信息可快速检索"/>
-            <span class="input-group-btn"><button class="btn btn-default" type="button">搜 索</button></span>
-        </div>
-        <div class="text-right" style="margin: 5px 70px 0 0">
-            <a class="a-underline" href="#">高级搜索</a>
-            |
-            <a class="a-underline" href="#">API指南</a>
-            |
-            <a class="a-underline" href="#">帮助文档</a>
-        </div>
-    </div>
-</div>
+<ng-include src="'partials/conf/project/search.html'"></ng-include>
 
 <h3 class="text-muted">
     <project-show pid="{{$stateParams.id}}"></project-show>
