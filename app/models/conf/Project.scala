@@ -47,7 +47,7 @@ object ProjectHelper extends PlayCache {
     qProject.where(_.id is id).firstOption
   }
 
-  def findByName(name: String) = db withSession { implicit session =>
+  def findByName(name: String): Option[Project] = db withSession { implicit session =>
     qProject.where(_.name is name).firstOption
   }
 
