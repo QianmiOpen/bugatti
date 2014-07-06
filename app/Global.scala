@@ -8,6 +8,7 @@ import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import play.api._
 import play.api.Play.current
+import utils.GitHelp
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
 import scala.collection.JavaConverters._
@@ -59,11 +60,12 @@ object Global extends GlobalSettings {
         AppData.attributeScript
         AppData.initFromYaml
       }
-
-
     )
+
+    GitHelp.checkGitWorkDir(app)
   }
 }
+
 
 object AppData {
   def initFromYaml(implicit session: Session) = {

@@ -51,6 +51,10 @@ object ConfHelper extends PlayCache {
     qConf.sortBy(_.updated desc).where(c => c.eid === eid && c.vid === vid).list
   }
 
+  def findByEid_Pid_Vid(eid: Int, pid: Int, vid: Int): Seq[Conf] = db withSession{ implicit session =>
+    qConf.where(c => c.eid === eid && c.pid === pid && c.vid === vid).list
+  }
+
   def create(confForm: ConfForm) = db withTransaction { implicit session =>
     val id = qConf.returning(qConf.map(_.id)).insert(confForm.toConf)
     val content = ConfContent(Some(id), confForm.content)
