@@ -1,6 +1,7 @@
 package controllers.conf
 
 import models.conf._
+import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
@@ -124,6 +125,50 @@ object ProjectController extends Controller {
           case token if token == authToken =>
 
             Ok(Json.obj("r" -> "ok"))
+          case _ =>
+            Forbidden
+        }
+      }
+    )
+  }
+
+
+  // ==========================================================
+  // open api
+  // ==========================================================
+  case class VerForm(projectName: String, groupId: String, artifactId: String, version: String, authToken: String)
+  val verForm = Form(
+    mapping(
+      "projectName" -> nonEmptyText(maxLength = 50),
+      "groupId" -> nonEmptyText(maxLength = 50),
+      "artifactId" -> nonEmptyText(maxLength = 50),
+      "version" -> nonEmptyText(maxLength = 50),
+      "authToken" -> nonEmptyText(maxLength = 50)
+    )(VerForm.apply)(VerForm.unapply)
+  )
+
+  // todo
+  implicit val app: play.api.Application = play.api.Play.current
+  lazy val authToken = app.configuration.getString("auth.token").getOrElse("bugatti")
+
+  def addVersion() = Action { implicit request =>
+    verForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      verData => {
+        verData.authToken match {
+          case token if token == authToken =>
+            ProjectHelper.findByName(verData.projectName) match {
+              case Some(project) =>
+                VersionHelper.findByPid_Vs(project.id.get, verData.version) match {
+                  case Some(_) =>
+                    Ok(Json.obj("r" -> "exist"))
+                  case None =>
+                    VersionHelper.create(Version(None, project.id.get, verData.version, DateTime.now()))
+                    Ok(Json.obj("r" -> "ok"))
+                }
+              case None =>
+                NotFound
+            }
           case _ =>
             Forbidden
         }

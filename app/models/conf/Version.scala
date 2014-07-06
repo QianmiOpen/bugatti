@@ -41,6 +41,10 @@ object VersionHelper extends PlayCache {
     qVersion.where(_.pid is pid).sortBy(_.updated desc).list
   }
 
+  def findByPid_Vs(pid: Int, vs: String): Option[Version] = db withSession { implicit session =>
+    qVersion.where(v => v.pid === pid && v.vs === vs).firstOption
+  }
+
   def count(pid: Int) = db withSession { implicit session =>
     Query(qVersion.where(_.pid is pid).length).first
   }
