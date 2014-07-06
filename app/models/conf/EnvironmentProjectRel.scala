@@ -32,7 +32,7 @@ object EnvironmentProjectRelHelper {
     qRelation.insertAll(relationForm.toRelations: _*)
   }
 
-  def findByEnvIdWithProjectId(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = db withSession {
+  def findByEnvId_ProjectId(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = db withSession {
     implicit session =>
       qRelation.where(r => r.envId === envId && r.projectId === projectId).list
   }
