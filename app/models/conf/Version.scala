@@ -62,7 +62,7 @@ object VersionHelper extends PlayCache {
           case LevelEnum.unsafe =>
             list
           case _ =>
-            list.filterNot(t => TaskTools.isSnapshot(t.vs))
+            list.filterNot(t => TaskTools.isSnapshot(t.id.get))
         }
       case None =>
         Nil

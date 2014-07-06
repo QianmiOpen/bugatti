@@ -349,17 +349,26 @@ class TaskProcess extends Actor {
     val artifactId = AttributeHelper.getValue(taskQueue.projectId, "artifactId")
 
     //3、version -> version, repository
-    val version = taskQueue.version
+    val versionId = taskQueue.versionId
     var repository = "releases"
-    if(TaskTools.isSnapshot(version)){
+    if(TaskTools.isSnapshot(versionId.getOrElse(0))){
       repository = "snapshots"
     }
+
+    var versionName = ""
+    versionId match {
+      case Some(vid) => {
+        versionName = VersionHelper.findById(vid).get.vs
+      }
+      case _ =>
+    }
+
 
     val paramsJson = Json.obj(
       "nfsServer" -> nfsServer
       ,"groupId" -> groupId
       ,"artifactId" -> artifactId
-      ,"version" -> version
+      ,"version" -> versionName
       ,"repository" -> repository
     )
 

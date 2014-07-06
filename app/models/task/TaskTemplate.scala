@@ -13,7 +13,7 @@ class TaskTemplateTable(tag: Tag) extends Table[TaskTemplate](tag, "task_templat
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(64)"))
   def css = column[String]("css", O.NotNull, O.DBType("VARCHAR(64)"))
-  def versionMenu = column[Boolean]("version_manu", O.NotNull, O.Default(false))
+  def versionMenu = column[Boolean]("version_menu", O.NotNull, O.Default(false))
   def typeId = column[Int]("type_id", O.NotNull)
   def orderNum = column[Int]("order_num", O.NotNull)
 

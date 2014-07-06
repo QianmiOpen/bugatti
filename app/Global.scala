@@ -22,7 +22,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
 
-    if (app.configuration.getBoolean("sql.not.init").getOrElse(false)) {
+    if (app.configuration.getBoolean("sql.not.init").getOrElse(true)) {
       AppDB.db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
           TableQuery[ConfLogTable] ::

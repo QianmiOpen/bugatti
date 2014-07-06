@@ -176,7 +176,7 @@ define(['angular'], function(angular) {
             $scope.versions = []
             TaskService.getVersions(pid, $scope.activeEnv, function(data){
                 for(var dIndex in data) {
-                    $scope.versions.push(data[dIndex].vs)
+                    $scope.versions.push(data[dIndex])
                 }
                 console.log($scope.versions)
             })
@@ -188,11 +188,11 @@ define(['angular'], function(angular) {
             })
         }
 
-        $scope.deploy = function(projectId, version){
+        $scope.deploy = function(projectId, versionId){
             $scope.taskQueue = {}
             $scope.taskQueue.envId = $scope.activeEnv
             $scope.taskQueue.projectId = projectId
-            $scope.taskQueue.version = version
+            $scope.taskQueue.versionId = versionId
             $scope.taskQueue.templateId = 1
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
 
@@ -379,7 +379,6 @@ define(['angular'], function(angular) {
 
         //1、创建socket连接
         $scope.wsInvoke()
-
 
         $scope.removeQueue = function(qid){
             TaskService.removeTaskQueue(qid, function(data){

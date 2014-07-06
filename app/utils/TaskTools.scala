@@ -2,6 +2,7 @@ package utils
 
 import java.io.File
 
+import models.conf.VersionHelper
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import play.api.{Application, Logger}
@@ -12,11 +13,19 @@ import play.api.{Application, Logger}
 object TaskTools {
   /**
    * 判断版本是否是snapshot
-   * @param version
+   * @param versionId
    * @return
    */
-  def isSnapshot(version: String): Boolean = {
-    val result = version.contains("-SNAPSHOT")
+  def isSnapshot(versionId: Int): Boolean = {
+    var result = true
+    VersionHelper.findById(versionId) match {
+      case Some(version) => {
+        result = version.vs.contains("-SNAPSHOT")
+      }
+      case _ => {
+        result = false
+      }
+    }
     Logger.info("isSnapshot ==>" + result.toString)
     result
   }

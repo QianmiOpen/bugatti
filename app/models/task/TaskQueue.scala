@@ -13,13 +13,13 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 /**
  * Created by jinwei on 18/6/14.
  */
-case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, version: String, taskTemplateId:Int, status: TaskStatus, importTime: DateTime, taskId: Option[Int], schemeId: Option[Int], operatorId: Int)
+case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, importTime: DateTime, taskId: Option[Int], schemeId: Option[Int], operatorId: Int)
 
 case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id", O.NotNull)
   def projectId = column[Int]("project_id", O.NotNull)
-  def version = column[String]("version", O.NotNull, O.DBType("VARCHAR(64)"))
+  def versionId = column[Int]("version_id", O.Nullable)
   def taskTemplateId = column[Int]("task_template_id",O.NotNull)
   def status = column[TaskStatus]("status", O.NotNull)
   def importTime = column[DateTime]("import_time", O.NotNull, O.DBType("DATETIME"))
@@ -27,7 +27,7 @@ case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") 
   def schemeId = column[Int]("scheme_id", O.Nullable)
   def operatorId = column[Int]("operator_id", O.NotNull)
 
-  override def * = (id.?, envId, projectId, version, taskTemplateId, status, importTime, taskId.?, schemeId.?, operatorId) <> (TaskQueue.tupled, TaskQueue.unapply _)
+  override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, importTime, taskId.?, schemeId.?, operatorId) <> (TaskQueue.tupled, TaskQueue.unapply _)
 }
 
 object TaskQueueHelper{
@@ -39,7 +39,7 @@ object TaskQueueHelper{
     (JsPath \ "id").readNullable[Int] and
     (JsPath \ "envId").read[Int] and
     (JsPath \ "projectId").read[Int] and
-    (JsPath \ "version").read[String] and
+    (JsPath \ "versionId").readNullable[Int] and
     (JsPath \ "taskTemplateId").read[Int] and
     (JsPath \ "status").read[TaskStatus] and
     (JsPath \ "importTime").read[DateTime] and
