@@ -27,9 +27,9 @@ POST          /env                               controllers.conf.EnvController.
 PUT           /env/:id                           controllers.conf.EnvController.update(id: Int)
 
 # Project
-GET           /project                           controllers.conf.ProjectController.index(page: Int ?=0, pageSize: Int ?=10, search: Option[String])
+GET           /project                           controllers.conf.ProjectController.index(my:Boolean ?= false, page: Int ?=0, pageSize: Int ?=30)
+GET           /project/count                     controllers.conf.ProjectController.count(my: Boolean ?= false)
 GET           /project/all                       controllers.conf.ProjectController.all
-GET           /project/count                     controllers.conf.ProjectController.count(search: Option[String])
 GET           /project/atts                      controllers.conf.ProjectController.atts(pid: Int)
 GET           /project/:id                       controllers.conf.ProjectController.show(id: Int)
 DELETE        /project/:id                       controllers.conf.ProjectController.delete(id: Int)

@@ -4,29 +4,36 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.projectModule', []);
 
-    app.controller('ProjectCtrl', ['$scope', '$stateParams', '$modal', 'ProjectService', 'VersionService', function($scope, $stateParams, $modal, ProjectService, VersionService) {
-
-        // search
-        if ($stateParams.search_text) {
-            $scope.search_text = $stateParams.search_text;
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', function($scope, $state, $stateParams, $modal, ProjectService, VersionService) {
+        $scope.currentPage = 1;
+        $scope.pageSize = 30;
+        $scope.my = false;
+        if($state.current.name === 'conf.project.my') {
+            $scope.my = true;
         }
 
-        $scope.currentPage = 1;
-        $scope.pageSize = 10;
+        $scope.myProject = function() {
+            $scope.my = !$scope.my;
+            if ($scope.my) {
+                $state.go("conf.project.my", {}, {reload: true});
+            } else {
+                $state.go("conf.project", {}, {reload: true});
+            }
+        };
 
         // count
-        ProjectService.count(function(data) {
+        ProjectService.count($scope.my, function(data) {
             $scope.totalItems = data;
         });
 
         // list
-        ProjectService.getPage(0, $scope.pageSize, function(data) {
+        ProjectService.getPage($scope.my, 0, $scope.pageSize, function(data) {
             $scope.projects = data;
         });
 
         // page
         $scope.setPage = function (pageNo) {
-            ProjectService.getPage(pageNo - 1, $scope.pageSize, function(data) {
+            ProjectService.getPage($scope.my, pageNo - 1, $scope.pageSize, function(data) {
                 $scope.projects = data;
             });
         };
@@ -57,7 +64,7 @@ define(['angular'], function(angular) {
             modalInstance.result.then(function(data) {
                 if (data.r >= 0) {
                     $scope.projects.splice(index, 1);
-                    ProjectService.count(function(num) {
+                    ProjectService.count($scope.my, function(num) {
                         $scope.totalItems = num;
                     });
                 } else if (data.r == 'exist') {

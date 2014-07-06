@@ -12,11 +12,11 @@ define(['angular'], function(angular) {
             getAll: function(callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.all()).success(callback);
             },
-            getPage: function(page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.index(page, pageSize)).success(callback);
+            getPage: function(my, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.index(my, page, pageSize)).success(callback);
             },
-            count: function(callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.count()).success(callback);
+            count: function(my, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.count(my)).success(callback);
             },
             save: function(project, callback) {
                 $http.post(PlayRoutes.controllers.conf.ProjectController.save().url, project).success(callback)
