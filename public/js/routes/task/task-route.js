@@ -48,7 +48,7 @@ define(['angular'], function(angular) {
         });
 
         $stateProvider.state('task.queue',{
-            url: "/queue?envId&pId",
+            url: "/queue?envId&projectId",
             views:{
                 "@":{
                     templateUrl: "partials/task/task-queue.html",
