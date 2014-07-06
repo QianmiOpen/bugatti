@@ -49,19 +49,21 @@ object GitHelp {
   }
 
   def checkGitWorkDir(app: Application) = {
-    val gitRemoteUrl = app.configuration.getString("git.work.url").getOrElse("ssh://cicode@git.dev.ofpay.com:29418/cicode/salt-work.git")
-    _gitWorkDir = new File(app.configuration.getString("git.work.dir").getOrElse("target/salt-work"))
-    val gitWorkDir_git = new File(s"${_gitWorkDir.getAbsolutePath}/.git")
-    if (!_gitWorkDir.exists() || !gitWorkDir_git.exists()) {
-      _delDir(_gitWorkDir)
-      val clone = Git.cloneRepository()
-      clone.setDirectory(_gitWorkDir).setURI(gitRemoteUrl)
-      clone.call()
-    }
+    if (app.configuration.getBoolean("git.work.init").getOrElse(true)) {
+      val gitRemoteUrl = app.configuration.getString("git.work.url").getOrElse("ssh://cicode@git.dev.ofpay.com:29418/cicode/salt-work.git")
+      _gitWorkDir = new File(app.configuration.getString("git.work.dir").getOrElse("target/salt-work"))
+      val gitWorkDir_git = new File(s"${_gitWorkDir.getAbsolutePath}/.git")
+      if (!_gitWorkDir.exists() || !gitWorkDir_git.exists()) {
+        _delDir(_gitWorkDir)
+        val clone = Git.cloneRepository()
+        clone.setDirectory(_gitWorkDir).setURI(gitRemoteUrl)
+        clone.call()
+      }
 
-    val builder = new FileRepositoryBuilder()
-    val repo = builder.setGitDir(gitWorkDir_git).build()
-    _git = new Git(repo)
+      val builder = new FileRepositoryBuilder()
+      val repo = builder.setGitDir(gitWorkDir_git).build()
+      _git = new Git(repo)
+    }
   }
 
   def push(message: String) {

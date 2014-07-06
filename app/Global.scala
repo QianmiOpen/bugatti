@@ -22,7 +22,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
 
-    app.configuration.getBoolean("sql.not.init").getOrElse(
+    if (app.configuration.getBoolean("sql.not.init").getOrElse(false)) {
       AppDB.db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
           TableQuery[ConfLogTable] ::
@@ -43,6 +43,7 @@ object Global extends GlobalSettings {
           TableQuery[TaskQueueTable] ::
           TableQuery[TaskSchemeTable] ::
           TableQuery[TaskTable] ::
+          TableQuery[AreaTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
@@ -59,8 +60,9 @@ object Global extends GlobalSettings {
         AppData.versionScript
         AppData.attributeScript
         AppData.initFromYaml
+        AppData.areaScript
       }
-    )
+    }
 
     GitHelp.checkGitWorkDir(app)
   }
@@ -198,6 +200,12 @@ object AppData {
     val taskScheme = TableQuery[TaskSchemeTable]
     if (!MTable.getTables(taskScheme.baseTableRow.tableName).list.isEmpty) taskScheme.ddl.drop
     taskScheme.ddl.create
+  }
+
+  def areaScript(implicit session: Session) = {
+    Seq {
+      Area(None, "测试", "t-syndic", "")
+    }.foreach(AreaHelper.create)
   }
 
 }
