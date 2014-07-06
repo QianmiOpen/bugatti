@@ -118,6 +118,12 @@ define(['angular'], function(angular) {
                 }
                 TemplateService.items(x, function(data) {
                     $scope.items = data;
+                    // default init <input> ng-model value
+                    angular.forEach($scope.items, function(item) {
+                        if (item.default) {
+                            item.value = item.default;
+                        }
+                    })
                 });
             }
     }]);
