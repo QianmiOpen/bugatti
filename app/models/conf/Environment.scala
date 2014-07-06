@@ -44,7 +44,7 @@ object EnvironmentHelper {
     qEnvironment.drop(offset).take(pageSize).list
   }
 
-  def all(): List[Environment] = db withSession { implicit session =>
+  def all(): Seq[Environment] = db withSession { implicit session =>
     qEnvironment.list
   }
 
