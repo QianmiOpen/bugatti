@@ -27,7 +27,7 @@ object EnvironmentHelper {
 
   val qEnvironment = TableQuery[EnvironmentTable]
 
-  def findById(id: Int) = db withSession { implicit session =>
+  def findById(id: Int): Option[Environment] = db withSession { implicit session =>
     qEnvironment.where(_.id is id).firstOption
   }
 
