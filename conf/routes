@@ -34,7 +34,6 @@ GET           /project/atts                      controllers.conf.ProjectControl
 GET           /project/:id                       controllers.conf.ProjectController.show(id: Int)
 DELETE        /project/:id                       controllers.conf.ProjectController.delete(id: Int)
 POST          /project                           controllers.conf.ProjectController.save
-POST          /project/v1/version                controllers.conf.ProjectController.addVersion
 PUT           /project/:id                       controllers.conf.ProjectController.update(id: Int)
 
 # Template
@@ -75,6 +74,8 @@ POST          /task/removeTaskQueue              controllers.task.TaskController
 POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
 GET           /task/nexusVersion                 controllers.task.TaskController.getNexusVersions(projectId: Int)
 
+# open api
+POST          /v1/project/version                controllers.conf.ProjectController.addVersion
 
 
 GET           /javascriptRoutes                  controllers.Application.javascriptRoutes
