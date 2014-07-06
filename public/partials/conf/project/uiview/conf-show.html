@@ -1,20 +1,30 @@
-
-<p class="navbar-text">{{conf.path}}
-<p class="navbar-text navbar-right btn-group btn-group-xs">
+<div class="navbar-text col-sm-8">{{conf.path}}</div>
+<div class="navbar-text navbar-right btn-group btn-group-xs m15">
     <button ui-sref="conf.project.version.conf.edit({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">编辑</button>
-    <button type="button" class="btn btn-default">历史</button>
+    <button ui-sref="conf.project.version.conf.log({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">历史</button>
     <button ng-click="delete(conf.id)" type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
-</p>
-</p>
+</div>
 
 <div class="clearfix"></div>
-<div ui-ace="{
+
+<div class="col-sm-10">
+    <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
           mode: 'properties',
           onLoad: aceLoaded,
           onChange: aceChanged
         }" ng-model="conf.content" readonly="true"></div>
+</div>
 
-<br/>
-备注：<pre>{{conf.remark}}</pre>
+<div class="clearfix"></div>
+
+<div class="mt15 col-sm-10">
+    备注：<br/>
+    <pre>{{conf.remark}}</pre>
+</div>
+
+<div class="mt15 col-sm-10">
+    操作人：<br/>
+    {{conf.jobNo}}
+</div>

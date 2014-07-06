@@ -57,6 +57,27 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('conf.project.version.conf.log', {
+            url: "/:cid/log",
+            views: {
+                "conf-info@conf.project.version.conf": {
+                    templateUrl: "partials/conf/project/uiview/log-index.html",
+                    controller: "ConfLogCtrl"
+                }
+            }
+        });
+
+        $stateProvider.state('conf.project.version.conf.log.detail', {
+            url: "/:lid",
+            views: {
+                "conf-info@conf.project.version.conf": {
+                    templateUrl: "partials/conf/project/uiview/log-show.html",
+                    controller: "ConfLogShowCtrl"
+                }
+            }
+        });
+
+
 
     }]);
 

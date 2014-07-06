@@ -12,21 +12,22 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  *
  * @author of546
  */
-case class Conf(id: Option[Int], eid: Int, pid: Int, vid: Int, name: String, path: String, remark: Option[String], updated: DateTime)
-case class ConfForm(id: Option[Int], eid: Int, pid: Int, vid: Int, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
-  def toConf = Conf(id, eid, pid, vid, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
+case class Conf(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
+case class ConfForm(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
+  def toConf = Conf(id, eid, pid, vid, jobNo, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def eid = column[Int]("eid", O.NotNull)   // 环境编号
   def pid = column[Int]("pid", O.NotNull)   // 主项目编号
   def vid = column[Int]("vid", O.NotNull)   // 子项目编号
+  def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
   def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
   def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(200)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
-  override def * = (id.?, eid, pid, vid, name, path, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
+  override def * = (id.?, eid, pid, vid, jobNo, name, path, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
 
   def idx_vid = index("idx_vid", vid)
   def idx_path = index("idx_path", (vid, path), unique = true)
@@ -39,7 +40,7 @@ object ConfHelper extends PlayCache {
 
   val qConf = TableQuery[ConfTable]
 
-  def findById(id: Int) = db withSession { implicit session =>
+  def findById(id: Int): Option[Conf] = db withSession { implicit session =>
     qConf.where(_.id is id).firstOption
   }
 
@@ -62,14 +63,37 @@ object ConfHelper extends PlayCache {
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
-    qConf.where(_.id is id).delete
-    ConfContentHelper.delete_(id)
+    findById(id) match {
+      case Some(conf) =>
+        val confLogId = ConfLogHelper.create_(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        qConf.where(_.id is id).delete
+        ConfContentHelper.findById(id) match {
+          case Some(content) =>
+            ConfLogContentHelper.create_(ConfLogContent(confLogId, content.content))
+            ConfContentHelper.delete_(id)
+          case None =>
+            -2
+        }
+      case None =>
+        -1
+    }
   }
 
   def update(id: Int, confForm: ConfForm) = db withSession { implicit session =>
-    val conf2update = confForm.toConf.copy(Some(id))
-    qConf.where(_.id is id).update(conf2update)
-    ConfContentHelper.update_(id, ConfContent(None, confForm.content))
+    findById(id) match {
+      case Some(conf) =>
+        val confLogId = ConfLogHelper.create_(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        qConf.where(_.id is id).update(confForm.toConf.copy(Some(id)))
+        ConfContentHelper.findById(id) match {
+          case Some(content) =>
+            ConfLogContentHelper.create_(ConfLogContent(confLogId, content.content))
+            ConfContentHelper.update_(id, ConfContent(None, confForm.content))
+          case None =>
+            -2
+        }
+      case None =>
+        -1
+    }
   }
 
 }

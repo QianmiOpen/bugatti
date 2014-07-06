@@ -4,6 +4,7 @@ import play.api.Play.current
 import models.PlayCache
 
 import scala.slick.driver.MySQLDriver.simple._
+import scala.slick.jdbc.JdbcBackend
 
 /**
  * 子项目配置文件修改记录内容
@@ -27,8 +28,8 @@ object ConfLogContentHelper extends PlayCache {
     qLogContent.where(_.id is id).firstOption
   }
 
-  def create(content: ConfLogContent) = db withSession { implicit session =>
-    qLogContent.insert(content)
+  def create_(content: ConfLogContent)(implicit session: JdbcBackend#Session) = {
+    qLogContent.insert(content)(session)
   }
 
   def delete(id: Int) = db withSession { implicit session =>

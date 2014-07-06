@@ -50,9 +50,12 @@ code {
     font-size: 80%;
 }
 
+.p0 {padding: 0}
 .m0 {
     margin: 0;
 }
+.m15 { margin: 15px;}
+.mt15{ margin-top: 15px;}
 .mt-16 {
     margin-top: -16px;
 }
