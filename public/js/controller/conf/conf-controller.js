@@ -21,8 +21,14 @@ define(['angular'], function(angular) {
                     return;
                 }
                 $scope.envs = data;
-                // default select first
-                $scope.envChange(data[0])
+
+                if ($stateParams.eid) {
+                    EnvService.get($stateParams.eid, function(e) {
+                        $scope.envChange(e)
+                    });
+                } else { // default select first
+                    $scope.envChange(data[0])
+                }
             });
 
             // 环境选择
@@ -60,8 +66,13 @@ define(['angular'], function(angular) {
                     }
                 });
 
-                modalInstance.result.then(function (curr_eid) {
-                    console.log('vid='+angular.toJson($stateParams.vid))
+                modalInstance.result.then(function (param) {
+                    var thisEid = param.eid;
+                    ConfService.copy(angular.toJson(param), function(data) {
+                        if (data.r === 'ok') {
+                            $state.go('conf.project.version.conf', {eid: thisEid}, {reload: true})
+                        }
+                    });
                 }, function () {
                     console.info('Modal dismissed at: ' + new Date());
                 });
@@ -80,9 +91,8 @@ define(['angular'], function(angular) {
 
         $scope.override = false;
 
-        $scope.ok = function () {
-
-            $modalInstance.close(curr_eid);
+        $scope.ok = function (selEnv, selVer, selOver) {
+            $modalInstance.close({target_eid: selEnv, target_vid: selVer, eid: curr_eid, vid: curr_vid, ovr: selOver});
         };
 
         $scope.cancel = function () {

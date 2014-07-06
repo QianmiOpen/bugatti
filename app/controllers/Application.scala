@@ -67,6 +67,7 @@ object Application extends Controller with Security {
         conf.routes.javascript.ConfController.save,
         conf.routes.javascript.ConfController.delete,
         conf.routes.javascript.ConfController.update,
+        conf.routes.javascript.ConfController.copy,
 
         // conf logs
         conf.routes.javascript.ConfController.logs,
