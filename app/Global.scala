@@ -85,16 +85,14 @@ object AppData {
     }
 
     // 创建template关联的actions
-    val actionList = template.get("actions").asInstanceOf[JList[JMap[String, JList[JMap[String, String]]]]].asScala
-    actionList.zipWithIndex.foreach { case (x, index) =>
-      val node = x.entrySet().iterator().next()
-      val taskTempName = node.getKey
+    val actions = template.get("actions").asInstanceOf[JList[JMap[String, AnyRef]]].asScala
+    actions.zipWithIndex.foreach { case (action, index) =>
 
-      val taskId = TaskTemplateHelper.create(TaskTemplate(None, taskTempName, templateId, index))
-      val actions = node.getValue.asScala
-      actions.zipWithIndex.foreach { case (y, index) =>
-        val action = y.entrySet().iterator().next()
-        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, action.getKey, action.getValue, index))
+      val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String], action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean], templateId, index + 1))
+      val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
+      steps.zipWithIndex.foreach { case (step, index) =>
+        val seconds = step.get("seconds").asInstanceOf[Int]
+        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 5 else seconds, index + 1))
       }
     }
   }
