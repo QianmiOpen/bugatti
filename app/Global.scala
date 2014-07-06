@@ -22,7 +22,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
 
-    app.configuration.getBoolean("sql.not.init").getOrElse(
+    if (app.configuration.getBoolean("sql.not.init").getOrElse(false)) {
       AppDB.db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
           TableQuery[ConfLogTable] ::
@@ -43,6 +43,7 @@ object Global extends GlobalSettings {
           TableQuery[TaskQueueTable] ::
           TableQuery[TaskSchemeTable] ::
           TableQuery[TaskTable] ::
+          TableQuery[AreaTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
@@ -59,8 +60,9 @@ object Global extends GlobalSettings {
         AppData.versionScript
         AppData.attributeScript
         AppData.initFromYaml
+        AppData.areaScript
       }
-    )
+    }
 
     GitHelp.checkGitWorkDir(app)
   }
@@ -85,16 +87,14 @@ object AppData {
     }
 
     // 创建template关联的actions
-    val actionList = template.get("actions").asInstanceOf[JList[JMap[String, JList[JMap[String, String]]]]].asScala
-    actionList.zipWithIndex.foreach { case (x, index) =>
-      val node = x.entrySet().iterator().next()
-      val taskTempName = node.getKey
+    val actions = template.get("actions").asInstanceOf[JList[JMap[String, AnyRef]]].asScala
+    actions.zipWithIndex.foreach { case (action, index) =>
 
-      val taskId = TaskTemplateHelper.create(TaskTemplate(None, taskTempName, templateId, index))
-      val actions = node.getValue.asScala
-      actions.zipWithIndex.foreach { case (y, index) =>
-        val action = y.entrySet().iterator().next()
-        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, action.getKey, action.getValue, index))
+      val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String], action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean], templateId, index + 1))
+      val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
+      steps.zipWithIndex.foreach { case (step, index) =>
+        val seconds = step.get("seconds").asInstanceOf[Int]
+        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1))
       }
     }
   }
@@ -200,6 +200,12 @@ object AppData {
     val taskScheme = TableQuery[TaskSchemeTable]
     if (!MTable.getTables(taskScheme.baseTableRow.tableName).list.isEmpty) taskScheme.ddl.drop
     taskScheme.ddl.create
+  }
+
+  def areaScript(implicit session: Session) = {
+    Seq {
+      Area(None, "测试", "t-syndic", "")
+    }.foreach(AreaHelper.create)
   }
 
 }

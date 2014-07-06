@@ -10,19 +10,39 @@ templates:
         itemDesc: 自动解压
         default: 'False'
     actions:
-      - 安装:
-        - 安装java: salt {{machine}} state.sls java.install
-        - 安装tomcat: salt {{machine}} state.sls tomcat.install
-        - 部署war包: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
-        - 拷贝配置文件: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
-        - 启动应用: salt {{machine}} state.sls tomcat.startup
-      - 重启:
-        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
-        - 启动应用: salt {{machine}} state.sls tomcat.startup
-      - 启动:
-        - 启动应用: salt {{machine}} state.sls tomcat.startup
-      - 停止:
-        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
+      - name: 安装
+        css: glyphicon glyphicon-play
+        versionMenu: True
+        steps:
+          - name: 安装java
+            sls: salt {{machine}} state.sls java.install
+            seconds: 10
+          - name: 安装tomcat
+            sls: salt {{machine}} state.sls tomcat.install
+            seconds: 6
+          - name: 部署war包
+            sls: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
+          - name: 拷贝配置文件
+            sls: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
+          - name: 启动应用
+            sls: salt {{machine}} state.sls tomcat.startup
+      - name: 重启
+        css: glyphicon glyphicon-repeat
+        steps:
+          - name: 关闭应用
+            sls: salt {{machine}} state.sls tomcat.shutdown
+          - name: 启动应用
+            sls: salt {{machine}} state.sls tomcat.startup
+      - name: 启动
+        css: glyphicon glyphicon-play
+        steps:
+          - name: 启动应用
+            sls: salt {{machine}} state.sls tomcat.startup
+      - name: 停止
+        css: glyphicon glyphicon-stop
+        steps:
+          - name: 关闭应用
+            sls: salt {{machine}} state.sls tomcat.shutdown
   - name: webui
     remark: 用于前端web项目的自动部署，即web类项目
     items:
@@ -34,16 +54,36 @@ templates:
         itemDesc: 自动解压
         default: 'False'
     actions:
-      - 安装:
-        - 安装java: salt {{machine}} state.sls java.install
-        - 安装tomcat: salt {{machine}} state.sls tomcat.install
-        - 部署war包: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
-        - 拷贝配置文件: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
-        - 启动应用: salt {{machine}} state.sls tomcat.startup
-      - 重启:
-        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
-        - 启动应用: salt {{machine}} state.sls tomcat.startup
-      - 启动:
-        - 启动应用: salt {{machine}} state.sls tomcat.startup
-      - 停止:
-        - 关闭应用: salt {{machine}} state.sls tomcat.shutdown
+      - name: 安装
+        css: glyphicon glyphicon-play
+        versionMenu: True
+        steps:
+          - name: 安装java
+            sls: salt {{machine}} state.sls java.install
+            seconds: 10
+          - name: 安装tomcat
+            sls: salt {{machine}} state.sls tomcat.install
+            seconds: 6
+          - name: 部署war包
+            sls: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
+          - name: 拷贝配置文件
+            sls: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
+          - name: 启动应用
+            sls: salt {{machine}} state.sls tomcat.startup
+      - name: 重启
+        css: glyphicon glyphicon-repeat
+        steps:
+          - name: 关闭应用
+            sls: salt {{machine}} state.sls tomcat.shutdown
+          - name: 启动应用
+            sls: salt {{machine}} state.sls tomcat.startup
+      - name: 启动
+        css: glyphicon glyphicon-play
+        steps:
+          - name: 启动应用
+            sls: salt {{machine}} state.sls tomcat.startup
+      - name: 停止
+        css: glyphicon glyphicon-stop
+        steps:
+          - name: 关闭应用
+            sls: salt {{machine}} state.sls tomcat.shutdown
