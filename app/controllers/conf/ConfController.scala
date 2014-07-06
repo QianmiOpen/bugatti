@@ -111,25 +111,26 @@ object ConfController extends Controller {
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       copyForm => {
-        if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid)
+        if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) {
           Ok(Json.obj("r" -> "exist"))
-
-        val targetConfs = ConfHelper.findByEid_Vid(copyForm.target_eid, copyForm.target_vid)
-        val currConfs = ConfHelper.findByEid_Vid(copyForm.eid, copyForm.vid)
-        val confs = copyForm.ovr match {
-          case true =>
-            targetConfs.filter(t => currConfs.map(_.path).contains(t.path)) foreach( c => ConfHelper.delete(c)) // delete exist
-            targetConfs // return targets
-          case false =>
-            targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path))
+        } else {
+          val targetConfs = ConfHelper.findByEid_Vid(copyForm.target_eid, copyForm.target_vid)
+          val currConfs = ConfHelper.findByEid_Vid(copyForm.eid, copyForm.vid)
+          val confs = copyForm.ovr match {
+            case true =>
+              targetConfs.filter(t => currConfs.map(_.path).contains(t.path)) foreach( c => ConfHelper.delete(c)) // delete exist
+              targetConfs // return targets
+            case false =>
+              targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path))
+          }
+          // insert all
+          confs.foreach { c =>
+            val content = ConfContentHelper.findById(c.id.get)
+            val confForm = ConfForm(None, copyForm.eid, c.pid, copyForm.vid, c.jobNo, Some(c.name), c.path, if (content != None) content.get.content else "", c.remark, c.updated)
+            ConfHelper.create(confForm)
+          }
+          Ok(Json.obj("r" -> "ok"))
         }
-        // insert all
-        confs.foreach { c =>
-          val content = ConfContentHelper.findById(c.id.get)
-          val confForm = ConfForm(None, copyForm.eid, c.pid, copyForm.vid, c.jobNo, Some(c.name), c.path, if (content != None) content.get.content else "", c.remark, c.updated)
-          ConfHelper.create(confForm)
-        }
-        Ok(Json.obj("r" -> "ok"))
       }
     )
 
