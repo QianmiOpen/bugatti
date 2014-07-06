@@ -26,7 +26,7 @@
                     {{pro.name}}
                 </td>
                 <td>
-                    <a>
+                    <a title="查看任务队列" ui-sref="task.queue({envId: pro.envId, projectId: pro.projectId})">
                         <span class="glyphicon glyphicon-random" style="float: right">&nbsp;{{pro.status.queueNum}}&nbsp;</span>
                     </a>
                     <a>

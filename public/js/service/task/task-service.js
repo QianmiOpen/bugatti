@@ -17,9 +17,10 @@ define(['angular'], function(angular) {
             },
             createNewTaskQueue: function(taskQueue, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.createNewTaskQueue().url, {'taskQueue': taskQueue}).success(callback)
+            },
+            removeTaskQueue: function(qid, callback){
+                $http(PlayRoutes.controllers.task.TaskController.removeTaskQueue(qid)).success(callback)
             }
         }
     });
-
-
 });

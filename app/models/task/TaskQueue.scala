@@ -67,6 +67,10 @@ object TaskQueueHelper{
     }
   }
 
+  def findWaitQueueById(qId: Int): Option[TaskQueue] = db withSession{ implicit session =>
+    qTaskQueue.where(_.id is qId).where(_.status is TaskEnum.TaskWait).firstOption
+  }
+
   def updateStatus(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
     qTaskQueue.where(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
   }
@@ -85,6 +89,10 @@ object TaskQueueHelper{
   def findQueueNum(tq: TaskQueue): Int = db withSession {implicit session =>
 //    Query(qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length).first
     qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length.run
+  }
+
+  def findQueues(tq: TaskQueue): List[TaskQueue] = db withSession { implicit session =>
+    qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).list
   }
 
 }

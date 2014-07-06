@@ -63,11 +63,8 @@ define(['angular'], function(angular) {
             var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
             var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.randomKey(1,10000)).webSocketURL()
 //            path = "ws://bugatti.dev.ofpay.com/task/joinProcess"
-            console.log(path)
             $scope.taskSocket = new WS(path)
-            console.log($scope.taskSocket)
             $scope.taskSocket.onmessage = $scope.receiveEvent
-            console.log(222)
         }
 
         $scope.receiveEvent = function(event){
@@ -334,5 +331,51 @@ define(['angular'], function(angular) {
     }]);
 
 
+    app.controller('TaskQueueCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
+        $scope.taskQueues = []
 
+        console.log($stateParams)
+        $scope.envId_search = $stateParams.envId
+        $scope.projectId_search = $stateParams.projectId
+
+        //1、创建socket连接
+        $scope.wsInvoke()
+
+//        $scope.returnList = function(){
+//            $state.go('^.^.task',{'envId': $scope.envId_search, 'proId': $scope.proId_search, 'envName': $scope.envName_search, 'proName': $scope.proName_search})
+//        }
+
+        $scope.wsInvoke = function(){
+            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+            var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.randomKey(1,10000)).webSocketURL()
+//            path = "ws://bugatti.dev.ofpay.com/task/joinProcess"
+            $scope.taskSocket = new WS(path)
+            $scope.taskSocket.onmessage = $scope.receiveEvent
+        }
+
+        $scope.receiveEvent = function(event){
+            $scope.data = JSON.parse(event.data)
+            console.log("Data received, Message is =>" + $scope.data.message)
+            if(event.data.error){
+                console.log("there is errors:"+event.data.error)
+            }else{
+                $scope.$apply(function(){
+                    var tsData = $scope.tsData
+                    console.log(tsData)
+
+                    var key = $scope.envId_search + "_" + $scope.projectId_search
+                    var taskQueues = tsData[key]
+
+                    $scope.taskQueues = taskQueues.queue
+                    console.table($scope.taskQueues)
+                })
+            }
+        }
+
+        $scope.removeQueue = function(id){
+            TaskService.removeTaskQueue(qid, function(data){
+                //如果删除的任务在一瞬间刚好变为正在执行，应告知
+            })
+        }
+    }]);
 });

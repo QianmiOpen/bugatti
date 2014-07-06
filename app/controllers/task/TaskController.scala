@@ -144,6 +144,29 @@ object TaskController extends Controller {
     TaskProcess.createNewTask(taskQueue)
   }
 
+  /**
+   * 从队列中删除正在等待执行的任务
+   * @param qid
+   * @return
+   */
+  def removeTaskQueue(qid: Int) = Action{
+    val taskQueue = TaskQueueHelper.findWaitQueueById(qid)
+    taskQueue match {
+      case Some(tq) => {
+        //1、删除队列；
+        TaskQueueHelper.remove(tq)
+        //2、调用方法checkQueueNum修改状态；
+        TaskProcess.checkQueueNum(tq)
+        //3、调用推送状态方法；
+        TaskProcess.pushStatus()
+      }
+      case _ => {
+
+      }
+    }
+    Ok
+  }
+
   implicit val projectWrites = Json.writes[Project]
   implicit val taskWrites = Json.writes[Task]
   implicit val versionWrites = Json.writes[Version]

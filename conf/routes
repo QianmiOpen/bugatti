@@ -69,6 +69,7 @@ GET           /conf/log/:id                      controllers.conf.ConfController
 POST          /task/lastStatus                   controllers.task.TaskController.findLastTaskStatus
 GET           /task/joinProcess/:taskId          controllers.task.TaskController.joinProcess(taskId: Int)
 POST          /task/newTaskQueue                 controllers.task.TaskController.createNewTaskQueue
+POST          /task/removeTaskQueue              controllers.task.TaskController.removeTaskQueue(qid: Int)
 POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
 GET           /task/nexusVersion                 controllers.task.TaskController.getNexusVersions(projectId: Int)
 

@@ -30,9 +30,9 @@ object TaskProcess {
   }
 
   lazy val socketActor = {
-    //    ActorSystem("mySocketSystem") actorOf Props[SocketActor]
+//    ActorSystem("mySocketSystem") actorOf Props[SocketActor]
     taskSystem actorOf Props[SocketActor]
-    //    Akka.system.actorOf(Props[SocketActor])
+//    Akka.system.actorOf(Props[SocketActor])
   }
 
   // 以envId:projectId作为key，区分任务执行actor
@@ -44,7 +44,7 @@ object TaskProcess {
   var statusMap = Json.obj()
 
   def chooseTaskActor(envProject: String): ActorRef = {
-    actorMap get envProject getOrElse {
+    actorMap get envProject getOrElse{
       val actor = taskSystem actorOf Props[TaskProcess]
       actorMap += envProject -> actor
       actor
@@ -93,8 +93,6 @@ object TaskProcess {
     checkQueueNum(tq)
     //发送到指定 actor mailbox
     executeTasks(tq.envId, tq.projectId)
-    // 拷贝文件，并推送到git, TODO
-    copyConfFileAddToGit(1, "cardbase-master", 1, 1)
     taskQueueId
   }
 
@@ -130,42 +128,42 @@ object TaskProcess {
     pushStatus()
   }
 
-  def generateQueueNumJson(tq: TaskQueue, num: Int) {
+  def generateQueueNumJson(tq: TaskQueue, num: Int){
     val key = s"${tq.envId}_${tq.projectId}"
     generateJson(key, Json.obj("queueNum" -> num))
   }
 
-  def generateJson(key: String, json: JsObject) {
+  def generateJson(key: String, json: JsObject){
     val status = (statusMap \ key).asOpt[JsObject]
-    if (status != None) {
+    if(status != None){
       val result = status.get ++ json
       changeAllStatus(Json.obj(key -> result))
       Logger.info(s"status ==> ${result.toString()}")
     }
-    else {
+    else{
       changeAllStatus(Json.obj(key -> json))
       Logger.info(s"status ==> ${json}")
     }
   }
 
-  def join(): scala.concurrent.Future[(Iteratee[JsValue, _], Enumerator[JsValue])] = {
+  def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     val js: JsValue = getAllStatus
-    (socketActor ? JoinProcess(js)).map {
+    (socketActor ? JoinProcess(js)).map{
       case ConnectedSocket(out) => {
-        val in = Iteratee.foreach[JsValue] { event =>
+        val in = Iteratee.foreach[JsValue]{ event =>
           //这个是为了client主动调用
           socketActor ! AllTaskStatus()
-        }.map { _ =>
+        }.map{ _ =>
           socketActor ! QuitProcess()
         }
         (in, out)
       }
-      case CannotConnect(error) => {
-        val iteratee = Done[JsValue, Unit]((), Input.EOF)
+      case CannotConnect(error) =>{
+        val iteratee = Done[JsValue,Unit]((),Input.EOF)
         // Send an error and close the socket
-        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
+        val enumerator =  Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
 
-        (iteratee, enumerator)
+        (iteratee,enumerator)
       }
     }
   }
@@ -173,7 +171,7 @@ object TaskProcess {
   /**
    * 推送任务状态
    */
-  def pushStatus() {
+  def pushStatus(){
     Logger.info("pushStatus")
     socketActor ! AllTaskStatus()
   }
@@ -205,7 +203,7 @@ class TaskProcess extends Actor {
       //3.1、队列表中获取最先执行的任务；
       var taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
       var taskName = ""
-      while (taskQueue != null) {
+      while(taskQueue != null){
         taskName = TaskTemplateHelper.getById(taskQueue.taskTemplateId).name
         //3.2、insert到任务表 & 命令表；
         val taskId = TaskHelper.addByTaskQueue(taskQueue)
@@ -218,7 +216,7 @@ class TaskProcess extends Actor {
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
-        if (executeCommand(commandList, envId, projectId, taskId, taskName)) {
+        if(executeCommand(commandList, envId, projectId, taskId, taskName)){
           //任务执行成功
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskSuccess)
         }
@@ -255,11 +253,11 @@ class TaskProcess extends Actor {
     val path = s"${baseLogPath}/${taskId}/execute.log"
     val resultLogPath = s"${baseLogPath}/${taskId}/result.log"
     val logDir = new File(baseDir)
-    if (!logDir.exists) {
+    if(!logDir.exists){
       logDir.mkdirs()
     }
 
-    for (command <- commandList) {
+    for(command <- commandList){
       //修改内存状态
       val currentNum = command.orderNum
       TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.command, 3, taskName)
@@ -271,7 +269,7 @@ class TaskProcess extends Actor {
       val cmd = command.command + s" -v --out-file=${path}"
       Logger.info(cmd)
       (cmd !!)
-      //      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
+//      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
 
       //合并日志
       val dir = new File(baseDir)
@@ -279,16 +277,16 @@ class TaskProcess extends Actor {
       mergeLog(path, file, cmd, false)
 
       //查看日志 失败的命令再次执行一次
-      if (!checkLog(path)) {
+      if(!checkLog(path)){
         (cmd !!)
         //合并日志
         mergeLog(path, file, cmd, true)
-        if (!checkLog(path)) {
+        if(!checkLog(path)){
           result = false
         }
       }
       //更新数据库状态
-      if (result) {
+      if(result){
         TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
       } else {
         TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskFailed)
@@ -303,7 +301,7 @@ class TaskProcess extends Actor {
 
   def mergeLog(path: String, file: File, cmd: String, again: Boolean) = {
     var executeAgain = ""
-    if (again) {
+    if(again){
       executeAgain = "[execute again] "
     }
 
@@ -317,14 +315,14 @@ class TaskProcess extends Actor {
   def checkLog(path: String): Boolean = {
     var result = true
     val row = (s"tail -n3 ${path}" !!).split("\n")(0)
-    if (row.split(":").length > 1) {
+    if(row.split(":").length>1){
       val failedNum = row.split(":")(1).trim().toInt
-      if (failedNum == 0) {
+      if(failedNum == 0){
         result = true
-      } else {
+      }else {
         result = false
       }
-    } else {
+    }else {
       result = false
     }
     result
@@ -337,7 +335,7 @@ class TaskProcess extends Actor {
    * @param jsValue
    * @return
    */
-  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue): Seq[TaskCommand] = {
+  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue): Seq[TaskCommand]={
     //1、envId , projectId -> machines, nfsServer
     val machines: List[String] = List("t-minion")
     val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
@@ -349,28 +347,28 @@ class TaskProcess extends Actor {
     //3、version -> version, repository
     val version = taskQueue.version
     var repository = "releases"
-    if (TaskTools.isSnapshot(version)) {
+    if(TaskTools.isSnapshot(version)){
       repository = "snapshots"
     }
 
     val paramsJson = Json.obj(
       "nfsServer" -> nfsServer
-      , "groupId" -> groupId
-      , "artifactId" -> artifactId
-      , "version" -> version
-      , "repository" -> repository
+      ,"groupId" -> groupId
+      ,"artifactId" -> artifactId
+      ,"version" -> version
+      ,"repository" -> repository
     )
 
 
-    val templateCommands = TaskTemplateStepHelper.getStepsByTemplateId(taskQueue.taskTemplateId).map { step =>
+    val templateCommands = TaskTemplateStepHelper.getStepsByTemplateId(taskQueue.taskTemplateId).map{ step =>
       //参数替换，更改sls命令
       fillSls(step, taskId, paramsJson)
     }
 
     //获取机器，遍历机器&模板命令
     var count = 0
-    for {machine <- machines
-         c <- templateCommands
+    for{machine <- machines
+      c <- templateCommands
     } yield {
       count += 1
       val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine)
@@ -386,11 +384,11 @@ class TaskProcess extends Actor {
    * @return
    */
   def fillSls(sls: TaskTemplateStep, taskId: Int, paramsJson: JsValue): TaskCommand = {
-    val keys: Set[String] = paramsJson match {
-      case JsObject(fields) => {
+    val keys: Set[String] = paramsJson match{
+      case JsObject(fields) =>{
         fields.toMap.keySet
       }
-      case _ => {
+      case _ =>{
         Set.empty[String]
       }
     }
@@ -400,7 +398,7 @@ class TaskProcess extends Actor {
 
   def replaceSls(sls: TaskTemplateStep, paramsJson: JsValue, keys: Set[String]): String = {
     var result = sls.sls
-    keys.map {
+    keys.map{
       key =>
         result = result.replaceAll("\\{\\{" + key + "\\}\\}", (paramsJson \ key).toString)
     }

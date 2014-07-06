@@ -45,7 +45,17 @@ define(['angular'], function(angular) {
                     controller: "TaskInfoCtrl"
                 }
             }
-        })
+        });
+
+        $stateProvider.state('task.queue',{
+            url: "/queue?envId&pId",
+            views:{
+                "@":{
+                    templateUrl: "partials/task/task-queue.html",
+                    controller: "TaskQueueCtrl"
+                }
+            }
+        });
 
     }]);
 
