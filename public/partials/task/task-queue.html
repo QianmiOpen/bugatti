@@ -1,7 +1,7 @@
 <div class="col-md-offset-0 main">
     <div class="page-header clearfix">
         <h1 class="pull-left" style="margin: 0;">任务管理 - 任务队列</h1>
-        <button class="btn btn-primary pull-right" back-button>返回</button></td>
+        <button class="btn btn-primary pull-right" ng-click="returnList()">返回</button></td>
     </div>
 
     <div class="table-responsive">
@@ -21,10 +21,10 @@
                     {{tq.id}}
                 </td>
                 <td>
-                    {{tq.task_template_id}}
+                    {{tq.taskTemplateId}}
                 </td>
                 <td style="padding:10px 0px 0px 0px;">
-                    {{tq.status}}
+                    {{tq.statusName}}
                 </td>
                 <!-- ========================================操作======================================== -->
                 <td class="show">

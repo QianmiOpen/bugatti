@@ -26,7 +26,7 @@
                     {{pro.name}}
                 </td>
                 <td>
-                    <a title="查看任务队列" ui-sref="task.queue({envId: pro.envId, projectId: pro.projectId})">
+                    <a title="查看任务队列" ng-click="goTaskQueue(activeEnv, pro.id)" href="">
                         <span class="glyphicon glyphicon-random" style="float: right">&nbsp;{{pro.status.queueNum}}&nbsp;</span>
                     </a>
                     <a>

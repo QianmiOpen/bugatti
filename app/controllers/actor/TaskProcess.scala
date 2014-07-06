@@ -23,6 +23,8 @@ import scala.sys.process._
  */
 object TaskProcess {
 
+  implicit val taskQueueWrites = Json.writes[TaskQueue]
+
   implicit val timeout = Timeout(2 seconds)
 
   lazy val taskSystem = {
@@ -121,16 +123,18 @@ object TaskProcess {
   def checkQueueNum(tq: TaskQueue) = {
     //1、获取队列中等待执行TaskWait的任务个数
     val waitNum = TaskQueueHelper.findQueueNum(tq)
+    val list = TaskQueueHelper.findQueues(tq)
     Logger.info(s"waitNum ==> ${waitNum}")
     //2、更改任务状态
-    generateQueueNumJson(tq, waitNum)
+    generateQueueNumJson(tq, waitNum, list)
     //3、推送任务状态
     pushStatus()
   }
 
-  def generateQueueNumJson(tq: TaskQueue, num: Int){
+  def generateQueueNumJson(tq: TaskQueue, num: Int, list: List[TaskQueue]){
     val key = s"${tq.envId}_${tq.projectId}"
     generateJson(key, Json.obj("queueNum" -> num))
+    generateJson(key, Json.obj("queues" -> Json.toJson(list)))
   }
 
   def generateJson(key: String, json: JsObject){
