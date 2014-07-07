@@ -37,7 +37,7 @@ templates:
         versionMenu: True
         steps:
           - name: 同步gitfs
-            sls: "salt {{syndic}} cmd.run 'salt-run fileserver.update'"
+            sls: "salt {{syndic}} state.sls job.updategfs"
           - name: 加固os
             sls: "salt {{machine}} state.sls os.security"
           - name: 安装ntp服务
@@ -89,7 +89,7 @@ templates:
         versionMenu: True
         steps:
           - name: 同步gitfs
-            sls: "salt {{syndic}} cmd.run 'salt-run fileserver.update'"
+            sls: "salt {{syndic}} state.sls job.updategfs"
           - name: 关闭应用
             sls: "salt {{machine}} state.sls tomcat.shutdown"
           - name: 部署war包
