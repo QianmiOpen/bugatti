@@ -215,12 +215,13 @@ class TaskProcess extends Actor {
         TaskProcess.checkQueueNum(taskQueue)
         //3.3、依次执行命令(insert命令列表，依次执行，修改数据库状态，修改内存状态)；
         val params = TaskProcess.getAllParams
-        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
+        val (commandList, paramsJson) = generateCommands(taskId, taskQueue, params)
+//        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
         Logger.info(commandList.toString)
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
-        if(executeCommand(commandList, envId, projectId, taskId, taskName, params)){
+        if(executeCommand(commandList, envId, projectId, taskId, taskName, paramsJson)){
           //任务执行成功
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskSuccess)
         }
@@ -271,6 +272,10 @@ class TaskProcess extends Actor {
       TaskProcess.pushStatus
       //如果是copy conf file，先上传git
       if(command.command.contains("job.copyfile")){
+        Logger.info("envId===> " + envId.toString)
+        Logger.info((params \ "projectName").as[String])
+        Logger.info(taskId.toString)
+        Logger.info((params \ "versionId").as[Int].toString)
         TaskProcess.copyConfFileAddToGit(envId, (params \ "projectName").as[String], taskId, ((params \ "versionId").as[Int]))
       }
 
@@ -344,7 +349,7 @@ class TaskProcess extends Actor {
    * @param jsValue
    * @return
    */
-  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue): Seq[TaskCommand]={
+  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue) = {
     //1、envId , projectId -> machines, nfsServer
     val machines: List[String] = List("t-minion")
     val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
@@ -391,13 +396,14 @@ class TaskProcess extends Actor {
 
     //获取机器，遍历机器&模板命令
     var count = 0
-    for{machine <- machines
+    val seq = for{machine <- machines
       c <- templateCommands
     } yield {
       count += 1
       val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine)
       c.copy(command = command).copy(orderNum = count).copy(machine = s"${machine}")
     }
+    (seq, paramsJson)
   }
 
   /**
