@@ -277,6 +277,8 @@ class TaskProcess extends Actor {
     if(!logDir.exists){
       logDir.mkdirs()
     }
+    Seq("touch", s"${path}") lines
+
     if(totalNum == 0){
       Seq("echo", "[ERROR] 项目没有绑定机器！") #>> file lines
 
@@ -302,13 +304,24 @@ class TaskProcess extends Actor {
       }
 
       //调用salt命令
-      val cmd = command.command + s" -v --out-file=${path}"
-      Logger.info(cmd)
-      (cmd !!)
+      val outputCommand = s" --out-file=${path}"
+      val cmd = command.command
+//      Logger.info(cmd)
+      var commandSeq = command2Seq(cmd)
+      if(cmd.contains("pillar")){
+        commandSeq = commandSeq :+ cmd.substring(cmd.indexOf("pillar"), cmd.length)
+      }
+      commandSeq = commandSeq :+ outputCommand
+
+      commandSeq lines
+
+//      Seq("salt", "\\t-minion", "state.sls", "webapp.deploy", "pillar='{webapp: {groupId: com.ofpay, artifactId: cardserverimpl, version: 1.6.3-RELEASE, repository: releases}}'",  s" --out-file=${path}") lines
+//      (cmd !!)
+//      salt \t-dminion state.sls webapp.deploy pillar='{webapp: {groupId: com.ofpay, artifactId: cardserverimpl, version: 1.6.3-RELEASE, repository: releases}}'
 //      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
 
       //合并日志
-      mergeLog(path, file, cmd, false)
+      mergeLog(path, file, cmd + outputCommand, false)
 
       //查看日志 失败的命令再次执行一次
       if(!checkLog(path)){
@@ -331,6 +344,10 @@ class TaskProcess extends Actor {
     }
     Logger.info(result.toString)
     result
+  }
+
+  def command2Seq(command: String): Seq[String] = {
+    command.split(" ")
   }
 
   def mergeLog(path: String, file: File, cmd: String, again: Boolean) = {
