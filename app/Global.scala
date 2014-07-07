@@ -202,7 +202,7 @@ object AppData {
 
   def areaScript(implicit session: Session) = {
     Seq {
-      Area(None, "测试", "t-syndic", "")
+      Area(None, "测试", "t-syndic", "172.19.3.149")
     }.foreach(AreaHelper.create)
   }
 }

@@ -24,6 +24,14 @@ object Application extends Controller with Security {
         conf.routes.javascript.UserController.update,
         conf.routes.javascript.UserController.delete,
 
+        // area
+        conf.routes.javascript.AreaController.all,
+        conf.routes.javascript.AreaController.get,
+        conf.routes.javascript.AreaController.save,
+        conf.routes.javascript.AreaController.update,
+        conf.routes.javascript.AreaController.delete,
+        conf.routes.javascript.AreaController.refresh,
+
         // env
         conf.routes.javascript.EnvController.index,
         conf.routes.javascript.EnvController.all,

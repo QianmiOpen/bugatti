@@ -4,6 +4,7 @@
 
 define(['angular',
     './conf/user-controller',
+    './conf/area-controller',
     './conf/env-controller',
     './conf/project-controller',
     './conf/template-controller',
@@ -14,6 +15,7 @@ define(['angular',
     /* Controllers */
     var app = angular.module('bugattiApp.controllers', [
         'bugattiApp.controller.conf.userModule',
+        'bugattiApp.controller.conf.areaModule',
         'bugattiApp.controller.conf.envModule',
         'bugattiApp.controller.conf.projectModule',
         'bugattiApp.controller.conf.templateModule',
