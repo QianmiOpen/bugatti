@@ -67,8 +67,7 @@ object SaltTools {
     }
   }
 
-  def baseLogPath(app: Application): String = {
+  def baseLogPath(app: Application) = {
     logPath = app.configuration.getString("salt.log.dir").getOrElse("target/saltlogs")
-    logPath
   }
 }
