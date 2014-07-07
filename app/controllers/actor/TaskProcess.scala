@@ -344,19 +344,19 @@ class TaskProcess extends Actor {
   }
 
   def command2Seq(command: String): Seq[String] = {
-    //1、找到'位置（两处）
-    val first = command.indexOf("'")
-    val second = command.lastIndexOf("'")
-    //2、第一个'的前一个字符判断是否是“=”
-    val (top, tail) = command.substring(first - 1, first) match {
-      case "=" => {
-        (command.substring(0, first - 7), command.substring(first - 7, command.length))
+    var retSeq = Seq.empty[String]
+    var bAppend = false
+    command.split(" ").foreach { c =>
+      if (bAppend) {
+        retSeq = retSeq.dropRight(1) :+ (retSeq.last + s" $c")
+      } else {
+        retSeq = retSeq :+ c
       }
-      case _ => {
-        (command.substring(0, first), command.substring(first, command.length))
+      if (c.contains("'")) {
+        bAppend = !bAppend
       }
     }
-    top.split(" ") :+ tail
+    retSeq
   }
 
   def mergeLog(path: String, file: File, cmd: String, again: Boolean) = {
