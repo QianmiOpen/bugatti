@@ -72,6 +72,9 @@ POST          /task/newTaskQueue                 controllers.task.TaskController
 POST          /task/removeTaskQueue              controllers.task.TaskController.removeTaskQueue(qid: Int)
 POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
 GET           /task/nexusVersion                 controllers.task.TaskController.getNexusVersions(projectId: Int)
+GET           /task/templates                    controllers.task.TaskController.getTemplates
+
+
 
 
 

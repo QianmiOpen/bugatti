@@ -88,19 +88,6 @@ object TaskController extends Controller {
     Ok(Json.toJson(list.reverse.drop(list.length - 5).reverse))
   }
 
-//  def findVersionsByProjects = Action(parse.json){implicit request =>
-//    request.body match {
-//      case JsObject(fields) => {
-//        Ok(Json.toJson(findVersions(fields)))
-//      }
-//      case _ => Ok(Json.toJson(0))
-//    }
-//  }
-//
-//  def findVersions(fields: Seq[(String, JsValue)]): List[Project] = {
-//    null
-//  }
-
   def findLastTaskStatus = Action(parse.json){implicit request =>
     request.body match {
       case JsObject(fields) => {
@@ -167,8 +154,37 @@ object TaskController extends Controller {
     Ok
   }
 
+  /**
+   * 获取所有项目类型的模板
+   */
+  def getTemplates() = Action{
+    var map = Map.empty[Int, Seq[TaskTemplate]]
+    TaskTemplateHelper.all.foreach{
+      template => {
+        //1、从map中获取seq，没有就创建
+        var seq = map.getOrElse(template.typeId, Seq.empty[TaskTemplate])
+        //2、添加到seq
+        seq = seq :+ template
+        //3、覆盖map
+        map += template.typeId -> seq
+      }
+    }
+    Ok(map2Json(map))
+  }
+
+  def map2Json(map: Map[Int, Seq[TaskTemplate]]): JsValue = {
+    var result = Json.obj()
+    map.foreach{
+      m => {
+        result ++= Json.obj(s"${m._1}" -> m._2)
+      }
+    }
+    Json.toJson(result)
+  }
+
   implicit val projectWrites = Json.writes[Project]
   implicit val taskWrites = Json.writes[Task]
   implicit val versionWrites = Json.writes[Version]
+  implicit val taskTemplateWrites = Json.writes[TaskTemplate]
 
 }

@@ -220,7 +220,7 @@ class TaskProcess extends Actor {
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
-        if(executeCommand(commandList, envId, projectId, taskId, taskName)){
+        if(executeCommand(commandList, envId, projectId, taskId, taskName, params)){
           //任务执行成功
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskSuccess)
         }
@@ -250,7 +250,7 @@ class TaskProcess extends Actor {
     }
   }
 
-  def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskId: Int, taskName: String): Boolean = {
+  def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskId: Int, taskName: String, params: JsValue): Boolean = {
     val totalNum = commandList.size
     var result = true
     val baseDir = s"${baseLogPath}/${taskId}"
@@ -269,6 +269,11 @@ class TaskProcess extends Actor {
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
       TaskProcess.pushStatus
+      //如果是copy conf file，先上传git
+      if(command.command.contains("job.copyfile")){
+        TaskProcess.copyConfFileAddToGit(envId, (params \ "projectName").as[String], taskId, ((params \ "versionId").as[Int]))
+      }
+
       //调用salt命令
       val cmd = command.command + s" -v --out-file=${path}"
       Logger.info(cmd)
@@ -347,6 +352,7 @@ class TaskProcess extends Actor {
     //2、projectId -> groupId, artifactId
     val groupId = AttributeHelper.getValue(taskQueue.projectId, "groupId")
     val artifactId = AttributeHelper.getValue(taskQueue.projectId, "artifactId")
+    val projectName = ProjectHelper.findById(taskQueue.projectId).get.name
 
     //3、version -> version, repository
     val versionId = taskQueue.versionId
@@ -369,7 +375,12 @@ class TaskProcess extends Actor {
       ,"groupId" -> groupId
       ,"artifactId" -> artifactId
       ,"version" -> versionName
+      ,"versionId" -> versionId.getOrElse[Int](0)
       ,"repository" -> repository
+      ,"projectName" -> projectName
+      ,"envId" -> taskQueue.envId
+      ,"projectId" -> taskQueue.projectId
+      ,"taskId" -> taskId
     )
 
 
