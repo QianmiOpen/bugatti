@@ -70,7 +70,15 @@ object TaskProcess {
 
   def generateTaskStatusJson(envId: Int, projectId: Int, task: JsValue, taskName: String) = {
     val key = s"${envId}_${projectId}"
-    generateJson(key, Json.obj("taskName" -> taskName, "task" -> task, "status" -> task \ "status", "endTime" -> (task \ "endTime").toString))
+    val version = VersionHelper.findById((task \ "versionId").asOpt[Int].getOrElse(0))
+    var taskObj = task
+    version match {
+      case Some(v) => {
+        taskObj = task.as[JsObject] ++ Json.obj("version" -> v.vs)
+      }
+      case _ =>
+    }
+    generateJson(key, Json.obj("taskName" -> taskName, "task" -> taskObj, "status" -> task \ "status", "endTime" -> (task \ "endTime").toString))
   }
 
   def changeAllStatus(js: JsObject): JsValue = {
