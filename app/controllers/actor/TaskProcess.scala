@@ -311,17 +311,11 @@ class TaskProcess extends Actor {
       val cmd = command.command
 //      Logger.info(cmd)
       var commandSeq = command2Seq(cmd)
-      if(cmd.contains("pillar")){
-        commandSeq = commandSeq :+ cmd.substring(cmd.indexOf("pillar"), cmd.length)
-      }
       commandSeq = commandSeq :+ outputCommand
 
       commandSeq lines
 
 //      Seq("salt", "\\t-minion", "state.sls", "webapp.deploy", "pillar='{webapp: {groupId: com.ofpay, artifactId: cardserverimpl, version: 1.6.3-RELEASE, repository: releases}}'",  s" --out-file=${path}") lines
-//      (cmd !!)
-//      salt \t-dminion state.sls webapp.deploy pillar='{webapp: {groupId: com.ofpay, artifactId: cardserverimpl, version: 1.6.3-RELEASE, repository: releases}}'
-//      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
 
       //合并日志
       mergeLog(path, file, cmd + outputCommand, false)
@@ -350,7 +344,19 @@ class TaskProcess extends Actor {
   }
 
   def command2Seq(command: String): Seq[String] = {
-    command.split(" ")
+    //1、找到'位置（两处）
+    val first = command.indexOf("'")
+    val second = command.lastIndexOf("'")
+    //2、第一个'的前一个字符判断是否是“=”
+    val (top, tail) = command.substring(first - 1, first) match {
+      case "=" => {
+        (command.substring(0, first - 7), command.substring(first - 7, command.length))
+      }
+      case _ => {
+        (command.substring(0, first), command.substring(first, command.length))
+      }
+    }
+    top.split(" ") :+ tail
   }
 
   def mergeLog(path: String, file: File, cmd: String, again: Boolean) = {
