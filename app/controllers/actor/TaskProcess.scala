@@ -62,9 +62,9 @@ object TaskProcess {
     statusMap
   }
 
-  def generateStatusJson(envId: Int, projectId: Int, currentNum: Int, totalNum: Int, sls: String, status: Int, taskName: String) = {
+  def generateStatusJson(envId: Int, projectId: Int, currentNum: Int, totalNum: Int, sls: String, machine: String, status: Int, taskName: String) = {
     val key = s"${envId}_${projectId}"
-    val json = Json.obj("currentNum" -> currentNum, "totalNum" -> totalNum, "sls" -> sls, "status" -> status, "taskName" -> taskName)
+    val json = Json.obj("currentNum" -> currentNum, "totalNum" -> totalNum, "sls" -> sls, "machine" -> machine, "status" -> status, "taskName" -> taskName)
     generateJson(key, json)
   }
 
@@ -142,7 +142,13 @@ object TaskProcess {
   def generateQueueNumJson(tq: TaskQueue, num: Int, list: List[TaskQueue]){
     val key = s"${tq.envId}_${tq.projectId}"
     generateJson(key, Json.obj("queueNum" -> num))
-    generateJson(key, Json.obj("queues" -> Json.toJson(list)))
+    val listJson: List[JsObject] = list.map{
+      x =>
+        var json = Json.toJson(x)
+        json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.getById(x.taskTemplateId).name)
+        json.as[JsObject]
+    }
+    generateJson(key, Json.obj("queues" -> listJson))
   }
 
   def generateJson(key: String, json: JsObject){
@@ -239,6 +245,8 @@ class TaskProcess extends Actor {
         }
         //删除队列taskQueue相应记录
         TaskQueueHelper.remove(taskQueue)
+        //更新statusMap中的queues信息
+        TaskProcess.checkQueueNum(taskQueue)
         //3.6、返回到3.1执行；
         taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
       }
@@ -273,7 +281,7 @@ class TaskProcess extends Actor {
     for(command <- commandList){
       //修改内存状态
       val currentNum = command.orderNum
-      TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.command, 3, taskName)
+      TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.sls, command.machine, 3, taskName)
       //修改数据库状态(task_command)
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
@@ -363,9 +371,7 @@ class TaskProcess extends Actor {
     val seqMachines = EnvironmentProjectRelHelper.findByEnvId_ProjectId(taskQueue.envId, taskQueue.projectId)
     val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
 
-    //2、projectId -> groupId, artifactId
-    val groupId = AttributeHelper.getValue(taskQueue.projectId, "groupId")
-    val artifactId = AttributeHelper.getValue(taskQueue.projectId, "artifactId")
+    //2、projectId -> groupId, artifactId, projectName
     val projectName = ProjectHelper.findById(taskQueue.projectId).get.name
 
     //3、version -> version, repository
@@ -384,10 +390,8 @@ class TaskProcess extends Actor {
     }
 
 
-    val paramsJson = Json.obj(
+    var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
-      ,"groupId" -> groupId
-      ,"artifactId" -> artifactId
       ,"version" -> versionName
       ,"versionId" -> versionId.getOrElse[Int](0)
       ,"repository" -> repository
@@ -397,6 +401,11 @@ class TaskProcess extends Actor {
       ,"taskId" -> taskId
     )
 
+    //projectId -> groupId, artifactId, unpacked
+    val attributesJson = AttributeHelper.findByPid(taskQueue.projectId).map{
+      s =>
+        paramsJson = paramsJson ++ Json.obj(s.name -> s.value)
+    }
 
     val templateCommands = TaskTemplateStepHelper.getStepsByTemplateId(taskQueue.taskTemplateId).map{ step =>
       //参数替换，更改sls命令
@@ -410,7 +419,7 @@ class TaskProcess extends Actor {
     } yield {
       count += 1
       val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine.name).replaceAll("\\{\\{syndic\\}\\}", machine.syndicName)
-      c.copy(command = command).copy(orderNum = count).copy(machine = s"${machine}")
+      c.copy(command = command).copy(orderNum = count).copy(machine = s"${machine.name}")
     }
     (seq, paramsJson)
   }
@@ -432,7 +441,7 @@ class TaskProcess extends Actor {
       }
     }
     //sls.sls需要被填充
-    TaskCommand(None, taskId, replaceSls(sls, paramsJson, keys), "machine", "sls", TaskEnum.TaskWait, sls.orderNum)
+    TaskCommand(None, taskId, replaceSls(sls, paramsJson, keys), "machine", sls.name, TaskEnum.TaskWait, sls.orderNum)
   }
 
   def replaceSls(sls: TaskTemplateStep, paramsJson: JsValue, keys: Set[String]): String = {

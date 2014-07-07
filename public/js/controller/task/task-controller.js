@@ -113,6 +113,7 @@ define(['angular'], function(angular) {
 //                            }
                             p.status.queueNum = projectObj.queueNum
                             p.status.sls = projectObj.sls
+                            p.status.machine = projectObj.machine
                             p.status.taskName = projectObj.taskName
                             p.status.status = projectObj.status
                             p.task = projectObj.task
