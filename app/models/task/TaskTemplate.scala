@@ -28,7 +28,7 @@ object TaskTemplateHelper{
   val qTaskTemplate = TableQuery[TaskTemplateTable]
 
   def all = db withSession {implicit session =>
-    qTaskTemplate.list()
+    qTaskTemplate.sortBy(x => (x.typeId, x.orderNum)).list()
   }
 
   def getById(tid: Int) = db withSession {implicit session =>

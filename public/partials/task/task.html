@@ -48,8 +48,16 @@
                 <!-- ========================================操作======================================== -->
                 <td class="show">
                     <div class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="" ng-click="showVersion(pro.id)" title="部署"><span class="glyphicon glyphicon-import"></span></a>
-                        <ul class="dropdown-menu">
+                        <!--<a ng-repeat="t in pro.templates" ng-class="showClass(t.versionMenu)" data-toggle="dropdown" ng-click="showClick(t.versionMenu, pro.id)" title="{{t.name}}" href="">-->
+                        <a ng-repeat="t in pro.templates" class="dropdown-toggle" data-toggle="dropdown" ng-click="showClick(t.versionMenu, pro.id, t.id)" title="{{t.name}}" href="">
+                            <span class="{{t.css}}"></span>
+                        </a>
+                        <!--<a class="dropdown-toggle" data-toggle="dropdown" href="" ng-click="showVersion(pro.id)" title="部署"><span class="glyphicon glyphicon-import"></span></a>-->
+                        <!--<a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="启动"><span class="glyphicon glyphicon-play"></span></a>-->
+                        <!--<a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="关闭"><span class="glyphicon glyphicon-stop"></span></a>-->
+                        <!--<a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="重启"><span class="glyphicon glyphicon-repeat"></span></a>-->
+                        <!--<a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="nfs"><span class="glyphicon glyphicon-folder-open"></span></a>-->
+                        <ul class="dropdown-menu" ng-show="showVersionMenu()">
                             <li ng-repeat="vs in versions">
                                 <a ng-click="deploy(pro.id, vs.id)">{{vs.vs}}</a>
                             </li>
@@ -57,10 +65,6 @@
                                 <a ng-click="">more ...</a>
                             </li>
                         </ul>
-                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="启动"><span class="glyphicon glyphicon-play"></span></a>
-                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="关闭"><span class="glyphicon glyphicon-stop"></span></a>
-                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="重启"><span class="glyphicon glyphicon-repeat"></span></a>
-                        <a ui-sref="task.log({taskId:1, envId: envId, proId: proId, envName: envName, proName: proName})" title="nfs"><span class="glyphicon glyphicon-folder-open"></span></a>
                     </div>
                 </td>
             </tr>

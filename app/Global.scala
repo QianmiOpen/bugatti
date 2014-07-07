@@ -67,6 +67,7 @@ object Global extends GlobalSettings {
 
     GitHelp.checkGitWorkDir(app)
     SaltTools.refreshHostList(app)
+    SaltTools.baseLogPath(app)
   }
 }
 

@@ -11,7 +11,7 @@ templates:
         default: 'False'
     actions:
       - name: 安装
-        css: glyphicon glyphicon-play
+        css: glyphicon glyphicon-import
         versionMenu: True
         steps:
           - name: 安装java
@@ -23,7 +23,7 @@ templates:
           - name: 部署war包
             sls: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
           - name: 拷贝配置文件
-            sls: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
+            sls: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{projectName}},"id":{{taskId}}}}
           - name: 启动应用
             sls: salt {{machine}} state.sls tomcat.startup
       - name: 重启
@@ -67,7 +67,7 @@ templates:
           - name: 部署war包
             sls: salt {{machine}} state.sls webapp.deploy pillar={webapp:{"groupId":{{groupId}},"artifactId":{{artifactId}},"version":{{version}},"repository":{{repository}}}}
           - name: 拷贝配置文件
-            sls: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{appName}},"id":{{jobId}}}
+            sls: salt {{machine}} state.sls job.copyfile pillar={job:{"appName":{{projectName}},"id":{{taskId}}}}
           - name: 启动应用
             sls: salt {{machine}} state.sls tomcat.startup
       - name: 重启

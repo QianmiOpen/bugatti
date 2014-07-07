@@ -13,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
 import utils.DateFormatter._
-import utils.{GitHelp, TaskTools}
+import utils.{SaltTools, GitHelp, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -70,7 +70,15 @@ object TaskProcess {
 
   def generateTaskStatusJson(envId: Int, projectId: Int, task: JsValue, taskName: String) = {
     val key = s"${envId}_${projectId}"
-    generateJson(key, Json.obj("taskName" -> taskName, "task" -> task, "status" -> task \ "status", "endTime" -> (task \ "endTime").toString))
+    val version = VersionHelper.findById((task \ "versionId").asOpt[Int].getOrElse(0))
+    var taskObj = task
+    version match {
+      case Some(v) => {
+        taskObj = task.as[JsObject] ++ Json.obj("version" -> v.vs)
+      }
+      case _ =>
+    }
+    generateJson(key, Json.obj("taskName" -> taskName, "task" -> taskObj, "status" -> task \ "status", "endTime" -> (task \ "endTime").toString))
   }
 
   def changeAllStatus(js: JsObject): JsValue = {
@@ -198,7 +206,7 @@ object TaskProcess {
  */
 class TaskProcess extends Actor {
 
-  val baseLogPath = "/Users/jinwei/bugatti/saltlogs"
+  val baseLogPath = SaltTools.logPath
 
   implicit val taskWrites = Json.writes[Task]
 
@@ -215,12 +223,13 @@ class TaskProcess extends Actor {
         TaskProcess.checkQueueNum(taskQueue)
         //3.3、依次执行命令(insert命令列表，依次执行，修改数据库状态，修改内存状态)；
         val params = TaskProcess.getAllParams
-        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
+        val (commandList, paramsJson) = generateCommands(taskId, taskQueue, params)
+//        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
         Logger.info(commandList.toString)
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
-        if(executeCommand(commandList, envId, projectId, taskId, taskName)){
+        if(executeCommand(commandList, envId, projectId, taskId, taskName, paramsJson)){
           //任务执行成功
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskSuccess)
         }
@@ -250,7 +259,7 @@ class TaskProcess extends Actor {
     }
   }
 
-  def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskId: Int, taskName: String): Boolean = {
+  def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskId: Int, taskName: String, params: JsValue): Boolean = {
     val totalNum = commandList.size
     var result = true
     val baseDir = s"${baseLogPath}/${taskId}"
@@ -269,6 +278,15 @@ class TaskProcess extends Actor {
       TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
       TaskProcess.pushStatus
+      //如果是copy conf file，先上传git
+      if(command.command.contains("job.copyfile")){
+        Logger.info("envId===> " + envId.toString)
+        Logger.info((params \ "projectName").as[String])
+        Logger.info(taskId.toString)
+        Logger.info((params \ "versionId").as[Int].toString)
+        TaskProcess.copyConfFileAddToGit(envId, (params \ "projectName").as[String], taskId, ((params \ "versionId").as[Int]))
+      }
+
       //调用salt命令
       val cmd = command.command + s" -v --out-file=${path}"
       Logger.info(cmd)
@@ -339,14 +357,16 @@ class TaskProcess extends Actor {
    * @param jsValue
    * @return
    */
-  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue): Seq[TaskCommand]={
+  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue) = {
     //1、envId , projectId -> machines, nfsServer
-    val machines: List[String] = List("t-minion")
+//    val machines: List[String] = List("t-minion")
+    val seqMachines = EnvironmentProjectRelHelper.findByEnvId_ProjectId(taskQueue.envId, taskQueue.projectId)
     val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
 
     //2、projectId -> groupId, artifactId
     val groupId = AttributeHelper.getValue(taskQueue.projectId, "groupId")
     val artifactId = AttributeHelper.getValue(taskQueue.projectId, "artifactId")
+    val projectName = ProjectHelper.findById(taskQueue.projectId).get.name
 
     //3、version -> version, repository
     val versionId = taskQueue.versionId
@@ -369,7 +389,12 @@ class TaskProcess extends Actor {
       ,"groupId" -> groupId
       ,"artifactId" -> artifactId
       ,"version" -> versionName
+      ,"versionId" -> versionId.getOrElse[Int](0)
       ,"repository" -> repository
+      ,"projectName" -> projectName
+      ,"envId" -> taskQueue.envId
+      ,"projectId" -> taskQueue.projectId
+      ,"taskId" -> taskId
     )
 
 
@@ -380,13 +405,14 @@ class TaskProcess extends Actor {
 
     //获取机器，遍历机器&模板命令
     var count = 0
-    for{machine <- machines
+    val seq = for{machine <- seqMachines
       c <- templateCommands
     } yield {
       count += 1
-      val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine)
+      val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine.name).replaceAll("\\{\\{syndic\\}\\}", machine.syndicName)
       c.copy(command = command).copy(orderNum = count).copy(machine = s"${machine}")
     }
+    (seq, paramsJson)
   }
 
   /**

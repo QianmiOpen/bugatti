@@ -48,10 +48,31 @@ define(['angular'], function(angular) {
                 console.table($scope.projectStatus)
                 $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
                 console.table($scope.projectStatus)
+                $scope.getTemplates()
+
                 //过滤正在执行任务的项目集 -> 使用websocket
                 $scope.wsInvoke()
             })
         });
+
+        $scope.getTemplates = function(){
+            //查询项目模板（操作按钮）
+            TaskService.getTemplates(function(data){
+                console.log(data)
+                $scope.templates = data
+                //按钮
+                $scope.projectStatus.map($scope.getProjectTemplates)
+                console.table($scope.projectStatus)
+            })
+        }
+
+        $scope.getProjectTemplates = function(data){
+            console.log(data)
+            console.log(data.templateId)
+            data.templates = $scope.templates[data.templateId]
+            console.table(data.templates)
+            data
+        }
 
         $scope.randomKey = function(min, max) {
             var num = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -210,6 +231,55 @@ define(['angular'], function(angular) {
         $scope.restart = function(){
 
         }
+
+        $scope.showClass = function(versionMenu){
+            if(versionMenu){
+                console.log("dropdown-toggle")
+                return "dropdown-toggle"
+            } else {
+                return "false"
+            }
+        }
+
+        $scope.changeDataToggle = function(projectId){
+            for(var dIndex in $scope.projectStatus){
+                var obj = $scope.projectStatus[dIndex]
+                if(obj.id == projectId){
+                    obj.dropClass = "dropdown"
+                }
+            }
+            console.table($scope.projectStatus)
+        }
+
+        $scope.showDropdown = function(versionMenu){
+            if(versionMenu){
+                return "dropdown"
+            } else {
+                return "false"
+            }
+        }
+
+        $scope.showClick = function(versionMenu, projectId, templateId){
+            if(!versionMenu){
+                $scope.taskQueue = {}
+                $scope.taskQueue.envId = $scope.activeEnv
+                $scope.taskQueue.projectId = projectId
+//                $scope.taskQueue.versionId = versionId
+                $scope.taskQueue.templateId = templateId
+                TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
+                $scope.versionShow = false
+            } else {//部署
+                $scope.showVersion(projectId)
+                $scope.versionShow = true
+            }
+
+        }
+
+        //用来控制是否展示下拉菜单
+        $scope.showVersionMenu = function(){
+            return $scope.versionShow
+        }
+
 //=====================================页面跳转========================================
         $scope.goTaskQueue = function(envId, projectId){
             console.log(envId + ", " + projectId)
