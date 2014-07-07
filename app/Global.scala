@@ -22,7 +22,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
 
-    if (app.configuration.getBoolean("sql.init").getOrElse(true)) {
+    if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
       AppDB.db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
           TableQuery[ConfLogTable] ::
@@ -49,19 +49,24 @@ object Global extends GlobalSettings {
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
         }
-        AppData.userScript
-        AppData.projectScript
-        AppData.memberScript
-        AppData.environmentScript
-        AppData.permissionScript
-        AppData.taskScript
-        AppData.taskCommandScript
-        AppData.taskQueueScript
-        AppData.taskSchemeScript
-        AppData.versionScript
-        AppData.attributeScript
         AppData.initFromYaml
-        AppData.areaScript
+      }
+    }
+
+    if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
+      AppDB.db.withSession { implicit session =>
+        AppTestData.userScript
+        AppTestData.projectScript
+        AppTestData.memberScript
+        AppTestData.environmentScript
+        AppTestData.permissionScript
+        AppTestData.taskScript
+        AppTestData.taskCommandScript
+        AppTestData.taskQueueScript
+        AppTestData.taskSchemeScript
+        AppTestData.versionScript
+        AppTestData.attributeScript
+        AppTestData.areaScript
       }
     }
 
@@ -101,7 +106,9 @@ object AppData {
       }
     }
   }
+}
 
+object AppTestData {
   // 用户表初始化
   def userScript(implicit session: Session) = {
     val q = TableQuery[UserTable]
@@ -151,9 +158,6 @@ object AppData {
 
   // 成员
   def memberScript(implicit session: Session) = {
-    val q = TableQuery[MemberTable]
-    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
-    q.ddl.create
   }
 
   // 环境
@@ -167,38 +171,22 @@ object AppData {
 
   // 权限
   def permissionScript(implicit session: Session) = {
-    val q = TableQuery[PermissionTable]
-    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
-    q.ddl.create
-    q.insert(Permission("of111", List(enums.FuncEnum.user, enums.FuncEnum.project)))
   }
 
   // 任务
   def taskScript(implicit session: Session) = {
-    val task = TableQuery[TaskTable]
-    if (!MTable.getTables(task.baseTableRow.tableName).list.isEmpty) task.ddl.drop
-    task.ddl.create
   }
 
   //任务命令关联表
   def taskCommandScript(implicit session: Session) = {
-    val taskCommand = TableQuery[TaskCommandTable]
-    if (!MTable.getTables(taskCommand.baseTableRow.tableName).list.isEmpty) taskCommand.ddl.drop
-    taskCommand.ddl.create
   }
 
   //任务队列表
   def taskQueueScript(implicit session: Session) = {
-    val taskQueue = TableQuery[TaskQueueTable]
-    if (!MTable.getTables(taskQueue.baseTableRow.tableName).list.isEmpty) taskQueue.ddl.drop
-    taskQueue.ddl.create
   }
 
   //定时任务表
   def taskSchemeScript(implicit session: Session) = {
-    val taskScheme = TableQuery[TaskSchemeTable]
-    if (!MTable.getTables(taskScheme.baseTableRow.tableName).list.isEmpty) taskScheme.ddl.drop
-    taskScheme.ddl.create
   }
 
   def areaScript(implicit session: Session) = {

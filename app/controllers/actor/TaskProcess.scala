@@ -111,10 +111,13 @@ object TaskProcess {
     val projectId = project.get.id.get
 
     val confSeq = ConfHelper.findByEid_Pid_Vid(environmentId, projectId, versionId)
+
+    val baseDir = s"${GitHelp.workDir.getAbsolutePath}/work/${appName}/${taskId}/files"
+    val file = new File(s"${baseDir}/.bugatti")
+    file.getParentFile.mkdirs()
+    file.createNewFile()
+
     if (confSeq.size > 0) {
-      val baseDir = s"${GitHelp.workDir.getAbsolutePath}/work/${appName}/${taskId}/files"
-      val file = new File(baseDir)
-      file.mkdirs()
       confSeq.foreach { xf =>
         val confContent = ConfContentHelper.findById(xf.id.get)
         val newFile = new File(s"${baseDir}/${xf.path}")
@@ -231,7 +234,6 @@ class TaskProcess extends Actor {
         val params = TaskProcess.getAllParams
         val (commandList, paramsJson) = generateCommands(taskId, taskQueue, params)
 //        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
-        Logger.info(commandList.toString)
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
@@ -268,14 +270,23 @@ class TaskProcess extends Actor {
   }
 
   def executeCommand(commandList: Seq[TaskCommand], envId: Int, projectId: Int, taskId: Int, taskName: String, params: JsValue): Boolean = {
-    val totalNum = commandList.size
     var result = true
+    val totalNum = commandList.size
     val baseDir = s"${baseLogPath}/${taskId}"
     val path = s"${baseLogPath}/${taskId}/execute.log"
     val resultLogPath = s"${baseLogPath}/${taskId}/result.log"
     val logDir = new File(baseDir)
+    val file = new File(resultLogPath)
     if(!logDir.exists){
       logDir.mkdirs()
+    }
+    Seq("touch", s"${path}") lines
+
+    if(totalNum == 0){
+      Seq("echo", "[ERROR] 项目没有绑定机器！") #>> file lines
+
+      result = false
+      return result
     }
 
     for(command <- commandList){
@@ -296,15 +307,18 @@ class TaskProcess extends Actor {
       }
 
       //调用salt命令
-      val cmd = command.command + s" -v --out-file=${path}"
-      Logger.info(cmd)
-      (cmd !!)
-//      """salt t-minion state.sls webapp.deploy pillar={webapp:{"groupId":"com.ofpay","artifactId":"cardserverimpl","version":"1.6.3-RELEASE","repository":"releases"}} -v --out-file=/Users/jinwei/bugatti/saltlogs/install.log""" !!
+      val outputCommand = s" --out-file=${path}"
+      val cmd = command.command
+//      Logger.info(cmd)
+      var commandSeq = command2Seq(cmd)
+      commandSeq = commandSeq :+ outputCommand
+
+      commandSeq lines
+
+//      Seq("salt", "\\t-minion", "state.sls", "webapp.deploy", "pillar='{webapp: {groupId: com.ofpay, artifactId: cardserverimpl, version: 1.6.3-RELEASE, repository: releases}}'",  s" --out-file=${path}") lines
 
       //合并日志
-      val dir = new File(baseDir)
-      val file = new File(resultLogPath)
-      mergeLog(path, file, cmd, false)
+      mergeLog(path, file, cmd + outputCommand, false)
 
       //查看日志 失败的命令再次执行一次
       if(!checkLog(path)){
@@ -327,6 +341,22 @@ class TaskProcess extends Actor {
     }
     Logger.info(result.toString)
     result
+  }
+
+  def command2Seq(command: String): Seq[String] = {
+    var retSeq = Seq.empty[String]
+    var bAppend = false
+    command.split(" ").foreach { c =>
+      if (bAppend) {
+        retSeq = retSeq.dropRight(1) :+ (retSeq.last + s" $c")
+      } else {
+        retSeq = retSeq :+ c
+      }
+      if (c.contains("'")) {
+        bAppend = !bAppend
+      }
+    }
+    retSeq
   }
 
   def mergeLog(path: String, file: File, cmd: String, again: Boolean) = {
@@ -365,10 +395,13 @@ class TaskProcess extends Actor {
    * @param jsValue
    * @return
    */
-  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue) = {
+  def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue): (Seq[TaskCommand], JsObject) = {
     //1、envId , projectId -> machines, nfsServer
 //    val machines: List[String] = List("t-minion")
     val seqMachines = EnvironmentProjectRelHelper.findByEnvId_ProjectId(taskQueue.envId, taskQueue.projectId)
+    if(seqMachines.length == 0){
+      return (Seq.empty[TaskCommand], null)
+    }
     val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
 
     //2、projectId -> groupId, artifactId, projectName
