@@ -17,6 +17,14 @@ DELETE        /user/:jobNo                       controllers.conf.UserController
 POST          /user                              controllers.conf.UserController.save
 PUT           /user/:jobNo                       controllers.conf.UserController.update(jobNo: String)
 
+# Area
+GET           /area                              controllers.conf.AreaController.all
+GET           /area/:id                          controllers.conf.AreaController.get(id: Int)
+GET           /area/:id/refresh                  controllers.conf.AreaController.refresh(id: Int)
+POST          /area                              controllers.conf.AreaController.save
+PUT           /area                              controllers.conf.AreaController.update
+DELETE        /area/:id                          controllers.conf.AreaController.delete(id: Int)
+
 # Environment
 GET           /env                               controllers.conf.EnvController.index(page: Int ?=0, pageSize: Int ?=10)
 GET           /env/total                         controllers.conf.EnvController.count
@@ -80,6 +88,9 @@ POST          /task/newTaskQueue                 controllers.task.TaskController
 POST          /task/removeTaskQueue              controllers.task.TaskController.removeTaskQueue(qid: Int)
 POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
 GET           /task/nexusVersion                 controllers.task.TaskController.getNexusVersions(projectId: Int)
+GET           /task/templates                    controllers.task.TaskController.getTemplates
+
+
 
 # Open API
 POST          /v1/project/version                controllers.conf.ProjectController.addVersion

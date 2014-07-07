@@ -88,4 +88,12 @@ object EnvironmentProjectRelHelper {
     }
   }
 
+  def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.where(c => c.syndicName === syndicName && c.envId.isNull).list
+  }
+
+  def update(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
+    qRelation.where(_.id === envProjectRel.id).update(envProjectRel)
+  }
+
 }

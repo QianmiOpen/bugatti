@@ -4,6 +4,7 @@
 
 define(['angular',
     './conf/user-routes',
+    './conf/area-routes',
     './conf/env-routes',
     './conf/project-routes',
     './conf/template-routes',
@@ -18,6 +19,7 @@ define(['angular',
 // In this case it is a simple value service.
     var app = angular.module('bugattiApp.routes', [
         'bugattiApp.route.conf.userModule',
+        'bugattiApp.route.conf.areaModule',
         'bugattiApp.route.conf.envModule',
         'bugattiApp.route.conf.projectModule',
         'bugattiApp.route.conf.templateModule',
