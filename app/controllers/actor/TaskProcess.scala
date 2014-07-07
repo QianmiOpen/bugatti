@@ -13,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
 import utils.DateFormatter._
-import utils.{GitHelp, TaskTools}
+import utils.{SaltTools, GitHelp, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -198,7 +198,7 @@ object TaskProcess {
  */
 class TaskProcess extends Actor {
 
-  val baseLogPath = "/Users/jinwei/bugatti/saltlogs"
+  val baseLogPath = SaltTools.logPath
 
   implicit val taskWrites = Json.writes[Task]
 
@@ -351,7 +351,8 @@ class TaskProcess extends Actor {
    */
   def generateCommands(taskId: Int, taskQueue: TaskQueue, jsValue: JsValue) = {
     //1、envId , projectId -> machines, nfsServer
-    val machines: List[String] = List("t-minion")
+//    val machines: List[String] = List("t-minion")
+    val seqMachines = EnvironmentProjectRelHelper.findByEnvId_ProjectId(taskQueue.envId, taskQueue.projectId)
     val nfsServer = EnvironmentHelper.findById(taskQueue.envId).get.nfServer
 
     //2、projectId -> groupId, artifactId
@@ -396,11 +397,11 @@ class TaskProcess extends Actor {
 
     //获取机器，遍历机器&模板命令
     var count = 0
-    val seq = for{machine <- machines
+    val seq = for{machine <- seqMachines
       c <- templateCommands
     } yield {
       count += 1
-      val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine)
+      val command = c.command.replaceAll("\\{\\{machine\\}\\}", machine.name).replaceAll("\\{\\{syndic\\}\\}", machine.syndicName)
       c.copy(command = command).copy(orderNum = count).copy(machine = s"${machine}")
     }
     (seq, paramsJson)
