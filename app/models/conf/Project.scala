@@ -1,6 +1,7 @@
 package models.conf
 
 import enums.LevelEnum
+import play.api.Logger
 import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
@@ -41,11 +42,12 @@ object ProjectHelper extends PlayCache {
 
   val qProject = TableQuery[ProjectTable]
 
+
   def findById(id: Int): Option[Project] = db withSession { implicit session =>
     qProject.where(_.id is id).firstOption
   }
 
-  def findByName(name: String) = db withSession { implicit session =>
+  def findByName(name: String): Option[Project] = db withSession { implicit session =>
     qProject.where(_.name is name).firstOption
   }
 
@@ -54,13 +56,34 @@ object ProjectHelper extends PlayCache {
     Query(qProject.where(_.templateId is tid).length).first
   }
 
-  def count: Int = db withSession { implicit session =>
-    Query(qProject.length).first
+
+  val qMember = TableQuery[MemberTable]
+
+  def count(jobNo: Option[String]): Int = db withSession { implicit session =>
+    jobNo match {
+      case Some(no) =>
+        val query = (for {
+          p <- qProject
+          m <- qMember if p.id === m.pid
+        } yield (p, m)).filter(_._2.jobNo is jobNo)
+        Query(query.length).first
+      case None =>
+        Query(qProject.length).first
+    }
   }
 
-  def all(page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
+  def all(jobNo: Option[String], page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
     val offset = pageSize * page
-    qProject.drop(offset).take(pageSize).list
+    jobNo match {
+      case Some(no) =>
+        val query = (for {
+          p <- qProject
+          m <- qMember if p.id === m.pid
+        } yield (p, m)).filter(_._2.jobNo is jobNo)
+        query.map(_._1).drop(offset).take(pageSize).list
+      case None =>
+        qProject.drop(offset).take(pageSize).list
+    }
   }
 
   def all(): Seq[Project] = db withSession { implicit session =>

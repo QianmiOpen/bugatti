@@ -3,10 +3,27 @@
     <h1 class="pull-left m0">项目管理</h1>
 </div>
 
-<ng-include src="'partials/conf/project/search.html'"></ng-include>
+<div class="row">
+    <div class="col-sm-6 col-centered">
+        <div class="input-group">
+            <span class="input-group-addon">搜索</span>
+            <input ng-model="searchText" type="text" class="form-control" placeholder="输入项目信息可快速检索"/>
+        </div>
+        <div class="text-right" style="margin: 5px 20px 0 0">
+            <!--
+            <a class="a-underline" href="#">高级搜索</a>
+            |-->
+            <a class="a-underline" href="#">API指南</a>
+            |
+            <a class="a-underline" href="#">帮助文档</a>
+        </div>
+    </div>
+</div>
 
 <h3 class="text-muted">搜索结果
-<button type="button" class="btn btn-primary btn-xs">我的项目</button>
+
+<button ng-click="myProject()" type="button" class="btn btn-xs" ng-class="my ? 'btn-primary' : 'btn-default'">我的项目</button>
+
 </h3>
 
 <div class="table-responsive">
@@ -22,7 +39,7 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="project in projects">
+        <tr ng-repeat="project in projects | filter:searchText">
             <td><a ui-sref="conf.project.version({id: project.id})">{{project.id}}</a></td>
             <td><a ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
             <td>

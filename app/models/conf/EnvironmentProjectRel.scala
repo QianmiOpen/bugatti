@@ -6,20 +6,21 @@ import play.api.Play.current
 /**
  * 环境和项目的关系配置
  */
-case class EnvironmentProjectRel(id: Option[Int], envId: Int, projectId: Int, ip: String, name: String)
+case class EnvironmentProjectRel(id: Option[Int], envId: Option[Int], projectId: Option[Int], syndicName: String, name: String, ip: String)
 case class EnvironmentProjectRelForm(id: Option[Int], envId: Int, projectId: Int, ips: Seq[IP]) {
-  def toRelations = for (ip <- ips; rel = EnvironmentProjectRel(id, envId, projectId, ip.ip, ip.name)) yield rel
+  def toRelations = for (ip <- ips; rel = EnvironmentProjectRel(id, Some(envId), Some(projectId),"", ip.name, ip.ip)) yield rel
 }
 case class IP(ip: String, name: String)
 
 class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](tag, "environment_project_rel") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def envId = column[Int]("env_id", O.NotNull)
-  def projectId = column[Int]("project_id", O.NotNull)
-  def ip = column[String]("ip", O.Nullable)
+  def envId = column[Int]("env_id", O.Nullable)
+  def projectId = column[Int]("project_id", O.Nullable)
+  def syndicName = column[String]("syndic_name", O.NotNull)
   def name = column[String]("name", O.Nullable)
+  def ip = column[String]("ip", O.Nullable)
 
-  override def * = (id.?, envId, projectId, ip, name) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
+  override def * = (id.?, envId.?, projectId.?, syndicName, name, ip) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
 }
 
 object EnvironmentProjectRelHelper {
@@ -32,6 +33,10 @@ object EnvironmentProjectRelHelper {
     qRelation.insertAll(relationForm.toRelations: _*)
   }
 
+  def create(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
+    qRelation.returning(qRelation.map(_.id)).insert(envProjectRel)
+  }
+
   def findByEnvId_ProjectId(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = db withSession {
     implicit session =>
       qRelation.where(r => r.envId === envId && r.projectId === projectId).list
@@ -40,6 +45,10 @@ object EnvironmentProjectRelHelper {
   def findByIp(ip: String): Seq[EnvironmentProjectRel] = db withSession {
     implicit session =>
       qRelation.where(_.ip === ip).list
+  }
+
+  def findBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession{ implicit session =>
+    qRelation.where(_.syndicName === syndicName).list
   }
 
   def findById(id: Int): Option[EnvironmentProjectRel] = db withSession { implicit session =>

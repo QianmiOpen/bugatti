@@ -20,6 +20,9 @@ define(['angular'], function(angular) {
             },
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ConfController.delete(id)).success(callback);
+            },
+            copy: function(copy, callback) {
+                $http.post(PlayRoutes.controllers.conf.ConfController.copy().url, copy).success(callback)
             }
         }
     });

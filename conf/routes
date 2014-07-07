@@ -27,13 +27,14 @@ POST          /env                               controllers.conf.EnvController.
 PUT           /env/:id                           controllers.conf.EnvController.update(id: Int)
 
 # Project
-GET           /project                           controllers.conf.ProjectController.index(page: Int ?=0, pageSize: Int ?=10, search: Option[String])
+GET           /project                           controllers.conf.ProjectController.index(my:Boolean ?= false, page: Int ?=0, pageSize: Int ?=30)
+GET           /project/count                     controllers.conf.ProjectController.count(my: Boolean ?= false)
 GET           /project/all                       controllers.conf.ProjectController.all
-GET           /project/count                     controllers.conf.ProjectController.count(search: Option[String])
 GET           /project/atts                      controllers.conf.ProjectController.atts(pid: Int)
 GET           /project/:id                       controllers.conf.ProjectController.show(id: Int)
 DELETE        /project/:id                       controllers.conf.ProjectController.delete(id: Int)
 POST          /project                           controllers.conf.ProjectController.save
+POST          /project/v1/version                controllers.conf.ProjectController.addVersion
 PUT           /project/:id                       controllers.conf.ProjectController.update(id: Int)
 
 # Template
@@ -58,6 +59,7 @@ GET           /conf/all                          controllers.conf.ConfController
 GET           /conf/:id                          controllers.conf.ConfController.show(id: Int)
 DELETE        /conf/:id                          controllers.conf.ConfController.delete(id: Int)
 POST          /conf                              controllers.conf.ConfController.save
+POST          /conf/copy                         controllers.conf.ConfController.copy
 PUT           /conf/:id                          controllers.conf.ConfController.update(id: Int)
 
 # Conf Log
