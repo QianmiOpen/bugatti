@@ -2,6 +2,7 @@ package controllers.conf
 
 import enums.RoleEnum
 import models.conf._
+import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
@@ -24,7 +25,7 @@ object UserController extends Controller {
       "role" -> enums.form.enum(RoleEnum),
       "locked" -> boolean,
       "lastIp" -> optional(text),
-      "lastVisit" -> optional(jodaDate),
+      "lastVisit" -> optional(jodaDate("yyyy-MM-dd hh:mm:ss")),
       "functions" ->  text
 //      "functions" ->  text.verifying("Bad phone number", {_.grouped(2).size == 5})
     )(UserForm.apply)(UserForm.unapply)

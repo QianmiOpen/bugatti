@@ -1,5 +1,6 @@
 package controllers.conf
 
+import enums.LevelEnum
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
@@ -98,6 +99,40 @@ object ProjectController extends Controller {
   // 项目属性
   def atts(pid: Int) = Action {
     Ok(Json.toJson(AttributeHelper.findByPid(pid)))
+  }
+
+  // 项目成员
+  implicit val memberWrites = Json.writes[Member]
+  def members(pid: Int) = Action {
+    Ok(Json.toJson(MemberHelper.findByPid(pid)))
+  }
+
+  def saveMember(pid: Int, jobNo: String) = Action {
+    UserHelper.findByJobNo(jobNo) match {
+      case Some(_) =>
+        Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(Member(None, pid, LevelEnum.unsafe, jobNo)))))
+      case _ =>
+        Ok(Json.obj("r" -> "none"))
+    }
+  }
+
+  def updateMember(mid: Int, op: String) = Action {
+    MemberHelper.findById(mid) match {
+      case Some(member) =>
+        op match {
+          case "up" =>
+            Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.safe))))
+          case "down" =>
+            Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.unsafe))))
+          case "remove" =>
+            Ok(Json.obj("r" -> MemberHelper.delete(mid)))
+          case _ =>
+            BadRequest
+        }
+      case None =>
+        NotFound
+    }
+
   }
 
   // ==========================================================
