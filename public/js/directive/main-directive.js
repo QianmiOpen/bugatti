@@ -56,6 +56,20 @@ define(['angular'], function(angular) {
         }
     }]);
 
-
+    // 环境名称显示
+    app.directive('envShow', ['EnvService', function(EnvService) {
+        return {
+            restrict: 'E',
+            scope: {
+                eid: '@'
+            },
+            template: '<span>{{env.name}}</span>',
+            link: function($scope, element, attrs) {
+                EnvService.get($scope.eid, function(data) {
+                    $scope.env = data;
+                });
+            }
+        }
+    }]);
 
 });

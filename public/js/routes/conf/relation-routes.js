@@ -9,7 +9,8 @@ define(['angular'], function(angular) {
         // 关系（环境和项目）
         $stateProvider.state('conf.relation', {
             url: "/relation",
-            templateUrl: "partials/conf/relation/relation-index.html"
+            templateUrl: "partials/conf/relation/relation-index.html",
+            controller: 'RelationCtrl'
         });
 
 
@@ -17,16 +18,8 @@ define(['angular'], function(angular) {
             url: "/create",
             views: {
                 "@conf": {
-                    templateUrl: "partials/conf/relation/relation-new.html"
-                }
-            }
-        });
-
-        $stateProvider.state('conf.relation.detail', {
-            url: "/:id",
-            views: {
-                "@conf": {
-                    templateUrl:"partials/conf/relation/relation-show.html"
+                    templateUrl: "partials/conf/relation/relation-new.html",
+                    controller: "RelationCreateCtrl"
                 }
             }
         });

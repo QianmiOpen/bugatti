@@ -1,5 +1,5 @@
 <div class="page-header clearfix">
-    <button class="btn btn-primary pull-right" ui-sref="configure.relation.create">新增</button></td>
+    <button class="btn btn-primary pull-right" ui-sref="conf.relation.create">绑定</button></td>
     <h1 class="pull-left m0">关系配置</h1>
 </div>
 
@@ -21,29 +21,35 @@
     <table class="table table-striped table-hover table-fixed">
         <thead>
         <tr>
-            <th width="30"><input type="checkbox" ng-model="master"></th>
             <th width="20%">环境</th>
-            <th width="30%">项目</th>
-            <th width="30%">机器IP&名称</th>
+            <th width="25%">项目</th>
+            <th width="20%">机器名称</th>
+            <th width="20%">机器IP</th>
             <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="rel in relations">
-            <td><input type="checkbox" ng-model="ids[rel.relation.id]" ng-checked="master" ng-change="checked(rel.relation.id, ids[rel.relation.id])"></td>
-            <!--<td><a ui-sref="configure.relation.detail({id: rel.relation.id})">{{rel.env}}</a></td>-->
-            <td>{{rel.env}}</td>
-            <td>{{rel.project}}</td>
-            <td>{{rel.relation.ip}},{{rel.relation.name}}</td>
             <td>
-                <a ng-click="delete(rel.relation.id, $index)" href title="删除"><span class="glyphicon glyphicon-remove"></span></a>
+                <div ng-if="rel.envId">
+                    <env-show eid="{{rel.envId}}"></env-show>
+                </div>
+            </td>
+            <td>
+                <div ng-if="rel.projectId">
+                    <project-show pid="{{rel.projectId}}"></project-show>
+                </div>
+            </td>
+            <td>{{rel.name}}</td>
+            <td>{{rel.ip}}</td>
+            <td>
+                <a ng-click="unbind(rel.id, $index)" href title="解绑">解绑</a>
             </td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
-            <td><a ng-click="deleteBatch()" href="" ng-show="!isEmpty(ids)"><span class="glyphicon glyphicon-trash"></span> </a></td>
-            <td colspan="4">&nbsp;</td>
+            <td colspan="5">&nbsp;</td>
         </tr>
         </tfoot>
     </table>

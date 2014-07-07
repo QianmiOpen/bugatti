@@ -8,6 +8,7 @@ define(['angular',
     './conf/project-controller',
     './conf/template-controller',
     './conf/conf-controller',
+    './conf/relation-controller',
     './task/task-controller'
 ], function(angular) {
 
@@ -18,6 +19,7 @@ define(['angular',
         'bugattiApp.controller.conf.projectModule',
         'bugattiApp.controller.conf.templateModule',
         'bugattiApp.controller.conf.confModule',
+        'bugattiApp.controller.conf.relationModule',
         'bugattiApp.controller.task.taskModule'
     ]);
 

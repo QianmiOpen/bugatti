@@ -74,6 +74,13 @@ object Application extends Controller with Security {
         conf.routes.javascript.ConfController.logsCount,
         conf.routes.javascript.ConfController.log,
 
+        // relation
+        conf.routes.javascript.RelationController.index,
+        conf.routes.javascript.RelationController.count,
+        conf.routes.javascript.RelationController.ips,
+        conf.routes.javascript.RelationController.bind,
+        conf.routes.javascript.RelationController.unbind,
+
         //task
         task.routes.javascript.TaskController.findLastTaskStatus,
         task.routes.javascript.TaskController.joinProcess,

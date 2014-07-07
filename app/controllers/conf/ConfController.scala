@@ -69,9 +69,9 @@ object ConfController extends Controller {
     )
   }
 
-  // ------------------------------------------------
+  // ===========================================================================
   // 配置文件历史记录
-  // ------------------------------------------------
+  // ===========================================================================
   implicit val confLogWrites = Json.writes[ConfLog]
   implicit val confLogContentWrites = Json.writes[ConfLogContent]
 
@@ -94,9 +94,9 @@ object ConfController extends Controller {
     Ok(Json.toJson(log, logContent))
   }
 
-  // ------------------------------------------------
+  // ===========================================================================
   // 一键拷贝, todo 无事务，后期改造为队列
-  // ------------------------------------------------
+  // ===========================================================================
   case class CopyForm(target_eid: Int, target_vid: Int, eid: Int, vid: Int, ovr: Boolean)
   val copyForm = Form(
     mapping(

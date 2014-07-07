@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "ace" % "07.31.2013",
   "org.webjars" % "angular-ui-ace" % "0.1.0",
   "org.webjars" % "jstree" % "3.0.1",
+  "org.webjars" % "jsdifflib" % "0fcca118e",
   "org.eclipse.jgit" % "org.eclipse.jgit" % "3.4.1.201406201815-r",
   "org.yaml" % "snakeyaml" % "1.13"
 )
