@@ -54,7 +54,7 @@ object SaltTools {
 
   def refreshSetHostEnv(syndicName: String) = {
     val subnetUtils = EnvironmentHelper.all().map { env =>
-      (env.id, env.ipRange.map(_.split(",").toList).getOrElse(Seq.empty[String]).map { x => new SubnetUtils(x)})
+      (env.id, env.ipRange.map(_.split(";").toList).getOrElse(Seq.empty[String]).map { x => new SubnetUtils(x)})
     }
 
     EnvironmentProjectRelHelper.findEmptyEnvsBySyndicName(syndicName).map{ envProjectRel =>

@@ -22,7 +22,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
 
-    if (app.configuration.getBoolean("sql.init").getOrElse(true)) {
+    if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
       AppDB.db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
           TableQuery[ConfLogTable] ::
@@ -49,6 +49,12 @@ object Global extends GlobalSettings {
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
         }
+        AppData.initFromYaml
+      }
+    }
+
+    if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
+      AppDB.db.withSession { implicit session =>
         AppData.userScript
         AppData.projectScript
         AppData.memberScript
@@ -60,7 +66,6 @@ object Global extends GlobalSettings {
         AppData.taskSchemeScript
         AppData.versionScript
         AppData.attributeScript
-        AppData.initFromYaml
         AppData.areaScript
       }
     }
