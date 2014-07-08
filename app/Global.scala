@@ -88,6 +88,7 @@ object Global extends GlobalSettings {
         AppTestData.versionScript
         AppTestData.attributeScript
         AppTestData.areaScript
+        AppTestData.environmentProjectRelScript
       }
     }
 
@@ -201,6 +202,12 @@ object AppTestData {
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
     ).foreach(EnvironmentHelper.create)
+  }
+
+  def environmentProjectRelScript(implicit session: Session) = {
+    Seq(
+      EnvironmentProjectRel(None, Option(3), Option(1), "t-syndic", "t-minion", "172.19.3.134")
+    ).foreach(EnvironmentProjectRelHelper.create)
   }
 
   // 权限
