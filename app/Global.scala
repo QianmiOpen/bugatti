@@ -192,8 +192,9 @@ object AppTestData {
   }
 
   def areaScript(implicit session: Session) = {
-    Seq {
-      Area(None, "测试", "t-syndic", "172.19.3.149")
-    }.foreach(AreaHelper.create)
+    Seq (
+      Area(None, "测试", "t-syndic", "172.19.3.149"),
+      Area(None, "test-syndic", "t-syndic", "172.19.3.132")
+    ).foreach(AreaHelper.create)
   }
 }
