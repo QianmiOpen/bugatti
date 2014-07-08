@@ -215,7 +215,7 @@ define(['angular'], function(angular) {
             $scope.taskQueue.envId = $scope.activeEnv
             $scope.taskQueue.projectId = projectId
             $scope.taskQueue.versionId = versionId
-            $scope.taskQueue.templateId = 1
+            $scope.taskQueue.templateId = $scope.choosedTemplateId
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
 
             })
@@ -270,6 +270,7 @@ define(['angular'], function(angular) {
                 TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
                 $scope.versionShow = false
             } else {//部署
+                $scope.choosedTemplateId = templateId
                 $scope.showVersion(projectId)
                 $scope.versionShow = true
             }
