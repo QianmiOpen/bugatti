@@ -26,8 +26,20 @@ define(['angular',
     ]);
 
     // Auth
-    app.controller('NavCtrl', ['$rootScope', '$scope', '$location', function($rootScope, $scope, $location) {
+    app.controller('NavCtrl', ['$rootScope', '$scope', '$location', 'Auth', function($rootScope, $scope, $location, Auth) {
+        $scope.user = Auth.user;
 
+        $scope.login = function() {
+            window.open('/login','千米LDAP登陆','location=yes,left=200,top=100,width=710,height=400,resizable=yes');
+        }
+
+        $scope.logout = function() {
+            Auth.logout(function() {
+                $location.path('/');
+            }, function() {
+                $rootScope.error = "Failed to logout";
+            });
+        };
     }]);
 
 });

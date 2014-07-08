@@ -13,14 +13,34 @@ import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
 import scala.collection.JavaConverters._
 
+import org.pac4j.core.client.Clients
+import org.pac4j.play.Config
+import org.pac4j.cas.client.CasClient
+
 import java.util.{List => JList, Map => JMap}
 
 /**
- * Created by li on 14-6-19.
+ * 环境配置
  */
 object Global extends GlobalSettings {
 
+  override def beforeStart(app: Application) {
+    System.setProperty("javax.net.ssl.trustStore", "conf/certificate.jks")
+  }
+
   override def onStart(app: Application) {
+    // cas init
+    val casClient = new CasClient()
+
+    val loginUrl = app.configuration.getString("cas.login_url").getOrElse("https://oflogin.of-crm.com")
+    casClient.setCasLoginUrl(loginUrl)
+
+    val logoutUrl = app.configuration.getString("cas.logout_url").getOrElse("https://oflogin.of-crm.com")
+    Config.setDefaultLogoutUrl(logoutUrl)
+
+    val callbackUrl = app.configuration.getString("cas.callback_url").getOrElse("http://bugatti.dev.ofpay.com/callback")
+    Config.setClients(new Clients(callbackUrl, casClient))
+
 
     if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
       AppDB.db.withSession { implicit session =>
@@ -50,6 +70,7 @@ object Global extends GlobalSettings {
           table.ddl.create
         }
         AppData.initFromYaml
+        AppData.initData
       }
     }
 
@@ -78,6 +99,17 @@ object Global extends GlobalSettings {
 
 
 object AppData {
+
+  def initData(implicit session: Session) = {
+    val U = TableQuery[UserTable]
+    Seq(
+      User("of546", "李允恒", RoleEnum.user, false, None, None),
+      User("of557", "彭毅", RoleEnum.admin, false, None, None),
+      User("of729", "金卫", RoleEnum.admin, false, None, None),
+      User("of999", "龚平", RoleEnum.admin, false, None, None)
+    ).foreach(U.insert)
+  }
+
   def initFromYaml(implicit session: Session) = {
     val yaml = new Yaml()
     val io = new FileInputStream(new File("conf/initial-data.yml"))

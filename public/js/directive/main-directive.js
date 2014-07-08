@@ -17,8 +17,23 @@ define(['angular'], function(angular) {
             },
             template: '<ul class="horizonal list-group"><li class="list-group-item" ng-repeat="func in functions">{{func}}</li></ul>',
             link: function($scope, element, attrs) {
+                $scope.functions = [];
                 UserService.permissions($scope.jobNo, function(data) {
-                    $scope.functions = data.functions;
+                    angular.forEach(data.functions, function(f) {
+                        if (f === 'user') {
+                            $scope.functions.push('用户管理');
+                        } else if (f === 'area') {
+                            $scope.functions.push('区域管理');
+                        } else if (f === 'env') {
+                            $scope.functions.push('环境管理');
+                        } else if (f === 'project') {
+                            $scope.functions.push('项目管理');
+                        } else if (f === 'relation') {
+                            $scope.functions.push('关系配置');
+                        } else if (f === 'task') {
+                            $scope.functions.push('任务管理');
+                        }
+                    });
                 });
             }
         }

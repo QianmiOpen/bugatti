@@ -1,15 +1,81 @@
 package controllers
 
+import enums.RoleEnum
+import models.conf._
+import org.joda.time.DateTime
 import play.api._
 import play.api.mvc._
+import play.api.cache._
+import play.api.libs.json._
+import org.pac4j.play.scala.ScalaController
 
-object Application extends Controller with Security {
+import views._
+
+object Application extends ScalaController with Security {
 
   lazy val siteDomain = app.configuration.getString("site.domain").getOrElse("ofpay.com")
 
   def index = Action { implicit request =>
-    Ok(views.html.index(siteDomain))
+    Ok(html.index(siteDomain))
   }
+
+  lazy val CacheExpiration = app.configuration.getInt("cache.expiration").getOrElse(60 /* seconds */ * 15 /* minutes */)
+
+  implicit class ResultWithToken(result: Result) {
+
+    def withToken(token: (String, String)): Result = {
+      Cache.set(token._1, token._2, CacheExpiration)
+      result.withCookies(Cookie(AuthTokenCookieKey, token._1, None, domain = Some(siteDomain), httpOnly = false))
+    }
+
+    def discardingToken(token: String): Result = {
+      Cache.remove(token)
+      result.discardingCookies(DiscardingCookie(name = AuthTokenCookieKey, domain = Some(siteDomain)))
+    }
+  }
+
+  def login = RequiresAuthentication("CasClient") { profile =>
+    Action { implicit request =>
+      UserHelper.findByJobNo(profile.getId) match {
+        case Some(user) if user.locked =>
+          Ok(html.template.ldap_callback_locked.render(siteDomain))
+        case Some(user) if user.role == RoleEnum.admin =>
+          UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
+          val token = java.util.UUID.randomUUID().toString
+          Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> user.jobNo)
+        case Some(user) if user.role == RoleEnum.user =>
+          PermissionHelper.findByJobNo(user.jobNo) match {
+            case Some(p) =>
+              UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
+              val token = java.util.UUID.randomUUID().toString
+              Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> user.jobNo)
+            case None =>
+              Ok(html.template.ldap_callback_error.render(siteDomain))
+          }
+        case None =>
+          NotFound
+      }
+    }
+  }
+
+  def logout = Action { implicit request =>
+    request.headers.get(AuthTokenHeader) map { token =>
+      Ok.discardingToken(token)
+    } getOrElse BadRequest (Json.obj("r" -> "No Token"))
+  }
+
+  def ping = HasToken() { token => jobNo => implicit request =>
+    UserHelper.findByJobNo(jobNo) map { user =>
+      val ps = PermissionHelper.findByJobNo(jobNo) match {
+        case Some(p) =>
+          p.functions
+        case None =>
+          Seq.empty
+      }
+      Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "permissions" -> ps)).withToken(token -> jobNo)
+    } getOrElse NotFound (Json.obj("r" -> "User Not Found"))
+  }
+
 
   def javascriptRoutes = Action { implicit request =>
     import controllers._

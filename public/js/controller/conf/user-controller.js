@@ -107,12 +107,12 @@ define(['angular'], function(angular) {
                     return;
                 }
                 angular.forEach(data.functions, function(val) {
-                    if (val === '用户管理') $scope.permission.user = "1";
-                    else if (val === '区域管理') $scope.permission.area = "2";
-                    else if (val === '环境管理') $scope.permission.env = "3";
-                    else if (val === '项目管理') $scope.permission.project = "4";
-                    else if (val === '关系配置') $scope.permission.relation = "5";
-                    else if (val === '任务管理') $scope.permission.task = "6";
+                    if (val === 'user') $scope.permission.user = "1";
+                    else if (val === 'area') $scope.permission.area = "2";
+                    else if (val === 'env') $scope.permission.env = "3";
+                    else if (val === 'project') $scope.permission.project = "4";
+                    else if (val === 'relation') $scope.permission.relation = "5";
+                    else if (val === 'task') $scope.permission.task = "6";
                 });
             });
 

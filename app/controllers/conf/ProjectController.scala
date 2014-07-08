@@ -96,12 +96,16 @@ object ProjectController extends Controller {
     Ok(Json.toJson(ProjectHelper.all()))
   }
 
+  // ----------------------------------------------------------
   // 项目属性
+  // ----------------------------------------------------------
   def atts(pid: Int) = Action {
     Ok(Json.toJson(AttributeHelper.findByPid(pid)))
   }
 
+  // ----------------------------------------------------------
   // 项目成员
+  // ----------------------------------------------------------
   implicit val memberWrites = Json.writes[Member]
   def members(pid: Int) = Action {
     Ok(Json.toJson(MemberHelper.findByPid(pid)))

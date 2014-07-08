@@ -26,12 +26,22 @@ require(['angular', './controller/main-controller', './directive/main-directive'
             'bugattiApp.directives',
             'bugattiApp.services',
             'bugattiApp.controllers'
-            ]).run(['$rootScope', '$state', '$stateParams', function($rootScope,   $state,   $stateParams) {
+            ]).run(['$rootScope', '$state', '$stateParams', 'Auth', function($rootScope,   $state,   $stateParams, Auth) {
                 $rootScope.$state = $state;
                 $rootScope.$stateParams = $stateParams;
 
                 $rootScope.$on("$stateChangeStart", function (event, toState) {
-
+                    Auth.ping(function() {
+//                        if (toState.data.access === permission.anon) {
+//                            return
+//                        }
+//                        if (!Auth.authorize(toState.data.access)) {
+//                            event.preventDefault();
+//                            $state.go('home');
+//                        }
+                    }, function() {
+                        $rootScope.error = "Unauthorized";
+                    });
                 });
 
             }]);
