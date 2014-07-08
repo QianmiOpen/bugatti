@@ -322,7 +322,12 @@ class TaskProcess extends Actor {
       else {
         commandSeq = commandSeq :+ outputCommand
         Logger.info(commandSeq.toString)
-        (commandSeq lines)
+
+        Thread.sleep(500)
+        (commandSeq lines).foreach(
+          x =>
+            Logger.info(s"commandLogs: ${x}")
+        )
 
         //      Seq("salt", "\\t-minion", "state.sls", "webapp.deploy", "pillar='{webapp: {groupId: com.ofpay, artifactId: cardserverimpl, version: 1.6.3-RELEASE, repository: releases}}'",  s" --out-file=${path}") lines
 
@@ -331,8 +336,11 @@ class TaskProcess extends Actor {
 
         //查看日志 失败的命令再次执行一次
         if(!checkLog(path)){
-          //        (cmd !!)
-          (commandSeq lines)
+          Thread.sleep(500)
+          (commandSeq lines).foreach(
+            x =>
+              Logger.info(s"commandLogs: ${x}")
+          )
 
           //合并日志
           mergeLog(path, file, s"${cmd} ${outputCommand}", true)
