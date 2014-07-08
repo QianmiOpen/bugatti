@@ -61,6 +61,7 @@ object GitHelp {
     if (app.configuration.getBoolean("git.work.init").getOrElse(true)) {
       val gitRemoteUrl = app.configuration.getString("git.work.url").getOrElse("ssh://cicode@git.dev.ofpay.com:29418/cicode/salt-work.git")
       _gitWorkDir = new File(app.configuration.getString("git.work.dir").getOrElse("target/salt-work"))
+
       val gitWorkDir_git = new File(s"${_gitWorkDir.getAbsolutePath}/.git")
       if (!_gitWorkDir.exists() || !gitWorkDir_git.exists()) {
         _delDir(_gitWorkDir)
