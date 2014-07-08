@@ -1,5 +1,8 @@
 package controllers.conf
 
+import controllers.BaseController
+import controllers.conf.EnvController._
+import enums.FuncEnum
 import models.conf.{AreaInfo, AreaHelper, Area}
 import play.api.data._
 import play.api.data.Forms._
@@ -8,9 +11,10 @@ import play.api.mvc.{Action, Controller}
 import utils.SaltTools
 
 /**
- * Created by mind on 7/6/14.
+ * 区域管理
+ * @author of557
  */
-object AreaController extends Controller{
+object AreaController extends BaseController {
   implicit val areaFormat = Json.format[Area]
   implicit val areaInfoFormat = Json.format[AreaInfo]
 
@@ -23,15 +27,15 @@ object AreaController extends Controller{
     )(Area.apply)(Area.unapply)
   )
 
-  def all = Action {
+  def all = AuthAction(FuncEnum.area) {
     Ok(Json.toJson(AreaHelper.allInfo))
   }
 
-  def get(id: Int) = Action {
+  def get(id: Int) = AuthAction(FuncEnum.area) {
     Ok(Json.toJson(AreaHelper.findInfoById(id)))
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       area =>
@@ -44,7 +48,7 @@ object AreaController extends Controller{
     )
   }
 
-  def update = Action { implicit request =>
+  def update = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       area =>
@@ -52,11 +56,11 @@ object AreaController extends Controller{
     )
   }
 
-  def delete(id: Int) = Action { implicit request =>
+  def delete(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
     Ok(Json.obj("r" -> Json.toJson(AreaHelper.delete(id))))
   }
 
-  def refresh(id: Int) = Action { implicit request =>
+  def refresh(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
     AreaHelper.findById(id) match {
       case Some(area) => {
         SaltTools.refreshHost(area.syndicName)

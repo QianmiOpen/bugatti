@@ -1,6 +1,8 @@
 package controllers.conf
 
-import enums.RoleEnum
+import controllers.BaseController
+import controllers.conf.RelationController._
+import enums.{FuncEnum, RoleEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
@@ -13,7 +15,7 @@ import play.api.libs.json._
  *
  * @author of546
  */
-object UserController extends Controller {
+object UserController extends BaseController {
 
   implicit val userWrites = Json.writes[User]
   implicit val permissionWrites = Json.writes[Permission]
@@ -31,27 +33,27 @@ object UserController extends Controller {
     )(UserForm.apply)(UserForm.unapply)
   )
 
-  def show(jobNo: String) = Action {
+  def show(jobNo: String) = AuthAction(FuncEnum.user) {
     Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
   }
 
-  def index(page: Int, pageSize: Int) = Action {
+  def index(page: Int, pageSize: Int) = AuthAction(FuncEnum.user) {
     Ok(Json.toJson(UserHelper.all(page, pageSize)))
   }
 
-  def count = Action {
+  def count = AuthAction(FuncEnum.user) {
     Ok(Json.toJson(UserHelper.count))
   }
 
-  def permissions(jobNo: String) = Action {
+  def permissions(jobNo: String) = AuthAction(FuncEnum.user) {
     Ok(Json.toJson(PermissionHelper.findByJobNo(jobNo)))
   }
 
-  def delete(jobNo: String) = Action {
+  def delete(jobNo: String) = AuthAction(FuncEnum.user) {
     Ok(Json.toJson(UserHelper.delete(jobNo)))
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction(FuncEnum.user) { implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       userForm => {
@@ -65,7 +67,7 @@ object UserController extends Controller {
     )
   }
 
-  def update(jobNo: String) = Action { implicit request =>
+  def update(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       userForm => {
