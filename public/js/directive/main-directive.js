@@ -88,6 +88,7 @@ define(['angular'], function(angular) {
     }]);
 
 
+    // 页面权限
     app.directive('accessPermission', ['Auth', function(Auth) {
         return {
             restrict: 'A',
@@ -113,5 +114,6 @@ define(['angular'], function(angular) {
             }
         }
     }]);
+
 
 });
