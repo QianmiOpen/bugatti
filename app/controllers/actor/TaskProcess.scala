@@ -126,9 +126,9 @@ object TaskProcess {
         io.write(confContent.get.content)
         io.close()
       }
-
-      GitHelp.push(s"push ${appName} job, id is ${taskId}")
     }
+
+    GitHelp.push(s"push ${appName} job, id is ${taskId}")
   }
 
   def checkQueueNum(tq: TaskQueue) = {

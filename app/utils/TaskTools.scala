@@ -73,14 +73,16 @@ object GitHelp {
       val builder = new FileRepositoryBuilder()
       val repo = builder.setGitDir(gitWorkDir_git).build()
       _git = new Git(repo)
+      Logger.info(s"Init git: ${_git.getRepository}")
     }
   }
 
   def push(message: String) {
     if (_git != null) {
-      _git.add().addFilepattern(".").call()
-      _git.commit().setMessage(message).call()
-      _git.push().call()
+      val addRet =_git.add().addFilepattern(".").call()
+      val commitRet =_git.commit().setMessage(message).call()
+      val pushRet = _git.push().call()
+      Logger.debug(s"git execute: addRet: $addRet, commitRet: $commitRet, pushRet: $pushRet")
     }
   }
 
