@@ -169,7 +169,8 @@ object AppTestData {
     val q = TableQuery[AttributeTable]
     val seq = Seq(
       Attribute(None, Option(1), "groupId", Option("com.ofpay")),
-      Attribute(None, Option(1), "artifactId", Option("cardserverimpl"))
+      Attribute(None, Option(1), "artifactId", Option("cardserverimpl")),
+      Attribute(None, Option(1), "unpacked", Option("false"))
     )
     q.insertAll(seq: _*)
   }
@@ -197,7 +198,8 @@ object AppTestData {
     Seq(
       //Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.19.3.1/24"), LevelEnum.unsafe),
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
-      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe)
+      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
+      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
     ).foreach(EnvironmentHelper.create)
   }
 
@@ -222,8 +224,9 @@ object AppTestData {
   }
 
   def areaScript(implicit session: Session) = {
-    Seq {
-      Area(None, "测试", "t-syndic", "172.19.3.149")
-    }.foreach(AreaHelper.create)
+    Seq (
+      Area(None, "测试", "t-syndic", "172.19.3.149"),
+      Area(None, "test-syndic", "t-syndic", "172.19.3.132")
+    ).foreach(AreaHelper.create)
   }
 }
