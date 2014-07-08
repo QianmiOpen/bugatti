@@ -20,7 +20,7 @@ trait Security { self: Controller =>
         Cache.getAs[String](token) map { jobNo =>
           f(token)(jobNo)(request)
         }
-      } getOrElse Unauthorized(Json.obj("err" -> "No Token"))
+      } getOrElse Unauthorized(Json.obj("r" -> "No Token"))
     }
 
 }

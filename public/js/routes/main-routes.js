@@ -33,20 +33,21 @@ define(['angular',
 
         $stateProvider.state('home', {
             url: "/",
-            templateUrl:'partials/index.html'
+            templateUrl:'partials/index.html',
+            data: { access: 'anon' }
         });
 
         $stateProvider.state('conf', {
             url: "/conf",
-            templateUrl: "partials/conf.html"
+            templateUrl: "partials/conf.html",
+            data: { access: 'anon' }
         });
 
         $stateProvider.state('task', {
             url: "/task",
             templateUrl: "partials/task/task.html",
-            controller: "TaskCtrl"
-//            ,
-//            data: {access: permission.task}
+            controller: "TaskCtrl",
+            data: { access: 'task' }
         });
 
     }]);

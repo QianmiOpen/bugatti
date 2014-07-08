@@ -10,7 +10,8 @@ define(['angular'], function(angular) {
         $stateProvider.state('conf.env', {
             url: "/env",
             templateUrl: "partials/conf/env/env-index.html",
-            controller: "EnvCtrl"
+            controller: "EnvCtrl",
+            data: { access: 'env' }
         });
 
         $stateProvider.state('conf.env.create', {

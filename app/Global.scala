@@ -104,7 +104,7 @@ object AppData {
   def initData(implicit session: Session) = {
     val U = TableQuery[UserTable]
     Seq(
-      User("of546", "李允恒", RoleEnum.user, false, None, None),
+      User("of546", "李允恒", RoleEnum.admin, false, None, None),
       User("of557", "彭毅", RoleEnum.admin, false, None, None),
       User("of729", "金卫", RoleEnum.admin, false, None, None),
       User("of999", "龚平", RoleEnum.admin, false, None, None)

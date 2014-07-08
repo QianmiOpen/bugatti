@@ -5,10 +5,12 @@ define(['angular'], function(angular) {
     var app = angular.module('bugattiApp.route.conf.areaModule', []);
 
     app.config(['$stateProvider', function ($stateProvider) {
+
         $stateProvider.state("conf.area", {
             url: "/area",
             templateUrl: "partials/conf/area/area-index.html",
-            controller: "AreaCtrl"
+            controller: "AreaCtrl",
+            data: { access: 'area' }
         });
 
         $stateProvider.state("conf.area.create", {

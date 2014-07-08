@@ -30,7 +30,7 @@
                     <ul class="nav navbar-nav">
                         <li ui-sref-active="active"><a ui-sref="home">首页</a></li>
                         <li ng-class="{active: $state.includes('conf')}"><a ui-sref="conf.user">配置</a></li>
-                        <li ui-sref-active="active"><a ui-sref="task">任务</a></li>
+                        <li access-permission="task" ui-sref-active="active"><a ui-sref="task">任务</a></li>
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">

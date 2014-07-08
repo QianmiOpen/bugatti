@@ -56,7 +56,10 @@ define(['angular',
                 $http.get('/ping').success(function(r) {
                     changeUser({username: r.jobNo, role: r.role, permissions: r.permissions});
                     success();
-                }).error(error);
+                }).error(function(r) {
+                    changeUser({username: '', role: '', permissions: []});
+                    error(r);
+                });
             },
             logout: function(success, error) {
                 $http.post('/logout').success(function() {

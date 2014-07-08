@@ -10,7 +10,8 @@ define(['angular'], function(angular) {
         $stateProvider.state('conf.project', {
             url: "/project",
             templateUrl: "partials/conf/project/project-index.html",
-            controller: "ProjectCtrl"
+            controller: "ProjectCtrl",
+            data: { access: 'project' }
         });
 
         $stateProvider.state('conf.project.my', {

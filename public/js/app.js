@@ -32,14 +32,17 @@ require(['angular', './controller/main-controller', './directive/main-directive'
 
                 $rootScope.$on("$stateChangeStart", function (event, toState) {
                     Auth.ping(function() {
-//                        if (toState.data.access === permission.anon) {
-//                            return
-//                        }
-//                        if (!Auth.authorize(toState.data.access)) {
-//                            event.preventDefault();
-//                            $state.go('home');
-//                        }
-                    }, function() {
+                        console.log('state.data.access=' + toState.data.access);
+                        if (toState.data.access === 'anon') {
+                            return
+                        }
+                        if (!Auth.authorize(toState.data.access)) {
+                            event.preventDefault();
+                            $state.go('home');
+                        }
+                    }, function(r) {
+                        event.preventDefault();
+                        $state.go('home');
                         $rootScope.error = "Unauthorized";
                     });
                 });

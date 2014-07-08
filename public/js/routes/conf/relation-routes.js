@@ -10,7 +10,8 @@ define(['angular'], function(angular) {
         $stateProvider.state('conf.relation', {
             url: "/relation",
             templateUrl: "partials/conf/relation/relation-index.html",
-            controller: 'RelationCtrl'
+            controller: 'RelationCtrl',
+            data: { access: 'relation' }
         });
 
 

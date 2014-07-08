@@ -87,4 +87,31 @@ define(['angular'], function(angular) {
         }
     }]);
 
+
+    app.directive('accessPermission', ['Auth', function(Auth) {
+        return {
+            restrict: 'A',
+            link: function($scope, element, attrs) {
+                var prevDisp = element.css('display')
+                    , access;
+                $scope.$watch('user', function(user) {
+                    updateCSS();
+                }, true);
+                attrs.$observe('accessPermission', function(al) {
+                    access = al;
+                    updateCSS();
+                });
+                function updateCSS() {
+                    if (access) {
+                        if (!Auth.authorize(access))
+                            element.css('display', 'none');
+                        else
+                            element.css('display', prevDisp);
+                    }
+                }
+
+            }
+        }
+    }]);
+
 });
