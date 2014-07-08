@@ -74,7 +74,7 @@ define(['angular'], function(angular) {
                 });
                 $scope.user.functions = func.join(",");
                 UserService.save(angular.toJson(user), function(data) {
-                    if (data.r === 2) {
+                    if (data.r >= 0) {
                         $state.go('^');
                     } else if (data.r == 'exist') {
                         $scope.form.jobNo.$invalid = true;
@@ -85,10 +85,10 @@ define(['angular'], function(angular) {
 
         }]);
 
-    app.controller('UserUpdateCtrl', ['$scope', '$stateParams', '$state', 'UserService',
-        function($scope, $stateParams, $state, UserService) {
+    app.controller('UserUpdateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'UserService',
+        function($scope, $filter, $stateParams, $state, UserService) {
             $scope.user, $scope.master = {};
-            $scope.permission = {user:"0", env:"0", project:"0", relation:"0", task:"0"}
+            $scope.permission = {user:"0", area: "0", env:"0", project:"0", relation:"0", task:"0"}
 
             UserService.get($stateParams.id, function(data) {
                 $scope.master = data;
@@ -108,10 +108,11 @@ define(['angular'], function(angular) {
                 }
                 angular.forEach(data.functions, function(val) {
                     if (val === '用户管理') $scope.permission.user = "1";
-                    else if (val === '环境管理') $scope.permission.env = "2";
-                    else if (val === '项目管理') $scope.permission.project = "3";
-                    else if (val === '关系配置') $scope.permission.relation = "4";
-                    else if (val === '任务管理') $scope.permission.task = "5";
+                    else if (val === '区域管理') $scope.permission.area = "2";
+                    else if (val === '环境管理') $scope.permission.env = "3";
+                    else if (val === '项目管理') $scope.permission.project = "4";
+                    else if (val === '关系配置') $scope.permission.relation = "5";
+                    else if (val === '任务管理') $scope.permission.task = "6";
                 });
             });
 
@@ -123,8 +124,9 @@ define(['angular'], function(angular) {
                     }
                 });
                 $scope.user.functions = func.join(",");
+                user.lastVisit = $filter('date')(user.lastVisit, "yyyy-MM-dd hh:mm:ss")
                 UserService.update($stateParams.id, angular.toJson(user), function(data) {
-                    if (data.r === 2) {
+                    if (data.r >= 0) {
                         $state.go('^');
                     } else if (data.r == 'exist') {
                         $scope.form.jobNo.$invalid = true;

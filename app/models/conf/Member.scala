@@ -13,7 +13,7 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class Member(id: Option[Int], pid: Int, level: Level, job_no: String)
+case class Member(id: Option[Int], pid: Int, level: Level, jobNo: String)
 class MemberTable(tag: Tag) extends Table[Member](tag, "member") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def pid = column[Int]("pid", O.NotNull) // 项目编号
@@ -22,6 +22,7 @@ class MemberTable(tag: Tag) extends Table[Member](tag, "member") {
 
   override def * = (id.?, pid, level, jobNo) <> (Member.tupled, Member.unapply _)
   def idx = index("idx_pid_no", (pid, jobNo), unique = true)
+  def idx_pid = index("idx_pid", pid)
 }
 object MemberHelper extends PlayCache {
 
@@ -31,6 +32,14 @@ object MemberHelper extends PlayCache {
 
   def findById(id: Int) = db withSession { implicit session =>
     qMember.where(_.id is id).firstOption
+  }
+
+  def findByPid(pid: Int): Seq[Member] = db withSession { implicit session =>
+    qMember.where(m => m.pid === pid).list
+  }
+
+  def findByPid_JobNo(pid: Int, jobNo: String): Option[Member] = db withSession { implicit session =>
+    qMember.where(m => m.pid === pid && m.jobNo === jobNo).firstOption
   }
 
   def create(member: Member) = db withSession { implicit session =>

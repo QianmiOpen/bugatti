@@ -20,6 +20,14 @@
         <td class="text-right col-sm-3">锁定？：</td>
         <td>{{user.locked | lock}}</td>
     </tr>
+    <tr>
+        <td class="text-right col-sm-3">最后访问IP：</td>
+        <td>{{user.lastIp}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">最后访问时间：</td>
+        <td>{{user.lastVisit | date: 'yyyy-MM-dd hh:mm:ss'}}</td>
+    </tr>
     <tr ng-if="user.jobNo">
         <td class="text-right col-sm-3">权限：</td>
         <td>

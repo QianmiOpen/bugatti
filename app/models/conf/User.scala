@@ -82,7 +82,12 @@ object UserHelper extends PlayCache {
   }
 
   def update(jobNo: String, user: User, permission: Permission) = db withTransaction { implicit session =>
-    update_(jobNo, user) + PermissionHelper.update_(jobNo, permission)
+    update_(jobNo, user) + (PermissionHelper.findByJobNo(jobNo) match {
+      case Some(p) =>
+        PermissionHelper.update_(jobNo, permission)
+      case None =>
+        PermissionHelper.create_(permission)
+    })
   }
 
 }

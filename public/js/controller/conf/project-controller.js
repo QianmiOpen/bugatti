@@ -89,6 +89,75 @@ define(['angular'], function(angular) {
                 $scope.atts = data;
             });
 
+            ProjectService.members($stateParams.id, function(data) {
+                $scope.members = data;
+            });
+
+            // 新增项目成员
+            $scope.addMember = function(jobNo) {
+            $scope.jobNo$error = '';
+                if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
+                    $scope.jobNo$error = '工号格式错误';
+                    return;
+                }
+                var exist = false;
+                angular.forEach($scope.members, function(m) {
+                    if (m.jobNo === jobNo) {
+                        exist = true;
+                    }
+                });
+                if (exist) {
+                    $scope.jobNo$error = '已存在';
+                    return;
+                }
+
+                ProjectService.saveMember($stateParams.id, jobNo, function(data) {
+                    if (data.r === 'none') {
+                        $scope.jobNo$error = '不存在的用户，请在用户管理添加';
+                    } else if (data.r > 0) {
+                        ProjectService.members($stateParams.id, function(data) {
+                            $scope.members = data;
+                            $scope.jobNo$error = '';
+                        });
+                    } else {
+                        $scope.jobNo$error = '添加错误';
+                    }
+                });
+            }
+
+            $scope.memberUp = function(mid, msg) {
+                if (confirm(msg)) {
+                    ProjectService.updateMember(mid, "up", function(data) {
+                        if (data.r > 0) {
+                            ProjectService.members($stateParams.id, function(data) {
+                                $scope.members = data;
+                            });
+                        }
+                    });
+                }
+            };
+            $scope.memberDown = function(mid, msg) {
+                if (confirm(msg)) {
+                    ProjectService.updateMember(mid, "down", function(data) {
+                        if (data.r > 0) {
+                            ProjectService.members($stateParams.id, function(data) {
+                                $scope.members = data;
+                            });
+                        }
+                    });
+                }
+            };
+            $scope.memberRemove = function(mid, msg) {
+                if (confirm(msg)) {
+                    ProjectService.updateMember(mid, "remove", function(data) {
+                        if (data.r > 0) {
+                            ProjectService.members($stateParams.id, function(data) {
+                                $scope.members = data;
+                            });
+                        }
+                    });
+                }
+            };
     }]);
 
 
