@@ -73,7 +73,7 @@ object GitHelp {
       val builder = new FileRepositoryBuilder()
       val repo = builder.setGitDir(gitWorkDir_git).build()
       _git = new Git(repo)
-      Logger.info(s"Init git: $_git")
+      Logger.info(s"Init git: ${_git.getRepository}")
     }
   }
 
