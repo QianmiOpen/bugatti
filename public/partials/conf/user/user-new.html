@@ -74,7 +74,7 @@
                     <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.relation" ng-true-value="5" ng-false-value="0" > 关系配置</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.task" ng-true-value="6" ng-false-value="0" > 任务管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-change="taskChecked(permission.task, permission.user)" ng-model="permission.task" ng-true-value="6" ng-false-value="0" > 任务管理</label>
                 </p>
             </div>
         </div>

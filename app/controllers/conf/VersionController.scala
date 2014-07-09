@@ -79,7 +79,6 @@ object VersionController extends BaseController {
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
-        Logger.info(versionForm.toString)
         VersionHelper.findByPid(versionForm.pid)
           .filterNot(_.id == versionForm.id) // Some(id)
           .find(_.vs == versionForm.vs) match {

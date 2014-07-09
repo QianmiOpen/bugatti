@@ -54,20 +54,15 @@ object ProjectController extends BaseController {
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
-    if (!UserHelper.hasProject(id, request.user)) Forbidden
+    if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
     else
       ProjectHelper.findById(id) match {
-        case Some(project) =>
-            project.subTotal match {
-              case 0 =>
-                Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
-              case _ =>
-                Ok(Json.obj("r" -> "exist"))
-            }
-        case None =>
-          Ok(Json.obj("r" -> "none"))
+        case Some(project) => project.subTotal match {
+          case 0 => Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
+          case _ => Ok(Json.obj("r" -> "exist"))
+        }
+        case None => Ok(Json.obj("r" -> "none"))
     }
-
   }
 
   def save = AuthAction(FuncEnum.project) { implicit request =>
@@ -88,7 +83,8 @@ object ProjectController extends BaseController {
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
-        Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
+        if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
+        else Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
       }
     )
   }
@@ -117,8 +113,9 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(MemberHelper.findByPid(pid)))
   }
 
-  def saveMember(pid: Int, jobNo: String) = AuthAction(FuncEnum.project) {
-    UserHelper.findByJobNo(jobNo) match {
+  def saveMember(pid: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
+    if (!UserHelper.hasProjectSafe(pid, request.user)) Forbidden
+    else UserHelper.findByJobNo(jobNo) match {
       case Some(_) =>
         Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(Member(None, pid, LevelEnum.unsafe, jobNo)))))
       case _ =>
@@ -126,23 +123,18 @@ object ProjectController extends BaseController {
     }
   }
 
-  def updateMember(mid: Int, op: String) = AuthAction(FuncEnum.project) {
+  def updateMember(mid: Int, op: String) = AuthAction(FuncEnum.project) { implicit request =>
     MemberHelper.findById(mid) match {
       case Some(member) =>
-        op match {
-          case "up" =>
-            Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.safe))))
-          case "down" =>
-            Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.unsafe))))
-          case "remove" =>
-            Ok(Json.obj("r" -> MemberHelper.delete(mid)))
-          case _ =>
-            BadRequest
+        if (request.user.role == RoleEnum.admin || member.level == LevelEnum.safe) op match {
+          case "up" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.safe))))
+          case "down" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.unsafe))))
+          case "remove" => Ok(Json.obj("r" -> MemberHelper.delete(mid)))
+          case _ => BadRequest
         }
-      case None =>
-        NotFound
+        else Forbidden
+      case None => NotFound
     }
-
   }
 
   // ==========================================================
@@ -159,30 +151,38 @@ object ProjectController extends BaseController {
     )(VerForm.apply)(VerForm.unapply)
   )
 
-  // todo
   lazy val authToken = app.configuration.getString("auth.token").getOrElse("bugatti")
 
+  /**
+   * OpenApi接口: 添加项目新版本
+   * desc: 这里不使用AuthAction，不存在内部登录
+   *
+   * URL Method: POST
+   * FormData:
+   *   projectName 项目名称
+   *   groupId     组名
+   *   artifactId  工件名
+   *   version     版本
+   *   authToken   开放平台的token值
+   *
+   * @return 401:token错误,404:项目不存在,200:r->exist已存在版本,200:r->ok添加成功
+   */
   def addVersion() = Action { implicit request =>
     verForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
-      verData => {
-        verData.authToken match {
-          case token if token == authToken =>
-            ProjectHelper.findByName(verData.projectName) match {
-              case Some(project) =>
-                VersionHelper.findByPid_Vs(project.id.get, verData.version) match {
-                  case Some(_) =>
-                    Ok(Json.obj("r" -> "exist"))
-                  case None =>
-                    VersionHelper.create(Version(None, project.id.get, verData.version, DateTime.now()))
-                    Ok(Json.obj("r" -> "ok"))
-                }
-              case None =>
-                NotFound
-            }
-          case _ =>
-            Forbidden
-        }
+      verData => verData.authToken match {
+        case token if token == authToken =>
+          ProjectHelper.findByName(verData.projectName) match {
+            case Some(project) =>
+              VersionHelper.findByPid_Vs(project.id.get, verData.version) match {
+                case Some(_) => Ok(Json.obj("r" -> "exist"))
+                case None =>
+                  VersionHelper.create(Version(None, project.id.get, verData.version, DateTime.now()))
+                  Ok(Json.obj("r" -> "ok"))
+              }
+            case None => NotFound
+          }
+        case _ => Unauthorized
       }
     )
   }

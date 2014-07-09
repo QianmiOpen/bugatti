@@ -4,9 +4,17 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.task.taskModule', []);
 
-    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService','$state', '$stateParams', '$interval', 'Auth', function($scope,TaskService,EnvService,ProjectService,$state,$stateParams, $interval, Auth) {
-        $scope.user = Auth.user;
-        console.log($scope.user)
+    function keepSession($scope, $interval, Auth) {
+        var intervalPromise = $interval(function () {
+            Auth.ping(function() {});
+        }, 5000);
+        $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
+    }
+
+    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService','$state', '$stateParams', '$interval', 'Auth',
+        function($scope,TaskService,EnvService,ProjectService,$state,$stateParams, $interval, Auth) {
+
+        keepSession($scope, $interval, Auth);
 //=====================================变量========================================
         $scope.projectStatus = []
 

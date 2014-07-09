@@ -83,13 +83,23 @@ define(['angular'], function(angular) {
                 });
             };
 
+            $scope.taskChecked = function(task, user) {
+                if (task !== '0') {
+                    $scope.permission = {user: user, area: "2", env:"3", project:"4", relation:"5", task: task}
+                }
+            };
+
         }]);
 
     app.controller('UserUpdateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'UserService',
         function($scope, $filter, $stateParams, $state, UserService) {
             $scope.user, $scope.master = {};
             $scope.permission = {user:"0", area: "0", env:"0", project:"0", relation:"0", task:"0"}
-
+            $scope.taskChecked = function(task, user) {
+                if (task !== '0') {
+                    $scope.permission = {user: user, area: "2", env:"3", project:"4", relation:"5", task: task}
+                }
+            };
             UserService.get($stateParams.id, function(data) {
                 $scope.master = data;
                 $scope.reset = function() {

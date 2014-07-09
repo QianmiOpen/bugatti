@@ -63,13 +63,10 @@ object VersionHelper extends PlayCache {
       case Some(env) =>
         val list = findByPid(pid)
         env.level match {
-          case LevelEnum.unsafe =>
-            list
-          case _ =>
-            list.filterNot(t => TaskTools.isSnapshot(t.id.get))
+          case LevelEnum.unsafe => list
+          case _ => list.filterNot(t => TaskTools.isSnapshot(t.id.get))
         }
-      case None =>
-        Nil
+      case None => Nil
     }
   }
 
