@@ -102,13 +102,13 @@ object Global extends GlobalSettings {
 object AppData {
 
   def initData(implicit session: Session) = {
-    val U = TableQuery[UserTable]
-    Seq(
-      User("of546", "李允恒", RoleEnum.admin, false, None, None),
-      User("of557", "彭毅", RoleEnum.admin, false, None, None),
-      User("of729", "金卫", RoleEnum.admin, false, None, None),
-      User("of999", "龚平", RoleEnum.admin, false, None, None)
-    ).foreach(U.insert)
+//    val U = TableQuery[UserTable]
+//    Seq(
+//      User("of546", "李允恒", RoleEnum.admin, false, None, None),
+//      User("of557", "彭毅", RoleEnum.admin, false, None, None),
+//      User("of729", "金卫", RoleEnum.admin, false, None, None),
+//      User("of999", "龚平", RoleEnum.admin, false, None, None)
+//    ).foreach(U.insert)
   }
 
   def initFromYaml(implicit session: Session) = {
@@ -142,12 +142,16 @@ object AppData {
 }
 
 object AppTestData {
+
   // 用户表初始化
   def userScript(implicit session: Session) = {
-    val q = TableQuery[UserTable]
-    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
-    q.ddl.create
-    q.insert(User("of546", "li", RoleEnum.admin, true, Some("1.1.1.1"), Some(DateTime.now())))
+    val U = TableQuery[UserTable]
+    Seq(
+      User("of546", "李允恒", RoleEnum.admin, false, None, None),
+      User("of557", "彭毅", RoleEnum.admin, false, None, None),
+      User("of729", "金卫", RoleEnum.admin, false, None, None),
+      User("of999", "龚平", RoleEnum.admin, false, None, None)
+    ).foreach(U.insert)
   }
 
   // 项目表初始化

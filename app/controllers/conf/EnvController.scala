@@ -1,8 +1,10 @@
 package controllers.conf
 
+import enums.{RoleEnum}
+import models.conf.{MemberHelper, UserHelper, Environment, EnvironmentHelper}
+import play.api.mvc._
 import controllers.BaseController
 import enums.{FuncEnum, LevelEnum}
-import models.conf.{Environment, EnvironmentHelper}
 import play.api.libs.json._
 import play.api.data._
 import play.api.data.Forms._
@@ -36,6 +38,19 @@ object EnvController extends BaseController {
 
   def all = AuthAction(FuncEnum.env) {
     Ok(Json.toJson(EnvironmentHelper.all()))
+  }
+
+  def showAuth = AuthAction(FuncEnum.env) { implicit request =>
+    //管理员 & 委员长 显示所有环境
+    var seq = Seq.empty[Environment]
+    val user = request.user
+    val countSafe = MemberHelper.countByJobNo_Level(user.jobNo, LevelEnum.safe)
+    if(user.role == RoleEnum.admin || countSafe > 0){
+      seq = EnvironmentHelper.all()
+    } else {
+      seq = EnvironmentHelper.findUnsafe()
+    }
+    Ok(Json.toJson(seq))
   }
 
   def count = AuthAction(FuncEnum.env) {

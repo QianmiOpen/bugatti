@@ -41,17 +41,18 @@ GET           /env/:id                           controllers.conf.EnvController.
 DELETE        /env/:id                           controllers.conf.EnvController.delete(id: Int)
 POST          /env                               controllers.conf.EnvController.save
 PUT           /env/:id                           controllers.conf.EnvController.update(id: Int)
+POST          /env/auth                          controllers.conf.EnvController.showAuth
 
 # Project
-GET           /project                           controllers.conf.ProjectController.index(my: Boolean ?=false, page: Int ?=0, pageSize: Int ?=30)
-GET           /project/total                     controllers.conf.ProjectController.count(my: Boolean ?=false)
+GET           /project                           controllers.conf.ProjectController.index(my: Boolean ?=                 false,        page:        Int                 ?=0,        pageSize:        Int                ?=30)
+GET           /project/total                     controllers.conf.ProjectController.count(my: Boolean ?=                 false)
 GET           /project/all                       controllers.conf.ProjectController.all
 GET           /project/atts                      controllers.conf.ProjectController.atts(pid: Int)
 GET           /project/:id                       controllers.conf.ProjectController.show(id: Int)
 DELETE        /project/:id                       controllers.conf.ProjectController.delete(id: Int)
 POST          /project                           controllers.conf.ProjectController.save
 PUT           /project/:id                       controllers.conf.ProjectController.update(id: Int)
-
+POST          /project/auth                      controllers.conf.ProjectController.showAuth
 # Project member
 GET           /project/:pid/member               controllers.conf.ProjectController.members(pid: Int)
 GET           /project/:pid/member/:jobNo        controllers.conf.ProjectController.member(pid: Int, jobNo: String)
