@@ -1,6 +1,6 @@
 package controllers.task
 
-import controllers.actor.TaskProcess
+import controllers.actor.{TaskLog, TaskProcess}
 import enums.TaskEnum
 import org.joda.time.DateTime
 import play.api.mvc.{Action, Controller}
@@ -18,11 +18,9 @@ import java.io._
 import java.net.{HttpURLConnection, URL}
 import java.util.Properties
 import java.util.concurrent.{Executors, ExecutorService}
-import models.task.Task
 import play.api.libs.json.JsObject
 import models.conf.Attribute
 import models.conf.Environment
-import models.task.Task
 import models.conf.Project
 import play.api.libs.json.JsObject
 
@@ -180,6 +178,15 @@ object TaskController extends Controller {
       }
     }
     Json.toJson(result)
+  }
+
+  def taskLog(taskId: Int) = WebSocket.async[JsValue] { request =>
+    TaskLog.show(request.session.hashCode().toString, taskId)
+  }
+
+  def taskLogFirst(taskId: Int, byteSize: Int) = WebSocket.using[String] { request =>
+    Logger.info("taskId:"+taskId+",byteSize:"+byteSize)
+    TaskLog.readHeader(taskId, byteSize)
   }
 
   implicit val projectWrites = Json.writes[Project]
