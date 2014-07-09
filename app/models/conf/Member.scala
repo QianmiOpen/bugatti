@@ -29,6 +29,7 @@ object MemberHelper extends PlayCache {
   import models.AppDB._
 
   val qMember = TableQuery[MemberTable]
+  val qProject = TableQuery[ProjectTable]
 
   def findById(id: Int) = db withSession { implicit session =>
     qMember.where(_.id is id).firstOption
@@ -57,6 +58,18 @@ object MemberHelper extends PlayCache {
   def update(id: Int, member: Member) = db withSession { implicit session =>
     val member2update = member.copy(Some(id))
     qMember.where(_.id is id).update(member2update)
+  }
+
+  def countByJobNo_Level(jobNo: String, level: Level): Int = db withSession { implicit session =>
+    qMember.where(m => m.jobNo === jobNo && m.level === level ).length.run
+  }
+
+  def findProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
+    val q = for{
+      (m, p) <- qMember leftJoin qProject on (_.pid is _.id)
+      if m.jobNo is jobNo
+    } yield p
+    q.list
   }
 
 }

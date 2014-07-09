@@ -97,6 +97,10 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.all()))
   }
 
+  def showAuth = AuthAction(FuncEnum.project) { implicit request =>
+    Ok(Json.toJson(MemberHelper.findProjectsByJobNo(request.user.jobNo)))
+  }
+
   // ----------------------------------------------------------
   // 项目属性
   // ----------------------------------------------------------

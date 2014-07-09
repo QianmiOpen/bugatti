@@ -13,15 +13,20 @@ define(['angular'], function(angular) {
         $scope.versions = []
 
 //=====================================环境========================================
+        //默认选中的环境id，应根据用户偏好获取
+        $scope.activeEnv = 1
         //环境列表(根据用户类型判断是否显示安全区环境)
-        EnvService.getAuth($scope.user.username, function(data){
+        EnvService.getAuth(function(data){
+            console.log(data)
             $scope.envs = [];
             for(var d in data){
                 $scope.envs.push(data[d])
             }
+            $scope.activeEnv = $scope.envs[0].id
+            console.log($scope.activeEnv)
+            $scope.chooseEnv($scope.activeEnv)
         });
-        //默认选中的环境id，应根据用户偏好获取
-        $scope.activeEnv = 1
+
         //选择默认选中的环境
         $scope.activeTab = function(envId){
             if(envId == $scope.activeEnv){
@@ -34,28 +39,31 @@ define(['angular'], function(angular) {
         $scope.chooseEnv = function(envId){
             $scope.activeEnv = envId
             //触发查询环境下的项目列表
-
+            $scope.showProjects()
+            //过滤正在执行任务的项目集 -> 使用websocket
+            $scope.wsInvoke()
         }
-//=====================================项目========================================
-        //项目列表
-        ProjectService.getAll(function(data){
-            $scope.pros = []
-            for(var p in data){
-                $scope.pros.push(data[p])
-            }
-            //查询任务表task 返回 projectId, status, string, taskId
-            TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
-                $scope.lastTasks = data
-                console.log(data)
-                console.table($scope.projectStatus)
-                $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
-                console.table($scope.projectStatus)
-                $scope.getTemplates()
 
-                //过滤正在执行任务的项目集 -> 使用websocket
-                $scope.wsInvoke()
+//=====================================项目========================================
+        $scope.showProjects = function(){
+            ProjectService.getAuth(function(data){
+                $scope.pros = []
+                for(var p in data){
+                    $scope.pros.push(data[p])
+                }
+                //查询任务表task 返回 projectId, status, string, taskId
+                TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
+                    $scope.lastTasks = data
+                    console.log(data)
+                    console.table($scope.projectStatus)
+                    $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                    console.table($scope.projectStatus)
+                    $scope.getTemplates()
+
+                })
             })
-        });
+        }
+
 
         $scope.getTemplates = function(){
             //查询项目模板（操作按钮）
