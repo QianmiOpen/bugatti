@@ -33,6 +33,9 @@ define(['angular'], function(angular) {
             atts: function(pid, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.atts(pid)).success(callback);
             },
+            member: function(pid, jobNo, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.member(pid, jobNo)).success(callback);
+            },
             members: function(pid, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.members(pid)).success(callback);
             },

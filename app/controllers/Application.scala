@@ -119,6 +119,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.ProjectController.atts,
         conf.routes.javascript.ProjectController.showAuth,
         // project member
+        conf.routes.javascript.ProjectController.member,
         conf.routes.javascript.ProjectController.members,
         conf.routes.javascript.ProjectController.saveMember,
         conf.routes.javascript.ProjectController.updateMember,

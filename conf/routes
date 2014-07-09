@@ -55,6 +55,7 @@ PUT           /project/:id                       controllers.conf.ProjectControl
 POST          /project/auth                      controllers.conf.ProjectController.showAuth
 # Project member
 GET           /project/:pid/member               controllers.conf.ProjectController.members(pid: Int)
+GET           /project/:pid/member/:jobNo        controllers.conf.ProjectController.member(pid: Int, jobNo: String)
 POST          /project/:pid/member               controllers.conf.ProjectController.saveMember(pid: Int, jobNo: String)
 PUT           /project/member/:mid               controllers.conf.ProjectController.updateMember(mid: Int, op: String)
 

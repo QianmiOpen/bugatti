@@ -3,10 +3,10 @@
 </div>
 
 <h3 class="text-muted">{{project.name}} : {{version.vs}}</h3>
-
 <ul class="nav nav-tabs" role="tablist">
     <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs">
-        <a href="" ng-click="envChange(e)">{{e.name}}</a>
+        <a ng-if="e.level == 'unsafe'" href="" ng-click="envChange(e)">{{e.name}}</a>
+        <a ng-if="e.level == 'safe'" has-project="{{project.id}}" ng-show="hasProject_"  href="" ng-click="envChange(e)">{{e.name}}</a>
     </li>
 </ul>
 

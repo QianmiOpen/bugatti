@@ -109,6 +109,10 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   implicit val memberWrites = Json.writes[Member]
 
+  def member(pid: Int, jobNo: String) = Action {
+    Ok(Json.toJson(MemberHelper.findByPid_JobNo(pid, jobNo)))
+  }
+
   def members(pid: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(MemberHelper.findByPid(pid)))
   }

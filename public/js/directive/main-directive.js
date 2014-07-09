@@ -110,10 +110,34 @@ define(['angular'], function(angular) {
                             element.css('display', prevDisp);
                     }
                 }
-
             }
         }
     }]);
 
+    app.directive('hasProject', ['Auth', 'ProjectService', function(Auth, ProjectService) {
+        return {
+            restrict: 'A',
+            scope: false,
+            link: function($scope, element, attrs) {
+                $scope.hasProject_ = false;
+
+                attrs.$observe('hasProject', function(pid) {
+                    updateCSS(pid)
+                });
+                function updateCSS(pid) {
+                    if (Auth.user.role === 'admin') {
+                        $scope.hasProject_ = true;
+                    }
+                    else if (Auth.user.role === 'user') {
+                        ProjectService.member(pid, Auth.user.username, function(member) {
+                            if (member != null && member.level == 'safe') {
+                                $scope.hasProject_ = true;
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }]);
 
 });

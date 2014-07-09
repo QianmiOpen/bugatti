@@ -95,7 +95,7 @@ define(['angular'], function(angular) {
 
             // 新增项目成员
             $scope.addMember = function(jobNo) {
-            $scope.jobNo$error = '';
+                $scope.jobNo$error = '';
                 if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
                     $scope.jobNo$error = '工号格式错误';
                     return;

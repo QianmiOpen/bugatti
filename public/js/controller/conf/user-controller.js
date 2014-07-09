@@ -83,9 +83,14 @@ define(['angular'], function(angular) {
                 });
             };
 
-            $scope.taskChecked = function(task, user) {
-                if (task !== '0') {
-                    $scope.permission = {user: user, area: "2", env:"3", project:"4", relation:"5", task: task}
+            $scope.taskChecked = function(ps) {
+                if (ps.task !== '0') {
+                    $scope.permission = {user: ps.user, area: "2", env:"3", project:"4", relation:"5", task: ps.task}
+                }
+            };
+            $scope.projectChecked = function(ps) {
+                if (ps.project !== '0') {
+                    $scope.permission = {user: ps.user, area: ps.area, env:"3", project:ps.project, relation: ps.relation, task: ps.task}
                 }
             };
 
