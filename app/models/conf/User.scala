@@ -101,6 +101,14 @@ object UserHelper extends PlayCache {
     }
   }
 
+  def hasProjectSafe(projectId: Int, user: User): Boolean = {
+    if (user.role == RoleEnum.admin) true
+    else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
+      case Some(member) if member.pid == projectId && member.level == LevelEnum.safe => true
+      case _ => false
+    }
+  }
+
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
