@@ -1,23 +1,20 @@
 package controllers.conf
 
-import models.conf
+import controllers.BaseController
+import enums.FuncEnum
 import models.conf._
 import org.joda.time.DateTime
-import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
-import play.api.mvc._
 import play.api.libs.json._
 
 /**
  * 配置文件
  */
-object ConfController extends Controller {
+object ConfController extends BaseController {
 
   implicit val confWrites = Json.writes[Conf]
   implicit val contentWrites = Json.writes[ConfContent]
-
-  def jobNo = "of546"
 
   val confForm = Form(
     mapping(
@@ -25,7 +22,7 @@ object ConfController extends Controller {
       "eid" -> number,
       "pid" -> number,
       "vid" -> number,
-      "jobNo" -> ignored(jobNo),
+      "jobNo" -> ignored(""),
       "name" -> optional(text),
       "path" -> nonEmptyText,
       "content" -> default(text, ""),
@@ -34,7 +31,7 @@ object ConfController extends Controller {
     )(ConfForm.apply)(ConfForm.unapply)
   )
 
-  def show(id: Int) = Action {
+  def show(id: Int) = AuthAction(FuncEnum.project) {
     ConfHelper.findById(id) match {
       case Some(conf) =>
         Ok(Json.obj("conf" -> Json.toJson(conf), "content" -> ConfContentHelper.findById(id)))
@@ -43,28 +40,28 @@ object ConfController extends Controller {
     }
   }
 
-  def all(eid: Int, vid: Int) = Action {
+  def all(eid: Int, vid: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ConfHelper.findByEid_Vid(eid, vid)))
   }
 
-  def delete(id: Int) = Action {
+  def delete(id: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ConfHelper.delete(id)))
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction(FuncEnum.project) { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
-        Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm))))
+        Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
 
-  def update(id: Int) = Action { implicit request =>
+  def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
-        Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm))))
+        Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
@@ -75,11 +72,11 @@ object ConfController extends Controller {
   implicit val confLogWrites = Json.writes[ConfLog]
   implicit val confLogContentWrites = Json.writes[ConfLogContent]
 
-  def logs(cid: Int, page: Int, pageSize: Int) = Action {
+  def logs(cid: Int, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ConfLogHelper.allByCid(cid, page, pageSize)))
   }
 
-  def logsCount(cid: Int) = Action {
+  def logsCount(cid: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ConfLogHelper.countByCid(cid)))
   }
 
@@ -88,7 +85,7 @@ object ConfController extends Controller {
       Json.obj("log"-> logType._1,"logContent" -> logType._2)
     }
   }
-  def log(id: Int) = Action {
+  def log(id: Int) = AuthAction(FuncEnum.project) {
     val log = ConfLogHelper.findById(id)
     val logContent = ConfLogContentHelper.findById(id)
     Ok(Json.toJson(log, logContent))
@@ -107,7 +104,7 @@ object ConfController extends Controller {
       "ovr" -> default(boolean, false)
     )(CopyForm.apply)(CopyForm.unapply)
   )
-  def copy = Action { implicit request =>
+  def copy = AuthAction(FuncEnum.project) { implicit request =>
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       copyForm => {

@@ -1,20 +1,20 @@
 package controllers.conf
 
-import enums.LevelEnum
+import controllers.BaseController
+import enums.{FuncEnum, LevelEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
-import play.api.mvc._
 import play.api.libs.json._
+import play.api.mvc.Action
+
 /**
  * 项目管理
  *
  * @author of546
  */
-object ProjectController extends Controller {
-
-  val jobNo = "of123"
+object ProjectController extends BaseController {
 
   implicit val projectWrites = Json.writes[Project]
   implicit val attributeWrites = Json.writes[Attribute]
@@ -39,21 +39,21 @@ object ProjectController extends Controller {
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(my: Boolean, page: Int, pageSize: Int) = Action {
+  def index(my: Boolean, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
     val jobNo = if (my) Some("of546") else None
     Ok(Json.toJson(ProjectHelper.all(jobNo, page, pageSize)))
   }
 
-  def count(my: Boolean) = Action {
+  def count(my: Boolean) = AuthAction(FuncEnum.project) {
     val jobNo = if (my) Some("of546") else None
     Ok(Json.toJson(ProjectHelper.count(jobNo)))
   }
 
-  def show(id: Int) = Action {
+  def show(id: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ProjectHelper.findById(id)))
   }
 
-  def delete(id: Int) = Action {
+  def delete(id: Int) = AuthAction(FuncEnum.project) {
     ProjectHelper.findById(id) match {
       case Some(project) =>
         // todo permission
@@ -69,7 +69,7 @@ object ProjectController extends Controller {
 
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction(FuncEnum.project) { implicit request =>
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
@@ -77,13 +77,13 @@ object ProjectController extends Controller {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
-            Ok(Json.obj("r" -> ProjectHelper.create(projectForm, jobNo)))
+            Ok(Json.obj("r" -> ProjectHelper.create(projectForm, request.user.jobNo)))
         }
       }
     )
   }
 
-  def update(id: Int) = Action { implicit request =>
+  def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
@@ -92,14 +92,14 @@ object ProjectController extends Controller {
     )
   }
 
-  def all = Action {
+  def all = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ProjectHelper.all()))
   }
 
   // ----------------------------------------------------------
   // 项目属性
   // ----------------------------------------------------------
-  def atts(pid: Int) = Action {
+  def atts(pid: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(AttributeHelper.findByPid(pid)))
   }
 
@@ -107,11 +107,12 @@ object ProjectController extends Controller {
   // 项目成员
   // ----------------------------------------------------------
   implicit val memberWrites = Json.writes[Member]
-  def members(pid: Int) = Action {
+
+  def members(pid: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(MemberHelper.findByPid(pid)))
   }
 
-  def saveMember(pid: Int, jobNo: String) = Action {
+  def saveMember(pid: Int, jobNo: String) = AuthAction(FuncEnum.project) {
     UserHelper.findByJobNo(jobNo) match {
       case Some(_) =>
         Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(Member(None, pid, LevelEnum.unsafe, jobNo)))))
@@ -120,7 +121,7 @@ object ProjectController extends Controller {
     }
   }
 
-  def updateMember(mid: Int, op: String) = Action {
+  def updateMember(mid: Int, op: String) = AuthAction(FuncEnum.project) {
     MemberHelper.findById(mid) match {
       case Some(member) =>
         op match {
@@ -154,7 +155,6 @@ object ProjectController extends Controller {
   )
 
   // todo
-  implicit val app: play.api.Application = play.api.Play.current
   lazy val authToken = app.configuration.getString("auth.token").getOrElse("bugatti")
 
   def addVersion() = Action { implicit request =>

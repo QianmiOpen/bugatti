@@ -1,5 +1,8 @@
 package controllers.conf
 
+import controllers.BaseController
+import controllers.conf.UserController._
+import enums.FuncEnum
 import models.conf._
 import org.joda.time.DateTime
 import play.api.Logger
@@ -13,7 +16,7 @@ import play.api.libs.json._
  *
  * @author of546
  */
-object VersionController extends Controller {
+object VersionController extends BaseController {
 
   implicit val versionWrites = Json.writes[Version]
 
@@ -26,23 +29,23 @@ object VersionController extends Controller {
     )(Version.apply)(Version.unapply)
   )
 
-  def show(id: Int) = Action {
+  def show(id: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(VersionHelper.findById(id)))
   }
 
-  def index(pid: Int, page: Int, pageSize: Int) = Action {
+  def index(pid: Int, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(VersionHelper.all(pid, page, pageSize)))
   }
 
-  def count(pid: Int) = Action {
+  def count(pid: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(VersionHelper.count(pid)))
   }
 
-  def all(pid: Int, top: Int) = Action {
+  def all(pid: Int, top: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(VersionHelper.all(pid, top)))
   }
 
-  def delete(id: Int) = Action {
+  def delete(id: Int) = AuthAction(FuncEnum.project) {
     VersionHelper.findById(id) match {
       case Some(version) =>
         // todo  version permission, return Forbidden
@@ -58,7 +61,7 @@ object VersionController extends Controller {
     }
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction(FuncEnum.project) { implicit request =>
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
@@ -72,7 +75,7 @@ object VersionController extends Controller {
     )
   }
 
-  def update(id: Int) = Action { implicit request =>
+  def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {

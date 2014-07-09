@@ -1,5 +1,6 @@
 package controllers.conf
 
+import controllers.BaseController
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -7,9 +8,11 @@ import play.api.mvc._
 import play.api.libs.json._
 
 /**
- * 项目类型
+ * 项目模板类型
+ *
+ * @author of546
  */
-object TemplateController extends Controller {
+object TemplateController extends BaseController {
 
   implicit val templateWrites = Json.writes[Template]
   implicit val templateItemsWrites = Json.writes[TemplateItem]

@@ -32,7 +32,6 @@ require(['angular', './controller/main-controller', './directive/main-directive'
 
                 $rootScope.$on("$stateChangeStart", function (event, toState) {
                     Auth.ping(function() {
-                        console.log('state.data.access=' + toState.data.access);
                         if (toState.data.access === 'anon') {
                             return
                         }

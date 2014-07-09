@@ -1,5 +1,8 @@
 package controllers.conf
 
+import controllers.BaseController
+import controllers.conf.ConfController._
+import enums.FuncEnum
 import models.conf._
 import org.apache.commons.net.util.SubnetUtils
 import play.api.Logger
@@ -10,7 +13,7 @@ import play.api.libs.json._
 /**
  * 关系
  */
-object RelationController extends Controller {
+object RelationController extends BaseController {
   implicit val relationWrites = Json.writes[EnvironmentProjectRel]
   //  implicit val ipWrites = Json.writes[IP]
   //  implicit val relationFormWrites = Json.writes[EnvironmentProjectRelForm]
@@ -28,17 +31,17 @@ object RelationController extends Controller {
     )(EnvRelForm.apply)(EnvRelForm.unapply)
   )
 
-  def index(envId: Option[Int], projectId: Option[Int], page: Int, pageSize: Int) = Action {
+  def index(envId: Option[Int], projectId: Option[Int], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
     val result = EnvironmentProjectRelHelper.all(envId, projectId, page, pageSize)
     Ok(Json.toJson(result))
   }
 
-  def count(envId: Option[Int], projectId: Option[Int]) = Action {
+  def count(envId: Option[Int], projectId: Option[Int]) = AuthAction(FuncEnum.relation) {
     val result = EnvironmentProjectRelHelper.count(envId, projectId)
     Ok(Json.toJson(result))
   }
 
-  def ips(envId: Int) = Action {
+  def ips(envId: Int) = AuthAction(FuncEnum.relation) {
 //    val env = EnvironmentHelper.findById(envId)
 //    val ip_range = env.map(_.ipRange.map(_.split(";").toList).getOrElse(Seq.empty[String])).getOrElse(Seq.empty[String]) // 格式化
 //    val rel_ips = EnvironmentProjectRelHelper.findIpsByEnvId(envId)
@@ -53,7 +56,7 @@ object RelationController extends Controller {
     Ok(Json.toJson(EnvironmentProjectRelHelper.findIpsByEnvId(envId)))
   }
 
-  def bind = Action{ implicit request =>
+  def bind = AuthAction(FuncEnum.relation) { implicit request =>
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation =>
@@ -61,7 +64,7 @@ object RelationController extends Controller {
     )
   }
 
-  def unbind(id: Int) = Action {
+  def unbind(id: Int) = AuthAction(FuncEnum.relation) {
     Ok(Json.toJson(EnvironmentProjectRelHelper.unbind(id)))
   }
 

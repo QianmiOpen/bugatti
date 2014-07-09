@@ -1,9 +1,11 @@
 package controllers.conf
 
-import enums.{RoleEnum, LevelEnum}
-import models.conf.{UserHelper, Environment, EnvironmentHelper}
-import play.api.Logger
+import enums.{RoleEnum}
+import models.conf.{UserHelper}
 import play.api.mvc._
+import controllers.BaseController
+import enums.{FuncEnum, LevelEnum}
+import models.conf.{Environment, EnvironmentHelper}
 import play.api.libs.json._
 import play.api.data._
 import play.api.data.Forms._
@@ -12,7 +14,7 @@ import play.api.data.Forms._
  *
  * @author of546
  */
-object EnvController extends Controller {
+object EnvController extends BaseController {
 
   implicit val envWrites = Json.writes[Environment]
 
@@ -27,15 +29,15 @@ object EnvController extends Controller {
     )(Environment.apply)(Environment.unapply)
   )
 
-  def show(id: Int) = Action {
+  def show(id: Int) = AuthAction(FuncEnum.env) {
     Ok(Json.toJson(EnvironmentHelper.findById(id)))
   }
 
-  def index(page: Int, pageSize: Int) = Action {
+  def index(page: Int, pageSize: Int) = AuthAction(FuncEnum.env) {
     Ok(Json.toJson(EnvironmentHelper.all(page, pageSize)))
   }
 
-  def all = Action {
+  def all = AuthAction(FuncEnum.env) {
     Ok(Json.toJson(EnvironmentHelper.all()))
   }
 
@@ -56,15 +58,16 @@ object EnvController extends Controller {
     }
     Ok(Json.toJson(seq))
   }
-  def count = Action {
+
+  def count = AuthAction(FuncEnum.env) {
     Ok(Json.toJson(EnvironmentHelper.count))
   }
 
-  def delete(id: Int) = Action {
+  def delete(id: Int) = AuthAction(FuncEnum.env) {
     Ok(Json.toJson(EnvironmentHelper.delete(id)))
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction(FuncEnum.env) { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       env =>
@@ -77,7 +80,7 @@ object EnvController extends Controller {
     )
   }
 
-  def update(id: Int) = Action { implicit request =>
+  def update(id: Int) = AuthAction(FuncEnum.env) { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       env =>
