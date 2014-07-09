@@ -44,8 +44,8 @@ PUT           /env/:id                           controllers.conf.EnvController.
 POST          /env/auth                          controllers.conf.EnvController.showAuth
 
 # Project
-GET           /project                           controllers.conf.ProjectController.index(my: Boolean ?=                 false,        page:        Int                 ?=0,        pageSize:        Int                ?=30)
-GET           /project/total                     controllers.conf.ProjectController.count(my: Boolean ?=                 false)
+GET           /project                           controllers.conf.ProjectController.index(my: Boolean ?= false, page: Int ?=0, pageSize: Int ?=30)
+GET           /project/total                     controllers.conf.ProjectController.count(my: Boolean ?= false)
 GET           /project/all                       controllers.conf.ProjectController.all
 GET           /project/atts                      controllers.conf.ProjectController.atts(pid: Int)
 GET           /project/:id                       controllers.conf.ProjectController.show(id: Int)
@@ -103,6 +103,9 @@ POST          /task/removeTaskQueue              controllers.task.TaskController
 POST          /task/version                      controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
 GET           /task/nexusVersion                 controllers.task.TaskController.getNexusVersions(projectId: Int)
 GET           /task/templates                    controllers.task.TaskController.getTemplates
+#Log
+GET           /log/:taskId                       controllers.task.TaskController.taskLog(taskId: Int)
+GET           /logHeader/:taskId/:byteSize       controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)
 
 # Open API
 POST          /v1/project/version                controllers.conf.ProjectController.addVersion

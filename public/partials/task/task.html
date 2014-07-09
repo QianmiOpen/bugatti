@@ -5,7 +5,7 @@
 
     <div class="tabs">
         <ul class="nav nav-tabs">
-            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env.id)" ng-repeat="env in envs"><a>{{env.name}}</a></li>
+            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env.id)" ng-repeat="env in envs"><a href="">{{env.name}}</a></li>
         </ul>
     </div>
 
@@ -34,7 +34,7 @@
                     </a>
                 </td>
                 <td style="padding:10px 0px 0px 0px;">
-                    <a ng-show="showHref(pro.status.status)" ui-sref="task.info({taskId:task.task.id, envId: envId, proId: proId, envName: envName, proName: proName})">{{pro.task.endTime}}  {{pro.status.statusTip}}!   版本号：{{pro.task.version}}   任务: {{pro.status.taskName}}</a>
+                    <a ng-show="showHref(pro.status.status)" ng-click="goTaskLog(pro.task.id)" href="">{{pro.task.endTime}}  {{pro.status.statusTip}}!   版本号：{{pro.task.version}}   任务: {{pro.status.taskName}}</a>
                     <div>
                         <span ng-show="showProgress(pro.status.status)" >机器 {{pro.status.machine}}  {{pro.status.statusTip}} : {{pro.status.sls}} </span>
 

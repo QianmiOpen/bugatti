@@ -25,13 +25,11 @@ define(['angular'], function(angular) {
         $scope.activeEnv = 1
         //环境列表(根据用户类型判断是否显示安全区环境)
         EnvService.getAuth(function(data){
-            console.log(data)
             $scope.envs = [];
             for(var d in data){
                 $scope.envs.push(data[d])
             }
             $scope.activeEnv = $scope.envs[0].id
-            console.log($scope.activeEnv)
             $scope.chooseEnv($scope.activeEnv)
         });
 
@@ -62,10 +60,7 @@ define(['angular'], function(angular) {
                 //查询任务表task 返回 projectId, status, string, taskId
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
-                    console.log(data)
-                    console.table($scope.projectStatus)
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
-                    console.table($scope.projectStatus)
                     $scope.getTemplates()
 
                 })
@@ -76,25 +71,19 @@ define(['angular'], function(angular) {
         $scope.getTemplates = function(){
             //查询项目模板（操作按钮）
             TaskService.getTemplates(function(data){
-                console.log(data)
                 $scope.templates = data
                 //按钮
                 $scope.projectStatus.map($scope.getProjectTemplates)
-                console.table($scope.projectStatus)
             })
         }
 
         $scope.getProjectTemplates = function(data){
-            console.log(data)
-            console.log(data.templateId)
             data.templates = $scope.templates[data.templateId]
-            console.table(data.templates)
             data
         }
 
         $scope.randomKey = function(min, max) {
             var num = Math.floor(Math.random() * (max - min + 1)) + min;
-            console.log("num:" + num)
             return num
         }
 
@@ -108,21 +97,16 @@ define(['angular'], function(angular) {
 
         $scope.receiveEvent = function(event){
             $scope.tsData = JSON.parse(event.data)
-            console.log($scope.tsData)
             if(event.data.error){
                 console.log("there is errors:" + event.data.error)
             }else{
                 $scope.$apply(function(){
                     var tsData = $scope.tsData
-                    console.log(tsData)
                     for(var pIndex in $scope.projectStatus){
                         var p = $scope.projectStatus[pIndex]
                         //envId + projectId
                         var key = $scope.activeEnv + "_" + p.id
-                        console.log(key)
-                        console.log(tsData)
                         var projectObj = tsData[key]
-                        console.log(projectObj)
                         if(projectObj != undefined){
                             p.status.currentNum = projectObj.currentNum
                             p.status.totalNum = projectObj.totalNum
@@ -138,7 +122,6 @@ define(['angular'], function(angular) {
                         }
                     }
                     $scope.projectStatus = $scope.projectStatus.map($scope.addStatusTip)
-                    console.log($scope.projectStatus)
                 })
             }
         }
@@ -211,14 +194,12 @@ define(['angular'], function(angular) {
         }
 //=====================================新建任务 （部署 + 启动 + 关闭 + 重启）========================================
         $scope.showVersion = function(pid){
-            console.log(pid)
 
             $scope.versions = []
             TaskService.getVersions(pid, $scope.activeEnv, function(data){
                 for(var dIndex in data) {
                     $scope.versions.push(data[dIndex])
                 }
-                console.log($scope.versions)
             })
         }
 
@@ -253,7 +234,6 @@ define(['angular'], function(angular) {
 
         $scope.showClass = function(versionMenu){
             if(versionMenu){
-                console.log("dropdown-toggle")
                 return "dropdown-toggle"
             } else {
                 return "false"
@@ -302,15 +282,18 @@ define(['angular'], function(angular) {
 
 //=====================================页面跳转========================================
         $scope.goTaskQueue = function(envId, projectId){
-            console.log(envId + ", " + projectId)
             $state.go('.queue', {envId: envId, projectId: projectId})
+        }
+
+        $scope.goTaskLog = function(taskId){
+            console.log(taskId)
+            $state.go('.log', {taskId: taskId})
         }
 
 
     }]);
 
     app.controller('TaskLogCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
-        console.log($stateParams)
         var taskId = $stateParams.taskId
 
         $scope.envId_search = $stateParams.envId
@@ -321,8 +304,8 @@ define(['angular'], function(angular) {
 
 
         var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-//        var path = PlayRoutes.controllers.task.TaskController.taskLog(taskId).webSocketURL()
-        var path = PlayRoutes.controllers.task.TaskController.taskLog(1).webSocketURL()
+        var path = PlayRoutes.controllers.task.TaskController.taskLog(taskId).webSocketURL()
+        console.log(path)
         var logSocket = new WS(path)
 //        var logSocket = new WS("ws://bugatti.dev.ofpay.com/#/task/joinProcess")
 
@@ -332,7 +315,6 @@ define(['angular'], function(angular) {
 
         $scope.receiveEvent = function(event){
             $scope.data = JSON.parse(event.data)
-            console.log("Data received, Message is =>" + $scope.data.message)
             if(event.data.error){
                 console.log("there is errors:"+event.data.error)
             }else{
@@ -346,7 +328,8 @@ define(['angular'], function(angular) {
                            $scope.logFirst = data.message
 //                       }
                     }else{
-                        $scope.message = $scope.message + $scope.TransferString(data.message)
+//                        $scope.message = $scope.message + $scope.TransferString(data.message)
+                        $scope.message = $scope.message + data.message
                     }
                 });
             }
@@ -363,9 +346,7 @@ define(['angular'], function(angular) {
 
         $scope.showHiddenMessage = function(){
             $scope.logFirstHidden = true
-            console.log("this is new actor")
             var len = parseInt($scope.logFirst.split(" ")[0])
-            console.log(len)
             var logHeaderPath = PlayRoutes.controllers.task.TaskController.taskLogFirst(taskId, len).webSocketURL()
             console.log(logHeaderPath)
             var logHeaderSocket = new WS(logHeaderPath)
@@ -375,8 +356,7 @@ define(['angular'], function(angular) {
 
         $scope.receiveHeaderEvent = function(event){
             $scope.$apply(function () {
-                console.log(event.data)
-                $scope.logSecond = $scope.TransferString(event.data)
+                $scope.message = event.data + $scope.message
             })
         }
 
@@ -384,7 +364,7 @@ define(['angular'], function(angular) {
         {
             var string = content;
             try{
-                string=string.replace(/\r\n/gi,"<br>")
+                string=string.replace(/\r\n/gi,"<br>");
                 string=string.replace(/\n/gi,"<br>");
             }catch(e) {
                 console.log(e.message);
@@ -399,7 +379,6 @@ define(['angular'], function(angular) {
     }]);
 
     app.controller('TaskInfoCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
-        console.log($stateParams)
         $scope.taskId = $stateParams.taskId
 
         $scope.envId_search = $stateParams.envId
@@ -428,13 +407,11 @@ define(['angular'], function(angular) {
     app.controller('TaskQueueCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
         $scope.taskQueues = []
 
-        console.log($stateParams)
         $scope.envId_search = $stateParams.envId
         $scope.projectId_search = $stateParams.projectId
 
         $scope.randomKey = function(min, max) {
             var num = Math.floor(Math.random() * (max - min + 1)) + min;
-            console.log("num:" + num)
             return num
         }
 
@@ -449,20 +426,16 @@ define(['angular'], function(angular) {
         $scope.receiveEvent = function(event){
             $scope.taskQueues = []
             $scope.tsData = JSON.parse(event.data)
-            console.log("Data received, Message is =>" + $scope.tsData.message)
             if(event.data.error){
                 console.log("there is errors:"+event.data.error)
             }else{
                 $scope.$apply(function(){
                     var tsData = $scope.tsData
-                    console.log(tsData)
 
                     var key = $scope.envId_search + "_" + $scope.projectId_search
-                    console.log("key==>" + key)
                     var taskQueues = tsData[key]
 
                     $scope.taskQueues = taskQueues.queues.map($scope.addStatusTip)
-                    console.table($scope.taskQueues)
                 })
             }
         }

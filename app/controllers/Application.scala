@@ -168,6 +168,8 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.getNexusVersions,
         task.routes.javascript.TaskController.createNewTaskQueue,
         task.routes.javascript.TaskController.getTemplates,
+        task.routes.javascript.TaskController.taskLog,
+        task.routes.javascript.TaskController.taskLogFirst,
         task.routes.javascript.TaskController.removeTaskQueue
       )
     ).as(JAVASCRIPT)
