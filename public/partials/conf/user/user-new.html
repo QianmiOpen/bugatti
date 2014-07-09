@@ -68,13 +68,13 @@
                     <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.env" ng-true-value="3" ng-false-value="0" > 环境管理</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.project" ng-true-value="4" ng-false-value="0" > 项目管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-change="projectChecked(permission)" ng-model="permission.project" ng-true-value="4" ng-false-value="0" > 项目管理</label>
                 </p>
                 <p class="list-group-item">
                     <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.relation" ng-true-value="5" ng-false-value="0" > 关系配置</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-change="taskChecked(permission.task, permission.user)" ng-model="permission.task" ng-true-value="6" ng-false-value="0" > 任务管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-change="taskChecked(permission)" ng-model="permission.task" ng-true-value="6" ng-false-value="0" > 任务管理</label>
                 </p>
             </div>
         </div>
