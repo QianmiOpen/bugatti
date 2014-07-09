@@ -76,28 +76,4 @@ object UserController extends BaseController {
     )
   }
 
-  // ---------------------------------------------------
-  // 项目和环境资源权限
-  // ---------------------------------------------------
-  def hasProject(projectId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin) true
-    else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
-      case Some(member) if member.pid == projectId => true
-      case _ => false
-    }
-  }
-
-  def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin) true
-    else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
-      case Some(member) if member.pid == projectId =>
-        EnvironmentHelper.findById(envId) match {
-          case Some(env) if env.level == LevelEnum.safe => if (member.level == env.level) true else false
-          case Some(env) if env.level == LevelEnum.unsafe => true
-          case None => false
-        }
-      case _ => false
-    }
-  }
-
 }

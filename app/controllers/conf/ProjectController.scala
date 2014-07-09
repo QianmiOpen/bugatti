@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{FuncEnum, LevelEnum}
+import enums.{RoleEnum, FuncEnum, LevelEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
@@ -39,13 +39,13 @@ object ProjectController extends BaseController {
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(my: Boolean, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
-    val jobNo = if (my) Some("of546") else None
+  def index(my: Boolean, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) { implicit request =>
+    val jobNo = if (my) Some(request.user.jobNo) else None
     Ok(Json.toJson(ProjectHelper.all(jobNo, page, pageSize)))
   }
 
-  def count(my: Boolean) = AuthAction(FuncEnum.project) {
-    val jobNo = if (my) Some("of546") else None
+  def count(my: Boolean) = AuthAction(FuncEnum.project) { implicit request =>
+    val jobNo = if (my) Some(request.user.jobNo) else None
     Ok(Json.toJson(ProjectHelper.count(jobNo)))
   }
 
@@ -53,18 +53,19 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.findById(id)))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project) {
-    ProjectHelper.findById(id) match {
-      case Some(project) =>
-        // todo permission
-        project.subTotal match {
-          case 0 =>
-            Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
-          case _ =>
-            Ok(Json.obj("r" -> "exist"))
-        }
-      case None =>
-        Ok(Json.obj("r" -> "none"))
+  def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+    if (!UserHelper.hasProject(id, request.user)) Forbidden
+    else
+      ProjectHelper.findById(id) match {
+        case Some(project) =>
+            project.subTotal match {
+              case 0 =>
+                Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
+              case _ =>
+                Ok(Json.obj("r" -> "exist"))
+            }
+        case None =>
+          Ok(Json.obj("r" -> "none"))
     }
 
   }
