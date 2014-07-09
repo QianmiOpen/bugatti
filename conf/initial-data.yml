@@ -38,8 +38,6 @@ templates:
         css: glyphicon glyphicon-import
         versionMenu: True
         steps:
-          - name: 加固os
-            sls: "salt {{machine}} state.sls os.security"
           - name: 安装ntp服务
             sls: "salt {{machine}} state.sls ntp"
           - name: 安装java
@@ -48,8 +46,6 @@ templates:
           - name: 安装tomcat
             sls: "salt {{machine}} state.sls tomcat.install"
             seconds: 6
-          - name: mount log目录
-            sls: "salt {{machine}} state.sls webapp.mountlog pillar='{webapp: {nfsServer: {{nfsServer}}, projectName: {{projectName}}}}'"
           - name: 部署war包
             sls: "salt {{machine}} state.sls webapp.deploy pillar='{webapp: {groupId: {{groupId}}, artifactId: {{artifactId}}, version: {{version}}, repository: {{repository}}, unzip: {{unpacked}}}}'"
           - name: 同步配置文件到gitfs
