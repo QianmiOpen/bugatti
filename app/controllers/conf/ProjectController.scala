@@ -109,8 +109,9 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(MemberHelper.findByPid(pid)))
   }
 
-  def saveMember(pid: Int, jobNo: String) = AuthAction(FuncEnum.project) {
-    UserHelper.findByJobNo(jobNo) match {
+  def saveMember(pid: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
+    if (!UserHelper.hasProjectSafe(pid, request.user)) Forbidden
+    else UserHelper.findByJobNo(jobNo) match {
       case Some(_) =>
         Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(Member(None, pid, LevelEnum.unsafe, jobNo)))))
       case _ =>
@@ -118,14 +119,16 @@ object ProjectController extends BaseController {
     }
   }
 
-  def updateMember(mid: Int, op: String) = AuthAction(FuncEnum.project) {
+  def updateMember(mid: Int, op: String) = AuthAction(FuncEnum.project) { implicit request =>
     MemberHelper.findById(mid) match {
-      case Some(member) => op match {
-        case "up" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.safe))))
-        case "down" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.unsafe))))
-        case "remove" => Ok(Json.obj("r" -> MemberHelper.delete(mid)))
-        case _ => BadRequest
-      }
+      case Some(member) =>
+        if (request.user.role == RoleEnum.admin || member.level == LevelEnum.safe) op match {
+          case "up" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.safe))))
+          case "down" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.unsafe))))
+          case "remove" => Ok(Json.obj("r" -> MemberHelper.delete(mid)))
+          case _ => BadRequest
+        }
+        else Forbidden
       case None => NotFound
     }
   }
@@ -144,7 +147,6 @@ object ProjectController extends BaseController {
     )(VerForm.apply)(VerForm.unapply)
   )
 
-  // todo
   lazy val authToken = app.configuration.getString("auth.token").getOrElse("bugatti")
 
   /**
