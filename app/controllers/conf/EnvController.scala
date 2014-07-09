@@ -1,7 +1,7 @@
 package controllers.conf
 
-import enums.LevelEnum
-import models.conf.{Environment, EnvironmentHelper}
+import enums.{RoleEnum, LevelEnum}
+import models.conf.{UserHelper, Environment, EnvironmentHelper}
 import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json._
@@ -39,6 +39,23 @@ object EnvController extends Controller {
     Ok(Json.toJson(EnvironmentHelper.all()))
   }
 
+  def showAuth(userName: String) = Action {
+    var seq = Seq.empty[Environment]
+    UserHelper.findByJobNo(userName) match {
+      case Some(user) => {
+        user.role match {
+          case RoleEnum.user => {
+            seq = EnvironmentHelper.findUnsafe()
+          }
+          case RoleEnum.admin => {
+            seq = EnvironmentHelper.all()
+          }
+        }
+      }
+      case _ =>
+    }
+    Ok(Json.toJson(seq))
+  }
   def count = Action {
     Ok(Json.toJson(EnvironmentHelper.count))
   }

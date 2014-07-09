@@ -106,6 +106,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.EnvController.save,
         conf.routes.javascript.EnvController.update,
         conf.routes.javascript.EnvController.delete,
+        conf.routes.javascript.EnvController.showAuth,
 
         // project
         conf.routes.javascript.ProjectController.show,

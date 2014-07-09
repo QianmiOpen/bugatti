@@ -4,15 +4,17 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.task.taskModule', []);
 
-    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService','$state', '$stateParams', '$interval',function($scope,TaskService,EnvService,ProjectService,$state,$stateParams, $interval) {
+    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService','$state', '$stateParams', '$interval', 'Auth', function($scope,TaskService,EnvService,ProjectService,$state,$stateParams, $interval, Auth) {
+        $scope.user = Auth.user;
+        console.log($scope.user)
 //=====================================变量========================================
         $scope.projectStatus = []
 
         $scope.versions = []
 
 //=====================================环境========================================
-        //环境列表
-        EnvService.getAll(function(data){
+        //环境列表(根据用户类型判断是否显示安全区环境)
+        EnvService.getAuth($scope.user.username, function(data){
             $scope.envs = [];
             for(var d in data){
                 $scope.envs.push(data[d])
