@@ -11,7 +11,8 @@ import play.api.data.Forms._
 import play.api.mvc._
 import play.api.libs.json._
 /**
- * 关系
+ * 项目于环境关系配置
+ * @author of546
  */
 object RelationController extends BaseController {
   implicit val relationWrites = Json.writes[EnvironmentProjectRel]

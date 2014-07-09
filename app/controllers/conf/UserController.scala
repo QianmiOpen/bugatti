@@ -2,7 +2,7 @@ package controllers.conf
 
 import controllers.BaseController
 import controllers.conf.RelationController._
-import enums.{FuncEnum, RoleEnum}
+import enums.{LevelEnum, FuncEnum, RoleEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
