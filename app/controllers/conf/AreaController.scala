@@ -1,13 +1,12 @@
 package controllers.conf
 
 import controllers.BaseController
-import controllers.conf.EnvController._
 import enums.FuncEnum
 import models.conf.{AreaInfo, AreaHelper, Area}
+import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller}
 import utils.SaltTools
 
 /**
@@ -27,11 +26,11 @@ object AreaController extends BaseController {
     )(Area.apply)(Area.unapply)
   )
 
-  def all = AuthAction(FuncEnum.area) {
+  def all = Action {
     Ok(Json.toJson(AreaHelper.allInfo))
   }
 
-  def get(id: Int) = AuthAction(FuncEnum.area) {
+  def get(id: Int) = Action {
     Ok(Json.toJson(AreaHelper.findInfoById(id)))
   }
 

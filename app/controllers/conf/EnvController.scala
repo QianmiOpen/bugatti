@@ -1,7 +1,7 @@
 package controllers.conf
 
 import enums.{RoleEnum}
-import models.conf.{MemberHelper, UserHelper, Environment, EnvironmentHelper}
+import models.conf.{MemberHelper, Environment, EnvironmentHelper}
 import play.api.mvc._
 import controllers.BaseController
 import enums.{FuncEnum, LevelEnum}
@@ -28,16 +28,20 @@ object EnvController extends BaseController {
     )(Environment.apply)(Environment.unapply)
   )
 
-  def show(id: Int) = AuthAction(FuncEnum.env) {
+  def show(id: Int) = Action {
     Ok(Json.toJson(EnvironmentHelper.findById(id)))
   }
 
-  def index(page: Int, pageSize: Int) = AuthAction(FuncEnum.env) {
+  def index(page: Int, pageSize: Int) = Action {
     Ok(Json.toJson(EnvironmentHelper.all(page, pageSize)))
   }
 
-  def all = AuthAction(FuncEnum.env) {
+  def all = Action {
     Ok(Json.toJson(EnvironmentHelper.all()))
+  }
+
+  def count = Action {
+    Ok(Json.toJson(EnvironmentHelper.count))
   }
 
   def showAuth = AuthAction(FuncEnum.env) { implicit request =>
@@ -51,10 +55,6 @@ object EnvController extends BaseController {
       seq = EnvironmentHelper.findUnsafe()
     }
     Ok(Json.toJson(seq))
-  }
-
-  def count = AuthAction(FuncEnum.env) {
-    Ok(Json.toJson(EnvironmentHelper.count))
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.env) {

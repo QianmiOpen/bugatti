@@ -49,8 +49,12 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.count(jobNo)))
   }
 
-  def show(id: Int) = AuthAction(FuncEnum.project) {
+  def show(id: Int) = Action {
     Ok(Json.toJson(ProjectHelper.findById(id)))
+  }
+
+  def all = Action {
+    Ok(Json.toJson(ProjectHelper.all()))
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
@@ -87,10 +91,6 @@ object ProjectController extends BaseController {
         else Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
       }
     )
-  }
-
-  def all = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(ProjectHelper.all()))
   }
 
   def showAuth = AuthAction(FuncEnum.project) { implicit request =>

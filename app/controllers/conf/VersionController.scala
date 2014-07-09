@@ -1,11 +1,9 @@
 package controllers.conf
 
 import controllers.BaseController
-import controllers.conf.UserController._
 import enums.FuncEnum
 import models.conf._
 import org.joda.time.DateTime
-import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
@@ -29,19 +27,19 @@ object VersionController extends BaseController {
     )(Version.apply)(Version.unapply)
   )
 
-  def show(id: Int) = AuthAction(FuncEnum.project) {
+  def show(id: Int) = Action {
     Ok(Json.toJson(VersionHelper.findById(id)))
   }
 
-  def index(pid: Int, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
+  def index(pid: Int, page: Int, pageSize: Int) = Action {
     Ok(Json.toJson(VersionHelper.all(pid, page, pageSize)))
   }
 
-  def count(pid: Int) = AuthAction(FuncEnum.project) {
+  def count(pid: Int) = Action {
     Ok(Json.toJson(VersionHelper.count(pid)))
   }
 
-  def all(pid: Int, top: Int) = AuthAction(FuncEnum.project) {
+  def all(pid: Int, top: Int) = Action {
     Ok(Json.toJson(VersionHelper.all(pid, top)))
   }
 

@@ -1,10 +1,8 @@
 package controllers.conf
 
 import controllers.BaseController
-import controllers.conf.RelationController._
-import enums.{LevelEnum, FuncEnum, RoleEnum}
+import enums.{FuncEnum, RoleEnum}
 import models.conf._
-import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
@@ -33,19 +31,19 @@ object UserController extends BaseController {
     )(UserForm.apply)(UserForm.unapply)
   )
 
-  def show(jobNo: String) = AuthAction(FuncEnum.user) {
+  def show(jobNo: String) = Action {
     Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
   }
 
-  def index(page: Int, pageSize: Int) = AuthAction(FuncEnum.user) {
+  def index(page: Int, pageSize: Int) = Action {
     Ok(Json.toJson(UserHelper.all(page, pageSize)))
   }
 
-  def count = AuthAction(FuncEnum.user) {
+  def count = Action {
     Ok(Json.toJson(UserHelper.count))
   }
 
-  def permissions(jobNo: String) = AuthAction(FuncEnum.user) {
+  def permissions(jobNo: String) = Action {
     Ok(Json.toJson(PermissionHelper.findByJobNo(jobNo)))
   }
 
