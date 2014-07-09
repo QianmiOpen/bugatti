@@ -54,7 +54,7 @@ object ProjectController extends BaseController {
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
-    if (!UserHelper.hasProject(id, request.user)) Forbidden
+    if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
     else
       ProjectHelper.findById(id) match {
         case Some(project) => project.subTotal match {
@@ -83,7 +83,7 @@ object ProjectController extends BaseController {
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
-        if (!UserHelper.hasProject(id, request.user)) Forbidden
+        if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
         else Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
       }
     )
