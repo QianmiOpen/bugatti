@@ -118,7 +118,10 @@ object TaskProcess {
 //    val file = new File(s"${baseDir}/.bugatti")
 //    file.getParentFile.mkdirs()
 //    file.createNewFile()
-
+    val file = new File(s"${baseDir}/files")
+    if(!file.exists()) {
+      file.mkdirs()
+    }
     if (confSeq.size > 0) {
       confSeq.foreach { xf =>
         val confContent = ConfContentHelper.findById(xf.id.get)
