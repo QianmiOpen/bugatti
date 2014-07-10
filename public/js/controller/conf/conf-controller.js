@@ -67,6 +67,7 @@ define(['angular'], function(angular) {
                 });
 
                 modalInstance.result.then(function (param) {
+                    param.pid = $stateParams.id;
                     var thisEid = param.eid;
                     ConfService.copy(angular.toJson(param), function(data) {
                         if (data.r === 'ok') {
@@ -176,6 +177,7 @@ define(['angular'], function(angular) {
                 var fileName = $scope.conf ? $scope.conf.name : undefined;
                 if (fileName) {
                     var suffix = fileName.substring(fileName.lastIndexOf('.') + 1);
+                    if (suffix == 'conf') {suffix = 'properties'}
                     suffix = "ace/mode/" + suffix;
                     _session.setMode(suffix);
                 }
