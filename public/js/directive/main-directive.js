@@ -130,9 +130,7 @@ define(['angular'], function(angular) {
                     }
                     else if (Auth.user.role === 'user') {
                         ProjectService.member(pid, Auth.user.username, function(member) {
-                            if (member != null && member.level == 'safe') {
-                                $scope.hasProject_ = true;
-                            }
+                            $scope.hasProject_ = true;
                         })
                     }
                 }
@@ -140,4 +138,31 @@ define(['angular'], function(angular) {
         }
     }]);
 
+
+
+    app.directive('hasProjectSafe', ['Auth', 'ProjectService', function(Auth, ProjectService) {
+        return {
+            restrict: 'A',
+            scope: false,
+            link: function($scope, element, attrs) {
+                $scope.hasProjectSafe_ = false;
+
+                attrs.$observe('hasProjectSafe', function(pid) {
+                    updateCSS(pid)
+                });
+                function updateCSS(pid) {
+                    if (Auth.user.role === 'admin') {
+                        $scope.hasProjectSafe_ = true;
+                    }
+                    else if (Auth.user.role === 'user') {
+                        ProjectService.member(pid, Auth.user.username, function(member) {
+                            if (member != null && member.level == 'safe') {
+                                $scope.hasProjectSafe_ = true;
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }]);
 });

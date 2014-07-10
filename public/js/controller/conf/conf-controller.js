@@ -84,10 +84,10 @@ define(['angular'], function(angular) {
     var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, curr_eid, curr_vid) {
 
         $scope.envs = envs;
-        $scope.env = $scope.envs[0].id;
+        if ($scope.envs.length) $scope.env = $scope.envs[0].id;
 
         $scope.versions = versions;
-        $scope.version = $scope.versions[0].id;
+        if ($scope.versions.length) $scope.version = $scope.versions[0].id;
 
         $scope.override = false;
 
@@ -168,6 +168,17 @@ define(['angular'], function(angular) {
                         alert('删除失败！')
                     }
                 });
+            };
+
+            $scope.aceLoaded = function(_editor) {
+                // Editor part
+                var _session = _editor.getSession();
+                var fileName = $scope.conf ? $scope.conf.name : undefined;
+                if (fileName) {
+                    var suffix = fileName.substring(fileName.lastIndexOf('.') + 1);
+                    suffix = "ace/mode/" + suffix;
+                    _session.setMode(suffix);
+                }
             };
     }]);
 

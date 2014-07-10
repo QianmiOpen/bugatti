@@ -115,7 +115,7 @@ object AppData {
       User("of546", "李允恒", RoleEnum.admin, false, None, None),
       User("of557", "彭毅", RoleEnum.admin, false, None, None),
       User("of729", "金卫", RoleEnum.admin, false, None, None),
-      User("of999", "龚平", RoleEnum.admin, false, None, None)
+      User("of9999", "龚平", RoleEnum.admin, false, None, None)
     ).foreach(U.insert)
   }
 

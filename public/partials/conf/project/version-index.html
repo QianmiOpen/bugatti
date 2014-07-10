@@ -1,5 +1,5 @@
 <div class="page-header clearfix">
-    <button class="btn btn-primary pull-right" ui-sref="conf.project.version.create">新增</button></td>
+    <button has-project-safe="{{$stateParams.id}}" ng-show="hasProjectSafe_" class="btn btn-primary pull-right" ui-sref="conf.project.version.create">新增</button></td>
     <h1 class="pull-left m0">项目版本</h1>
 </div>
 
@@ -8,7 +8,7 @@
      的历史版本:</h3>
 
 <div class="table-responsive">
-    <table class="table table-striped table-hover table-fixed">
+    <table class="table table-striped table-hover table-fixed" has-project-safe="{{$stateParams.id}}">
         <thead>
         <tr>
             <th width="10%">版本编号</th>
@@ -22,7 +22,7 @@
             <td>{{version.id}}</td>
             <td>{{version.vs}}</td>
             <td>{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-            <td>
+            <td ng-show="hasProjectSafe_">
                 <a ui-sref="conf.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(version.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>

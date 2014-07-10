@@ -44,15 +44,23 @@ object ConfController extends BaseController {
     Ok(Json.toJson(ConfHelper.findByEid_Vid(eid, vid)))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(ConfHelper.delete(id)))
+  def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+    ConfHelper.findById(id) match {
+      case Some(conf) =>
+        if (!UserHelper.hasProjectInEnv(conf.pid, conf.eid, request.user)) Forbidden
+        else Ok(Json.toJson(ConfHelper.delete(id)))
+      case None =>
+        NotFound
+    }
+
   }
 
   def save = AuthAction(FuncEnum.project) { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
-        Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
+        if (!UserHelper.hasProjectInEnv(confForm.pid, confForm.eid, request.user)) Forbidden
+        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
@@ -61,7 +69,8 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
-        Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
+        if (!UserHelper.hasProjectInEnv(confForm.pid, confForm.eid, request.user)) Forbidden
+        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
@@ -108,6 +117,8 @@ object ConfController extends BaseController {
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       copyForm => {
+//        if (!UserHelper.hasProjectInEnv(copyForm.pid, copyForm.eid, request.user)) Forbidden
+
         if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) {
           Ok(Json.obj("r" -> "exist"))
         } else {

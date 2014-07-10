@@ -43,12 +43,11 @@ object VersionController extends BaseController {
     Ok(Json.toJson(VersionHelper.all(pid, top)))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project) {
+  def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     VersionHelper.findById(id) match {
       case Some(version) =>
-        // todo  version permission, return Forbidden
-
-        ConfHelper.findByVid(id).isEmpty match {
+        if (!UserHelper.hasProjectSafe(version.pid, request.user)) Forbidden
+        else ConfHelper.findByVid(id).isEmpty match {
           case true =>
             Ok(Json.obj("r" -> Json.toJson(VersionHelper.delete(version))))
           case false =>
@@ -63,7 +62,8 @@ object VersionController extends BaseController {
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
-        VersionHelper.findByPid(versionForm.pid).find(_.vs == versionForm.vs) match {
+        if (!UserHelper.hasProjectSafe(versionForm.pid, request.user)) Forbidden
+        else  VersionHelper.findByPid(versionForm.pid).find(_.vs == versionForm.vs) match {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
@@ -77,7 +77,8 @@ object VersionController extends BaseController {
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
-        VersionHelper.findByPid(versionForm.pid)
+        if (!UserHelper.hasProjectSafe(versionForm.pid, request.user)) Forbidden
+        else VersionHelper.findByPid(versionForm.pid)
           .filterNot(_.id == versionForm.id) // Some(id)
           .find(_.vs == versionForm.vs) match {
           case Some(_) =>
