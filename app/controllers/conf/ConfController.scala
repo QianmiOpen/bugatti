@@ -103,13 +103,14 @@ object ConfController extends BaseController {
   // ===========================================================================
   // 一键拷贝, todo 无事务，后期改造为队列
   // ===========================================================================
-  case class CopyForm(target_eid: Int, target_vid: Int, eid: Int, vid: Int, ovr: Boolean)
+  case class CopyForm(target_eid: Int, target_vid: Int, eid: Int, vid: Int, pid: Int, ovr: Boolean)
   val copyForm = Form(
     mapping(
       "target_eid" -> number,
       "target_vid" -> number,
       "eid" -> number,
       "vid" -> number,
+      "pid" -> number,
       "ovr" -> default(boolean, false)
     )(CopyForm.apply)(CopyForm.unapply)
   )
@@ -117,9 +118,8 @@ object ConfController extends BaseController {
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       copyForm => {
-//        if (!UserHelper.hasProjectInEnv(copyForm.pid, copyForm.eid, request.user)) Forbidden
-
-        if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) {
+        if (!UserHelper.hasProjectInEnv(copyForm.pid, copyForm.eid, request.user)) Forbidden
+        else if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) {
           Ok(Json.obj("r" -> "exist"))
         } else {
           val targetConfs = ConfHelper.findByEid_Vid(copyForm.target_eid, copyForm.target_vid)
