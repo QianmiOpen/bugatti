@@ -32,7 +32,7 @@ object TemplateItemHelper extends PlayCache {
   }
 
   def findByTid(tid: Int): Seq[TemplateItem] = db withSession { implicit session =>
-    qItem.where(_.tid is tid).list
+    qItem.sortBy(_.order asc).where(_.tid is tid).list
   }
 
   def create(templateInfo: TemplateItem) = db withSession { implicit session =>
