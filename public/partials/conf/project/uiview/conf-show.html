@@ -7,11 +7,10 @@
 
 <div class="clearfix"></div>
 
-<div class="col-sm-10">
+<div class="col-sm-10" ng-if="conf.name">
     <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
-          mode: 'properties',
           onLoad: aceLoaded,
           onChange: aceChanged
         }" ng-model="conf.content" readonly="true"></div>

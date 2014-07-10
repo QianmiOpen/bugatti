@@ -169,6 +169,17 @@ define(['angular'], function(angular) {
                     }
                 });
             };
+
+            $scope.aceLoaded = function(_editor) {
+                // Editor part
+                var _session = _editor.getSession();
+                var fileName = $scope.conf ? $scope.conf.name : undefined;
+                if (fileName) {
+                    var suffix = fileName.substring(fileName.lastIndexOf('.') + 1);
+                    suffix = "ace/mode/" + suffix;
+                    _session.setMode(suffix);
+                }
+            };
     }]);
 
     app.controller('ConfEditCtrl', ['$scope', '$state', '$filter', '$stateParams', '$modal',
