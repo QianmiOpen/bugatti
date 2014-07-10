@@ -179,7 +179,7 @@ object ProjectController extends BaseController {
           ProjectHelper.findByName(verData.projectName) match {
             case Some(project) =>
               VersionHelper.findByPid_Vs(project.id.get, verData.version) match {
-                case Some(_) => Ok(Json.obj("r" -> "exist"))
+                case Some(_) => Conflict(Json.obj("r" -> "exist"))
                 case None =>
                   VersionHelper.create(Version(None, project.id.get, verData.version, DateTime.now()))
                   Ok(Json.obj("r" -> "ok"))

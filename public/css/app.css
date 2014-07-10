@@ -122,6 +122,35 @@ code {
 }
 
 
+.bs-callout {
+    padding:20px;
+    border:1px solid #eee;
+    border-left-width:5px;
+    border-radius:3px
+}
+.bs-callout h1 {
+    font-size: 28px;
+    margin-top:0;
+    margin-bottom:5px;
+}
+.bs-callout hr {
+    margin: 10px 0;
+}
+.bs-callout table {
+    width: auto;
+}
+.bs-callout p:last-child {
+    margin-bottom:0
+}
+.bs-callout code {
+    border-radius:3px
+}
+.bs-callout+.bs-callout {
+    margin-top:-5px
+}
+.bs-callout-danger {
+    border-left-color:#428bca
+}
 
 /*
  * Sidebar
