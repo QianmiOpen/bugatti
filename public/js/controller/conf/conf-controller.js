@@ -84,10 +84,10 @@ define(['angular'], function(angular) {
     var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, curr_eid, curr_vid) {
 
         $scope.envs = envs;
-        $scope.env = $scope.envs[0].id;
+        if ($scope.envs.length) $scope.env = $scope.envs[0].id;
 
         $scope.versions = versions;
-        $scope.version = $scope.versions[0].id;
+        if ($scope.versions.length) $scope.version = $scope.versions[0].id;
 
         $scope.override = false;
 
