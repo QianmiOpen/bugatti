@@ -113,5 +113,7 @@ POST          /v1/project/version                 controllers.conf.ProjectContro
 
 GET           /javascriptRoutes                   controllers.Application.javascriptRoutes
 
+GET           /pkgs/*pkg                          controllers.Application.pkgs(pkg: String)
+
 # Map static resources from the /public folder to the / URL path, webjar
 GET           /*file                              controllers.Assets.at(path="/public", file)
