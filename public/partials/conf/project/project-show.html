@@ -84,7 +84,7 @@
     }
 </style>
 
-<div ng-if="project.id" has-project="{{project.id}}">
+<div ng-if="project.id" has-project-safe="{{project.id}}">
 <div class="panel panel-default">
     <div class="panel-heading">委员长
         <sup class="btn-info" href="" tooltip-placement="right" tooltip="“委员长” 一个有趣称呼，即：项目所有人、管理者。【环境】标示为'安全'情况下，仅项目所有人可操作!">?</sup>
@@ -94,7 +94,7 @@
             <li ng-repeat="m in members" ng-if="m.level == 'safe'">
                 <div class="pic">
                     <img src="/img/user_normal.jpg" alt="test"/>
-                    <div class="u_actions" ng-show="hasProject_">
+                    <div class="u_actions" ng-show="hasProjectSafe_">
                         <span class="gact" title="降为成员">
                             <a href="" ng-click="memberDown(m.id, '真的要把' + m.jobNo + '降为委员？')" title="把{{m.jobNo}}降为委员">v</a>
                         </span><br/><br/><br/>
@@ -112,7 +112,7 @@
     <div class="panel-heading">
         委员
         &nbsp;&nbsp;
-        <input ng-show="hasProject_" type="text" ng-model="searchMember.jobNo"><button  ng-show="hasProject_" ng-click="addMember(searchMember.jobNo)" type="button" class="btn btn-link">+</button>
+        <input ng-show="hasProjectSafe_" type="text" ng-model="searchMember.jobNo"><button  ng-show="hasProjectSafe_" ng-click="addMember(searchMember.jobNo)" type="button" class="btn btn-link">+</button>
         <div class="has-error">
             <span ng-show="jobNo$error" class="control-label">{{jobNo$error}}</span>
         </div>
@@ -123,7 +123,7 @@
             <li ng-repeat="m in members | filter:searchMember" ng-if="m.level == 'unsafe'">
                 <div class="pic">
                     <img src="/img/user_normal.jpg" alt="test"/>
-                    <div class="u_actions" ng-show="hasProject_">
+                    <div class="u_actions" ng-show="hasProjectSafe_">
                         <span class="gact" title="提升为管理员">
                             <a href="" ng-click="memberUp(m.id, '真的要把' + m.jobNo + '提升为委员长？')" title="把{{m.jobNo}}提升为委员长">^</a>
                         </span><br/>
