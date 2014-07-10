@@ -64,7 +64,8 @@ object TaskProcess {
 
   def generateStatusJson(envId: Int, projectId: Int, currentNum: Int, totalNum: Int, sls: String, machine: String, status: Int, taskName: String) = {
     val key = s"${envId}_${projectId}"
-    val json = Json.obj("currentNum" -> currentNum, "totalNum" -> totalNum, "sls" -> sls, "machine" -> machine, "status" -> status, "taskName" -> taskName)
+    val json = Json.obj("currentNum" -> currentNum, "totalNum" -> totalNum, "sls" -> sls, "machine" -> machine, "status" -> status, "taskName" -> taskName, "task" -> Json.obj())
+    Logger.info("68 =>" + json)
     generateJson(key, json)
   }
 
@@ -83,7 +84,7 @@ object TaskProcess {
 
   def changeAllStatus(js: JsObject): JsValue = {
     statusMap = statusMap ++ js
-    Logger.info(statusMap.toString())
+    Logger.info("changeAllStatus ==>"+statusMap.toString())
     statusMap
   }
 
@@ -100,7 +101,7 @@ object TaskProcess {
   def createNewTask(tq: TaskQueue): Int = {
     val taskQueueId = TaskQueueHelper.add(tq)
     //更新队列任务信息
-    checkQueueNum(tq)
+    checkQueueNum(tq.envId, tq.projectId)
     //发送到指定 actor mailbox
     executeTasks(tq.envId, tq.projectId)
     taskQueueId
@@ -131,21 +132,22 @@ object TaskProcess {
     GitHelp.push(s"push ${appName} job, id is ${taskId}")
   }
 
-  def checkQueueNum(tq: TaskQueue) = {
+  def checkQueueNum(envId: Int, projectId: Int) = {
     //1、获取队列中等待执行TaskWait的任务个数
-    val waitNum = TaskQueueHelper.findQueueNum(tq)
-    val list = TaskQueueHelper.findQueues(tq)
+    val waitNum = TaskQueueHelper.findQueueNum(envId, projectId)
+    val list = TaskQueueHelper.findQueues(envId, projectId)
     Logger.info(s"waitNum ==> ${waitNum}")
     //2、更改任务状态
-    generateQueueNumJson(tq, waitNum, list)
+    generateQueueNumJson(envId, projectId, waitNum, list)
     //3、推送任务状态
     pushStatus()
   }
 
-  def generateQueueNumJson(tq: TaskQueue, num: Int, list: List[TaskQueue]) {
-    val key = s"${tq.envId}_${tq.projectId}"
+  def generateQueueNumJson(envId: Int, projectId: Int, num: Int, list: List[TaskQueue]){
+    val key = s"${envId}_${projectId}"
+    Logger.info("149=>"+num)
     generateJson(key, Json.obj("queueNum" -> num))
-    val listJson: List[JsObject] = list.map {
+    val listJson: List[JsObject] = list.map{
       x =>
         var json = Json.toJson(x)
         json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.getById(x.taskTemplateId).name)
@@ -154,37 +156,38 @@ object TaskProcess {
     generateJson(key, Json.obj("queues" -> listJson))
   }
 
-  def generateJson(key: String, json: JsObject) {
+  def generateJson(key: String, json: JsObject){
+    Logger.info("generateJson ==>"+json)
     val status = (statusMap \ key).asOpt[JsObject]
-    if (status != None) {
+    if(status != None){
       val result = status.get ++ json
       changeAllStatus(Json.obj(key -> result))
       Logger.info(s"status ==> ${result.toString()}")
     }
-    else {
+    else{
       changeAllStatus(Json.obj(key -> json))
       Logger.info(s"status ==> ${json}")
     }
   }
 
-  def join(): scala.concurrent.Future[(Iteratee[JsValue, _], Enumerator[JsValue])] = {
+  def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     val js: JsValue = getAllStatus
-    (socketActor ? JoinProcess(js)).map {
+    (socketActor ? JoinProcess(js)).map{
       case ConnectedSocket(out) => {
-        val in = Iteratee.foreach[JsValue] { event =>
+        val in = Iteratee.foreach[JsValue]{ event =>
           //这个是为了client主动调用
           socketActor ! AllTaskStatus()
-        }.map { _ =>
+        }.map{ _ =>
           socketActor ! QuitProcess()
         }
         (in, out)
       }
-      case CannotConnect(error) => {
-        val iteratee = Done[JsValue, Unit]((), Input.EOF)
+      case CannotConnect(error) =>{
+        val iteratee = Done[JsValue,Unit]((),Input.EOF)
         // Send an error and close the socket
-        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
+        val enumerator =  Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
 
-        (iteratee, enumerator)
+        (iteratee,enumerator)
       }
     }
   }
@@ -229,20 +232,20 @@ class TaskProcess extends Actor {
       //3.1、队列表中获取最先执行的任务；
       var taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
       var taskName = ""
-      while (taskQueue != null) {
-        taskName = TaskTemplateHelper.getById(taskQueue.taskTemplateId).name
+      while(taskQueue != None){
+        taskName = TaskTemplateHelper.getById(taskQueue.get.taskTemplateId).name
         //3.2、insert到任务表 & 命令表；
-        val taskId = TaskHelper.addByTaskQueue(taskQueue)
+        val taskId = TaskHelper.addByTaskQueue(taskQueue.get)
         //更新队列任务信息
-        TaskProcess.checkQueueNum(taskQueue)
+        TaskProcess.checkQueueNum(taskQueue.get.envId, taskQueue.get.projectId)
         //3.3、依次执行命令(insert命令列表，依次执行，修改数据库状态，修改内存状态)；
         val params = TaskProcess.getAllParams
-        val (commandList, paramsJson) = generateCommands(taskId, taskQueue, params)
-        //        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
+        val (commandList, paramsJson) = generateCommands(taskId, taskQueue.get, params)
+//        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
         TaskCommandHelper.addCommands(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
-        if (executeCommand(commandList, envId, projectId, taskId, taskName, paramsJson)) {
+        if(executeCommand(commandList, envId, projectId, taskId, taskName, paramsJson)){
           //任务执行成功
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskSuccess)
         }
@@ -251,17 +254,19 @@ class TaskProcess extends Actor {
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskFailed)
         }
         //删除队列taskQueue相应记录
-        TaskQueueHelper.remove(taskQueue)
+        TaskQueueHelper.remove(taskQueue.get)
         //更新statusMap中的queues信息
-        TaskProcess.checkQueueNum(taskQueue)
+        TaskProcess.checkQueueNum(taskQueue.get.envId, taskQueue.get.projectId)
         //3.6、返回到3.1执行；
         taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
       }
-      // 推送任务状态
-      val taskStatus: JsValue = Json.toJson(TaskHelper.findLastStatusByProject(envId, projectId)(0))
-      Logger.info(s"JsValue ==> ${taskStatus}")
-      TaskProcess.generateTaskStatusJson(envId, projectId, taskStatus, taskName)
-      TaskProcess.pushStatus
+      if(taskName != ""){
+        // 推送任务状态
+        val taskStatus: JsValue = Json.toJson(TaskHelper.findLastStatusByProject(envId, projectId)(0))
+        Logger.info(s"JsValue ==> ${taskStatus}")
+        TaskProcess.generateTaskStatusJson(envId, projectId, taskStatus, taskName)
+        TaskProcess.pushStatus
+      }
       //no task no actor
       self ! RemoveActor(envId, projectId)
     }

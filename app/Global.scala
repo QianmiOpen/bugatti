@@ -1,5 +1,6 @@
 import java.io.{File, FileInputStream}
 
+import controllers.actor.TaskProcess
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
 import models.conf._
@@ -40,7 +41,6 @@ object Global extends GlobalSettings {
 
     val callbackUrl = app.configuration.getString("cas.callback_url").getOrElse("http://bugatti.dev.ofpay.com/callback")
     Config.setClients(new Clients(callbackUrl, casClient))
-
 
     if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
       AppDB.db.withSession { implicit session =>
@@ -95,6 +95,14 @@ object Global extends GlobalSettings {
     GitHelp.checkGitWorkDir(app)
     SaltTools.refreshHostList(app)
     SaltTools.baseLogPath(app)
+
+    //查看队列表中是否有可执行任务
+    val set = TaskQueueHelper.findEnvId_ProjectId()
+    set.foreach{
+      s =>
+        TaskProcess.checkQueueNum(s._1, s._2)
+        TaskProcess.executeTasks(s._1, s._2)
+    }
   }
 }
 

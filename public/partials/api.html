@@ -1,0 +1,65 @@
+<br/><br/><br/><br/>
+<div class="container">
+
+    <div class="row row-offcanvas row-offcanvas-right">
+
+        <div class="col-xs-12 col-sm-9">
+
+            <div class="bs-callout bs-callout-danger">
+                <h1>项目版本Api V1</h1>
+                <hr/>
+                <p>
+                    注意：目前接口不对外系统开放，仅支持Jenkins。
+                    <h3>添加项目版本</h3><hr/>
+                    <pre><code>POST  http://bugatti2.dev.ofpay.com/v1/project/version</code></pre>
+                    <table class="table table-striped table-bordered">
+                        <tr>
+                            <td>参数</td>
+                            <td>意义</td>
+                            <td>备注</td>
+                        </tr>
+                        <tr>
+                            <td>projectName</td>
+                            <td>项目名称</td>
+                            <td>必传，和系统保持一致</td>
+                        </tr>
+                        <tr>
+                            <td>groupId</td>
+                            <td>组件名</td>
+                            <td>必传，对应pom.xml中groupId</td>
+                        </tr>
+                        <tr>
+                            <td>artifactId</td>
+                            <td>工件名</td>
+                            <td>必传，对应pom.xml中artifactId</td>
+                        </tr>
+                        <tr>
+                            <td>version</td>
+                            <td>版本号</td>
+                            <td>必传，对应当前版本</td>
+                        </tr>
+                        <tr>
+                            <td>authToken</td>
+                            <td>系统分配的token值</td>
+                            <td>必传，系统双方约定的值</td>
+                        </tr>
+                    </table>
+                返回：
+<pre><code>    status=200，添加成功，{"r": "ok"}
+    status=400，参数格式错误
+    status=401，token错误
+    status=404，项目不存在
+    status=409，版本冲突，{"r": "exist"}</code></pre>
+                </p>
+            </div>
+
+        </div><!--/span-->
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            <div class="list-group">
+                <a ui-sref="api" class="list-group-item">项目版本</a>
+            </div>
+        </div><!--/span-->
+    </div><!--/row-->
+
+</div><!--/.container-->
