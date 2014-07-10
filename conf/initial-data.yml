@@ -22,74 +22,10 @@ templates:
         css: glyphicon glyphicon-upload
         versionMenu: True
         steps:
-          - name: 关闭应用
-            sls: "salt {{machine}} state.sls tomcat.shutdown"
-          - name: 部署war包
-            sls: "salt {{machine}} state.sls webapp.deploy pillar='{webapp: {groupId: {{groupId}}, artifactId: {{artifactId}}, version: {{version}}, repository: {{repository}}, unzip: {{unpacked}}}}'"
-          - name: 同步配置文件到gitfs
+          - name: 配置文件准备
             sls: "bugatti copyfile"
-          - name: 同步gitfs
-            sls: "salt {{syndic}} state.sls job.updategfs"
-          - name: 拷贝配置文件
-            sls: "salt {{machine}} state.sls job.copyfile pillar='{job: {appName: {{projectName}}, id: {{taskId}}}}'"
-          - name: 启动应用
-            sls: "salt {{machine}} state.sls tomcat.startup"
-      - name: 安装应用
-        css: glyphicon glyphicon-import
-        versionMenu: True
-        steps:
-          - name: 安装ntp服务
-            sls: "salt {{machine}} state.sls ntp"
-          - name: 安装java
-            sls: "salt {{machine}} state.sls java.install"
-            seconds: 10
-          - name: 安装tomcat
-            sls: "salt {{machine}} state.sls tomcat.install"
-            seconds: 6
-          - name: 部署war包
-            sls: "salt {{machine}} state.sls webapp.deploy pillar='{webapp: {groupId: {{groupId}}, artifactId: {{artifactId}}, version: {{version}}, repository: {{repository}}, unzip: {{unpacked}}}}'"
-          - name: 同步配置文件到gitfs
-            sls: "bugatti copyfile"
-          - name: 同步gitfs
-            sls: "salt {{syndic}} state.sls job.updategfs"
-          - name: 拷贝配置文件
-            sls: "salt {{machine}} state.sls job.copyfile pillar='{job: {appName: {{projectName}}, id: {{taskId}}}}'"
-          - name: 启动应用
-            sls: "salt {{machine}} state.sls tomcat.startup"
-      - name: 重启应用
-        css: glyphicon glyphicon-repeat
-        steps:
-          - name: 关闭应用
-            sls: "salt {{machine}} state.sls tomcat.shutdown"
-          - name: 启动应用
-            sls: "salt {{machine}} state.sls tomcat.startup"
-      - name: 启动应用
-        css: glyphicon glyphicon-play
-        steps:
-          - name: 启动应用
-            sls: "salt {{machine}} state.sls tomcat.startup"
-      - name: 停止应用
-        css: glyphicon glyphicon-stop
-        steps:
-          - name: 关闭应用
-            sls: "salt {{machine}} state.sls tomcat.shutdown"
-  - name: webui
-    remark: 用于前端web项目的自动部署，即web类项目
-    items:
-      - itemName: groupId
-        itemDesc: groupId
-      - itemName: artifactId
-        itemDesc: artifactId
-      - itemName: unpacked
-        itemDesc: 自动解压
-        default: 'False'
-    actions:
-      - name: 升级应用
-        css: glyphicon glyphicon-upload
-        versionMenu: True
-        steps:
-          - name: 同步gitfs
-            sls: "salt {{syndic}} state.sls job.updategfs"
+          - name: 同步配置文件到服务器
+            sls: "salt {{syndic}} state.sls job.updategfs pillar='{job: {appName: {{projectName}}, id: {{taskId}}}}'"
           - name: 关闭应用
             sls: "salt {{machine}} state.sls tomcat.shutdown"
           - name: 部署war包
@@ -102,8 +38,10 @@ templates:
         css: glyphicon glyphicon-import
         versionMenu: True
         steps:
-          - name: 同步gitfs
-            sls: "salt {{syndic}} state.sls job.updategfs"
+          - name: 配置文件准备
+            sls: "bugatti copyfile"
+          - name: 同步配置文件到服务器
+            sls: "salt {{syndic}} state.sls job.updategfs pillar='{job: {appName: {{projectName}}, id: {{taskId}}}}'"
           - name: 加固os
             sls: "salt {{machine}} state.sls os.security"
           - name: 安装ntp服务
@@ -118,6 +56,10 @@ templates:
             sls: "salt {{machine}} state.sls webapp.mountlog pillar='{webapp: {nfsServer: {{nfsServer}}, projectName: {{projectName}}}}'"
           - name: 部署war包
             sls: "salt {{machine}} state.sls webapp.deploy pillar='{webapp: {groupId: {{groupId}}, artifactId: {{artifactId}}, version: {{version}}, repository: {{repository}}, unzip: {{unpacked}}}}'"
+          - name: 同步配置文件到gitfs
+            sls: "bugatti copyfile"
+          - name: 同步gitfs
+            sls: "salt {{syndic}} state.sls job.updategfs"
           - name: 拷贝配置文件
             sls: "salt {{machine}} state.sls job.copyfile pillar='{job: {appName: {{projectName}}, id: {{taskId}}}}'"
           - name: 启动应用
