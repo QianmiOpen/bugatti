@@ -58,7 +58,7 @@ define(['angular',
                     success();
                 }).error(function(r) {
                     changeUser({username: '', role: '', permissions: []});
-                    error(r);
+                    error();
                 });
             },
             logout: function(success, error) {
