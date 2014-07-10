@@ -114,7 +114,6 @@ object TaskController extends Controller {
           case template => {
             tJson = tJson ++ Json.obj("taskName" -> template.name)
           }
-          case _ =>
         }
         tJson
       }
