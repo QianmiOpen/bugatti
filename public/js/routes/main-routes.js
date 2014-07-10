@@ -50,6 +50,18 @@ define(['angular',
             data: { access: 'task' }
         });
 
+        $stateProvider.state('api', {
+            url: "/api",
+            templateUrl: "partials/api.html",
+            data: { access: 'anon' }
+        });
+
+        $stateProvider.state('help', {
+            url: "/help",
+            templateUrl: "partials/help.html",
+            data: { access: 'anon' }
+        });
+
     }]);
 
 });

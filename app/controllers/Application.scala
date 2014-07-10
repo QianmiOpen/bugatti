@@ -38,7 +38,7 @@ object Application extends ScalaController with Security {
     Action { implicit request =>
       UserHelper.findByJobNo(profile.getId) match {
         case Some(user) if user.locked =>
-          Ok(html.template.ldap_callback_locked.render(siteDomain))
+          Locked(html.template.ldap_callback_locked.render(siteDomain))
         case Some(user) if user.role == RoleEnum.admin =>
           UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
           val token = java.util.UUID.randomUUID().toString
@@ -50,10 +50,10 @@ object Application extends ScalaController with Security {
               val token = java.util.UUID.randomUUID().toString
               Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> user.jobNo)
             case None =>
-              Ok(html.template.ldap_callback_error.render(siteDomain))
+              Forbidden(html.template.ldap_callback_forbidden.render(siteDomain))
           }
         case None =>
-          NotFound
+          NotFound(html.template.ldap_callback_none.render(siteDomain))
       }
     }
   }
