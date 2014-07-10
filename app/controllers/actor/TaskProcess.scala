@@ -133,9 +133,9 @@ object TaskProcess {
     Logger.info("baseDir ==>"+baseDir)
     Logger.info("fileName ==>"+fileName)
 
-    (Seq("tar", "zcf", s"${baseDir}/${fileName}", s"${baseDir}/files") lines)
+    (Seq("tar", "zcf", s"${baseDir}/${fileName}.tar.gz", s"${baseDir}/files") lines)
 
-    (Seq("md5sum", s"${baseDir}/${fileName}") #> new File(s"${baseDir}/${fileName}.md5")  lines)
+    (Seq("md5sum", s"${baseDir}/${fileName}.tar.gz") #> new File(s"${baseDir}/${fileName}.md5")  lines)
 
     (Seq("rm", "-r", s"${baseDir}/files") lines )
 
@@ -145,7 +145,7 @@ object TaskProcess {
 
   def getFileName() = {
     val timestamp: Long = System.currentTimeMillis / 1000
-    s"${timestamp}.tar.gz"
+    s"${timestamp}"
   }
 
   def checkQueueNum(envId: Int, projectId: Int) = {
