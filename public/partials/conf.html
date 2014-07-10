@@ -3,7 +3,7 @@
 
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-            <ul class="nav nav-sidebar">
+            <ul class="nav nav-sidebar" ng-if="user">
                 <li access-permission="user" ng-class="{active: $state.includes('conf.user')}"><a ui-sref="conf.user">用户管理</a></li>
                 <li access-permission="area" ng-class="{active: $state.includes('conf.area')}"><a ui-sref="conf.area">区域管理</a></li>
                 <li access-permission="env" ng-class="{active: $state.includes('conf.env')}"><a ui-sref="conf.env">环境管理</a></li>

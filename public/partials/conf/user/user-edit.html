@@ -59,22 +59,22 @@
         <div class="col-sm-5">
             <div class="list-group">
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.user" ng-true-value="1" ng-false-value="0"> 用户管理 （<span class="text-warning">一般不选择该项</span>）</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.user" ng-true-value="1" ng-false-value="0" ng-disabled="user.role == 'admin'"> 用户管理 （<span class="text-warning">一般不选择该项</span>）</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.area" ng-true-value="2" ng-false-value="0" > 区域管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.area" ng-true-value="2" ng-false-value="0" ng-disabled="user.role == 'admin'"> 区域管理</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.env" ng-true-value="3" ng-false-value="0" > 环境管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.env" ng-true-value="3" ng-false-value="0" ng-disabled="user.role == 'admin'"> 环境管理</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.project" ng-true-value="4" ng-false-value="0" > 项目管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.project" ng-true-value="4" ng-false-value="0" ng-disabled="user.role == 'admin'"> 项目管理</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.relation" ng-true-value="5" ng-false-value="0" > 关系配置</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.relation" ng-true-value="5" ng-false-value="0" ng-disabled="user.role == 'admin'"> 关系配置</label>
                 </p>
                 <p class="list-group-item">
-                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.task" ng-true-value="6" ng-false-value="0" > 任务管理</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="permission" ng-model="permission.task" ng-true-value="6" ng-false-value="0" ng-disabled="user.role == 'admin'"> 任务管理</label>
                 </p>
             </div>
         </div>

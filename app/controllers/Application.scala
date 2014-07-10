@@ -1,5 +1,7 @@
 package controllers
 
+import java.io.File
+
 import enums.RoleEnum
 import models.conf._
 import org.joda.time.DateTime
@@ -8,6 +10,7 @@ import play.api.mvc._
 import play.api.cache._
 import play.api.libs.json._
 import org.pac4j.play.scala.ScalaController
+import utils.GitHelp
 
 import views._
 
@@ -61,7 +64,7 @@ object Application extends ScalaController with Security {
   def logout = Action { implicit request =>
     request.headers.get(AuthTokenHeader) map { token =>
       Ok.discardingToken(token)
-    } getOrElse BadRequest (Json.obj("r" -> "No Token"))
+    } getOrElse BadRequest(Json.obj("r" -> "No Token"))
   }
 
   def ping = HasToken() { token => jobNo => implicit request =>
@@ -73,9 +76,20 @@ object Application extends ScalaController with Security {
           Seq.empty
       }
       Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "permissions" -> ps)).withToken(token -> jobNo)
-    } getOrElse NotFound (Json.obj("r" -> "User Not Found"))
+    } getOrElse NotFound(Json.obj("r" -> "User Not Found"))
   }
 
+  def pkgs(pkg: String) = Action { implicit request =>
+    Logger.info(s"Download file: ${pkg}")
+    val file = new File(s"${GitHelp.workDir}/${pkg}")
+
+    if (file.exists() && file.isFile && (pkg.endsWith(".tar.gz") || pkg.endsWith(".md5"))) {
+      Ok.sendFile(content = file, fileName = _ => pkg.split("/").last)
+    }
+    else {
+      Ok
+    }
+  }
 
   def javascriptRoutes = Action { implicit request =>
     import controllers._

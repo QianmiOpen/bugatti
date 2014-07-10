@@ -39,7 +39,7 @@ require(['angular', './controller/main-controller', './directive/main-directive'
                             event.preventDefault();
                             $state.go('home');
                         }
-                    }, function(r) {
+                    }, function() {
                         event.preventDefault();
                         $state.go('home');
                         $rootScope.error = "Unauthorized";

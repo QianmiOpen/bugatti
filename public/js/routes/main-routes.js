@@ -40,6 +40,9 @@ define(['angular',
         $stateProvider.state('conf', {
             url: "/conf",
             templateUrl: "partials/conf.html",
+            controller: function($scope, Auth) {
+                $scope.user = Auth.user;
+            },
             data: { access: 'anon' }
         });
 
