@@ -54,17 +54,26 @@ object TaskQueueHelper{
    * @param projectId
    * @return
    */
-  def findExecuteTask(envId: Int, projectId: Int): TaskQueue = db withSession { implicit session =>
+  def findExecuteTask(envId: Int, projectId: Int): Option[TaskQueue] = db withSession { implicit session =>
     val minTime = qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).groupBy(_.projectId).map{
       case (id, row) => row.map(_.importTime).min
     }.firstOption
     Logger.info("time is " + minTime)
-    if(minTime != None){
-      qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).where(_.importTime === minTime.get).first
+
+    minTime match {
+      case Some(time) => {
+        qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).where(_.importTime === time).firstOption
+      }
+      case _ => {
+        None
+      }
     }
-    else {
-      null
-    }
+//    if(minTime != None){
+//      qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).where(_.importTime === minTime.get).first
+//    }
+//    else {
+//      null
+//    }
   }
 
   def findWaitQueueById(qId: Int): Option[TaskQueue] = db withSession{ implicit session =>
@@ -86,13 +95,22 @@ object TaskQueueHelper{
     qTaskQueue.where(_.id === tq.id).delete
   }
 
-  def findQueueNum(tq: TaskQueue): Int = db withSession {implicit session =>
+  def findQueueNum(envId: Int, projectId: Int): Int = db withSession {implicit session =>
 //    Query(qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length).first
-    qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length.run
+    qTaskQueue.where(_.envId is envId).where(_.projectId is projectId).where(_.status is TaskEnum.TaskWait).length.run
   }
 
-  def findQueues(tq: TaskQueue): List[TaskQueue] = db withSession { implicit session =>
-    qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).list
+  def findQueues(envId: Int, projectId: Int): List[TaskQueue] = db withSession { implicit session =>
+    qTaskQueue.where(_.envId is envId).where(_.projectId is projectId).list
+  }
+
+  def findEnvId_ProjectId(): Set[(Int, Int)] = db withSession { implicit session =>
+    var set = Set.empty[(Int, Int)]
+    qTaskQueue.list.map{
+      q =>
+        set = set + ((q.envId, q.projectId))
+    }
+    set
   }
 
 }

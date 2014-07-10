@@ -95,13 +95,29 @@ object TaskController extends Controller {
     }
   }
 
-  def findStatus(fields: Seq[(String, JsValue)]): List[Task] = {
+  def findStatus(fields: Seq[(String, JsValue)]): List[JsValue] = {
     val jsons = Json.toJson(fields.toMap)
     val envId = (jsons \ "envId").toString.toInt
     val projects = (jsons \ "projects")
     Logger.info(""+projects(0))
     projects.as[JsArray].value
-    TaskHelper.findLastStatus(envId, projects)
+    TaskHelper.findLastStatus(envId, projects).map{
+      t => {
+        var tJson = Json.toJson(t).as[JsObject]
+        VersionHelper.findById(t.versionId.getOrElse(0)) match {
+          case Some(version) => {
+            tJson = tJson ++ Json.obj("version" -> version.vs)
+          }
+          case _ => {}
+        }
+        TaskTemplateHelper.getById(t.taskTemplateId) match {
+          case template => {
+            tJson = tJson ++ Json.obj("taskName" -> template.name)
+          }
+        }
+        tJson
+      }
+    }
   }
 
   def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
@@ -141,7 +157,7 @@ object TaskController extends Controller {
         //1、删除队列；
         TaskQueueHelper.remove(tq)
         //2、调用方法checkQueueNum修改状态；
-        TaskProcess.checkQueueNum(tq)
+        TaskProcess.checkQueueNum(tq.envId, tq.projectId)
         //3、调用推送状态方法；
         TaskProcess.pushStatus()
       }

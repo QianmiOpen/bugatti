@@ -61,6 +61,8 @@ define(['angular'], function(angular) {
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                    console.log($scope.projectStatus)
+
                     $scope.getTemplates()
 
                 })
@@ -110,15 +112,14 @@ define(['angular'], function(angular) {
                         if(projectObj != undefined){
                             p.status.currentNum = projectObj.currentNum
                             p.status.totalNum = projectObj.totalNum
-//                            if(projectObj.queueNum == undefined){
-//                             projectObj.queueNum = 0
-//                            }
                             p.status.queueNum = projectObj.queueNum
                             p.status.sls = projectObj.sls
                             p.status.machine = projectObj.machine
-                            p.status.taskName = projectObj.taskName
                             p.status.status = projectObj.status
                             p.task = projectObj.task
+                            if(p.task != undefined){
+                                p.task.taskName = projectObj.taskName
+                            }
                         }
                     }
                     $scope.projectStatus = $scope.projectStatus.map($scope.addStatusTip)
@@ -143,6 +144,7 @@ define(['angular'], function(angular) {
                 var p = $scope.lastTasks[index]
                 if(p.projectId === data.id){
                     data.status = p
+                    data.task = p
                 }
             }
             data.status.queueNum = 0
