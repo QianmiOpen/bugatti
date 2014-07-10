@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import play.api._
 import play.api.Play.current
-import utils.{SaltTools, GitHelp}
+import utils.{ConfHelp, SaltTools, GitHelp}
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
 import scala.collection.JavaConverters._
@@ -92,9 +92,10 @@ object Global extends GlobalSettings {
       }
     }
 
-    GitHelp.checkGitWorkDir(app)
+//    GitHelp.checkGitWorkDir(app)
     SaltTools.refreshHostList(app)
     SaltTools.baseLogPath(app)
+    ConfHelp.initConfPath(app)
 
     //查看队列表中是否有可执行任务
     val set = TaskQueueHelper.findEnvId_ProjectId()

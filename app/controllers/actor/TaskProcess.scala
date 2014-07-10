@@ -13,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
 import utils.DateFormatter._
-import utils.{SaltTools, GitHelp, TaskTools}
+import utils.{ConfHelp, SaltTools, GitHelp, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -107,21 +107,22 @@ object TaskProcess {
     taskQueueId
   }
 
-  def copyConfFileAddToGit(environmentId: Int, appName: String, taskId: Int, versionId: Int) = {
+  def generateConfFile(environmentId: Int, appName: String, taskId: Int, versionId: Int, fileName: String) = {
     val project = ProjectHelper.findByName(appName)
     val projectId = project.get.id.get
 
     val confSeq = ConfHelper.findByEid_Pid_Vid(environmentId, projectId, versionId)
+    val baseDir = s"${ConfHelp._confPath}/${taskId}"
 
-    val baseDir = s"${GitHelp.workDir.getAbsolutePath}/work/${appName}/${taskId}/files"
-    val file = new File(s"${baseDir}/.bugatti")
-    file.getParentFile.mkdirs()
-    file.createNewFile()
+//    val baseDir = s"${GitHelp.workDir.getAbsolutePath}/work/${appName}/${taskId}/files"
+//    val file = new File(s"${baseDir}/.bugatti")
+//    file.getParentFile.mkdirs()
+//    file.createNewFile()
 
     if (confSeq.size > 0) {
       confSeq.foreach { xf =>
         val confContent = ConfContentHelper.findById(xf.id.get)
-        val newFile = new File(s"${baseDir}/${xf.path}")
+        val newFile = new File(s"${baseDir}/files/${xf.path}")
         newFile.getParentFile().mkdirs()
         val io = new PrintWriter(newFile)
         io.write(confContent.get.content)
@@ -129,7 +130,22 @@ object TaskProcess {
       }
     }
 
-    GitHelp.push(s"push ${appName} job, id is ${taskId}")
+    Logger.info("baseDir ==>"+baseDir)
+    Logger.info("fileName ==>"+fileName)
+
+    (Seq("tar", "zcf", s"${baseDir}/${fileName}.tar.gz", s"${baseDir}/files") lines)
+
+    (Seq("md5sum", s"${baseDir}/${fileName}.tar.gz") #> new File(s"${baseDir}/${fileName}.md5")  lines)
+
+    (Seq("rm", "-r", s"${baseDir}/files") lines )
+
+  }
+
+
+
+  def getFileName() = {
+    val timestamp: Long = System.currentTimeMillis / 1000
+    s"${timestamp}"
   }
 
   def checkQueueNum(envId: Int, projectId: Int) = {
@@ -320,7 +336,7 @@ class TaskProcess extends Actor {
             Logger.info((params \ "projectName").as[String])
             Logger.info(taskId.toString)
             Logger.info((params \ "versionId").as[Int].toString)
-            TaskProcess.copyConfFileAddToGit(envId, (params \ "projectName").as[String], taskId, ((params \ "versionId").as[Int]))
+            TaskProcess.generateConfFile(envId, (params \ "projectName").as[String], taskId, ((params \ "versionId").as[Int]), (params \ "confFileName").as[String])
           }
         }
       }
@@ -495,6 +511,8 @@ class TaskProcess extends Actor {
       case _ =>
     }
 
+    val fileName = TaskProcess.getFileName()
+
 
     var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
@@ -505,6 +523,7 @@ class TaskProcess extends Actor {
       , "envId" -> taskQueue.envId
       , "projectId" -> taskQueue.projectId
       , "taskId" -> taskId
+      , "confFileName" -> fileName
     )
 
     //projectId -> groupId, artifactId, unpacked

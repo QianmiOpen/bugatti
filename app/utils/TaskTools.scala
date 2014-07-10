@@ -40,6 +40,14 @@ object TaskTools {
   }
 }
 
+object ConfHelp {
+  var _confPath: String = ""
+
+  def initConfPath(app: Application) = {
+    _confPath = app.configuration.getString("git.work.dir").getOrElse("/srv/salt")
+  }
+}
+
 object GitHelp {
   var _git: Git = null
   var _gitWorkDir: File = null

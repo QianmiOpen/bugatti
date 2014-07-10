@@ -29,7 +29,7 @@ define(['angular'], function(angular) {
             for(var d in data){
                 $scope.envs.push(data[d])
             }
-            $scope.activeEnv = $scope.envs[0].id
+            $scope.activeEnv = $scope.envs.length == 0 ? 1 : $scope.envs[0].id
             $scope.chooseEnv($scope.activeEnv)
         });
 
