@@ -53,22 +53,19 @@ object TaskController extends Controller {
 
   def versions(groupId: String, artifactId: String, isSnapshot: Boolean): List[String] = {
     var list = mutable.LinkedList[String]()
-    var branch = "releases"
-    if(isSnapshot){
-      branch = "snapshots"
-    }
+    val branch = if (isSnapshot) "snapshots" else "releases"
     val url = s"${httpURLBase}/${branch}/${groupId}/${artifactId}"
     Logger.info(url)
-    try{
+    try {
       val source = Source.fromURL(url)
       val htmlSource = source.mkString
       val reg = """<a href=".+">([^/]+)/</a>""".r
       val regMatchs = reg.findAllMatchIn(htmlSource)
-      for(regMatch <- regMatchs){
+      for (regMatch <- regMatchs) {
         list = list :+ regMatch.group(1).toString
       }
       source.close
-    }catch{
+    } catch {
       case ex: Exception => Logger.error("version error : " + ex.toString)
     }
     Logger.info("versions==>" + list)
