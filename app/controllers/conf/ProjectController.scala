@@ -94,7 +94,13 @@ object ProjectController extends BaseController {
   }
 
   def showAuth = AuthAction(FuncEnum.project) { implicit request =>
-    Ok(Json.toJson(MemberHelper.findProjectsByJobNo(request.user.jobNo)))
+    val user = request.user
+    if(user.role == RoleEnum.admin){
+      Ok(Json.toJson(ProjectHelper.all()))
+    }
+    else {
+      Ok(Json.toJson(MemberHelper.findProjectsByJobNo(request.user.jobNo)))
+    }
   }
 
   // ----------------------------------------------------------
