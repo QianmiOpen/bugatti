@@ -18,9 +18,9 @@ case class ConfForm(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def eid = column[Int]("eid", O.NotNull)   // 环境编号
-  def pid = column[Int]("pid", O.NotNull)   // 主项目编号
-  def vid = column[Int]("vid", O.NotNull)   // 子项目编号
+  def eid = column[Int]("env_id", O.NotNull)     // 环境编号
+  def pid = column[Int]("project_id", O.NotNull) // 项目编号
+  def vid = column[Int]("version_id", O.NotNull) // 项目版本编号
   def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
   def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
   def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(200)"))

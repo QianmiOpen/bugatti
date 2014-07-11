@@ -18,9 +18,9 @@ case class ConfLog(id: Option[Int], cid: Int, eid: Int, vid: Int, jobNo: String,
 
 class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def cid = column[Int]("cid", O.NotNull)   // 子项目配置文件编号
-  def eid = column[Int]("eid", O.NotNull)     // 环境编号
-  def vid = column[Int]("vid", O.NotNull)   // 子项目编号
+  def cid = column[Int]("conf_id", O.NotNull)    // 配置文件编号
+  def eid = column[Int]("env_id", O.NotNull)     // 环境编号
+  def vid = column[Int]("version_id", O.NotNull) // 版本编号
   def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
   def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
   def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(500)"))

@@ -16,7 +16,7 @@ import scala.slick.jdbc.JdbcBackend
 case class Member(id: Option[Int], pid: Int, level: Level, jobNo: String)
 class MemberTable(tag: Tag) extends Table[Member](tag, "member") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def pid = column[Int]("pid", O.NotNull) // 项目编号
+  def pid = column[Int]("project_id", O.NotNull) // 项目编号
   def level = column[Level]("level", O.NotNull, O.Default(LevelEnum.unsafe)) // 成员级别(对应环境级别)
   def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
 

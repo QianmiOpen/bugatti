@@ -13,7 +13,7 @@ import scala.slick.jdbc.JdbcBackend
  */
 case class ConfContent(id: Option[Int], content: String)
 class ConfContentTable(tag: Tag) extends Table[ConfContent](tag, "conf_content") {
-  def id = column[Int]("id", O.PrimaryKey) // 子项目配置文件编号
+  def id = column[Int]("conf_id", O.PrimaryKey) // 版本配置文件编号
   def content = column[String]("content", O.DBType("text"))
 
   override def * = (id.?, content) <> (ConfContent.tupled, ConfContent.unapply _)

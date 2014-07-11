@@ -12,9 +12,9 @@ import scala.slick.jdbc.JdbcBackend
 case class TemplateItem(id: Option[Int], tid: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int)
 class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_item") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def tid = column[Int]("tid") // 模板编号
-  def itemName = column[String]("item_name", O.NotNull) // 字段定义的名称
-  def itemDesc = column[String]("item_desc", O.Nullable) // 字段定义的描述
+  def tid = column[Int]("template_id")                      // 模板编号
+  def itemName = column[String]("item_name", O.NotNull)     // 字段定义的名称
+  def itemDesc = column[String]("item_desc", O.Nullable)    // 字段定义的描述
   def default = column[String]("item_default", O.Nullable)
   def order = column[Int]("order", O.NotNull, O.Default(0)) // 字段排序
 
