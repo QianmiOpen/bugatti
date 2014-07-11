@@ -47,7 +47,7 @@ object ConfHelp {
     _confPath = app.configuration.getString("git.work.dir").getOrElse("/srv/salt")
   }
 
-  def confPath {
+  def confPath = {
     _confPath
   }
 }

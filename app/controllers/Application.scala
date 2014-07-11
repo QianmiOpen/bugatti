@@ -10,7 +10,7 @@ import play.api.mvc._
 import play.api.cache._
 import play.api.libs.json._
 import org.pac4j.play.scala.ScalaController
-import utils.ConfHelp
+import utils.{ConfHelp}
 
 import views._
 
