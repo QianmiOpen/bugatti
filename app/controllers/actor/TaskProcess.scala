@@ -330,7 +330,7 @@ class TaskProcess extends Actor {
       val outputCommand = s"--log-file=${path}"
       val cmd = command.command
       //      Logger.info(cmd)
-      var commandSeq = command2Seq(cmd)
+      val commandSeq = command2Seq(cmd)
       //如果是copy conf file，先上传git
       if (command.command.startsWith("bugatti")) {
         commandSeq(1) match {
