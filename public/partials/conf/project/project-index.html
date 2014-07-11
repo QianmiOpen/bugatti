@@ -35,7 +35,7 @@
                 <th width="10%">项目模板</th>
                 <th width="25%">最近版本</th>
                 <th width="25%">最近版本时间</th>
-                <th>操作</th>
+                <th ng-show="my || user.role == 'admin'">操作</th>
             </tr>
         </thead>
         <tbody>
@@ -58,15 +58,15 @@
                 </div>
             </td>
             <td>{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-            <td>
+            <td ng-show="my || user.role == 'admin'">
                 <a ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>
         </tbody>
         <tfoot>
-        <tr>
-            <td colspan="6">&nbsp;</td>
+        <tr ng-init="col = my||user.role=='admin'?6:5">
+            <td colspan="{{col}}">&nbsp;</td>
         </tr>
         </tfoot>
     </table>
