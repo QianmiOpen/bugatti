@@ -98,6 +98,22 @@ define(['angular'], function(angular) {
                 }
             };
 
+            $scope.refresh = function() {
+                var valid = false;
+                if ($scope.project == undefined || $scope.project.id == undefined) {
+                    $scope.form.projectId.$dirty = true;
+                    $scope.form.projectId.$invalid = true;
+                    $scope.form.projectId.$error.required = true;
+                    valid = true;
+                }
+                if ($scope.env == undefined || $scope.env.id == undefined) {
+                    $scope.form.envId.$dirty = true;
+                    $scope.form.envId.$invalid = true;
+                    $scope.form.envId.$error.required = true;
+                    valid = true;
+                }
+                if (!valid) $scope.selectEnv();
+            };
 
             // insert
             $scope.save = function() {
