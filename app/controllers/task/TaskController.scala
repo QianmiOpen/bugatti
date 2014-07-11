@@ -52,25 +52,24 @@ object TaskController extends Controller {
   }
 
   def versions(groupId: String, artifactId: String, isSnapshot: Boolean): List[String] = {
-    var list = mutable.LinkedList[String]()
+    val list = new mutable.ListBuffer[String]
     val branch = if (isSnapshot) "snapshots" else "releases"
     val url = s"${httpURLBase}/${branch}/${groupId}/${artifactId}"
-    Logger.info(url)
+    Logger.info(s"request version url = [${url}]")
     try {
       val source = Source.fromURL(url)
-      val htmlSource = source.mkString
       val reg = """<a href=".+">([^/]+)/</a>""".r
-      val regMatchs = reg.findAllMatchIn(htmlSource)
-      for (regMatch <- regMatchs) {
-        list = list :+ regMatch.group(1).toString
+      for (regMatch <- reg.findAllMatchIn(source.mkString)) {
+        list += regMatch.group(1).toString
       }
       source.close
     } catch {
-      case ex: Exception => Logger.error("version error : " + ex.toString)
+      case ex: Exception => Logger.error(s"request version error : ${ex}")
     }
-    Logger.info("versions==>" + list)
+    Logger.info(s"request version result : [${list}]")
     list.toList
   }
+
   /**
    * 根据项目id获取最近的5个版本号，按照时间倒序
    * 在线上环境会过滤掉SNAPSHOT版本号
