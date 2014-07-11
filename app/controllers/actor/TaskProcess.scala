@@ -13,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
 import utils.DateFormatter._
-import utils.{ConfHelp, SaltTools, GitHelp, TaskTools}
+import utils.{ConfHelp, SaltTools, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -133,14 +133,15 @@ object TaskProcess {
       }
     }
 
-    Logger.info("baseDir ==>"+baseDir)
+    Logger.info("baseDir ==>" + baseDir)
     Logger.info("fileName ==>"+fileName)
 
-    (Seq("tar", "zcf", s"${baseDir}/${fileName}.tar.gz", s"${baseDir}/files") lines)
+    val baseDirPath = new File(new File(baseDir).getAbsolutePath)
+    Process(Seq("tar", "zcf", s"${fileName}.tar.gz", "files"), baseDirPath).!!
 
-    (Seq("md5sum", s"${baseDir}/${fileName}.tar.gz") #> new File(s"${baseDir}/${fileName}.md5")  lines)
+    Process(Seq("md5sum", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
 
-    (Seq("rm", "-r", s"${baseDir}/files") lines )
+    Seq("rm", "-r", s"${baseDir}/files").!!
 
   }
 
