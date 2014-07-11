@@ -82,7 +82,7 @@ object TaskController extends Controller {
    * @return
    */
   def getVersions(projectId: Int, envId: Int) = Action{
-    val list = VersionHelper.findByPidAndEid(projectId, envId)
+    val list = VersionHelper.findByPid_Eid(projectId, envId)
     Ok(Json.toJson(list.reverse.drop(list.length - 5).reverse))
   }
 
@@ -110,7 +110,7 @@ object TaskController extends Controller {
           }
           case _ => {}
         }
-        TaskTemplateHelper.getById(t.taskTemplateId) match {
+        TaskTemplateHelper.findById(t.taskTemplateId) match {
           case template => {
             tJson = tJson ++ Json.obj("taskName" -> template.name)
           }
@@ -155,7 +155,7 @@ object TaskController extends Controller {
     taskQueue match {
       case Some(tq) => {
         //1、删除队列；
-        TaskQueueHelper.remove(tq)
+        TaskQueueHelper.delete(tq)
         //2、调用方法checkQueueNum修改状态；
         TaskProcess.checkQueueNum(tq.envId, tq.projectId)
         //3、调用推送状态方法；

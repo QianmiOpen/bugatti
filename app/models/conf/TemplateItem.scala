@@ -36,11 +36,15 @@ object TemplateItemHelper extends PlayCache {
   }
 
   def create(templateInfo: TemplateItem) = db withSession { implicit session =>
-    create_(templateInfo)
+    _create(templateInfo)
   }
 
-  def create_(templateInfo: TemplateItem)(implicit session: JdbcBackend#Session) = {
+  def _create(templateInfo: TemplateItem)(implicit session: JdbcBackend#Session) = {
     qItem.insert(templateInfo)(session)
+  }
+
+  def _deleteByTid(tid: Int)(implicit session: JdbcBackend#Session) = {
+    qItem.where(_.tid is tid).delete
   }
 
   def update(id: Int, templateInfo: TemplateItem) = db withSession { implicit session =>
@@ -48,7 +52,4 @@ object TemplateItemHelper extends PlayCache {
     qItem.where(_.id is id).update(info2update)
   }
 
-  def deleteByTid_(tid: Int)(implicit session: JdbcBackend#Session) = {
-    qItem.where(_.tid is tid).delete
-  }
 }

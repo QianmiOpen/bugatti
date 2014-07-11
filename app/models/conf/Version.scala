@@ -58,7 +58,7 @@ object VersionHelper extends PlayCache {
     qVersion.where(_.pid is pid).sortBy(_.updated desc).take(top).list
   }
 
-  def findByPidAndEid(pid: Int, eid: Int): Seq[Version] = db withSession { implicit session =>
+  def findByPid_Eid(pid: Int, eid: Int): Seq[Version] = db withSession { implicit session =>
     EnvironmentHelper.findById(eid) match {
       case Some(env) =>
         val list = findByPid(pid)
@@ -74,7 +74,7 @@ object VersionHelper extends PlayCache {
     val vid = qVersion.returning(qVersion.map(_.id)).insert(version)
     ProjectHelper.findById(version.pid) match {
         case Some(p) =>
-          ProjectHelper.update_(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
+          ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
         case None =>
     }
     vid
@@ -83,7 +83,7 @@ object VersionHelper extends PlayCache {
   def delete(version: Version): Int = db withTransaction { implicit session =>
     ProjectHelper.findById(version.pid) match {
       case Some(p) =>
-        ProjectHelper.update_(version.pid, Project(p.id, p.name, p.templateId, p.subTotal - 1, p.lastVid, p.lastVersion, p.lastUpdated))
+        ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal - 1, p.lastVid, p.lastVersion, p.lastUpdated))
       case None =>
     }
     qVersion.where(_.id is version.id).delete

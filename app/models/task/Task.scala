@@ -32,8 +32,6 @@ case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def operatorId = column[Int]("operator_id", O.NotNull)
 
   override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
-
-
 }
 
 object TaskHelper {

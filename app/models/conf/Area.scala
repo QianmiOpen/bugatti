@@ -28,24 +28,12 @@ object AreaHelper {
   val qArea = TableQuery[AreaTable]
   val qRel = TableQuery[EnvironmentProjectRelTable]
 
-  def create(area: Area): Int = db withSession { implicit session =>
-    qArea.returning(qArea.map(_.id)).insert(area)
+  def findById(id: Int): Option[Area] = db withSession { implicit session =>
+    qArea.where(_.id === id).firstOption
   }
 
   def findByName(name: String): Option[Area] = db withSession { implicit session =>
     qArea.where(_.name === name).firstOption
-  }
-
-  def update(area: Area) = db withSession { implicit session =>
-    qArea.where(_.id === area.id).update(area)
-  }
-
-  def delete(id: Int) = db withSession { implicit session =>
-    qArea.where(_.id === id).delete
-  }
-
-  def findById(id: Int): Option[Area] = db withSession { implicit session =>
-    qArea.where(_.id === id).firstOption
   }
 
   def allInfo: Seq[AreaInfo] = db withSession { implicit session =>
@@ -54,6 +42,18 @@ object AreaHelper {
 
   def findInfoById(id: Int): Option[AreaInfo] = db withSession { implicit session =>
     qArea.where(_.id === id).firstOption.map(_Area2AreaInfo)
+  }
+
+  def create(area: Area): Int = db withSession { implicit session =>
+    qArea.returning(qArea.map(_.id)).insert(area)
+  }
+
+  def delete(id: Int) = db withSession { implicit session =>
+    qArea.where(_.id === id).delete
+  }
+
+  def update(area: Area) = db withSession { implicit session =>
+    qArea.where(_.id === area.id).update(area)
   }
 
   def _Area2AreaInfo(implicit session: Session) = { area: Area =>

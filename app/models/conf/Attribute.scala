@@ -28,10 +28,6 @@ object AttributeHelper {
     qAttribute.sortBy(_.id).where(_.pid is pid).list
   }
 
-  def exists(typeId: Int, name: String): Boolean = {
-    findByPid(typeId).filter(_.name == name).isEmpty
-  }
-
   def getValue(pid: Int, name: String): String = {
     findByPid(pid).filter(_.name == name)(0).value.get
   }
@@ -40,8 +36,7 @@ object AttributeHelper {
     qAttribute.insert(attr)
   }
 
-  // batch
-  def create_(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
+  def _create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
     qAttribute.insertAll(attr: _*)(session)
   }
 
@@ -49,7 +44,7 @@ object AttributeHelper {
     qAttribute.where(_.id is id).delete
   }
 
-  def deleteByPid_(pid: Int)(implicit session: JdbcBackend#Session) = {
+  def _deleteByPid(pid: Int)(implicit session: JdbcBackend#Session) = {
     qAttribute.where(_.pid is pid).delete
   }
 

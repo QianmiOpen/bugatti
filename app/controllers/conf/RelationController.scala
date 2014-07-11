@@ -57,7 +57,7 @@ object RelationController extends BaseController {
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation =>
-        Ok(Json.toJson(EnvironmentProjectRelHelper.updateProjectId(relation)))
+        Ok(Json.toJson(EnvironmentProjectRelHelper.updateByProjectId(relation)))
     )
   }
 

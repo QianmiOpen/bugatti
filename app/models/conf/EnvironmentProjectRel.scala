@@ -26,8 +26,16 @@ object EnvironmentProjectRelHelper {
   val qEnv = TableQuery[EnvironmentTable]
   val qProject = TableQuery[ProjectTable]
 
-  def create(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
-    qRelation.returning(qRelation.map(_.id)).insert(envProjectRel)
+  def findById(id: Int): Option[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.where(_.id === id).firstOption
+  }
+
+  def findByIp(ip: String): Seq[EnvironmentProjectRel] = db withSession {
+    implicit session => qRelation.where(_.ip === ip).list
+  }
+
+  def findBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession{ implicit session =>
+    qRelation.where(_.syndicName === syndicName).list
   }
 
   def findByEnvId_ProjectId(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = db withSession {
@@ -35,17 +43,8 @@ object EnvironmentProjectRelHelper {
       qRelation.where(r => r.envId === envId && r.projectId === projectId).list
   }
 
-  def findByIp(ip: String): Seq[EnvironmentProjectRel] = db withSession {
-    implicit session =>
-      qRelation.where(_.ip === ip).list
-  }
-
-  def findBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession{ implicit session =>
-    qRelation.where(_.syndicName === syndicName).list
-  }
-
-  def findById(id: Int): Option[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.where(_.id === id).firstOption
+  def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.where(c => c.syndicName === syndicName && c.envId.isNull).list
   }
 
   def findIpsByEnvId(envId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
@@ -66,12 +65,12 @@ object EnvironmentProjectRelHelper {
     projectId.map(id => query = query.filter(_.projectId === id))
     Query(query.length).first
   }
+  
+  def create(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
+    qRelation.returning(qRelation.map(_.id)).insert(envProjectRel)
+  }
 
-//  def bind(relationForm: EnvironmentProjectRelForm) = db withTransaction { implicit session =>
-//    qRelation.insertAll(relationForm.toRelations: _*)
-//  }
-
-  def updateProjectId(relForm: EnvRelForm): Int = db withSession { implicit session =>
+  def updateByProjectId(relForm: EnvRelForm): Int = db withSession { implicit session =>
     relForm.ids.map { id =>
       val q = for { r <- qRelation if r.id === id } yield r.projectId
       q.update(relForm.projectId)
@@ -86,10 +85,6 @@ object EnvironmentProjectRelHelper {
       case None =>
         0
     }
-  }
-
-  def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.where(c => c.syndicName === syndicName && c.envId.isNull).list
   }
 
   def update(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>

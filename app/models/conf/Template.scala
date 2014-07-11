@@ -29,10 +29,6 @@ object TemplateHelper extends PlayCache {
 
   val qTemplate = TableQuery[TemplateTable]
 
-  def all = db withSession { implicit session =>
-    qTemplate.list
-  }
-
   def findById(id: Int) = db withSession { implicit session =>
     qTemplate.where(_.id is id).firstOption
   }
@@ -41,50 +37,51 @@ object TemplateHelper extends PlayCache {
     qTemplate.where(_.name is name).firstOption
   }
 
+  def all = db withSession { implicit session =>
+    qTemplate.list
+  }
+
   def create(template: Template) = db withSession { implicit session =>
-    create_(template)
+    _create(template)
   }
 
   def create(template: Template, items: Seq[TemplateItem]) = db withTransaction { implicit session =>
-    val tid = create_(template)
-
+    val tid = _create(template)
     items.map{ item =>
       val ti = TemplateItem(None, Some(tid), item.itemName, item.itemDesc, item.default, item.order)
-      TemplateItemHelper.create_(ti)
+      TemplateItemHelper._create(ti)
     }.size
   }
 
-  def create_(template: Template)(implicit session: JdbcBackend#Session) = {
+  def _create(template: Template)(implicit session: JdbcBackend#Session) = {
     qTemplate.returning(qTemplate.map(_.id)).insert(template)(session)
   }
 
-  def update(id: Int, template: Template) = db withSession { implicit session =>
-    update_(id, template)
+  def delete(id: Int) = db withTransaction { implicit session =>
+    _delete(id)(session)
+    TemplateItemHelper._deleteByTid(id)
   }
 
-  def update_(id: Int, template: Template)(implicit session: JdbcBackend#Session) = {
-    val template2update = template.copy(Some(id))
-    qTemplate.where(_.id is id).update(template2update)(session)
-  }
-
-  def update(id: Int, template: Template, items: Seq[TemplateItem]) = db withTransaction { implicit session =>
-    update_(id, template) // 更新项目
-    TemplateItemHelper.deleteByTid_(id) // 删除该项目下所有属性
-
-    items.map{ item =>  // 插入新属性
-      val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.default, item.order)
-      TemplateItemHelper.create_(ti)
-    }.size
-
-  }
-
-  def delete_(id: Int)(implicit session: JdbcBackend#Session) = {
+  def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
     qTemplate.where(_.id is id).delete
   }
 
-  def delete(id: Int) = db withTransaction { implicit session =>
-    delete_(id)(session)
-    TemplateItemHelper.deleteByTid_(id)
+  def update(id: Int, template: Template) = db withSession { implicit session =>
+    _update(id, template)
+  }
+
+  def update(id: Int, template: Template, items: Seq[TemplateItem]) = db withTransaction { implicit session =>
+    _update(id, template) // 更新项目
+    TemplateItemHelper._deleteByTid(id) // 删除该项目下所有属性
+    items.map{ item =>  // 插入新属性
+      val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.default, item.order)
+      TemplateItemHelper._create(ti)
+    }.size
+  }
+
+  def _update(id: Int, template: Template)(implicit session: JdbcBackend#Session) = {
+    val template2update = template.copy(Some(id))
+    qTemplate.where(_.id is id).update(template2update)(session)
   }
 
 }

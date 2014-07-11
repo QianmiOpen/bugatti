@@ -43,11 +43,23 @@ object MemberHelper extends PlayCache {
     qMember.where(m => m.pid === pid && m.jobNo === jobNo).firstOption
   }
 
-  def create(member: Member) = db withSession { implicit session =>
-    create_(member)
+  def findProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
+    val q = for{
+      (m, p) <- qMember leftJoin qProject on (_.pid is _.id)
+      if m.jobNo is jobNo
+    } yield p
+    q.list
   }
 
-  def create_(member: Member)(implicit session: JdbcBackend#Session) = {
+  def countByJobNo_Level(jobNo: String, level: Level): Int = db withSession { implicit session =>
+    qMember.where(m => m.jobNo === jobNo && m.level === level ).length.run
+  }
+
+  def create(member: Member) = db withSession { implicit session =>
+    _create(member)
+  }
+
+  def _create(member: Member)(implicit session: JdbcBackend#Session) = {
     qMember.insert(member)(session)
   }
 
@@ -58,18 +70,6 @@ object MemberHelper extends PlayCache {
   def update(id: Int, member: Member) = db withSession { implicit session =>
     val member2update = member.copy(Some(id))
     qMember.where(_.id is id).update(member2update)
-  }
-
-  def countByJobNo_Level(jobNo: String, level: Level): Int = db withSession { implicit session =>
-    qMember.where(m => m.jobNo === jobNo && m.level === level ).length.run
-  }
-
-  def findProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
-    val q = for{
-      (m, p) <- qMember leftJoin qProject on (_.pid is _.id)
-      if m.jobNo is jobNo
-    } yield p
-    q.list
   }
 
 }

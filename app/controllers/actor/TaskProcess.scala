@@ -99,7 +99,7 @@ object TaskProcess {
 
   //新建任务,insert队列表
   def createNewTask(tq: TaskQueue): Int = {
-    val taskQueueId = TaskQueueHelper.add(tq)
+    val taskQueueId = TaskQueueHelper.create(tq)
     //更新队列任务信息
     checkQueueNum(tq.envId, tq.projectId)
     //发送到指定 actor mailbox
@@ -170,7 +170,7 @@ object TaskProcess {
     val listJson: List[JsObject] = list.map{
       x =>
         var json = Json.toJson(x)
-        json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.getById(x.taskTemplateId).name)
+        json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
         json.as[JsObject]
     }
     generateJson(key, Json.obj("queues" -> listJson))
@@ -253,7 +253,7 @@ class TaskProcess extends Actor {
       var taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
       var taskName = ""
       while(taskQueue != None){
-        taskName = TaskTemplateHelper.getById(taskQueue.get.taskTemplateId).name
+        taskName = TaskTemplateHelper.findById(taskQueue.get.taskTemplateId).name
         //3.2、insert到任务表 & 命令表；
         val taskId = TaskHelper.addByTaskQueue(taskQueue.get)
         //更新队列任务信息
@@ -262,7 +262,7 @@ class TaskProcess extends Actor {
         val params = TaskProcess.getAllParams
         val (commandList, paramsJson) = generateCommands(taskId, taskQueue.get, params)
 //        val commandList: Seq[TaskCommand] = generateCommands(taskId, taskQueue, params)
-        TaskCommandHelper.addCommands(commandList)
+        TaskCommandHelper.create(commandList)
         //3.4、检查命令执行日志，判断是否继续；
         //3.5、更改statusMap状态 & 推送任务状态；
         if(executeCommand(commandList, envId, projectId, taskId, taskName, paramsJson)){
@@ -274,7 +274,7 @@ class TaskProcess extends Actor {
           TaskHelper.changeStatus(taskId, enums.TaskEnum.TaskFailed)
         }
         //删除队列taskQueue相应记录
-        TaskQueueHelper.remove(taskQueue.get)
+        TaskQueueHelper.delete(taskQueue.get)
         //更新statusMap中的queues信息
         TaskProcess.checkQueueNum(taskQueue.get.envId, taskQueue.get.projectId)
         //3.6、返回到3.1执行；
@@ -323,7 +323,7 @@ class TaskProcess extends Actor {
       val currentNum = command.orderNum
       TaskProcess.generateStatusJson(envId, projectId, currentNum, totalNum, command.sls, command.machine, 3, taskName)
       //修改数据库状态(task_command)
-      TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskProcess)
+      TaskCommandHelper.update(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
       TaskProcess.pushStatus
 
@@ -362,9 +362,9 @@ class TaskProcess extends Actor {
         }
         //更新数据库状态
         if (result) {
-          TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
+          TaskCommandHelper.update(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
         } else {
-          TaskCommandHelper.updateStatusByOrder(command.taskId, command.orderNum, TaskEnum.TaskFailed)
+          TaskCommandHelper.update(command.taskId, command.orderNum, TaskEnum.TaskFailed)
           return result
         }
       }
@@ -536,7 +536,7 @@ class TaskProcess extends Actor {
         paramsJson = paramsJson ++ Json.obj(s.name -> s.value)
     }
 
-    val templateCommands = TaskTemplateStepHelper.getStepsByTemplateId(taskQueue.taskTemplateId).map { step =>
+    val templateCommands = TaskTemplateStepHelper.findStepsByTemplateId(taskQueue.taskTemplateId).map { step =>
       //参数替换，更改sls命令
       fillSls(step, taskId, paramsJson)
     }

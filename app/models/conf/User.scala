@@ -53,41 +53,41 @@ object UserHelper extends PlayCache {
   }
 
   def create(user: User) = db withSession { implicit session =>
-    create_(user)
-  }
-
-  def create_(user: User)(implicit session: JdbcBackend#Session) = {
-    qUser.insert(user)(session)
+    _create(user)
   }
 
   def create(user: User, permission: Permission) = db withTransaction { implicit session =>
-    create_(user) + PermissionHelper.create_(permission)
+    _create(user) + PermissionHelper._create(permission)
+  }
+
+  def _create(user: User)(implicit session: JdbcBackend#Session) = {
+    qUser.insert(user)(session)
   }
 
   def delete(jobNo: String) = db withSession { implicit session =>
-    delete_(jobNo) + PermissionHelper.delete(jobNo)
+    _delete(jobNo) + PermissionHelper.delete(jobNo)
   }
 
-  def delete_(jobNo: String)(implicit session: JdbcBackend#Session) = {
+  def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
     qUser.where(_.jobNo is jobNo).delete(session)
   }
 
   def update(jobNo: String, user: User) = db withSession { implicit session =>
-    update_(jobNo, user)
-  }
-
-  def update_(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
-    val user2update = user.copy(jobNo)
-    qUser.where(_.jobNo is jobNo).update(user2update)(session)
+    _update(jobNo, user)
   }
 
   def update(jobNo: String, user: User, permission: Permission) = db withTransaction { implicit session =>
-    update_(jobNo, user) + (PermissionHelper.findByJobNo(jobNo) match {
+    _update(jobNo, user) + (PermissionHelper.findByJobNo(jobNo) match {
       case Some(p) =>
-        PermissionHelper.update_(jobNo, permission)
+        PermissionHelper._update(jobNo, permission)
       case None =>
-        PermissionHelper.create_(permission)
+        PermissionHelper._create(permission)
     })
+  }
+
+  def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
+    val user2update = user.copy(jobNo)
+    qUser.where(_.jobNo is jobNo).update(user2update)(session)
   }
 
   // ---------------------------------------------------

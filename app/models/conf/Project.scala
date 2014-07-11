@@ -41,7 +41,7 @@ object ProjectHelper extends PlayCache {
   import models.AppDB._
 
   val qProject = TableQuery[ProjectTable]
-
+  val qMember = TableQuery[MemberTable]
 
   def findById(id: Int): Option[Project] = db withSession { implicit session =>
     qProject.where(_.id is id).firstOption
@@ -55,9 +55,6 @@ object ProjectHelper extends PlayCache {
   def countByTid(tid: Int) = db withSession { implicit session =>
     Query(qProject.where(_.templateId is tid).length).first
   }
-
-
-  val qMember = TableQuery[MemberTable]
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
     jobNo match {
@@ -94,17 +91,17 @@ object ProjectHelper extends PlayCache {
     qProject.insert(project)
   }
 
-  def create_(project: Project)(implicit session: JdbcBackend#Session) = {
-    qProject.returning(qProject.map(_.id)).insert(project)(session)
-  }
-
   def create(projectForm: ProjectForm, jobNo: String) = db withTransaction { implicit session =>
-    val pid = create_(projectForm.toProject)
+    val pid = _create(projectForm.toProject)
     val attrs = projectForm.items.map(item =>
       Attribute(None, Some(pid), item.name, item.value)
     )
-    AttributeHelper.create_(attrs)
-    MemberHelper.create_(Member(None, pid, LevelEnum.safe, jobNo))
+    AttributeHelper._create(attrs)
+    MemberHelper._create(Member(None, pid, LevelEnum.safe, jobNo))
+  }
+
+  def _create(project: Project)(implicit session: JdbcBackend#Session) = {
+    qProject.returning(qProject.map(_.id)).insert(project)(session)
   }
 
   def delete(id: Int) = db withSession { implicit session =>
@@ -112,15 +109,15 @@ object ProjectHelper extends PlayCache {
   }
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
-    AttributeHelper.deleteByPid_(id)
+    AttributeHelper._deleteByPid(id)
     val attrs = projectForm.items.map(item =>
       Attribute(None, Some(id), item.name, item.value)
     )
-    AttributeHelper.create_(attrs)
-    update_(id, projectForm.toProject)
+    AttributeHelper._create(attrs)
+    _update(id, projectForm.toProject)
   }
 
-  def update_(id: Int, project: Project)(implicit session: JdbcBackend#Session) = {
+  def _update(id: Int, project: Project)(implicit session: JdbcBackend#Session) = {
     val project2update = project.copy(Some(id))
     qProject.where(_.id is id).update(project2update)(session)
   }

@@ -79,24 +79,8 @@ object TaskQueueHelper{
   def findWaitQueueById(qId: Int): Option[TaskQueue] = db withSession{ implicit session =>
     qTaskQueue.where(_.id is qId).where(_.status is TaskEnum.TaskWait).firstOption
   }
-
-  def updateStatus(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
-    qTaskQueue.where(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
-  }
-
-  def add(tq: TaskQueue): Int = db withSession{ implicit session =>
-    Logger.info("insert into taskQueue")
-    val taskQueueId = qTaskQueue.returning(qTaskQueue.map(_.id)).insert(tq)
-    taskQueueId
-  }
-
-  def remove(tq: TaskQueue): Int = db withSession{ implicit session =>
-    Logger.info("remove from taskQueue")
-    qTaskQueue.where(_.id === tq.id).delete
-  }
-
   def findQueueNum(envId: Int, projectId: Int): Int = db withSession {implicit session =>
-//    Query(qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length).first
+    //    Query(qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length).first
     qTaskQueue.where(_.envId is envId).where(_.projectId is projectId).where(_.status is TaskEnum.TaskWait).length.run
   }
 
@@ -111,6 +95,21 @@ object TaskQueueHelper{
         set = set + ((q.envId, q.projectId))
     }
     set
+  }
+
+  def create(tq: TaskQueue): Int = db withSession{ implicit session =>
+    Logger.info("insert into taskQueue")
+    val taskQueueId = qTaskQueue.returning(qTaskQueue.map(_.id)).insert(tq)
+    taskQueueId
+  }
+
+  def delete(tq: TaskQueue): Int = db withSession{ implicit session =>
+    Logger.info("remove from taskQueue")
+    qTaskQueue.where(_.id === tq.id).delete
+  }
+
+  def updateStatus(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
+    qTaskQueue.where(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
   }
 
 }

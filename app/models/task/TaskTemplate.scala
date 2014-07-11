@@ -27,19 +27,19 @@ object TaskTemplateHelper{
 
   val qTaskTemplate = TableQuery[TaskTemplateTable]
 
-  def all = db withSession {implicit session =>
-    qTaskTemplate.sortBy(x => (x.typeId, x.orderNum)).list()
+  def findById(tid: Int) = db withSession {implicit session =>
+    qTaskTemplate.where(_.id === tid).first
   }
 
-  def getById(tid: Int) = db withSession {implicit session =>
-    qTaskTemplate.where(_.id === tid).first
+  def all = db withSession {implicit session =>
+    qTaskTemplate.sortBy(x => (x.typeId, x.orderNum)).list()
   }
 
   def create(template: TaskTemplate) = db withSession { implicit session =>
     qTaskTemplate.returning(qTaskTemplate.map(_.id)).insert(template)
   }
 
-  def insertTemplates(templates: Seq[TaskTemplate]) = db withSession {implicit session =>
+  def createTemplates(templates: Seq[TaskTemplate]) = db withSession {implicit session =>
     qTaskTemplate.insertAll(templates: _*)
   }
 }

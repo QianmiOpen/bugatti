@@ -37,27 +37,26 @@ object PermissionHelper extends PlayCache {
   }
 
   def create(permission: Permission) = db withSession { implicit session =>
-    create_(permission)
+    _create(permission)
   }
 
-  def create_(permission: Permission)(implicit session: JdbcBackend#Session) = {
+  def _create(permission: Permission)(implicit session: JdbcBackend#Session) = {
     qPermission.insert(permission)(session)
   }
 
   def delete(jobNo: String) = db withSession { implicit session =>
-    delete_(jobNo)
+    _delete(jobNo)
   }
 
-  def delete_(jobNo: String)(implicit session: JdbcBackend#Session) = {
+  def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
     qPermission.where(_.jobNo is jobNo).delete(session)
   }
 
   def update(jobNo: String, permission: Permission) = db withSession { implicit session =>
-    val permission2update = permission.copy(jobNo)
-    qPermission.where(_.jobNo is jobNo).update(permission2update)
+    _update(jobNo, permission)
   }
 
-  def update_(jobNo: String, permission: Permission)(implicit session: JdbcBackend#Session) = {
+  def _update(jobNo: String, permission: Permission)(implicit session: JdbcBackend#Session) = {
     val permission2update = permission.copy(jobNo)
     qPermission.where(_.jobNo is jobNo).update(permission2update)(session)
   }

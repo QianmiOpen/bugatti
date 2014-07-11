@@ -50,7 +50,7 @@ object ConfLogHelper extends PlayCache {
     Query(qLog.where(_.cid is cid).length).first
   }
 
-  def create_(log: ConfLog)(implicit session: JdbcBackend#Session) = {
+  def _create(log: ConfLog)(implicit session: JdbcBackend#Session) = {
     qLog.returning(qLog.map(_.id)).insert(log)(session)
   }
 

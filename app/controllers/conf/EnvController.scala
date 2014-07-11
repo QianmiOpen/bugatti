@@ -52,7 +52,7 @@ object EnvController extends BaseController {
     if(user.role == RoleEnum.admin || countSafe > 0){
       seq = EnvironmentHelper.all()
     } else {
-      seq = EnvironmentHelper.findUnsafe()
+      seq = EnvironmentHelper.findByUnsafe()
     }
     Ok(Json.toJson(seq))
   }

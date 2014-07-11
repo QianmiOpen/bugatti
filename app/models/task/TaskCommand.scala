@@ -27,11 +27,11 @@ object TaskCommandHelper{
   import models.AppDB._
   val qTaskCommand = TableQuery[TaskCommandTable]
 
-  def addCommands(commands: Seq[TaskCommand]) = db withSession { implicit session =>
+  def create(commands: Seq[TaskCommand]) = db withSession { implicit session =>
     qTaskCommand.insertAll(commands: _*)
   }
 
-  def updateStatusByOrder(taskId: Int, orderNum: Int, status: TaskStatus) = db withSession{implicit session =>
+  def update(taskId: Int, orderNum: Int, status: TaskStatus) = db withSession{implicit session =>
     qTaskCommand.filter(_.taskId is taskId).filter(_.orderNum is orderNum)
       .map(command => command.status).update(status)
   }

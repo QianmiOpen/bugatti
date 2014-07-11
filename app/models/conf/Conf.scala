@@ -59,23 +59,23 @@ object ConfHelper extends PlayCache {
   def create(confForm: ConfForm) = db withTransaction { implicit session =>
     val id = qConf.returning(qConf.map(_.id)).insert(confForm.toConf)
     val content = ConfContent(Some(id), confForm.content)
-    ConfContentHelper.create_(content)
+    ConfContentHelper._create(content)
   }
 
   def delete(conf: Conf) = db withTransaction { implicit session =>
     qConf.where(_.id is conf.id).delete
-    ConfContentHelper.delete_(conf.id.get)
+    ConfContentHelper._delete(conf.id.get)
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
     findById(id) match {
       case Some(conf) =>
-        val confLogId = ConfLogHelper.create_(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
         qConf.where(_.id is id).delete
         ConfContentHelper.findById(id) match {
           case Some(content) =>
-            ConfLogContentHelper.create_(ConfLogContent(confLogId, content.content))
-            ConfContentHelper.delete_(id)
+            ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))
+            ConfContentHelper._delete(id)
           case None =>
             -2
         }
@@ -87,12 +87,12 @@ object ConfHelper extends PlayCache {
   def update(id: Int, confForm: ConfForm) = db withSession { implicit session =>
     findById(id) match {
       case Some(conf) =>
-        val confLogId = ConfLogHelper.create_(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
         qConf.where(_.id is id).update(confForm.toConf.copy(Some(id)))
         ConfContentHelper.findById(id) match {
           case Some(content) =>
-            ConfLogContentHelper.create_(ConfLogContent(confLogId, content.content))
-            ConfContentHelper.update_(id, ConfContent(None, confForm.content))
+            ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))
+            ConfContentHelper._update(id, ConfContent(None, confForm.content))
           case None =>
             -2
         }

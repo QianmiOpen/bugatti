@@ -28,7 +28,7 @@ object ConfLogContentHelper extends PlayCache {
     qLogContent.where(_.id is id).firstOption
   }
 
-  def create_(content: ConfLogContent)(implicit session: JdbcBackend#Session) = {
+  def _create(content: ConfLogContent)(implicit session: JdbcBackend#Session) = {
     qLogContent.insert(content)(session)
   }
 

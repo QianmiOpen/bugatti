@@ -28,11 +28,11 @@ object TaskTemplateStepHelper {
 
   val qTaskTemplateStep = TableQuery[TaskTemplateStepTable]
 
-  def create(action : TaskTemplateStep) = db withSession {implicit session =>
-    qTaskTemplateStep.returning(qTaskTemplateStep.map(_.id)).insert(action)
+  def findStepsByTemplateId(templateId: Int): Seq[TaskTemplateStep] = db withSession { implicit session =>
+    qTaskTemplateStep.where(_.templateId is templateId).sortBy(r => r.orderNum).list
   }
 
-  def getStepsByTemplateId(templateId: Int): Seq[TaskTemplateStep] = db withSession { implicit session =>
-    qTaskTemplateStep.where(_.templateId is templateId).sortBy(r => r.orderNum).list
+  def create(action : TaskTemplateStep) = db withSession {implicit session =>
+    qTaskTemplateStep.returning(qTaskTemplateStep.map(_.id)).insert(action)
   }
 }
