@@ -1,0 +1,67 @@
+#"nfsServer" -> nfsServer
+#"repository" -> repository
+#"taskId" -> taskId
+#"projectName" -> projectName
+#"machine" -> machine
+#"syndic" -> syndic
+#"version" -> version
+
+templates:
+  - name: webtest
+    remark: 用于dubbo项目的自动部署，即api类项目
+    items:
+      - itemName: groupId
+        itemDesc: groupId
+      - itemName: artifactId
+        itemDesc: artifactId
+      - itemName: unpacked
+        itemDesc: 自动解压
+        default: 'False'
+    actions:
+      - name: 拷贝文件
+        css: glyphicon glyphicon-upload
+        versionMenu: True
+        steps:
+          - name: 配置文件准备
+            sls: "bugatti copyfile"
+      - name: 安装应用
+        css: glyphicon glyphicon-import
+        versionMenu: True
+        steps:
+          - name: 加固os
+            sls: "salt {{machine}} state.sls os.security"
+          - name: 安装ntp服务
+            sls: "salt {{machine}} state.sls ntp"
+          - name: 安装java
+            sls: "salt {{machine}} state.sls java.install"
+            seconds: 10
+          - name: 安装tomcat
+            sls: "salt {{machine}} state.sls tomcat.install"
+            seconds: 6
+          - name: mount log目录
+            sls: "salt {{machine}} state.sls webapp.mountlog pillar='{webapp: {nfsServer: {{nfsServer}}, projectName: {{projectName}}}}'"
+          - name: 部署war包
+            sls: "salt {{machine}} state.sls webapp.deploy pillar='{webapp: {groupId: {{groupId}}, artifactId: {{artifactId}}, version: {{version}}, repository: {{repository}}, unzip: {{unpacked}}}}'"
+          - name: 配置文件准备
+            sls: "bugatti copyfile"
+          - name: 拷贝配置文件
+            sls: "salt {{machine}} state.sls job.copyfile pillar='{job: {confFileName: {{confFileName}}, id: {{taskId}}}}'"
+          - name: 启动应用
+            sls: "salt {{machine}} state.sls tomcat.startup"
+      - name: 重启应用
+        css: glyphicon glyphicon-repeat
+        steps:
+          - name: 关闭应用
+            sls: "salt {{machine}} state.sls tomcat.shutdown"
+          - name: 启动应用
+            sls: "salt {{machine}} state.sls tomcat.startup"
+      - name: 启动应用
+        css: glyphicon glyphicon-play
+        steps:
+          - name: 启动应用
+            sls: "salt {{machine}} state.sls tomcat.startup"
+      - name: 停止应用
+        css: glyphicon glyphicon-stop
+        steps:
+          - name: 关闭应用
+            sls: "salt {{machine}} state.sls tomcat.shutdown"

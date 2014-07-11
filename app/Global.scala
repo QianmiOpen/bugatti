@@ -69,7 +69,8 @@ object Global extends GlobalSettings {
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
         }
-        AppData.initFromYaml
+
+        AppData.initFromYaml(new File("conf/initial-data.yml"))
         AppData.initData
       }
     }
@@ -90,6 +91,8 @@ object Global extends GlobalSettings {
         AppTestData.areaScript
         AppTestData.environmentProjectRelScript
       }
+
+      AppData.initFromYaml(new File("conf/initial-test-data.yml"))
     }
 
 //    GitHelp.checkGitWorkDir(app)
@@ -120,9 +123,9 @@ object AppData {
     ).foreach(U.insert)
   }
 
-  def initFromYaml(implicit session: Session) = {
+  def initFromYaml(file: File) = {
     val yaml = new Yaml()
-    val io = new FileInputStream(new File("conf/initial-data.yml"))
+    val io = new FileInputStream(file)
     val templates = yaml.load(io).asInstanceOf[JMap[String, AnyRef]].get("templates").asInstanceOf[JList[JMap[String, AnyRef]]].asScala
     templates.foreach(_initTemplate)
   }
@@ -210,7 +213,7 @@ object AppTestData {
   // 环境
   def environmentScript(implicit session: Session) = {
     Seq(
-      //Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.19.3.1/24"), LevelEnum.unsafe),
+      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
@@ -246,7 +249,8 @@ object AppTestData {
   def areaScript(implicit session: Session) = {
     Seq (
       Area(None, "测试", "t-syndic", "172.19.3.149"),
-      Area(None, "test-syndic", "t-syndic", "172.19.3.132")
+      Area(None, "test-syndic", "t-syndic", "172.19.3.132"),
+      Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
   }
 }
