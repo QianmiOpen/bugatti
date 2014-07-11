@@ -35,20 +35,20 @@ object TemplateItemHelper extends PlayCache {
     qItem.sortBy(_.order asc).where(_.tid is tid).list
   }
 
-  def create(templateInfo: TemplateItem) = db withSession { implicit session =>
-    _create(templateInfo)
+  def create(item: TemplateItem) = db withSession { implicit session =>
+    _create(item)
   }
 
-  def _create(templateInfo: TemplateItem)(implicit session: JdbcBackend#Session) = {
-    qItem.insert(templateInfo)(session)
+  def _create(item: TemplateItem)(implicit session: JdbcBackend#Session) = {
+    qItem.returning(qItem.map(_.id)).insert(item)(session)
   }
 
   def _deleteByTid(tid: Int)(implicit session: JdbcBackend#Session) = {
     qItem.where(_.tid is tid).delete
   }
 
-  def update(id: Int, templateInfo: TemplateItem) = db withSession { implicit session =>
-    val info2update = templateInfo.copy(Some(id))
+  def update(id: Int, item: TemplateItem) = db withSession { implicit session =>
+    val info2update = item.copy(Some(id))
     qItem.where(_.id is id).update(info2update)
   }
 

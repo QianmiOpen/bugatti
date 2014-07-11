@@ -60,7 +60,7 @@ object MemberHelper extends PlayCache {
   }
 
   def _create(member: Member)(implicit session: JdbcBackend#Session) = {
-    qMember.insert(member)(session)
+    qMember.returning(qMember.map(_.id)).insert(member)(session)
   }
 
   def delete(id: Int) = db withSession { implicit session =>

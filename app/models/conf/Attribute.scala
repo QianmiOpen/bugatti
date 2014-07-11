@@ -32,10 +32,6 @@ object AttributeHelper {
     findByPid(pid).filter(_.name == name)(0).value.get
   }
 
-  def create(attr: Attribute) = db withSession { implicit session =>
-    qAttribute.insert(attr)
-  }
-
   def _create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
     qAttribute.insertAll(attr: _*)(session)
   }

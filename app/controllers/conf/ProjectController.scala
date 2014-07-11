@@ -136,13 +136,13 @@ object ProjectController extends BaseController {
   def updateMember(mid: Int, op: String) = AuthAction(FuncEnum.project) { implicit request =>
     MemberHelper.findById(mid) match {
       case Some(member) =>
-        if (request.user.role == RoleEnum.admin || member.level == LevelEnum.safe) op match {
+        if (!UserHelper.hasProjectSafe(member.pid, request.user)) Forbidden
+        else op match {
           case "up" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.safe))))
           case "down" => Ok(Json.obj("r" -> MemberHelper.update(mid, member.copy(level = LevelEnum.unsafe))))
           case "remove" => Ok(Json.obj("r" -> MemberHelper.delete(mid)))
           case _ => BadRequest
         }
-        else Forbidden
       case None => NotFound
     }
   }

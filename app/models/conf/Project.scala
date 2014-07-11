@@ -88,7 +88,7 @@ object ProjectHelper extends PlayCache {
   }
 
   def create(project: Project) = db withSession { implicit session =>
-    qProject.insert(project)
+    _create(project)
   }
 
   def create(projectForm: ProjectForm, jobNo: String) = db withTransaction { implicit session =>

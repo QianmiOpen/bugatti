@@ -63,7 +63,7 @@ define(['angular'], function(angular) {
         $scope.env = {level: "unsafe"}
         $scope.saveOrUpdate = function(env) {
             EnvService.save(angular.toJson(env), function(data) {
-                if (data.r === 1) {
+                if (data.r >= 0) {
                     $state.go('^');
                 } else if (data.r == 'exist') {
                     $scope.form.name.$invalid = true;
@@ -76,7 +76,7 @@ define(['angular'], function(angular) {
     app.controller('EnvUpdateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
         $scope.saveOrUpdate = function(env) {
             EnvService.update($stateParams.id, angular.toJson(env), function(data) {
-                if (data.r === 1) {
+                if (data.r >= 0) {
                     $state.go('^');
                 } else if (data.r == 'exist') {
                     $scope.form.name.$invalid = true;

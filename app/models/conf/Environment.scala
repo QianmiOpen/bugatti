@@ -53,7 +53,7 @@ object EnvironmentHelper {
   }
 
   def create(environment: Environment) = db withSession { implicit session =>
-    qEnvironment.insert(environment)
+    qEnvironment.returning(qEnvironment.map(_.id)).insert(environment)
   }
 
   def delete(id: Int) = db withSession { implicit session =>
