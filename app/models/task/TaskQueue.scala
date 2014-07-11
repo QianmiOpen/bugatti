@@ -108,7 +108,7 @@ object TaskQueueHelper{
     qTaskQueue.where(_.id === tq.id).delete
   }
 
-  def updateStatus(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
+  def update(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
     qTaskQueue.where(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
   }
 

@@ -56,44 +56,17 @@ object TaskHelper {
   val qTaskAttribute = TableQuery[AttributeTable]
   val qTaskQueue = TableQuery[TaskQueueTable]
 
-
-  def findLastStatus(envId: Int, projects: JsValue): List[Task] = db withSession { implicit session =>
-    val list: List[Int] = (projects \\ "id").toList.map( id => id.toString.toInt)
-
-    val maxEndTime = qTask.where(_.envId is envId).where(_.projectId inSet list.toSeq).groupBy(_.projectId)
-      .map {
-        case (projectId, row) => projectId -> row.map(_.startTime).max
-      }
-
-    val taskQuery = for{
-      task <- qTask
-      max <- maxEndTime
-      if(task.projectId === max._1 && task.startTime === max._2)
-    }yield task
-    taskQuery.list
+  def findById(taskId: Int) = db withSession { implicit session =>
+    val task = qTask.where(_.id is taskId).first
+    task
   }
 
-  def findLastStatusByProject(envId: Int, projectId: Int): List[Task] = {
-    val projects = Json.obj("id" -> projectId)
-    findLastStatus(envId, projects)
-  }
-
-  implicit def taskQueue2Task(tq: TaskQueue): Task ={
-    Task(None, tq.envId, tq.projectId, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
-  }
-
-  def addByTaskQueue(tq: TaskQueue): Int = db withSession { implicit session =>
-    //2、insert Task
-    val taskId = add(tq)
-    //3、update taskQueue
-    TaskQueueHelper.updateStatus(tq, taskId)
-    taskId
-  }
-
-  def changeStatus(taskId: Int, status: TaskStatus) = db withSession { implicit session =>
-    val task = qTask.where(_.id === taskId).first
-    val taskUpdate = task.copy(status = status, endTime = Some(new DateTime()))
-    qTask.where(_.id === taskId).update(taskUpdate)
+  def all(page: Int, pageSize: Int) = db withSession { implicit session =>
+    val offset = pageSize * page
+    val query = (for {
+      ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId is _.id) innerJoin qProject on (_._1.projectId is _.id)
+    } yield (task,environment,project)).sortBy(s => s._1.startTime.desc)
+    query.drop(offset).take(pageSize).list
   }
 
   def count(envId: Int, projectId: Int): Int = db withSession { implicit session =>
@@ -111,38 +84,6 @@ object TaskHelper {
         Query(qTask.length).first
       }
     }
-  }
-
-  def addByJson(json: JsValue) = db withSession{ implicit session =>
-    val taskResult:JsResult[Task] = json.validate[Task]
-    Logger.info(taskResult.toString)
-    taskResult match {
-      case s : JsSuccess[Task] => add(s.get)
-      case e : JsError => {
-        Logger.info("Errors: " + JsError.toFlatJson(e).toString())
-        0
-      }
-    }
-  }
-
-  def add(task: Task) = db withSession { implicit session =>
-    val tasktmp = task.copy(startTime = Some(new DateTime()))
-    val taskId = qTask.returning(qTask.map(_.id)).insert(tasktmp)
-    Logger.info("task db ==> "+taskId)
-    taskId
-  }
-
-  def all(page: Int, pageSize: Int) = db withSession { implicit session =>
-    val offset = pageSize * page
-    val query = (for {
-      ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId is _.id) innerJoin qProject on (_._1.projectId is _.id)
-    } yield (task,environment,project)).sortBy(s => s._1.startTime.desc)
-    query.drop(offset).take(pageSize).list
-  }
-
-  def findTask(taskId: Int) = db withSession { implicit session =>
-    val task = qTask.where(_.id is taskId).first
-    task
   }
 
   def findByEnv(envId: Int, projectId: Int, page: Int, pageSize: Int) = db withSession { implicit session =>
@@ -170,4 +111,63 @@ object TaskHelper {
       case _ => all(page, pageSize)
     }
   }
+
+  def findLastStatus(envId: Int, projects: JsValue): List[Task] = db withSession { implicit session =>
+    val list: List[Int] = (projects \\ "id").toList.map( id => id.toString.toInt)
+
+    val maxEndTime = qTask.where(_.envId is envId).where(_.projectId inSet list.toSeq).groupBy(_.projectId)
+      .map {
+      case (projectId, row) => projectId -> row.map(_.startTime).max
+    }
+
+    val taskQuery = for{
+      task <- qTask
+      max <- maxEndTime
+      if(task.projectId === max._1 && task.startTime === max._2)
+    }yield task
+    taskQuery.list
+  }
+
+  def findLastStatusByProject(envId: Int, projectId: Int): List[Task] = {
+    val projects = Json.obj("id" -> projectId)
+    findLastStatus(envId, projects)
+  }
+
+  implicit def taskQueue2Task(tq: TaskQueue): Task ={
+    Task(None, tq.envId, tq.projectId, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
+  }
+
+  def addByTaskQueue(tq: TaskQueue): Int = db withSession { implicit session =>
+    //2、insert Task
+    val taskId = create(tq)
+    //3、update taskQueue
+    TaskQueueHelper.update(tq, taskId)
+    taskId
+  }
+
+  def changeStatus(taskId: Int, status: TaskStatus) = db withSession { implicit session =>
+    val task = qTask.where(_.id === taskId).first
+    val taskUpdate = task.copy(status = status, endTime = Some(new DateTime()))
+    qTask.where(_.id === taskId).update(taskUpdate)
+  }
+
+  def addByJson(json: JsValue) = db withSession{ implicit session =>
+    val taskResult:JsResult[Task] = json.validate[Task]
+    Logger.info(taskResult.toString)
+    taskResult match {
+      case s : JsSuccess[Task] => create(s.get)
+      case e : JsError => {
+        Logger.info("Errors: " + JsError.toFlatJson(e).toString())
+        0
+      }
+    }
+  }
+
+  def create(task: Task) = db withSession { implicit session =>
+    val task2create = task.copy(startTime = Some(new DateTime()))
+    val taskId = qTask.returning(qTask.map(_.id)).insert(task2create)
+    Logger.info("task db ==> "+taskId)
+    taskId
+  }
+
 }

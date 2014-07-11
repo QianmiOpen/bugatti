@@ -64,7 +64,7 @@ object TaskLog{
   def show(sessionId: String, taskId: Int): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     val actor = chooseSystem(taskId)
     val schedule = startSchedule(taskId)
-    val task = TaskHelper.findTask(taskId)
+    val task = TaskHelper.findById(taskId)
 //    val task = null
     val logFilePath = getLogFilePath(taskId)
 //    val logFilePath = "/Users/jinwei/tmp/1564.log"
