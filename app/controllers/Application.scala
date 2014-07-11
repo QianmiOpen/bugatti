@@ -10,7 +10,7 @@ import play.api.mvc._
 import play.api.cache._
 import play.api.libs.json._
 import org.pac4j.play.scala.ScalaController
-import utils.GitHelp
+import utils.ConfHelp
 
 import views._
 
@@ -81,7 +81,7 @@ object Application extends ScalaController with Security {
 
   def pkgs(pkg: String) = Action { implicit request =>
     Logger.info(s"Download file: ${pkg}")
-    val file = new File(s"${GitHelp.workDir}/${pkg}")
+    val file = new File(s"${ConfHelp.confPath}/${pkg}")
 
     if (file.exists() && file.isFile && (pkg.endsWith(".tar.gz") || pkg.endsWith(".md5"))) {
       Ok.sendFile(content = file, fileName = _ => pkg.split("/").last)

@@ -112,13 +112,16 @@ object TaskProcess {
     val projectId = project.get.id.get
 
     val confSeq = ConfHelper.findByEid_Pid_Vid(environmentId, projectId, versionId)
-    val baseDir = s"${ConfHelp._confPath}/${taskId}"
+    val baseDir = s"${ConfHelp.confPath}/${taskId}"
 
 //    val baseDir = s"${GitHelp.workDir.getAbsolutePath}/work/${appName}/${taskId}/files"
 //    val file = new File(s"${baseDir}/.bugatti")
 //    file.getParentFile.mkdirs()
 //    file.createNewFile()
-
+    val file = new File(s"${baseDir}/files")
+    if(!file.exists()) {
+      file.mkdirs()
+    }
     if (confSeq.size > 0) {
       confSeq.foreach { xf =>
         val confContent = ConfContentHelper.findById(xf.id.get)

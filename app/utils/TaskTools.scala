@@ -46,6 +46,10 @@ object ConfHelp {
   def initConfPath(app: Application) = {
     _confPath = app.configuration.getString("git.work.dir").getOrElse("/srv/salt")
   }
+
+  def confPath {
+    _confPath
+  }
 }
 
 object GitHelp {
