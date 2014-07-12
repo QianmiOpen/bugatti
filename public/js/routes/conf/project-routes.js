@@ -16,8 +16,12 @@ define(['angular'], function(angular) {
 
         $stateProvider.state('conf.project.my', {
             url: "/my",
-            templateUrl: "partials/conf/project/project-index.html",
-            controller: "ProjectCtrl"
+            views: {
+                "@conf": {
+                    templateUrl: "partials/conf/project/project-my.html",
+                    controller: "ProjectCtrl"
+                }
+            }
         });
 
         $stateProvider.state('conf.project.create', {

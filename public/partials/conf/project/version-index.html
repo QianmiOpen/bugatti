@@ -1,6 +1,9 @@
 <div class="page-header clearfix">
     <button has-project-safe="{{$stateParams.id}}" ng-show="hasProjectSafe_" class="btn btn-primary pull-right" ui-sref="conf.project.version.create">新增</button></td>
-    <h1 class="pull-left m0">项目版本</h1>
+
+    <h1 class="pull-left m0">项目版本
+        <sub><a class="small" href="" back-button>返回</a></sub>
+    </h1>
 </div>
 
 <h3 class="text-muted">
@@ -14,7 +17,7 @@
             <th width="10%">版本编号</th>
             <th width="30%">版本号</th>
             <th width="30%">版本时间</th>
-            <th>操作</th>
+            <th ng-show="hasProjectSafe_">操作</th>
         </tr>
         </thead>
         <tbody>
@@ -30,7 +33,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="4">&nbsp;</td>
+            <td colspan="{{hasProjectSafe_?4:3}}">&nbsp;</td>
         </tr>
         </tfoot>
     </table>

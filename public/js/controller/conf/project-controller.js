@@ -12,15 +12,6 @@ define(['angular'], function(angular) {
             $scope.my = true;
         }
 
-        $scope.myProject = function() {
-            $scope.my = !$scope.my;
-            if ($scope.my) {
-                $state.go("conf.project.my", {}, {reload: true});
-            } else {
-                $state.go("conf.project", {}, {reload: true});
-            }
-        };
-
         // count
         ProjectService.count($scope.my, function(data) {
             $scope.totalItems = data;

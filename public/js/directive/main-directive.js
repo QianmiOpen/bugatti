@@ -8,6 +8,17 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.directives', []);
 
+    app.directive('backButton', [function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elm, attrs) {
+                elm.bind('click', function () {
+                    history.back();
+                });
+            }
+        }
+    }]);
+
     /* 用户权限列表展示 */
     app.directive('permission', ['UserService', function(UserService) {
         return {
