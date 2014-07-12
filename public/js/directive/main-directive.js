@@ -8,6 +8,7 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.directives', []);
 
+    /* 返回上一页(浏览器历史) */
     app.directive('backButton', [function() {
         return {
             restrict: 'A',
@@ -125,6 +126,7 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    /* 判断用户是否为项目成员 */
     app.directive('hasProject', ['Auth', 'ProjectService', function(Auth, ProjectService) {
         return {
             restrict: 'A',
@@ -149,8 +151,7 @@ define(['angular'], function(angular) {
         }
     }]);
 
-
-
+    /* 判断用户是否为项目管理员 */
     app.directive('hasProjectSafe', ['Auth', 'ProjectService', function(Auth, ProjectService) {
         return {
             restrict: 'A',
@@ -176,4 +177,45 @@ define(['angular'], function(angular) {
             }
         }
     }]);
+
+    /* diff比较内容 */
+    app.directive('diffShow', [function() {
+        if (angular.isUndefined(window.difflib)) {
+            throw new Error('js diff need js difflib to work...(o rly?)');
+        }
+        if (angular.isUndefined(window.diffview)) {
+            throw new Error('js diff need js diffview to work...(o rly?)');
+        }
+        return {
+            restrict: 'A',
+            scope: {
+                baseText: '@diffBaseText',
+                baseTextName: '@diffBaseTextName',
+                newText: '@diffNewText',
+                newTextName: '@diffNewTextName',
+                viewType : '@diffViewType'
+            },
+            link: function(scope, iElement, iAttrs) {
+                console.log('baseText='+scope.baseText
+                +',baseTextName='+scope.baseTextName
+                +',newText='+scope.newText
+                +',newTextName='+scope.newTextName)
+
+                var base = difflib.stringAsLines(scope.baseText),
+                    newtxt = difflib.stringAsLines(scope.newText),
+                    sm = new difflib.SequenceMatcher(base, newtxt),
+                    opcodes = sm.get_opcodes();
+                var diffViewData = diffview.buildView({
+                    baseTextLines: base,
+                    newTextLines: newtxt,
+                    opcodes: opcodes,
+                    baseTextName: scope.baseTextName,
+                    newTextName: scope.newTextName,
+                    viewType: scope.viewType
+                });
+                iElement.append(diffViewData);
+            }
+        }
+    }]);
+
 });

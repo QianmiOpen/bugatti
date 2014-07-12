@@ -239,7 +239,8 @@ define(['angular'], function(angular) {
             });
 
             ConfService.get($stateParams.cid, function(data) {
-//                console.log('conf='+angular.toJson(data))
+                $scope.conf = data.conf;
+                $scope.conf.content = data.content;
             });
 
 

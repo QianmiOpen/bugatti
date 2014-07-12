@@ -7,6 +7,7 @@
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("img/favicon.png")">
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap-theme.min.css"))">
+
         <link rel="stylesheet" href="@routes.Assets.at("css/app.css")">
         @Html(org.webjars.play.RequireJS.setup("js/app"))
         <script type="text/javascript">
@@ -56,5 +57,9 @@
         </div>
 
         <script type="text/javascript" src="@routes.Application.javascriptRoutes"></script>
+        <!-- jsDiff -->
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("diffview.css"))">
+        <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("difflib.js"))"></script>
+        <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("diffview.js"))"></script>
     </body>
 </html>

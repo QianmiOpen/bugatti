@@ -1,6 +1,6 @@
 
 <div class="navbar-text">
-    <a ui-sref="conf.project.version.conf.detail({id: $stateParams.id, vid: $stateParams.vid, cid: $stateParams.cid})">{{log.name}}</a>
+    <a ui-sref="conf.project.version.conf.detail({id: $stateParams.id, vid: $stateParams.vid, cid: $stateParams.cid})">{{conf.name}}</a>
 </div>
 
 <div class="clearfix"></div>
@@ -8,10 +8,14 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <span class="glyphicon glyphicon-user"></span>
-        {{log.jobNo}}
+        {{conf.jobNo}}
     </div>
 </div>
 
-<pre>
-    {{log.content.content}}
-</pre>
+<div ng-if="log && conf"
+     diff-show
+     diff-base-text="{{log.content.content}}"
+     diff-base-text-name="{{log.name}}"
+     diff-new-text="{{conf.content.content}}"
+     diff-new-text-name="{{conf.name}}"
+     diff-view-type="1"></div>

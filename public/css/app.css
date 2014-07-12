@@ -152,6 +152,11 @@ code {
     border-left-color:#428bca
 }
 
+/*jsdiff*/
+table.inlinediff {
+    width: 100%;
+}
+
 /*
  * Sidebar
  */

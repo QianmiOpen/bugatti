@@ -38,20 +38,19 @@ object Application extends ScalaController with Security {
   }
 
   def login = RequiresAuthentication("CasClient") { profile =>
+    def makeToken = java.util.UUID.randomUUID().toString
     Action { implicit request =>
       UserHelper.findByJobNo(profile.getId) match {
         case Some(user) if user.locked =>
           Locked(html.template.ldap_callback_locked.render(siteDomain))
         case Some(user) if user.role == RoleEnum.admin =>
           UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
-          val token = java.util.UUID.randomUUID().toString
-          Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> user.jobNo)
+          Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
         case Some(user) if user.role == RoleEnum.user =>
           PermissionHelper.findByJobNo(user.jobNo) match {
             case Some(p) =>
               UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
-              val token = java.util.UUID.randomUUID().toString
-              Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> user.jobNo)
+              Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
             case None =>
               Forbidden(html.template.ldap_callback_forbidden.render(siteDomain))
           }
@@ -70,10 +69,8 @@ object Application extends ScalaController with Security {
   def ping = HasToken() { token => jobNo => implicit request =>
     UserHelper.findByJobNo(jobNo) map { user =>
       val ps = PermissionHelper.findByJobNo(jobNo) match {
-        case Some(p) =>
-          p.functions
-        case None =>
-          Seq.empty
+        case Some(p) => p.functions
+        case None => Seq.empty
       }
       Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "permissions" -> ps)).withToken(token -> jobNo)
     } getOrElse NotFound(Json.obj("r" -> "User Not Found"))
