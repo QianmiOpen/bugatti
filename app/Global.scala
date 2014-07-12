@@ -107,6 +107,8 @@ object Global extends GlobalSettings {
         TaskProcess.checkQueueNum(s._1, s._2)
         TaskProcess.executeTasks(s._1, s._2)
     }
+
+    TaskProcess.generateSchedule
   }
 }
 

@@ -9,6 +9,7 @@ import enums.TaskEnum
 import models.conf._
 import models.task._
 import play.api.Logger
+import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
@@ -17,7 +18,7 @@ import utils.{ConfHelp, SaltTools, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
-
+import play.api.Play.current
 /**
  * Created by jinwei on 20/6/14.
  */
@@ -32,10 +33,15 @@ object TaskProcess {
   }
 
   lazy val socketActor = {
-    //    ActorSystem("mySocketSystem") actorOf Props[SocketActor]
-    taskSystem actorOf Props[SocketActor]
+        ActorSystem("mySocketSystem") actorOf Props[SocketActor]
+//    taskSystem actorOf Props[SocketActor]
     //    Akka.system.actorOf(Props[SocketActor])
   }
+
+  def generateSchedule = {
+    new WSSchedule().start(socketActor, TaskProcess.getAllStatus)
+  }
+
 
   // 以envId:projectId作为key，区分任务执行actor
   var actorMap = {
@@ -59,7 +65,12 @@ object TaskProcess {
    */
   def getAllStatus: JsValue = {
     Logger.info(Json.prettyPrint(statusMap))
-    statusMap
+//    statusMap.keys.map{
+//      key =>
+//        statusMap = statusMap ++ Json.obj(s"${key}_1" -> (statusMap \ key))
+//    }
+          statusMap
+
   }
 
   def generateStatusJson(envId: Int, projectId: Int, currentNum: Int, totalNum: Int, sls: String, machine: String, status: Int, taskName: String) = {
@@ -160,7 +171,7 @@ object TaskProcess {
     //2、更改任务状态
     generateQueueNumJson(envId, projectId, waitNum, list)
     //3、推送任务状态
-    pushStatus()
+    //TODO pushStatus()
   }
 
   def generateQueueNumJson(envId: Int, projectId: Int, num: Int, list: List[TaskQueue]){
@@ -191,6 +202,7 @@ object TaskProcess {
   }
 
   def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
+
     val js: JsValue = getAllStatus
     (socketActor ? JoinProcess(js)).map{
       case ConnectedSocket(out) => {
@@ -285,7 +297,7 @@ class TaskProcess extends Actor {
         val taskStatus: JsValue = Json.toJson(TaskHelper.findLastStatusByProject(envId, projectId)(0))
         Logger.info(s"JsValue ==> ${taskStatus}")
         TaskProcess.generateTaskStatusJson(envId, projectId, taskStatus, taskName)
-        TaskProcess.pushStatus
+        //TODO        TaskProcess.pushStatus
       }
       //no task no actor
       self ! RemoveActor(envId, projectId)
@@ -325,7 +337,7 @@ class TaskProcess extends Actor {
       //修改数据库状态(task_command)
       TaskCommandHelper.update(command.taskId, command.orderNum, TaskEnum.TaskProcess)
       //推送状态
-      TaskProcess.pushStatus
+      //TODO TaskProcess.pushStatus
 
       //调用salt命令
       val outputCommand = s"--log-file=${path}"
@@ -583,6 +595,16 @@ class TaskProcess extends Actor {
   }
 }
 
+class WSSchedule{
+  def start(socketActor: ActorRef, jsValue: JsValue): Cancellable = {
+    Akka.system.scheduler.schedule(
+      1 second,
+      1 seconds,
+      socketActor,
+      jsValue
+    )
+  }
+}
 
 case class ExecuteOneByOne(envId: Int, projectId: Int)
 

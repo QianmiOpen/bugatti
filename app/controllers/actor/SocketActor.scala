@@ -25,11 +25,14 @@ class SocketActor extends Actor {
     case AllTaskStatus() => {
       notifyAllSocket(TaskProcess.getAllStatus)
     }
+    case js: JsValue => {
+      self ! AllTaskStatus()
+    }
   }
 
   def notifyAllSocket(js: JsValue) {
     Logger.info("notifyAllSocket==>" + js.toString())
-    Thread.sleep(100)
+//    Thread.sleep(100)
     channel.push(js)
   }
 }
