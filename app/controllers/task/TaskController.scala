@@ -121,7 +121,7 @@ object TaskController extends Controller {
         //2、调用方法checkQueueNum修改状态；
         TaskProcess.checkQueueNum(tq.envId, tq.projectId)
         //3、调用推送状态方法；
-        TaskProcess.pushStatus()
+        //TODO TaskProcess.pushStatus()
       }
       case _ => {
 
