@@ -4,15 +4,20 @@ import controllers.BaseController
 import enums.FuncEnum
 import models.conf._
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
 import play.api.libs.json._
 
+import scala.collection.mutable
+import scala.io.Source
+
 /**
  * 项目版本
  *
  * @author of546
+ * @author of729
  */
 object VersionController extends BaseController {
 
@@ -26,6 +31,20 @@ object VersionController extends BaseController {
       "updated" -> default(jodaDate("yyyy-MM-dd hh:mm:ss"), DateTime.now())
     )(Version.apply)(Version.unapply)
   )
+
+  def nexusVersions(pid: Int) = Action {
+    // 1、根据projectId获取项目attribute中的groupId、artifactId
+    val groupId = AttributeHelper.getValue(pid, "groupId").replaceAll("\\.", "/")
+    val artifactId = AttributeHelper.getValue(pid, "artifactId")
+    Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
+    // 2、查询release、snapshot版本
+    val listRelease = _makeVersion(groupId, artifactId, false)
+    val listSnapshot = _makeVersion(groupId, artifactId, true)
+    // 3、拼接版本号，按照版本号逆序
+    val result = (listRelease ::: listSnapshot).sorted.reverse
+    Logger.info(s"nexus return versions : [${result}]")
+    Ok(Json.toJson(result))
+  }
 
   def show(id: Int) = Action {
     Ok(Json.toJson(VersionHelper.findById(id)))
@@ -88,6 +107,26 @@ object VersionController extends BaseController {
         }
       }
     )
+  }
+
+  lazy val NexusRepUrl = app.configuration.getString("nexus.rep_url").getOrElse("http://nexus.dev.ofpay.com/nexus/content/repositories")
+  def _makeVersion(groupId: String, artifactId: String, isSnapshot: Boolean): List[String] = {
+    val list = new mutable.ListBuffer[String]
+    val branch = if (isSnapshot) "snapshots" else "releases"
+    val url = s"${NexusRepUrl}/${branch}/${groupId}/${artifactId}"
+    Logger.info(s"request version url = [${url}]")
+    try {
+      val source = Source.fromURL(url)
+      val reg = """<a href=".+">([^/]+)/</a>""".r
+      for (regMatch <- reg.findAllMatchIn(source.mkString)) {
+        list += regMatch.group(1).toString
+      }
+      source.close
+    } catch {
+      case ex: Exception => Logger.error(s"request version error : ${ex}")
+    }
+    Logger.info(s"request version result : [${list}]")
+    list.toList
   }
 
 }

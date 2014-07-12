@@ -12,7 +12,7 @@ case class Attribute(id: Option[Int], pid: Option[Int], name: String, value: Opt
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def pid = column[Int]("pid", O.NotNull)   // 项目编号
+  def pid = column[Int]("project_id", O.NotNull)   // 项目编号
   def name = column[String]("name", O.NotNull)   // 属性名称（同TemplateInfo.itemName)
   def value = column[String]("value", O.Nullable) // 属性值
 

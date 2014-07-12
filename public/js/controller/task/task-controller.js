@@ -11,8 +11,8 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService','$state', '$stateParams', '$interval', 'Auth',
-        function($scope,TaskService,EnvService,ProjectService,$state,$stateParams, $interval, Auth) {
+    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService', 'VersionService', '$state', '$stateParams', '$interval', 'Auth',
+        function($scope,TaskService,EnvService,ProjectService,VersionService,$state,$stateParams, $interval, Auth) {
 
         keepSession($scope, $interval, Auth);
 //=====================================变量========================================
@@ -206,7 +206,7 @@ define(['angular'], function(angular) {
         }
 
         $scope.showNexusVersion = function(pid){
-            TaskService.getNexusVersions(pid, function(data){
+            VersionService.getNexusVersions(pid, function(data){
                 console.log(data)
             })
         }

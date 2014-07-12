@@ -8,7 +8,9 @@
     <div class="form-group">
         <label for="vs" class="col-sm-3 control-label">版本号：</label>
         <div class="col-sm-3">
-            <input type="text" class="form-control" ng-model="version.vs" name="vs" id="vs" ng-maxlength="200" placeholder="必填，唯一" required>
+            <select name="vs" id="vs" class="form-control" ng-model="version.vs" ng-options="v for v in versions" required>
+                <option value="">-- 选择版本 --</option>
+            </select>
         </div>
         <div ng-show="form.vs.$dirty && form.vs.$invalid" class="has-error">
             <span ng-show="form.vs.$error.required" class="control-label">请输入版本</span>

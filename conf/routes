@@ -67,6 +67,7 @@ POST          /template                           controllers.conf.TemplateContr
 PUT           /template/:id                       controllers.conf.TemplateController.update(id: Int)
 
 # Project Version
+GET           /project/:pid/nexusVersion          controllers.conf.VersionController.nexusVersions(pid: Int)
 GET           /project/:pid/version               controllers.conf.VersionController.index(pid: Int, page: Int ?=0, pageSize: Int ?=10)
 GET           /project/:pid/versoin/total         controllers.conf.VersionController.count(pid: Int)
 GET           /project/version/all                controllers.conf.VersionController.all(pid: Int, top: Int ?=10)
@@ -101,7 +102,6 @@ GET           /task/joinProcess/:taskId           controllers.task.TaskControlle
 POST          /task/newTaskQueue                  controllers.task.TaskController.createNewTaskQueue
 POST          /task/removeTaskQueue               controllers.task.TaskController.removeTaskQueue(qid: Int)
 POST          /task/version                       controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
-GET           /task/nexusVersion                  controllers.task.TaskController.getNexusVersions(projectId: Int)
 GET           /task/templates                     controllers.task.TaskController.getTemplates
 #Log
 GET           /log/:taskId                        controllers.task.TaskController.taskLog(taskId: Int)

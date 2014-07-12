@@ -19,7 +19,7 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 case class Version(id: Option[Int], pid: Int, vs: String, updated: DateTime)
 class VersionTable(tag: Tag) extends Table[Version](tag, "version"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def pid = column[Int]("pid", O.NotNull)   // 项目编号
+  def pid = column[Int]("project_id", O.NotNull)   // 项目编号
   def vs = column[String]("version", O.NotNull) // 当前版本
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 

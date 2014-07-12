@@ -35,45 +35,7 @@ object TaskController extends Controller {
 
   val templateDir = "/srv/sls"
 
-  val httpURLBase = "http://nexus.dev.ofpay.com/nexus/content/repositories"
 
-  def getNexusVersions(pid: Int) = Action{
-    //1、根据projectId获取项目attribute中的groupId、artifactId
-    val groupId = AttributeHelper.getValue(pid, "groupId").replaceAll("\\.", "/")
-    val artifactId = AttributeHelper.getValue(pid, "artifactId")
-    Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
-    //2、查询release、snapshot版本
-    val listRelease = versions(groupId, artifactId, false)
-    val listSnapshot = versions(groupId, artifactId, true)
-    //3、拼接版本号，按照版本号逆序
-    val result = listRelease ::: listSnapshot
-    Logger.info(result.sorted.reverse.toString())
-    Ok(Json.toJson(result.sorted.reverse))
-  }
-
-  def versions(groupId: String, artifactId: String, isSnapshot: Boolean): List[String] = {
-    var list = mutable.LinkedList[String]()
-    var branch = "releases"
-    if(isSnapshot){
-      branch = "snapshots"
-    }
-    val url = s"${httpURLBase}/${branch}/${groupId}/${artifactId}"
-    Logger.info(url)
-    try{
-      val source = Source.fromURL(url)
-      val htmlSource = source.mkString
-      val reg = """<a href=".+">([^/]+)/</a>""".r
-      val regMatchs = reg.findAllMatchIn(htmlSource)
-      for(regMatch <- regMatchs){
-        list = list :+ regMatch.group(1).toString
-      }
-      source.close
-    }catch{
-      case ex: Exception => Logger.error("version error : " + ex.toString)
-    }
-    Logger.info("versions==>" + list)
-    list.toList
-  }
   /**
    * 根据项目id获取最近的5个版本号，按照时间倒序
    * 在线上环境会过滤掉SNAPSHOT版本号

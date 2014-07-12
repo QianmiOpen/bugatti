@@ -2,6 +2,7 @@
     <pre>当前页: {{currentPage}} / {{numPages}}，共 {{totalItems}} 条记录。</pre>
 </div>
 <div class="text-center">
-    <pagination on-select-page="setPage(page)" total-items="totalItems" page="currentPage" class="m0" max-size="pageSize" boundary-links="true" rotate="false" num-pages="numPages"
+    <pagination items-per-page="pageSize" on-select-page="setPage(page)" total-items="totalItems" page="currentPage" class="m0"
+                boundary-links="true" rotate="false" num-pages="numPages"
                 previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 </div>

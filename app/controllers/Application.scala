@@ -148,6 +148,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.TemplateController.items,
 
         // version
+        conf.routes.javascript.VersionController.nexusVersions,
         conf.routes.javascript.VersionController.index,
         conf.routes.javascript.VersionController.count,
         conf.routes.javascript.VersionController.show,
@@ -180,7 +181,6 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.findLastTaskStatus,
         task.routes.javascript.TaskController.joinProcess,
         task.routes.javascript.TaskController.getVersions,
-        task.routes.javascript.TaskController.getNexusVersions,
         task.routes.javascript.TaskController.createNewTaskQueue,
         task.routes.javascript.TaskController.getTemplates,
         task.routes.javascript.TaskController.taskLog,
