@@ -19,7 +19,7 @@ class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_ite
   def order = column[Int]("order", O.NotNull, O.Default(0)) // 字段排序
 
   override def * = (id.?, tid.?, itemName, itemDesc.?, default.?, order) <> (TemplateItem.tupled, TemplateItem.unapply _)
-  def idx = index("idx_tid", tid)
+  def idx_order = index("idx_tid_order", (tid, order))
   def idx_name = index("idx_name", (tid, itemName), unique = true)
 }
 object TemplateItemHelper extends PlayCache {

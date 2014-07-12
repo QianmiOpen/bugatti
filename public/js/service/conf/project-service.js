@@ -57,6 +57,9 @@ define(['angular'], function(angular) {
             top: function(pid, callback) {
                 $http(PlayRoutes.controllers.conf.VersionController.all(pid)).success(callback);
             },
+            getNexusVersions: function(pid, callback){
+                $http(PlayRoutes.controllers.conf.VersionController.nexusVersions(pid)).success(callback)
+            },
             getPage: function(pid, page, pageSize, callback) {
                 $http(PlayRoutes.controllers.conf.VersionController.index(pid, page, pageSize)).success(callback);
             },

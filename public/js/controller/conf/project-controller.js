@@ -341,6 +341,11 @@ define(['angular'], function(angular) {
                     }
                 });
             };
+
+            VersionService.getNexusVersions($stateParams.id, function(data) {
+                $scope.versions = data;
+            });
+
     }]);
 
 
@@ -369,6 +374,10 @@ define(['angular'], function(angular) {
                     return angular.equals(version, $scope.master);
                 };
                 $scope.reset();
+            });
+
+            VersionService.getNexusVersions($stateParams.id, function(data) {
+                $scope.versions = data;
             });
     }]);
 
