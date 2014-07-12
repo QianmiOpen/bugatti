@@ -108,9 +108,9 @@ object ConfController extends BaseController {
     mapping(
       "target_eid" -> number,
       "target_vid" -> number,
-      "eid" -> number,
-      "vid" -> number,
-      "pid" -> number,
+      "eid" -> number, // 原环境编号
+      "vid" -> number, // 原版本编号
+      "pid" -> number, // 原项目编号
       "ovr" -> default(boolean, false)
     )(CopyForm.apply)(CopyForm.unapply)
   )
