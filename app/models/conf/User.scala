@@ -40,11 +40,11 @@ object UserHelper extends PlayCache {
   val qUser = TableQuery[UserTable]
 
   def findByJobNo(jobNo: String) = db withSession { implicit session =>
-    qUser.where(_.jobNo is jobNo).firstOption
+    qUser.filter(_.jobNo === jobNo).firstOption
   }
 
   def count: Int = db withSession { implicit session =>
-    Query(qUser.length).first
+    qUser.length.run
   }
 
   def all(page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
@@ -69,7 +69,7 @@ object UserHelper extends PlayCache {
   }
 
   def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
-    qUser.where(_.jobNo is jobNo).delete(session)
+    qUser.filter(_.jobNo === jobNo).delete(session)
   }
 
   def update(jobNo: String, user: User) = db withSession { implicit session =>
@@ -87,12 +87,14 @@ object UserHelper extends PlayCache {
 
   def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
     val user2update = user.copy(jobNo)
-    qUser.where(_.jobNo is jobNo).update(user2update)(session)
+    qUser.filter(_.jobNo === jobNo).update(user2update)(session)
   }
 
   // ---------------------------------------------------
   // 项目和环境资源权限
   // ---------------------------------------------------
+
+  /* 项目委员 */
   def hasProject(projectId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
@@ -101,6 +103,7 @@ object UserHelper extends PlayCache {
     }
   }
 
+  /* 项目委员长 */
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
@@ -109,6 +112,7 @@ object UserHelper extends PlayCache {
     }
   }
 
+  /* 指定环境下，根据安全级别选择委员长或成员访问 */
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {

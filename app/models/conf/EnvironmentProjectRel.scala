@@ -27,28 +27,28 @@ object EnvironmentProjectRelHelper {
   val qProject = TableQuery[ProjectTable]
 
   def findById(id: Int): Option[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.where(_.id === id).firstOption
+    qRelation.filter(_.id === id).firstOption
   }
 
-  def findByIp(ip: String): Seq[EnvironmentProjectRel] = db withSession {
-    implicit session => qRelation.where(_.ip === ip).list
+  def findByIp(ip: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.filter(_.ip === ip).list
   }
 
   def findBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession{ implicit session =>
-    qRelation.where(_.syndicName === syndicName).list
+    qRelation.filter(_.syndicName === syndicName).list
   }
 
   def findByEnvId_ProjectId(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = db withSession {
     implicit session =>
-      qRelation.where(r => r.envId === envId && r.projectId === projectId).list
+      qRelation.filter(r => r.envId === envId && r.projectId === projectId).list
   }
 
   def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.where(c => c.syndicName === syndicName && c.envId.isNull).list
+    qRelation.filter(c => c.syndicName === syndicName && c.envId.isNull).list
   }
 
   def findIpsByEnvId(envId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.where(r => r.envId === envId && r.projectId.isNull).list
+    qRelation.filter(r => r.envId === envId && r.projectId.isNull).list
   }
 
   def all(envId: Option[Int], projectId: Option[Int], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
@@ -63,7 +63,7 @@ object EnvironmentProjectRelHelper {
     var query = for { r <- qRelation } yield r
     envId.map(id => query = query.filter(_.envId === id))
     projectId.map(id => query = query.filter(_.projectId === id))
-    Query(query.length).first
+    query.length.run
   }
   
   def create(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
@@ -81,14 +81,14 @@ object EnvironmentProjectRelHelper {
     findById(id) match {
       case Some(rel) =>
         val update2rel = EnvironmentProjectRel(rel.id, rel.envId, None, rel.syndicName, rel.name, rel.ip)
-        qRelation.where(_.id === id).update(update2rel)
+        qRelation.filter(_.id === id).update(update2rel)
       case None =>
         0
     }
   }
 
   def update(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
-    qRelation.where(_.id === envProjectRel.id).update(envProjectRel)
+    qRelation.filter(_.id === envProjectRel.id).update(envProjectRel)
   }
 
 }

@@ -1,8 +1,6 @@
 package models.conf
 
 import enums.LevelEnum
-import enums.LevelEnum.Level
-import play.api.Logger
 import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
@@ -34,28 +32,28 @@ object VersionHelper extends PlayCache {
   val qVersion = TableQuery[VersionTable]
 
   def findById(id: Int) = db withSession { implicit session =>
-    qVersion.where(_.id is id).firstOption
+    qVersion.filter(_.id === id).firstOption
   }
 
   def findByPid(pid: Int): Seq[Version] = db withSession { implicit session =>
-    qVersion.where(_.pid is pid).sortBy(_.updated desc).list
+    qVersion.filter(_.pid === pid).sortBy(_.updated desc).list
   }
 
   def findByPid_Vs(pid: Int, vs: String): Option[Version] = db withSession { implicit session =>
-    qVersion.where(v => v.pid === pid && v.vs === vs).firstOption
+    qVersion.filter(v => v.pid === pid && v.vs === vs).firstOption
   }
 
   def count(pid: Int) = db withSession { implicit session =>
-    Query(qVersion.where(_.pid is pid).length).first
+    qVersion.filter(_.pid === pid).length.run
   }
 
   def all(pid: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
     val offset = pageSize * page
-    qVersion.sortBy(_.updated desc).where(_.pid is pid).drop(offset).take(pageSize).list
+    qVersion.filter(_.pid === pid).sortBy(_.updated desc).drop(offset).take(pageSize).list
   }
 
   def all(pid: Int, top: Int): Seq[Version] = db withSession { implicit session =>
-    qVersion.where(_.pid is pid).sortBy(_.updated desc).take(top).list
+    qVersion.filter(_.pid === pid).sortBy(_.updated desc).take(top).list
   }
 
   def findByPid_Eid(pid: Int, eid: Int): Seq[Version] = db withSession { implicit session =>
@@ -86,12 +84,12 @@ object VersionHelper extends PlayCache {
         ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal - 1, p.lastVid, p.lastVersion, p.lastUpdated))
       case None =>
     }
-    qVersion.where(_.id is version.id).delete
+    qVersion.filter(_.id is version.id).delete
   }
 
   def update(id: Int, sp: Version) = db withSession { implicit session =>
     val sp2update = sp.copy(Option(id))
-    qVersion.where(_.id is id).update(sp2update)
+    qVersion.filter(_.id === id).update(sp2update)
   }
 
 }

@@ -28,7 +28,7 @@ object TaskTemplateHelper{
   val qTaskTemplate = TableQuery[TaskTemplateTable]
 
   def findById(tid: Int) = db withSession {implicit session =>
-    qTaskTemplate.where(_.id === tid).first
+    qTaskTemplate.filter(_.id === tid).first
   }
 
   def all = db withSession {implicit session =>
@@ -42,4 +42,5 @@ object TaskTemplateHelper{
   def create(templates: Seq[TaskTemplate]) = db withSession { implicit session =>
     qTaskTemplate.insertAll(templates: _*)
   }
+
 }

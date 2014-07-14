@@ -29,11 +29,11 @@ object AreaHelper {
   val qRel = TableQuery[EnvironmentProjectRelTable]
 
   def findById(id: Int): Option[Area] = db withSession { implicit session =>
-    qArea.where(_.id === id).firstOption
+    qArea.filter(_.id === id).firstOption
   }
 
   def findByName(name: String): Option[Area] = db withSession { implicit session =>
-    qArea.where(_.name === name).firstOption
+    qArea.filter(_.name === name).firstOption
   }
 
   def allInfo: Seq[AreaInfo] = db withSession { implicit session =>
@@ -41,7 +41,7 @@ object AreaHelper {
   }
 
   def findInfoById(id: Int): Option[AreaInfo] = db withSession { implicit session =>
-    qArea.where(_.id === id).firstOption.map(_Area2AreaInfo)
+    qArea.filter(_.id === id).firstOption.map(_Area2AreaInfo)
   }
 
   def create(area: Area): Int = db withSession { implicit session =>
@@ -49,18 +49,18 @@ object AreaHelper {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qArea.where(_.id === id).delete
+    qArea.filter(_.id === id).delete
   }
 
   def update(area: Area) = db withSession { implicit session =>
-    qArea.where(_.id === area.id).update(area)
+    qArea.filter(_.id === area.id).update(area)
   }
 
   def _Area2AreaInfo(implicit session: Session) = { area: Area =>
     val syndicName = area.syndicName
-    val counts = (qRel.where(_.syndicName === syndicName).length.run,
-      qRel.where(c => c.syndicName === syndicName && c.envId.isNull).length.run,
-      qRel.where(c => c.syndicName === syndicName && c.projectId.isNull).length.run)
+    val counts = (qRel.filter(_.syndicName === syndicName).length.run,
+      qRel.filter(c => c.syndicName === syndicName && c.envId.isNull).length.run,
+      qRel.filter(c => c.syndicName === syndicName && c.projectId.isNull).length.run)
     AreaInfo(area.id, area.name, area.syndicName, area.syndicIp, counts._1, counts._2, counts._3)
   }
 }

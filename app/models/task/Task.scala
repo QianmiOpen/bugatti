@@ -57,31 +57,31 @@ object TaskHelper {
   val qTaskQueue = TableQuery[TaskQueueTable]
 
   def findById(taskId: Int) = db withSession { implicit session =>
-    val task = qTask.where(_.id is taskId).first
+    val task = qTask.filter(_.id === taskId).first
     task
   }
 
   def all(page: Int, pageSize: Int) = db withSession { implicit session =>
     val offset = pageSize * page
     val query = (for {
-      ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId is _.id) innerJoin qProject on (_._1.projectId is _.id)
+      ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
     } yield (task,environment,project)).sortBy(s => s._1.startTime.desc)
     query.drop(offset).take(pageSize).list
   }
 
   def count(envId: Int, projectId: Int): Int = db withSession { implicit session =>
     (envId, projectId) match {
-      case (e, p) if e != -1 && p != -1 =>{
-        Query(qTask.where(_.envId is envId).where(_.projectId is projectId).length).first
+      case (e, p) if e != -1 && p != -1 => {
+        qTask.filter(t => t.envId === envId && t.projectId === projectId).length.run
       }
-      case (e, p) if e == -1 && p != -1 =>{
-        Query(qTask.where(_.projectId is projectId).length).first
+      case (e, p) if e == -1 && p != -1 => {
+        qTask.filter(_.projectId === projectId).length.run
       }
-      case (e, p) if e != -1 && p == -1 =>{
-        Query(qTask.where(_.envId is envId).length).first
+      case (e, p) if e != -1 && p == -1 => {
+        qTask.filter(_.envId === envId).length.run
       }
-      case (e, p) if e == -1 && p == -1 =>{
-        Query(qTask.length).first
+      case (e, p) if e == -1 && p == -1 => {
+        qTask.length.run
       }
     }
   }
@@ -91,20 +91,20 @@ object TaskHelper {
     (envId, projectId) match {
       case (e, p) if e != -1 && p != -1 => {
         (for {
-          ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId is _.id) innerJoin qProject on (_._1.projectId is _.id)
+          ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
           if task.envId is envId
           if task.projectId is projectId
         } yield (task,environment,project)).sortBy(s => s._1.startTime.desc).drop(offset).take(pageSize).list
       }
       case (e, p) if e != -1 && p == -1 => {
         (for {
-          ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId is _.id) innerJoin qProject on (_._1.projectId is _.id)
+          ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
           if task.envId is envId
         } yield (task,environment,project)).sortBy(s => s._1.startTime.desc).drop(offset).take(pageSize).list
       }
       case (e, p) if e == -1 && p != -1 => {
         (for {
-          ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId is _.id) innerJoin qProject on (_._1.projectId is _.id)
+          ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
           if task.projectId is projectId
         } yield (task,environment,project)).sortBy(s => s._1.startTime.desc).drop(offset).take(pageSize).list
       }
@@ -115,7 +115,7 @@ object TaskHelper {
   def findLastStatus(envId: Int, projects: JsValue): List[Task] = db withSession { implicit session =>
     val list: List[Int] = (projects \\ "id").toList.map( id => id.toString.toInt)
 
-    val maxEndTime = qTask.where(_.envId is envId).where(_.projectId inSet list.toSeq).groupBy(_.projectId)
+    val maxEndTime = qTask.filter(_.envId === envId).filter(_.projectId inSet list.toSeq).groupBy(_.projectId)
       .map {
       case (projectId, row) => projectId -> row.map(_.startTime).max
     }
@@ -146,9 +146,9 @@ object TaskHelper {
   }
 
   def changeStatus(taskId: Int, status: TaskStatus) = db withSession { implicit session =>
-    val task = qTask.where(_.id === taskId).first
+    val task = qTask.filter(_.id === taskId).first
     val taskUpdate = task.copy(status = status, endTime = Some(new DateTime()))
-    qTask.where(_.id === taskId).update(taskUpdate)
+    qTask.filter(_.id === taskId).update(taskUpdate)
   }
 
   def addByJson(json: JsValue) = db withSession{ implicit session =>

@@ -46,14 +46,10 @@ object EnvController extends BaseController {
 
   def showAuth = AuthAction(FuncEnum.env) { implicit request =>
     //管理员 & 委员长 显示所有环境
-    var seq = Seq.empty[Environment]
-    val user = request.user
-    val countSafe = MemberHelper.countByJobNo_Level(user.jobNo, LevelEnum.safe)
-    if(user.role == RoleEnum.admin || countSafe > 0){
-      seq = EnvironmentHelper.all()
-    } else {
-      seq = EnvironmentHelper.findByUnsafe()
-    }
+    val countSafe = MemberHelper.countByJobNo_Level(request.user.jobNo, LevelEnum.safe)
+    val seq =
+      if (request.user.role == RoleEnum.admin || countSafe > 0) EnvironmentHelper.all()
+      else EnvironmentHelper.findByUnsafe()
     Ok(Json.toJson(seq))
   }
 

@@ -32,7 +32,7 @@ object TaskCommandHelper{
   }
 
   def update(taskId: Int, orderNum: Int, status: TaskStatus) = db withSession{implicit session =>
-    qTaskCommand.filter(_.taskId is taskId).filter(_.orderNum is orderNum)
+    qTaskCommand.filter(tc => tc.taskId === taskId && tc.orderNum === orderNum)
       .map(command => command.status).update(status)
   }
 

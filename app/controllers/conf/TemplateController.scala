@@ -73,7 +73,7 @@ object TemplateController extends BaseController {
     )
   }
 
-  // 模板，所有属性
+  // 模板属性
   def items(tid: Int) = Action { implicit request =>
     Ok(Json.toJson(TemplateItemHelper.findByTid(tid)))
   }

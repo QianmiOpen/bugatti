@@ -30,11 +30,11 @@ object TemplateHelper extends PlayCache {
   val qTemplate = TableQuery[TemplateTable]
 
   def findById(id: Int) = db withSession { implicit session =>
-    qTemplate.where(_.id is id).firstOption
+    qTemplate.filter(_.id === id).firstOption
   }
 
   def findByName(name: String) = db withSession { implicit session =>
-    qTemplate.where(_.name is name).firstOption
+    qTemplate.filter(_.name === name).firstOption
   }
 
   def all = db withSession { implicit session =>
@@ -63,7 +63,7 @@ object TemplateHelper extends PlayCache {
   }
 
   def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
-    qTemplate.where(_.id is id).delete
+    qTemplate.filter(_.id === id).delete
   }
 
   def update(id: Int, template: Template) = db withSession { implicit session =>
@@ -81,7 +81,7 @@ object TemplateHelper extends PlayCache {
 
   def _update(id: Int, template: Template)(implicit session: JdbcBackend#Session) = {
     val template2update = template.copy(Some(id))
-    qTemplate.where(_.id is id).update(template2update)(session)
+    qTemplate.filter(_.id === id).update(template2update)(session)
   }
 
 }
