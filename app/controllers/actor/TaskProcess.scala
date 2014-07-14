@@ -362,16 +362,16 @@ class TaskProcess extends Actor {
         mergeLog(path, file, s"${cmd} ${outputCommand}", false)
 
         //查看日志 失败的命令再次执行一次
-        if (!checkLog(path)) {
-          Thread.sleep(2000)
-          doCommand(commandSeq, path)
-
-          //合并日志
-          mergeLog(path, file, s"${cmd} ${outputCommand}", true)
-          if (!checkLog(path)) {
-            result = false
-          }
-        }
+//        if (!checkLog(path)) {
+//          Thread.sleep(2000)
+//          doCommand(commandSeq, path)
+//
+//          //合并日志
+//          mergeLog(path, file, s"${cmd} ${outputCommand}", true)
+//          if (!checkLog(path)) {
+//            result = false
+//          }
+//        }
         //更新数据库状态
         if (result) {
           TaskCommandHelper.update(command.taskId, command.orderNum, TaskEnum.TaskSuccess)
