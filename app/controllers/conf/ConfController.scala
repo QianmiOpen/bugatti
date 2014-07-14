@@ -119,9 +119,8 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       copyForm => {
         if (!UserHelper.hasProjectInEnv(copyForm.pid, copyForm.eid, request.user)) Forbidden
-        else if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) {
-          Ok(Json.obj("r" -> "exist"))
-        } else {
+        else if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) Ok(Json.obj("r" -> "exist"))
+        else {
           val targetConfs = ConfHelper.findByEid_Vid(copyForm.target_eid, copyForm.target_vid)
           val currConfs = ConfHelper.findByEid_Vid(copyForm.eid, copyForm.vid)
           val confs = copyForm.ovr match {

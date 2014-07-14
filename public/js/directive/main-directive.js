@@ -196,11 +196,11 @@ define(['angular'], function(angular) {
                 viewType : '@diffViewType'
             },
             link: function(scope, iElement, iAttrs) {
-                console.log('baseText='+scope.baseText
-                +',baseTextName='+scope.baseTextName
-                +',newText='+scope.newText
-                +',newTextName='+scope.newTextName)
-
+//                console.log('baseText='+scope.baseText
+//                +',baseTextName='+scope.baseTextName
+//                +',newText='+scope.newText
+//                +',newTextName='+scope.newTextName
+//                +',viewtype='+scope.viewType)
                 var base = difflib.stringAsLines(scope.baseText),
                     newtxt = difflib.stringAsLines(scope.newText),
                     sm = new difflib.SequenceMatcher(base, newtxt),
@@ -211,7 +211,7 @@ define(['angular'], function(angular) {
                     opcodes: opcodes,
                     baseTextName: scope.baseTextName,
                     newTextName: scope.newTextName,
-                    viewType: scope.viewType
+                    viewType: scope.viewType==1?1:0 // the bug?
                 });
                 iElement.append(diffViewData);
             }

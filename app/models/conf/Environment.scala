@@ -40,7 +40,7 @@ object EnvironmentHelper {
   }
 
   def count: Int = db withSession { implicit session =>
-    Query(qEnvironment.length).first
+    qEnvironment.length.run
   }
 
   def all(page: Int, pageSize: Int): Seq[Environment] = db withSession { implicit session =>

@@ -63,7 +63,7 @@ object EnvironmentProjectRelHelper {
     var query = for { r <- qRelation } yield r
     envId.map(id => query = query.filter(_.envId === id))
     projectId.map(id => query = query.filter(_.projectId === id))
-    Query(query.length).first
+    query.length.run
   }
   
   def create(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>

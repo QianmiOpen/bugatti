@@ -47,7 +47,7 @@ object ConfLogHelper extends PlayCache {
   }
 
   def countByCid(cid: Int) = db withSession { implicit session =>
-    Query(qLog.where(_.cid is cid).length).first
+    qLog.where(_.cid is cid).length.run
   }
 
   def _create(log: ConfLog)(implicit session: JdbcBackend#Session) = {

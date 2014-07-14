@@ -46,7 +46,7 @@ object VersionHelper extends PlayCache {
   }
 
   def count(pid: Int) = db withSession { implicit session =>
-    Query(qVersion.where(_.pid is pid).length).first
+    qVersion.where(_.pid is pid).length.run
   }
 
   def all(pid: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>

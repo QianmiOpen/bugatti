@@ -71,17 +71,17 @@ object TaskHelper {
 
   def count(envId: Int, projectId: Int): Int = db withSession { implicit session =>
     (envId, projectId) match {
-      case (e, p) if e != -1 && p != -1 =>{
-        Query(qTask.where(_.envId is envId).where(_.projectId is projectId).length).first
+      case (e, p) if e != -1 && p != -1 => {
+        qTask.where(_.envId is envId).where(_.projectId is projectId).length.run
       }
-      case (e, p) if e == -1 && p != -1 =>{
-        Query(qTask.where(_.projectId is projectId).length).first
+      case (e, p) if e == -1 && p != -1 => {
+        qTask.where(_.projectId is projectId).length.run
       }
-      case (e, p) if e != -1 && p == -1 =>{
-        Query(qTask.where(_.envId is envId).length).first
+      case (e, p) if e != -1 && p == -1 => {
+        qTask.where(_.envId is envId).length.run
       }
-      case (e, p) if e == -1 && p == -1 =>{
-        Query(qTask.length).first
+      case (e, p) if e == -1 && p == -1 => {
+        qTask.length.run
       }
     }
   }

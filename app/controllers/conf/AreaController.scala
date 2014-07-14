@@ -70,4 +70,5 @@ object AreaController extends BaseController {
       }
     }
   }
+
 }

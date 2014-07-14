@@ -53,7 +53,7 @@ object ProjectHelper extends PlayCache {
 
   // templateId
   def countByTid(tid: Int) = db withSession { implicit session =>
-    Query(qProject.where(_.templateId is tid).length).first
+    qProject.where(_.templateId is tid).length.run
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
@@ -63,9 +63,9 @@ object ProjectHelper extends PlayCache {
           p <- qProject
           m <- qMember if p.id === m.pid
         } yield (p, m)).filter(_._2.jobNo is jobNo)
-        Query(query.length).first
+        query.length.run
       case None =>
-        Query(qProject.length).first
+        qProject.length.run
     }
   }
 

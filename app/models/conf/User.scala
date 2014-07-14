@@ -44,7 +44,7 @@ object UserHelper extends PlayCache {
   }
 
   def count: Int = db withSession { implicit session =>
-    Query(qUser.length).first
+    qUser.length.run
   }
 
   def all(page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
@@ -93,6 +93,8 @@ object UserHelper extends PlayCache {
   // ---------------------------------------------------
   // 项目和环境资源权限
   // ---------------------------------------------------
+
+  /* 项目委员 */
   def hasProject(projectId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
@@ -101,6 +103,7 @@ object UserHelper extends PlayCache {
     }
   }
 
+  /* 项目委员长 */
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
@@ -109,6 +112,7 @@ object UserHelper extends PlayCache {
     }
   }
 
+  /* 指定环境下，根据安全级别选择委员长或成员访问 */
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByPid_JobNo(projectId, user.jobNo) match {
