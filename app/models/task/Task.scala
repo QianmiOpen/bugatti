@@ -115,7 +115,7 @@ object TaskHelper {
   def findLastStatus(envId: Int, projects: JsValue): List[Task] = db withSession { implicit session =>
     val list: List[Int] = (projects \\ "id").toList.map( id => id.toString.toInt)
 
-    val maxEndTime = qTask.filter(_.envId === envId).filter(_.projectId inSet list.toSeq).groupBy(_.projectId)
+    val maxEndTime = qTask.filter(t => t.envId === envId && (t.projectId inSet list.toSeq)).groupBy(_.projectId)
       .map {
       case (projectId, row) => projectId -> row.map(_.startTime).max
     }
@@ -123,8 +123,8 @@ object TaskHelper {
     val taskQuery = for{
       task <- qTask
       max <- maxEndTime
-      if(task.projectId === max._1 && task.startTime === max._2)
-    }yield task
+      if (task.projectId === max._1 && task.startTime === max._2)
+    } yield task
     taskQuery.list
   }
 
