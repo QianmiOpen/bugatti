@@ -543,7 +543,7 @@ class TaskProcess extends Actor {
     )
 
     //projectId -> groupId, artifactId, unpacked
-    val attributesJson = AttributeHelper.findByPid(taskQueue.projectId).map {
+    val attributesJson = AttributeHelper.findByProjectId(taskQueue.projectId).map {
       s =>
         paramsJson = paramsJson ++ Json.obj(s.name -> s.value)
     }

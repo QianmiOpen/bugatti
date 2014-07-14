@@ -4,7 +4,9 @@ import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 
 /**
- * Created by mind on 7/6/14.
+ * 区域
+ *
+ * @author 557
  */
 case class AreaInfo(id: Option[Int], name: String, syndicName: String, syndicIp: String, total: Int, envNCount: Int, projectNCount: Int)
 

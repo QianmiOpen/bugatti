@@ -107,7 +107,7 @@ object ProjectController extends BaseController {
   // 项目属性
   // ----------------------------------------------------------
   def atts(pid: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(AttributeHelper.findByPid(pid)))
+    Ok(Json.toJson(AttributeHelper.findByProjectId(pid)))
   }
 
   // ----------------------------------------------------------

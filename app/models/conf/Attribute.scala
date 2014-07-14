@@ -12,24 +12,24 @@ case class Attribute(id: Option[Int], pid: Option[Int], name: String, value: Opt
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def pid = column[Int]("project_id", O.NotNull)   // 项目编号
+  def projectId = column[Int]("project_id", O.NotNull)   // 项目编号
   def name = column[String]("name", O.NotNull)   // 属性名称（同TemplateInfo.itemName)
   def value = column[String]("value", O.Nullable) // 属性值
 
-  override def * = (id.?, pid.?, name, value.?) <> (Attribute.tupled, Attribute.unapply _)
-  def idx = index("idx_pid", pid)
+  override def * = (id.?, projectId.?, name, value.?) <> (Attribute.tupled, Attribute.unapply _)
+  def idx = index("idx_pid", projectId)
 }
 
 object AttributeHelper {
   import models.AppDB._
   val qAttribute = TableQuery[AttributeTable]
 
-  def findByPid(pid: Int): Seq[Attribute] = db withSession { implicit session =>
-    qAttribute.filter(_.pid === pid).sortBy(_.id).list
+  def findByProjectId(projectId: Int): Seq[Attribute] = db withSession { implicit session =>
+    qAttribute.filter(_.projectId === projectId).sortBy(_.id).list
   }
 
-  def getValue(pid: Int, name: String): String = {
-    findByPid(pid).filter(_.name == name)(0).value.get
+  def getValue(projectId: Int, name: String): String = {
+    findByProjectId(projectId).filter(_.name == name)(0).value.get
   }
 
   def _create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
@@ -40,8 +40,8 @@ object AttributeHelper {
     qAttribute.filter(_.id === id).delete
   }
 
-  def _deleteByPid(pid: Int)(implicit session: JdbcBackend#Session) = {
-    qAttribute.filter(_.pid === pid).delete
+  def _deleteByProjectId(projectId: Int)(implicit session: JdbcBackend#Session) = {
+    qAttribute.filter(_.projectId === projectId).delete
   }
 
   def update(id: Int, attr: Attribute) = db withSession { implicit session =>

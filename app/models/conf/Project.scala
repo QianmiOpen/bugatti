@@ -109,7 +109,7 @@ object ProjectHelper extends PlayCache {
   }
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
-    AttributeHelper._deleteByPid(id)
+    AttributeHelper._deleteByProjectId(id)
     val attrs = projectForm.items.map(item =>
       Attribute(None, Some(id), item.name, item.value)
     )
