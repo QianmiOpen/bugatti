@@ -66,7 +66,7 @@ object VersionController extends BaseController {
     VersionHelper.findById(id) match {
       case Some(version) =>
         if (!UserHelper.hasProjectSafe(version.pid, request.user)) Forbidden
-        else ConfHelper.findByVid(id).isEmpty match {
+        else ConfHelper.findByVersionId(id).isEmpty match {
           case true =>
             Ok(Json.obj("r" -> Json.toJson(VersionHelper.delete(version))))
           case false =>

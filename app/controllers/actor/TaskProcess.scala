@@ -122,7 +122,7 @@ object TaskProcess {
     val project = ProjectHelper.findByName(appName)
     val projectId = project.get.id.get
 
-    val confSeq = ConfHelper.findByEid_Pid_Vid(environmentId, projectId, versionId)
+    val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(environmentId, projectId, versionId)
     val baseDir = s"${ConfHelp.confPath}/${taskId}"
 
 //    val baseDir = s"${GitHelp.workDir.getAbsolutePath}/work/${appName}/${taskId}/files"

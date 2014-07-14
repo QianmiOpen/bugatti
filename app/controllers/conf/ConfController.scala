@@ -16,6 +16,8 @@ object ConfController extends BaseController {
   implicit val confWrites = Json.writes[Conf]
   implicit val contentWrites = Json.writes[ConfContent]
 
+  def nl2(text: String) = text.replaceAll("(\r\n)|(\n\r)|\r|\n", "\n")
+
   val confForm = Form(
     mapping(
       "id" -> optional(number),
@@ -41,7 +43,7 @@ object ConfController extends BaseController {
   }
 
   def all(eid: Int, vid: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(ConfHelper.findByEid_Vid(eid, vid)))
+    Ok(Json.toJson(ConfHelper.findByEnvId_VersionId(eid, vid)))
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
@@ -60,7 +62,7 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.pid, confForm.eid, request.user)) Forbidden
-        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
+        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo, content = nl2(confForm.content))))))
       }
     )
   }
@@ -70,7 +72,7 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.pid, confForm.eid, request.user)) Forbidden
-        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
+        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo, content = nl2(confForm.content))))))
       }
     )
   }
@@ -121,8 +123,8 @@ object ConfController extends BaseController {
         if (!UserHelper.hasProjectInEnv(copyForm.pid, copyForm.eid, request.user)) Forbidden
         else if (copyForm.target_eid == copyForm.eid && copyForm.target_vid == copyForm.vid) Ok(Json.obj("r" -> "exist"))
         else {
-          val targetConfs = ConfHelper.findByEid_Vid(copyForm.target_eid, copyForm.target_vid)
-          val currConfs = ConfHelper.findByEid_Vid(copyForm.eid, copyForm.vid)
+          val targetConfs = ConfHelper.findByEnvId_VersionId(copyForm.target_eid, copyForm.target_vid)
+          val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.eid, copyForm.vid)
           val confs = copyForm.ovr match {
             case true =>
               targetConfs.filter(t => currConfs.map(_.path).contains(t.path)) foreach( c => ConfHelper.delete(c)) // delete exist
