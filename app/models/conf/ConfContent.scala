@@ -25,7 +25,7 @@ object ConfContentHelper extends PlayCache {
   val qConfContent = TableQuery[ConfContentTable]
 
   def findById(id: Int): Option[ConfContent] = db withSession { implicit session =>
-    qConfContent.where(_.id is id).firstOption
+    qConfContent.filter(_.id === id).firstOption
   }
 
   def _create(content: ConfContent)(implicit session: JdbcBackend#Session) = {
@@ -33,12 +33,12 @@ object ConfContentHelper extends PlayCache {
   }
 
   def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
-    qConfContent.where(_.id is id).delete(session)
+    qConfContent.filter(_.id === id).delete(session)
   }
 
   def _update(id: Int, content: ConfContent)(implicit session: JdbcBackend#Session) = {
     val content2update = content.copy(Some(id))
-    qConfContent.where(_.id is id).update(content2update)(session)
+    qConfContent.filter(_.id === id).update(content2update)(session)
   }
 
 }

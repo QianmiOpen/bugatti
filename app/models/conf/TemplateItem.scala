@@ -28,11 +28,11 @@ object TemplateItemHelper extends PlayCache {
   val qItem = TableQuery[TemplateItemTable]
 
   def findById(id: Int) = db withSession { implicit session =>
-    qItem.where(_.id is id).firstOption
+    qItem.filter(_.id === id).firstOption
   }
 
   def findByTid(tid: Int): Seq[TemplateItem] = db withSession { implicit session =>
-    qItem.sortBy(_.order asc).where(_.tid is tid).list
+    qItem.filter(_.tid === tid).sortBy(_.order asc).list
   }
 
   def create(item: TemplateItem) = db withSession { implicit session =>
@@ -44,12 +44,12 @@ object TemplateItemHelper extends PlayCache {
   }
 
   def _deleteByTid(tid: Int)(implicit session: JdbcBackend#Session) = {
-    qItem.where(_.tid is tid).delete
+    qItem.filter(_.tid === tid).delete
   }
 
   def update(id: Int, item: TemplateItem) = db withSession { implicit session =>
     val info2update = item.copy(Some(id))
-    qItem.where(_.id is id).update(info2update)
+    qItem.filter(_.id === id).update(info2update)
   }
 
 }

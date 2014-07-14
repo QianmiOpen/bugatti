@@ -33,7 +33,7 @@ object PermissionHelper extends PlayCache {
   val qPermission = TableQuery[PermissionTable]
 
   def findByJobNo(jobNo: String) = db withSession { implicit session =>
-    qPermission.where(_.jobNo is jobNo).firstOption
+    qPermission.filter(_.jobNo === jobNo).firstOption
   }
 
   def create(permission: Permission) = db withSession { implicit session =>
@@ -49,7 +49,7 @@ object PermissionHelper extends PlayCache {
   }
 
   def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
-    qPermission.where(_.jobNo is jobNo).delete(session)
+    qPermission.filter(_.jobNo === jobNo).delete(session)
   }
 
   def update(jobNo: String, permission: Permission) = db withSession { implicit session =>
@@ -58,7 +58,7 @@ object PermissionHelper extends PlayCache {
 
   def _update(jobNo: String, permission: Permission)(implicit session: JdbcBackend#Session) = {
     val permission2update = permission.copy(jobNo)
-    qPermission.where(_.jobNo is jobNo).update(permission2update)(session)
+    qPermission.filter(_.jobNo === jobNo).update(permission2update)(session)
   }
 
 }

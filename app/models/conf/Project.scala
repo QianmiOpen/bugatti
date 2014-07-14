@@ -44,16 +44,16 @@ object ProjectHelper extends PlayCache {
   val qMember = TableQuery[MemberTable]
 
   def findById(id: Int): Option[Project] = db withSession { implicit session =>
-    qProject.where(_.id is id).firstOption
+    qProject.filter(_.id === id).firstOption
   }
 
   def findByName(name: String): Option[Project] = db withSession { implicit session =>
-    qProject.where(_.name is name).firstOption
+    qProject.filter(_.name === name).firstOption
   }
 
   // templateId
   def countByTid(tid: Int) = db withSession { implicit session =>
-    qProject.where(_.templateId is tid).length.run
+    qProject.filter(_.templateId === tid).length.run
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
@@ -62,7 +62,7 @@ object ProjectHelper extends PlayCache {
         val query = (for {
           p <- qProject
           m <- qMember if p.id === m.pid
-        } yield (p, m)).filter(_._2.jobNo is jobNo)
+        } yield (p, m)).filter(_._2.jobNo === jobNo)
         query.length.run
       case None =>
         qProject.length.run
@@ -76,7 +76,7 @@ object ProjectHelper extends PlayCache {
         val query = (for {
           p <- qProject
           m <- qMember if p.id === m.pid
-        } yield (p, m)).filter(_._2.jobNo is jobNo)
+        } yield (p, m)).filter(_._2.jobNo === jobNo)
         query.map(_._1).drop(offset).take(pageSize).list
       case None =>
         qProject.drop(offset).take(pageSize).list
@@ -105,7 +105,7 @@ object ProjectHelper extends PlayCache {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qProject.where(_.id is id).delete
+    qProject.filter(_.id === id).delete
   }
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
@@ -119,7 +119,7 @@ object ProjectHelper extends PlayCache {
 
   def _update(id: Int, project: Project)(implicit session: JdbcBackend#Session) = {
     val project2update = project.copy(Some(id))
-    qProject.where(_.id is id).update(project2update)(session)
+    qProject.filter(_.id === id).update(project2update)(session)
   }
 
 }

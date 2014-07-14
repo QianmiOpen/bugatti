@@ -38,16 +38,16 @@ object ConfLogHelper extends PlayCache {
   val qLog = TableQuery[ConfLogTable]
 
   def findById(id: Int): Option[ConfLog] = db withSession { implicit session =>
-    qLog.where(_.id is id).firstOption
+    qLog.filter(_.id === id).firstOption
   }
 
   def allByCid(cid: Int, page: Int, pageSize: Int): Seq[ConfLog] = db withSession { implicit session =>
     val offset = pageSize * page
-    qLog.sortBy(_.updated desc).where(_.cid is cid).drop(offset).take(pageSize).list
+    qLog.filter(_.cid === cid).sortBy(_.updated desc).drop(offset).take(pageSize).list
   }
 
   def countByCid(cid: Int) = db withSession { implicit session =>
-    qLog.where(_.cid is cid).length.run
+    qLog.filter(_.cid === cid).length.run
   }
 
   def _create(log: ConfLog)(implicit session: JdbcBackend#Session) = {
@@ -55,11 +55,12 @@ object ConfLogHelper extends PlayCache {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qLog.where(_.id is id).delete
+    qLog.filter(_.id is id).delete
   }
 
   def update(id: Int, log: ConfLog) = db withSession { implicit session =>
     val log2update = log.copy(Some(id))
-    qLog.where(_.id is id).update(log2update)
+    qLog.filter(_.id === id).update(log2update)
   }
+
 }

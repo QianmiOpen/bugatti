@@ -28,15 +28,15 @@ object EnvironmentHelper {
   val qEnvironment = TableQuery[EnvironmentTable]
 
   def findById(id: Int): Option[Environment] = db withSession { implicit session =>
-    qEnvironment.where(_.id is id).firstOption
+    qEnvironment.filter(_.id === id).firstOption
   }
 
   def findByUnsafe(): Seq[Environment] = db withSession {implicit session =>
-    qEnvironment.where(_.level === LevelEnum.unsafe).list
+    qEnvironment.filter(_.level === LevelEnum.unsafe).list
   }
 
   def findByName(name: String): Option[Environment] = db withSession { implicit session =>
-    qEnvironment.where(_.name is name).firstOption
+    qEnvironment.filter(_.name === name).firstOption
   }
 
   def count: Int = db withSession { implicit session =>
@@ -57,12 +57,12 @@ object EnvironmentHelper {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qEnvironment.where(_.id is id).delete
+    qEnvironment.filter(_.id === id).delete
   }
 
   def update(id: Int, env: Environment) = db withSession { implicit session =>
     val envToUpdate = env.copy(Some(id))
-    qEnvironment.where(_.id is id).update(envToUpdate)
+    qEnvironment.filter(_.id === id).update(envToUpdate)
   }
 
 }

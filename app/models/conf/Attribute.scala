@@ -25,7 +25,7 @@ object AttributeHelper {
   val qAttribute = TableQuery[AttributeTable]
 
   def findByPid(pid: Int): Seq[Attribute] = db withSession { implicit session =>
-    qAttribute.sortBy(_.id).where(_.pid is pid).list
+    qAttribute.filter(_.pid === pid).sortBy(_.id).list
   }
 
   def getValue(pid: Int, name: String): String = {
@@ -37,16 +37,16 @@ object AttributeHelper {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qAttribute.where(_.id is id).delete
+    qAttribute.filter(_.id === id).delete
   }
 
   def _deleteByPid(pid: Int)(implicit session: JdbcBackend#Session) = {
-    qAttribute.where(_.pid is pid).delete
+    qAttribute.filter(_.pid === pid).delete
   }
 
   def update(id: Int, attr: Attribute) = db withSession { implicit session =>
     val attr2update = attr.copy(Some(id))
-    qAttribute.where(_.id is id).update(attr2update)
+    qAttribute.filter(_.id === id).update(attr2update)
   }
 
 }

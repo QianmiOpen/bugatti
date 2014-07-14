@@ -55,21 +55,21 @@ object TaskQueueHelper{
    * @return
    */
   def findExecuteTask(envId: Int, projectId: Int): Option[TaskQueue] = db withSession { implicit session =>
-    val minTime = qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).groupBy(_.projectId).map{
+    val minTime = qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId).groupBy(_.projectId).map {
       case (id, row) => row.map(_.importTime).min
     }.firstOption
     Logger.info("time is " + minTime)
 
     minTime match {
       case Some(time) => {
-        qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).where(_.importTime === time).firstOption
+        qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId && tq.importTime === time).firstOption
       }
       case _ => {
         None
       }
     }
 //    if(minTime != None){
-//      qTaskQueue.where(_.envId === envId).where(_.projectId === projectId).where(_.importTime === minTime.get).first
+//      qTaskQueue.filter(_.envId === envId).filter(_.projectId === projectId).filter(_.importTime === minTime.get).first
 //    }
 //    else {
 //      null
@@ -77,15 +77,15 @@ object TaskQueueHelper{
   }
 
   def findWaitQueueById(qId: Int): Option[TaskQueue] = db withSession{ implicit session =>
-    qTaskQueue.where(_.id is qId).where(_.status is TaskEnum.TaskWait).firstOption
+    qTaskQueue.filter(tq => tq.id === qId && tq.status === TaskEnum.TaskWait).firstOption
   }
   def findQueueNum(envId: Int, projectId: Int): Int = db withSession {implicit session =>
-    //    Query(qTaskQueue.where(_.envId is tq.envId).where(_.projectId is tq.projectId).where(_.status is TaskEnum.TaskWait).length).first
-    qTaskQueue.where(_.envId is envId).where(_.projectId is projectId).where(_.status is TaskEnum.TaskWait).length.run
+    //    Query(qTaskQueue.filter(_.envId is tq.envId).filter(_.projectId is tq.projectId).filter(_.status is TaskEnum.TaskWait).length).first
+    qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId && tq.status === TaskEnum.TaskWait).length.run
   }
 
   def findQueues(envId: Int, projectId: Int): List[TaskQueue] = db withSession { implicit session =>
-    qTaskQueue.where(_.envId is envId).where(_.projectId is projectId).list
+    qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId).list
   }
 
   def findEnvId_ProjectId(): Set[(Int, Int)] = db withSession { implicit session =>
@@ -105,11 +105,11 @@ object TaskQueueHelper{
 
   def delete(tq: TaskQueue): Int = db withSession{ implicit session =>
     Logger.info("remove from taskQueue")
-    qTaskQueue.where(_.id === tq.id).delete
+    qTaskQueue.filter(_.id === tq.id).delete
   }
 
   def update(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
-    qTaskQueue.where(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
+    qTaskQueue.filter(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
   }
 
 }

@@ -41,19 +41,19 @@ object ConfHelper extends PlayCache {
   val qConf = TableQuery[ConfTable]
 
   def findById(id: Int): Option[Conf] = db withSession { implicit session =>
-    qConf.where(_.id is id).firstOption
+    qConf.filter(_.id === id).firstOption
   }
 
   def findByVid(vid: Int): Seq[Conf] = db withSession { implicit session =>
-    qConf.where(_.vid is vid).list
+    qConf.filter(_.vid === vid).list
   }
 
   def findByEid_Vid(eid: Int, vid: Int): Seq[Conf] = db withSession { implicit session =>
-    qConf.sortBy(_.updated desc).where(c => c.eid === eid && c.vid === vid).list
+    qConf.filter(c => c.eid === eid && c.vid === vid).sortBy(_.updated desc).list
   }
 
   def findByEid_Pid_Vid(eid: Int, pid: Int, vid: Int): Seq[Conf] = db withSession{ implicit session =>
-    qConf.where(c => c.eid === eid && c.pid === pid && c.vid === vid).list
+    qConf.filter(c => c.eid === eid && c.pid === pid && c.vid === vid).list
   }
 
   def create(confForm: ConfForm) = db withTransaction { implicit session =>
@@ -63,7 +63,7 @@ object ConfHelper extends PlayCache {
   }
 
   def delete(conf: Conf) = db withTransaction { implicit session =>
-    qConf.where(_.id is conf.id).delete
+    qConf.filter(_.id === conf.id).delete
     ConfContentHelper._delete(conf.id.get)
   }
 
@@ -71,7 +71,7 @@ object ConfHelper extends PlayCache {
     findById(id) match {
       case Some(conf) =>
         val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
-        qConf.where(_.id is id).delete
+        qConf.filter(_.id === id).delete
         ConfContentHelper.findById(id) match {
           case Some(content) =>
             ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))
@@ -88,7 +88,7 @@ object ConfHelper extends PlayCache {
     findById(id) match {
       case Some(conf) =>
         val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
-        qConf.where(_.id is id).update(confForm.toConf.copy(Some(id)))
+        qConf.filter(_.id === id).update(confForm.toConf.copy(Some(id)))
         ConfContentHelper.findById(id) match {
           case Some(content) =>
             ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))

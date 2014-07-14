@@ -32,27 +32,27 @@ object MemberHelper extends PlayCache {
   val qProject = TableQuery[ProjectTable]
 
   def findById(id: Int) = db withSession { implicit session =>
-    qMember.where(_.id is id).firstOption
+    qMember.filter(_.id === id).firstOption
   }
 
   def findByPid(pid: Int): Seq[Member] = db withSession { implicit session =>
-    qMember.where(m => m.pid === pid).list
+    qMember.filter(m => m.pid === pid).list
   }
 
   def findByPid_JobNo(pid: Int, jobNo: String): Option[Member] = db withSession { implicit session =>
-    qMember.where(m => m.pid === pid && m.jobNo === jobNo).firstOption
+    qMember.filter(m => m.pid === pid && m.jobNo === jobNo).firstOption
   }
 
   def findProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
     val q = for{
-      (m, p) <- qMember leftJoin qProject on (_.pid is _.id)
-      if m.jobNo is jobNo
+      (m, p) <- qMember leftJoin qProject on (_.pid === _.id)
+      if m.jobNo === jobNo
     } yield p
     q.list
   }
 
   def countByJobNo_Level(jobNo: String, level: Level): Int = db withSession { implicit session =>
-    qMember.where(m => m.jobNo === jobNo && m.level === level ).length.run
+    qMember.filter(m => m.jobNo === jobNo && m.level === level ).length.run
   }
 
   def create(member: Member) = db withSession { implicit session =>
@@ -64,12 +64,12 @@ object MemberHelper extends PlayCache {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qMember.where(_.id is id).delete
+    qMember.filter(_.id === id).delete
   }
 
   def update(id: Int, member: Member) = db withSession { implicit session =>
     val member2update = member.copy(Some(id))
-    qMember.where(_.id is id).update(member2update)
+    qMember.filter(_.id === id).update(member2update)
   }
 
 }
