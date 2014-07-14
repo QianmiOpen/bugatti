@@ -16,8 +16,6 @@ object ConfController extends BaseController {
   implicit val confWrites = Json.writes[Conf]
   implicit val contentWrites = Json.writes[ConfContent]
 
-  def nl2(text: String) = text.replaceAll("(\r\n)|(\n\r)|\r|\n", "\n")
-
   val confForm = Form(
     mapping(
       "id" -> optional(number),
@@ -62,7 +60,7 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.pid, confForm.eid, request.user)) Forbidden
-        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo, content = nl2(confForm.content))))))
+        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
@@ -72,7 +70,7 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.pid, confForm.eid, request.user)) Forbidden
-        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo, content = nl2(confForm.content))))))
+        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }

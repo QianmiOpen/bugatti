@@ -15,6 +15,8 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 case class Conf(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
 case class ConfForm(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
   def toConf = Conf(id, eid, pid, vid, jobNo, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
+  def _nl2(text: String) = text.replaceAll("(\r\n)|(\n\r)|\r|\n", "\n")
+  def toContent = ConfContent(id, _nl2(content))
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -58,8 +60,7 @@ object ConfHelper extends PlayCache {
 
   def create(confForm: ConfForm) = db withTransaction { implicit session =>
     val id = qConf.returning(qConf.map(_.id)).insert(confForm.toConf)
-    val content = ConfContent(Some(id), confForm.content)
-    ConfContentHelper._create(content)
+    ConfContentHelper._create(confForm.toContent.copy(Some(id)))
   }
 
   def delete(conf: Conf) = db withTransaction { implicit session =>
@@ -92,7 +93,7 @@ object ConfHelper extends PlayCache {
         ConfContentHelper.findById(id) match {
           case Some(content) =>
             ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))
-            ConfContentHelper._update(id, ConfContent(None, confForm.content))
+            ConfContentHelper._update(id, confForm.toContent)
           case None =>
             -2
         }
