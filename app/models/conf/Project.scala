@@ -92,9 +92,7 @@ object ProjectHelper extends PlayCache {
 
   def create(projectForm: ProjectForm, jobNo: String) = db withTransaction { implicit session =>
     val pid = _create(projectForm.toProject)
-    val attrs = projectForm.items.map(item =>
-      Attribute(None, Some(pid), item.name, item.value)
-    )
+    val attrs = projectForm.items.map(item => item.copy(None, Some(pid)))
     AttributeHelper._create(attrs)
     MemberHelper._create(Member(None, pid, LevelEnum.safe, jobNo))
   }
@@ -109,9 +107,7 @@ object ProjectHelper extends PlayCache {
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
     AttributeHelper._deleteByProjectId(id)
-    val attrs = projectForm.items.map(item =>
-      Attribute(None, Some(id), item.name, item.value)
-    )
+    val attrs = projectForm.items.map(item => item.copy(None, Some(id)))
     AttributeHelper._create(attrs)
     _update(id, projectForm.toProject)
   }

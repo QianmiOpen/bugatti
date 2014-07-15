@@ -31,7 +31,7 @@ object ProjectController extends BaseController {
       "items" -> list(
         mapping(
           "id" -> optional(number),
-          "tid" -> optional(number),
+          "projectId" -> optional(number),
           "name" -> nonEmptyText,
           "value" -> optional(text)
         )(Attribute.apply)(Attribute.unapply)

@@ -8,7 +8,7 @@ import scala.slick.jdbc.JdbcBackend
 /**
  * 项目属性
  */
-case class Attribute(id: Option[Int], pid: Option[Int], name: String, value: Option[String])
+case class Attribute(id: Option[Int], projectId: Option[Int], name: String, value: Option[String])
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
