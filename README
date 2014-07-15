@@ -1,4 +1,38 @@
-This is your new Play application
-=====================================
+《方法命名规则》
 
-This file will be packaged with your application, when using `play dist`.
+一、内部调用方法：
+_update
+使用下划线前缀
+
+二、多参数方法：
+1、方法签名支持的，保持原始名称
+2、findByProjectId_EnvId
+   使用下划线分割参数
+
+三、定义
+避免var变量
+命名使用全称，比如pid改为projectId
+
+建议model方法摆放顺序：
+查询 < 增加 < 删除 < 修改
+
+model层（和controller不同）方法前缀：
+查询方法：find 条件，all列表，统计count
+增加方法：create
+删除方法：delete
+修改方法：update
+
+编码：
+create增加方法返回值：
+增加返回自动增长id
+批量增加返回影响行数
+
+slick统计方法：
+1.Query(xx.length).first 改为 xx.length.run
+2.where is 改为 filter === 并且作为首个条件
+
+
+不清楚方法加注释：
+/*
+* 说明方法使用情况
+*/
