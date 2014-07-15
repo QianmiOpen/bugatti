@@ -59,7 +59,7 @@ object TemplateHelper extends PlayCache {
 
   def delete(id: Int) = db withTransaction { implicit session =>
     _delete(id)(session)
-    TemplateItemHelper._deleteByTid(id)
+    TemplateItemHelper._deleteByTemplateId(id)
   }
 
   def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
@@ -72,7 +72,7 @@ object TemplateHelper extends PlayCache {
 
   def update(id: Int, template: Template, items: Seq[TemplateItem]) = db withTransaction { implicit session =>
     _update(id, template) // 更新项目
-    TemplateItemHelper._deleteByTid(id) // 删除该项目下所有属性
+    TemplateItemHelper._deleteByTemplateId(id) // 删除该项目下所有属性
     items.map{ item =>  // 插入新属性
       val ti = TemplateItem(None, Some(id), item.itemName, item.itemDesc, item.default, item.order)
       TemplateItemHelper._create(ti)

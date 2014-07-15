@@ -44,7 +44,7 @@ object TaskController extends Controller {
    * @return
    */
   def getVersions(projectId: Int, envId: Int) = Action{
-    val list = VersionHelper.findByPid_Eid(projectId, envId)
+    val list = VersionHelper.findByProjectId_EnvId(projectId, envId)
     Ok(Json.toJson(list.reverse.drop(list.length - 5).reverse))
   }
 

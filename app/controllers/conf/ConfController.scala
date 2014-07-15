@@ -82,11 +82,11 @@ object ConfController extends BaseController {
   implicit val confLogContentWrites = Json.writes[ConfLogContent]
 
   def logs(cid: Int, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(ConfLogHelper.allByCid(cid, page, pageSize)))
+    Ok(Json.toJson(ConfLogHelper.all(cid, page, pageSize)))
   }
 
   def logsCount(cid: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(ConfLogHelper.countByCid(cid)))
+    Ok(Json.toJson(ConfLogHelper.count(cid)))
   }
 
   implicit def recordWrite = new Writes[(Option[ConfLog], Option[ConfLogContent])] {

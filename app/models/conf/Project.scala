@@ -51,9 +51,8 @@ object ProjectHelper extends PlayCache {
     qProject.filter(_.name === name).firstOption
   }
 
-  // templateId
-  def countByTid(tid: Int) = db withSession { implicit session =>
-    qProject.filter(_.templateId === tid).length.run
+  def countByTemplateId(templateId: Int) = db withSession { implicit session =>
+    qProject.filter(_.templateId === templateId).length.run
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
@@ -61,7 +60,7 @@ object ProjectHelper extends PlayCache {
       case Some(no) =>
         val query = (for {
           p <- qProject
-          m <- qMember if p.id === m.pid
+          m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
         query.length.run
       case None =>
@@ -75,7 +74,7 @@ object ProjectHelper extends PlayCache {
       case Some(no) =>
         val query = (for {
           p <- qProject
-          m <- qMember if p.id === m.pid
+          m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
         query.map(_._1).drop(offset).take(pageSize).list
       case None =>

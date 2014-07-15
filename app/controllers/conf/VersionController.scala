@@ -34,12 +34,16 @@ object VersionController extends BaseController {
 
   def nexusVersions(pid: Int) = Action {
     // 1、根据projectId获取项目attribute中的groupId、artifactId
-    val groupId = AttributeHelper.getValue(pid, "groupId").replaceAll("\\.", "/")
+    val groupId = AttributeHelper.getValue(pid, "groupId").map(_.replaceAll("\\.", "/"))
     val artifactId = AttributeHelper.getValue(pid, "artifactId")
     Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
     // 2、查询release、snapshot版本
-    val listRelease = _makeVersion(groupId, artifactId, false)
-    val listSnapshot = _makeVersion(groupId, artifactId, true)
+    val (listRelease, listSnapshot) = (groupId, artifactId) match {
+      case (Some(gid), Some(aid)) =>
+        (_makeVersion(gid, aid, false), _makeVersion(gid, aid, true))
+      case _ =>
+        (List.empty[String], List.empty[String])
+    }
     // 3、拼接版本号，按照版本号逆序
     val result = (listRelease ::: listSnapshot).sorted.reverse
     Logger.info(s"nexus return versions : [${result}]")
@@ -82,7 +86,7 @@ object VersionController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
         if (!UserHelper.hasProjectSafe(versionForm.pid, request.user)) Forbidden
-        else  VersionHelper.findByPid(versionForm.pid).find(_.vs == versionForm.vs) match {
+        else  VersionHelper.findByProjectId(versionForm.pid).find(_.vs == versionForm.vs) match {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
@@ -97,7 +101,7 @@ object VersionController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
         if (!UserHelper.hasProjectSafe(versionForm.pid, request.user)) Forbidden
-        else VersionHelper.findByPid(versionForm.pid)
+        else VersionHelper.findByProjectId(versionForm.pid)
           .filterNot(_.id == versionForm.id) // Some(id)
           .find(_.vs == versionForm.vs) match {
           case Some(_) =>

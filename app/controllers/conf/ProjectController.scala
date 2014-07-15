@@ -116,11 +116,11 @@ object ProjectController extends BaseController {
   implicit val memberWrites = Json.writes[Member]
 
   def member(pid: Int, jobNo: String) = Action {
-    Ok(Json.toJson(MemberHelper.findByPid_JobNo(pid, jobNo)))
+    Ok(Json.toJson(MemberHelper.findByProjectId_JobNo(pid, jobNo)))
   }
 
   def members(pid: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(MemberHelper.findByPid(pid)))
+    Ok(Json.toJson(MemberHelper.findByProjectId(pid)))
   }
 
   def saveMember(pid: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
@@ -184,7 +184,7 @@ object ProjectController extends BaseController {
         case token if token == authToken =>
           ProjectHelper.findByName(verData.projectName) match {
             case Some(project) =>
-              VersionHelper.findByPid_Vs(project.id.get, verData.version) match {
+              VersionHelper.findByProjectId_Vs(project.id.get, verData.version) match {
                 case Some(_) => Conflict(Json.obj("r" -> "exist"))
                 case None =>
                   VersionHelper.create(Version(None, project.id.get, verData.version, DateTime.now()))

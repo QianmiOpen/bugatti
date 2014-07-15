@@ -28,8 +28,8 @@ object AttributeHelper {
     qAttribute.filter(_.projectId === projectId).sortBy(_.id).list
   }
 
-  def getValue(projectId: Int, name: String): String = {
-    findByProjectId(projectId).filter(_.name == name)(0).value.get
+  def getValue(projectId: Int, name: String): Option[String] = {
+    findByProjectId(projectId).filter(_.name == name)(0).value
   }
 
   def _create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
