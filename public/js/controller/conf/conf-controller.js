@@ -69,7 +69,7 @@ define(['angular'], function(angular) {
 
                 modalInstance.result.then(function (param) {
                     param.projectId = $stateParams.id;
-                    var thisEid = param.eid;
+                    var thisEid = param.envId;
                     ConfService.copy(angular.toJson(param), function(data) {
                         if (data.r === 'ok') {
                             $state.go('conf.project.version.conf.list', {eid: thisEid}, {reload: true})
@@ -118,15 +118,7 @@ define(['angular'], function(angular) {
             $scope.conf = {projectId: $stateParams.id, versionId: $stateParams.vid};
 
             $scope.cancel = function() {
-
                 $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
-
-//                $scope.$on('$locationChangeStart', function( event ) {
-//                    var answer = confirm("Are you sure you want to leave this page?")
-//                    if (!answer) {
-//                        event.preventDefault();
-//                    }
-//                });
             };
 
             $scope.save = function() {
@@ -243,7 +235,6 @@ define(['angular'], function(angular) {
                 $scope.conf = data.conf;
                 $scope.conf.content = data.confContent;
             });
-
 
         }]);
 
