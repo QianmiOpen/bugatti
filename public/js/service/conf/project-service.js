@@ -30,20 +30,23 @@ define(['angular'], function(angular) {
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.delete(id)).success(callback);
             },
-            atts: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.atts(pid)).success(callback);
+            atts: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.atts(projectId)).success(callback);
             },
-            member: function(pid, jobNo, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.member(pid, jobNo)).success(callback);
+            // ------------------------------------------------
+            // 项目成员
+            // ------------------------------------------------
+            member: function(projectId, jobNo, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.member(projectId, jobNo)).success(callback);
             },
-            members: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.members(pid)).success(callback);
+            members: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.members(projectId)).success(callback);
             },
-            saveMember: function(pid, jobNo, callback) {
-                $http.post(PlayRoutes.controllers.conf.ProjectController.saveMember(pid, jobNo).url).success(callback);
+            saveMember: function(projectId, jobNo, callback) {
+                $http.post(PlayRoutes.controllers.conf.ProjectController.saveMember(projectId, jobNo).url).success(callback);
             },
-            updateMember: function(mid, op, callback) {
-                $http.put(PlayRoutes.controllers.conf.ProjectController.updateMember(mid, op).url).success(callback);
+            updateMember: function(memberId, op, callback) {
+                $http.put(PlayRoutes.controllers.conf.ProjectController.updateMember(memberId, op).url).success(callback);
             }
         }
     });

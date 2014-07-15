@@ -13,7 +13,7 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class Member(id: Option[Int], pid: Int, level: Level, jobNo: String)
+case class Member(id: Option[Int], projectId: Int, level: Level, jobNo: String)
 class MemberTable(tag: Tag) extends Table[Member](tag, "member") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def projectId = column[Int]("project_id", O.NotNull) // 项目编号
@@ -35,12 +35,12 @@ object MemberHelper extends PlayCache {
     qMember.filter(_.id === id).firstOption
   }
 
-  def findByProjectId(pid: Int): Seq[Member] = db withSession { implicit session =>
-    qMember.filter(m => m.projectId === pid).list
+  def findByProjectId(projectId: Int): Seq[Member] = db withSession { implicit session =>
+    qMember.filter(m => m.projectId === projectId).list
   }
 
-  def findByProjectId_JobNo(pid: Int, jobNo: String): Option[Member] = db withSession { implicit session =>
-    qMember.filter(m => m.projectId === pid && m.jobNo === jobNo).firstOption
+  def findByProjectId_JobNo(projectId: Int, jobNo: String): Option[Member] = db withSession { implicit session =>
+    qMember.filter(m => m.projectId === projectId && m.jobNo === jobNo).firstOption
   }
 
   def findProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>

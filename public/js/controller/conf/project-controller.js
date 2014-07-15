@@ -89,11 +89,13 @@ define(['angular'], function(angular) {
                 $scope.atts = data;
             });
 
+            // ---------------------------------------------
+            // 项目成员管理
+            // ---------------------------------------------
             ProjectService.members($stateParams.id, function(data) {
                 $scope.members = data;
             });
 
-            // 新增项目成员
             $scope.addMember = function(jobNo) {
                 $scope.jobNo$error = '';
                 if (!/^of[0-9]{1,10}$/i.test(jobNo)) {

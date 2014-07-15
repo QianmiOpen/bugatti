@@ -98,7 +98,7 @@ object UserHelper extends PlayCache {
   def hasProject(projectId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
-      case Some(member) if member.pid == projectId => true
+      case Some(member) if member.projectId == projectId => true
       case _ => false
     }
   }
@@ -107,7 +107,7 @@ object UserHelper extends PlayCache {
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
-      case Some(member) if member.pid == projectId && member.level == LevelEnum.safe => true
+      case Some(member) if member.projectId == projectId && member.level == LevelEnum.safe => true
       case _ => false
     }
   }
@@ -116,7 +116,7 @@ object UserHelper extends PlayCache {
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
     if (user.role == RoleEnum.admin) true
     else MemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
-      case Some(member) if member.pid == projectId =>
+      case Some(member) if member.projectId == projectId =>
         EnvironmentHelper.findById(envId) match {
           case Some(env) if env.level == LevelEnum.safe => if (member.level == env.level) true else false
           case Some(env) if env.level == LevelEnum.unsafe => true
