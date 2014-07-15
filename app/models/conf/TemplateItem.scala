@@ -9,7 +9,7 @@ import scala.slick.jdbc.JdbcBackend
 /**
  * 项目模板描述表
  */
-case class TemplateItem(id: Option[Int], tid: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int)
+case class TemplateItem(id: Option[Int], templateId: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int)
 class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_item") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def templateId = column[Int]("template_id")                      // 模板编号

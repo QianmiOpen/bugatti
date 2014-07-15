@@ -25,7 +25,7 @@ object TemplateController extends BaseController {
       "items" -> list(
         mapping(
           "id" -> optional(number),
-          "tid" -> optional(number),
+          "templateId" -> optional(number),
           "itemName" -> nonEmptyText,
           "itemDesc" -> optional(text),
           "default" -> optional(text),
@@ -74,8 +74,8 @@ object TemplateController extends BaseController {
   }
 
   // 模板属性
-  def items(tid: Int) = Action { implicit request =>
-    Ok(Json.toJson(TemplateItemHelper.findByTemplateId(tid)))
+  def items(templateId: Int) = Action { implicit request =>
+    Ok(Json.toJson(TemplateItemHelper.findByTemplateId(templateId)))
   }
 
 }

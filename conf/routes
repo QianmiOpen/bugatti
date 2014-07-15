@@ -61,7 +61,7 @@ PUT           /project/member/:mid                controllers.conf.ProjectContro
 # Template
 GET           /tempalte/all                       controllers.conf.TemplateController.all
 GET           /tempalte/:id                       controllers.conf.TemplateController.show(id: Int)
-GET           /tempalte/:tid/items                controllers.conf.TemplateController.items(tid: Int)
+GET           /tempalte/:templateId/items         controllers.conf.TemplateController.items(templateId: Int)
 DELETE        /tempalte/:id                       controllers.conf.TemplateController.delete(id: Int)
 POST          /template                           controllers.conf.TemplateController.save
 PUT           /template/:id                       controllers.conf.TemplateController.update(id: Int)
