@@ -29,7 +29,10 @@ object AttributeHelper {
   }
 
   def getValue(projectId: Int, name: String): Option[String] = {
-    findByProjectId(projectId).filter(_.name == name)(0).value
+    findByProjectId(projectId).find(_.name == name) match {
+      case Some(attr) => attr.value
+      case None => Option.empty[String]
+    }
   }
 
   def _create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {

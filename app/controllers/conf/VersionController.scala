@@ -38,16 +38,16 @@ object VersionController extends BaseController {
     val artifactId = AttributeHelper.getValue(pid, "artifactId")
     Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
     // 2、查询release、snapshot版本
-    val (listRelease, listSnapshot) = (groupId, artifactId) match {
+    val result = (groupId, artifactId) match {
       case (Some(gid), Some(aid)) =>
-        (_makeVersion(gid, aid, false), _makeVersion(gid, aid, true))
+        _makeVersion(gid, aid, false) ::: _makeVersion(gid, aid, true)
       case _ =>
-        (List.empty[String], List.empty[String])
+        List.empty[String]
     }
     // 3、拼接版本号，按照版本号逆序
-    val result = (listRelease ::: listSnapshot).sorted.reverse
-    Logger.info(s"nexus return versions : [${result}]")
-    Ok(Json.toJson(result))
+    val resultReverse = result.sorted.reverse
+    Logger.info(s"nexus return versions : [${resultReverse}]")
+    Ok(Json.toJson(resultReverse))
   }
 
   def show(id: Int) = Action {
