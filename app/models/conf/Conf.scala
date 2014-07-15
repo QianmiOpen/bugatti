@@ -15,8 +15,11 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 case class Conf(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
 case class ConfForm(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
   def toConf = Conf(id, eid, pid, vid, jobNo, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
-  def _nl2(text: String) = text.replaceAll("(\r\n)|(\n\r)|\r|\n", "\n")
-  def toContent = ConfContent(id, _nl2(content))
+  // windows = \r\n | \n\r
+  // linux, unix = \n
+  // mac = \r
+  def _nl2n(text: String) = text.replaceAll("(\r\n)|(\n\r)|\r", "\n")
+  def toContent = ConfContent(id, _nl2n(content))
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)

@@ -34,7 +34,8 @@ define(['angular'], function(angular) {
             // 环境选择
             $scope.envChange = function(e) {
                 $scope.env = e;
-                $state.go('conf.project.version.conf.list', {eid: e.id})
+                // Session expired due to cyclic bug
+//                $state.go('conf.project.version.conf.list', {eid: e.id})
             };
 
             // ----------------------------------------------------

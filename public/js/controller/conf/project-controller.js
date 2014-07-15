@@ -4,13 +4,22 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.projectModule', []);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', function($scope, $state, $stateParams, $modal, ProjectService, VersionService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', 'EnvService',
+        function($scope, $state, $stateParams, $modal, ProjectService, VersionService, EnvService) {
         $scope.currentPage = 1;
         $scope.pageSize = 30;
         $scope.my = false;
         if($state.current.name === 'conf.project.my') {
             $scope.my = true;
         }
+
+        // load env
+        EnvService.getAll(function(data) {
+            if (data == null || data.length == 0) {
+                return;
+            }
+            $scope.envId = data[0].id;
+        });
 
         // count
         ProjectService.count($scope.my, function(data) {
