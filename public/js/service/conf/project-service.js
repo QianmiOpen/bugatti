@@ -54,17 +54,17 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.VersionController.show(id)).success(callback);
             },
-            top: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.VersionController.all(pid)).success(callback);
+            top: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.all(projectId)).success(callback);
             },
-            getNexusVersions: function(pid, callback){
-                $http(PlayRoutes.controllers.conf.VersionController.nexusVersions(pid)).success(callback)
+            getNexusVersions: function(projectId, callback){
+                $http(PlayRoutes.controllers.conf.VersionController.nexusVersions(projectId)).success(callback)
             },
-            getPage: function(pid, page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.VersionController.index(pid, page, pageSize)).success(callback);
+            getPage: function(projectId, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.index(projectId, page, pageSize)).success(callback);
             },
-            count: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.VersionController.count(pid)).success(callback);
+            count: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.count(projectId)).success(callback);
             },
             save: function(version, callback) {
                 $http.post(PlayRoutes.controllers.conf.VersionController.save().url, version).success(callback)

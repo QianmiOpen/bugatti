@@ -14,7 +14,7 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  *
  * @author of546
  */
-case class Version(id: Option[Int], pid: Int, vs: String, updated: DateTime)
+case class Version(id: Option[Int], projectId: Int, vs: String, updated: DateTime)
 class VersionTable(tag: Tag) extends Table[Version](tag, "version"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def projectId = column[Int]("project_id", O.NotNull)   // 项目编号
@@ -35,12 +35,12 @@ object VersionHelper extends PlayCache {
     qVersion.filter(_.id === id).firstOption
   }
 
-  def findByProjectId(pid: Int): Seq[Version] = db withSession { implicit session =>
-    qVersion.filter(_.projectId === pid).sortBy(_.updated desc).list
+  def findByProjectId(projectId: Int): Seq[Version] = db withSession { implicit session =>
+    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).list
   }
 
-  def findByProjectId_Vs(pid: Int, vs: String): Option[Version] = db withSession { implicit session =>
-    qVersion.filter(v => v.projectId === pid && v.vs === vs).firstOption
+  def findByProjectId_Vs(projectId: Int, vs: String): Option[Version] = db withSession { implicit session =>
+    qVersion.filter(v => v.projectId === projectId && v.vs === vs).firstOption
   }
 
   def findByProjectId_EnvId(projectId: Int, envId: Int): Seq[Version] = db withSession { implicit session =>
@@ -55,33 +55,34 @@ object VersionHelper extends PlayCache {
     }
   }
 
-  def count(pid: Int) = db withSession { implicit session =>
-    qVersion.filter(_.projectId === pid).length.run
+  def count(projectId: Int) = db withSession { implicit session =>
+    qVersion.filter(_.projectId === projectId).length.run
   }
 
-  def all(pid: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
+  def all(projectId: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
     val offset = pageSize * page
-    qVersion.filter(_.projectId === pid).sortBy(_.updated desc).drop(offset).take(pageSize).list
+    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).drop(offset).take(pageSize).list
   }
 
-  def all(pid: Int, top: Int): Seq[Version] = db withSession { implicit session =>
-    qVersion.filter(_.projectId === pid).sortBy(_.updated desc).take(top).list
+  def all(projectId: Int, top: Int): Seq[Version] = db withSession { implicit session =>
+    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).take(top).list
   }
 
   def create(version: Version) = db withTransaction { implicit session =>
-    val vid = qVersion.returning(qVersion.map(_.id)).insert(version)
-    ProjectHelper.findById(version.pid) match {
+    val versionId = qVersion.returning(qVersion.map(_.id)).insert(version)
+    ProjectHelper.findById(version.projectId) match {
         case Some(p) =>
-          ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
+          ProjectHelper._update(version.projectId, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
         case None =>
     }
-    vid
+    versionId
   }
 
   def delete(version: Version): Int = db withTransaction { implicit session =>
-    ProjectHelper.findById(version.pid) match {
+    ProjectHelper.findById(version.projectId) match {
       case Some(p) =>
-        ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal - 1, p.lastVid, p.lastVersion, p.lastUpdated))
+        val total = if (p.subTotal - 1 < 0) 0 else p.subTotal - 1 // prevent -1
+        ProjectHelper._update(version.projectId, p.copy(subTotal = total))
       case None =>
     }
     qVersion.filter(_.id is version.id).delete

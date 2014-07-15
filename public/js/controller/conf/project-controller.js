@@ -328,7 +328,7 @@ define(['angular'], function(angular) {
 
     app.controller('VersionCreateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'VersionService',
         function($scope, $filter, $stateParams, $state, VersionService) {
-            $scope.version = {pid: $stateParams.id, vs: ''}
+            $scope.version = {projectId: $stateParams.id, vs: ''}
 
             $scope.saveOrUpdate = function(version) {
                 version.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
