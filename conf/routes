@@ -85,8 +85,8 @@ POST          /conf/copy                          controllers.conf.ConfControlle
 PUT           /conf/:id                           controllers.conf.ConfController.update(id: Int)
 
 # Conf Log
-GET           /conf/:cid/logs                     controllers.conf.ConfController.logs(cid: Int, page: Int ?=0, pageSize: Int ?=10)
-GET           /conf/:cid/logs/total               controllers.conf.ConfController.logsCount(cid: Int)
+GET           /conf/:confId/logs                  controllers.conf.ConfController.logs(confId: Int, page: Int ?=0, pageSize: Int ?=10)
+GET           /conf/:confId/logs/total            controllers.conf.ConfController.logsCount(confId: Int)
 GET           /conf/log/:id                       controllers.conf.ConfController.log(id: Int)
 
 # Relation

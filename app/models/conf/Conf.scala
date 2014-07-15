@@ -12,9 +12,9 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  *
  * @author of546
  */
-case class Conf(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
-case class ConfForm(id: Option[Int], eid: Int, pid: Int, vid: Int, jobNo: String, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
-  def toConf = Conf(id, eid, pid, vid, jobNo, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
+case class Conf(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
+case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
+  def toConf = Conf(id, envId, projectId, versionId, jobNo, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
   // windows = \r\n | \n\r
   // linux, unix = \n
   // mac = \r
@@ -74,7 +74,7 @@ object ConfHelper extends PlayCache {
   def delete(id: Int) = db withTransaction { implicit session =>
     findById(id) match {
       case Some(conf) =>
-        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
         qConf.filter(_.id === id).delete
         ConfContentHelper.findById(id) match {
           case Some(content) =>
@@ -91,7 +91,7 @@ object ConfHelper extends PlayCache {
   def update(id: Int, confForm: ConfForm) = db withSession { implicit session =>
     findById(id) match {
       case Some(conf) =>
-        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.eid, conf.vid, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
         qConf.filter(_.id === id).update(confForm.toConf.copy(Some(id)))
         ConfContentHelper.findById(id) match {
           case Some(content) =>

@@ -14,7 +14,7 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class ConfLog(id: Option[Int], cid: Int, eid: Int, vid: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
+case class ConfLog(id: Option[Int], confId: Int, envId: Int, versionId: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
 
 class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
