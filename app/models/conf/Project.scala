@@ -51,9 +51,8 @@ object ProjectHelper extends PlayCache {
     qProject.filter(_.name === name).firstOption
   }
 
-  // templateId
-  def countByTid(tid: Int) = db withSession { implicit session =>
-    qProject.filter(_.templateId === tid).length.run
+  def countByTemplateId(templateId: Int) = db withSession { implicit session =>
+    qProject.filter(_.templateId === templateId).length.run
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
@@ -61,7 +60,7 @@ object ProjectHelper extends PlayCache {
       case Some(no) =>
         val query = (for {
           p <- qProject
-          m <- qMember if p.id === m.pid
+          m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
         query.length.run
       case None =>
@@ -75,7 +74,7 @@ object ProjectHelper extends PlayCache {
       case Some(no) =>
         val query = (for {
           p <- qProject
-          m <- qMember if p.id === m.pid
+          m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
         query.map(_._1).drop(offset).take(pageSize).list
       case None =>
@@ -93,9 +92,7 @@ object ProjectHelper extends PlayCache {
 
   def create(projectForm: ProjectForm, jobNo: String) = db withTransaction { implicit session =>
     val pid = _create(projectForm.toProject)
-    val attrs = projectForm.items.map(item =>
-      Attribute(None, Some(pid), item.name, item.value)
-    )
+    val attrs = projectForm.items.map(item => item.copy(None, Some(pid)))
     AttributeHelper._create(attrs)
     MemberHelper._create(Member(None, pid, LevelEnum.safe, jobNo))
   }
@@ -109,10 +106,8 @@ object ProjectHelper extends PlayCache {
   }
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
-    AttributeHelper._deleteByPid(id)
-    val attrs = projectForm.items.map(item =>
-      Attribute(None, Some(id), item.name, item.value)
-    )
+    AttributeHelper._deleteByProjectId(id)
+    val attrs = projectForm.items.map(item => item.copy(None, Some(id)))
     AttributeHelper._create(attrs)
     _update(id, projectForm.toProject)
   }

@@ -34,7 +34,8 @@ define(['angular'], function(angular) {
             // 环境选择
             $scope.envChange = function(e) {
                 $scope.env = e;
-                $state.go('conf.project.version.conf.list', {eid: e.id})
+                // Session expired due to cyclic bug
+//                $state.go('conf.project.version.conf.list', {eid: e.id})
             };
 
             // ----------------------------------------------------
@@ -67,11 +68,11 @@ define(['angular'], function(angular) {
                 });
 
                 modalInstance.result.then(function (param) {
-                    param.pid = $stateParams.id;
-                    var thisEid = param.eid;
+                    param.projectId = $stateParams.id;
+                    var thisEid = param.envId;
                     ConfService.copy(angular.toJson(param), function(data) {
                         if (data.r === 'ok') {
-                            $state.go('conf.project.version.conf', {eid: thisEid}, {reload: true})
+                            $state.go('conf.project.version.conf.list', {eid: thisEid}, {reload: true})
                         }
                     });
                 }, function () {
@@ -93,7 +94,7 @@ define(['angular'], function(angular) {
         $scope.override = false;
 
         $scope.ok = function (selEnv, selVer, selOver) {
-            $modalInstance.close({target_eid: selEnv, target_vid: selVer, eid: curr_eid, vid: curr_vid, ovr: selOver});
+            $modalInstance.close({target_eid: selEnv, target_vid: selVer, envId: curr_eid, versionId: curr_vid, ovr: selOver});
         };
 
         $scope.cancel = function () {
@@ -114,22 +115,14 @@ define(['angular'], function(angular) {
     app.controller('ConfCreateCtrl', ['$scope', '$filter', '$state', '$stateParams', '$modal',
         'ConfService', 'EnvService', 'ProjectService', 'VersionService',
         function($scope, $filter, $state, $stateParams, $modal, ConfService, EnvService, ProjectService, VersionService) {
-            $scope.conf = {pid: $stateParams.id, vid: $stateParams.vid};
+            $scope.conf = {projectId: $stateParams.id, versionId: $stateParams.vid};
 
             $scope.cancel = function() {
-
                 $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
-
-//                $scope.$on('$locationChangeStart', function( event ) {
-//                    var answer = confirm("Are you sure you want to leave this page?")
-//                    if (!answer) {
-//                        event.preventDefault();
-//                    }
-//                });
             };
 
             $scope.save = function() {
-                $scope.conf.eid = $scope.env.id;
+                $scope.conf.envId = $scope.env.id;
                 $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
                 ConfService.save(angular.toJson($scope.conf), function(data) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
@@ -144,7 +137,7 @@ define(['angular'], function(angular) {
 
             ConfService.get($stateParams.cid, function(data) {
                 $scope.conf = data.conf;
-                $scope.conf.content = data.content.content;
+                $scope.conf.content = data.confContent.content;
             });
 
             // remove
@@ -189,7 +182,7 @@ define(['angular'], function(angular) {
         function($scope, $state, $filter, $stateParams, $modal, ConfService) {
             ConfService.get($stateParams.cid, function(data) {
                 $scope.conf = data.conf;
-                $scope.conf.content = data.content.content;
+                $scope.conf.content = data.confContent.content;
             });
 
             $scope.update = function() {
@@ -240,9 +233,8 @@ define(['angular'], function(angular) {
 
             ConfService.get($stateParams.cid, function(data) {
                 $scope.conf = data.conf;
-                $scope.conf.content = data.content;
+                $scope.conf.content = data.confContent;
             });
-
 
         }]);
 

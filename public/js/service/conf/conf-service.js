@@ -9,8 +9,8 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ConfController.show(id)).success(callback);
             },
-            getAll: function(eid, vid, callback) {
-                $http(PlayRoutes.controllers.conf.ConfController.all(eid, vid)).success(callback);
+            getAll: function(envId, vid, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.all(envId, vid)).success(callback);
             },
             save: function(conf, callback) {
                 $http.post(PlayRoutes.controllers.conf.ConfController.save().url, conf).success(callback)
@@ -33,11 +33,11 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ConfController.log(id)).success(callback);
             },
-            getPage: function(cid, page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.ConfController.logs(cid, page, pageSize)).success(callback);
+            getPage: function(confId, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.logs(confId, page, pageSize)).success(callback);
             },
-            count: function(cid, callback) {
-                $http(PlayRoutes.controllers.conf.ConfController.logsCount(cid)).success(callback);
+            count: function(confId, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.logsCount(confId)).success(callback);
             }
         }
     });

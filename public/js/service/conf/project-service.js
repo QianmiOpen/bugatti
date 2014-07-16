@@ -30,20 +30,23 @@ define(['angular'], function(angular) {
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.delete(id)).success(callback);
             },
-            atts: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.atts(pid)).success(callback);
+            atts: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.atts(projectId)).success(callback);
             },
-            member: function(pid, jobNo, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.member(pid, jobNo)).success(callback);
+            // ------------------------------------------------
+            // 项目成员
+            // ------------------------------------------------
+            member: function(projectId, jobNo, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.member(projectId, jobNo)).success(callback);
             },
-            members: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.members(pid)).success(callback);
+            members: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.members(projectId)).success(callback);
             },
-            saveMember: function(pid, jobNo, callback) {
-                $http.post(PlayRoutes.controllers.conf.ProjectController.saveMember(pid, jobNo).url).success(callback);
+            saveMember: function(projectId, jobNo, callback) {
+                $http.post(PlayRoutes.controllers.conf.ProjectController.saveMember(projectId, jobNo).url).success(callback);
             },
-            updateMember: function(mid, op, callback) {
-                $http.put(PlayRoutes.controllers.conf.ProjectController.updateMember(mid, op).url).success(callback);
+            updateMember: function(memberId, op, callback) {
+                $http.put(PlayRoutes.controllers.conf.ProjectController.updateMember(memberId, op).url).success(callback);
             }
         }
     });
@@ -54,17 +57,17 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.VersionController.show(id)).success(callback);
             },
-            top: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.VersionController.all(pid)).success(callback);
+            top: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.all(projectId)).success(callback);
             },
-            getNexusVersions: function(pid, callback){
-                $http(PlayRoutes.controllers.conf.VersionController.nexusVersions(pid)).success(callback)
+            getNexusVersions: function(projectId, callback){
+                $http(PlayRoutes.controllers.conf.VersionController.nexusVersions(projectId)).success(callback)
             },
-            getPage: function(pid, page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.VersionController.index(pid, page, pageSize)).success(callback);
+            getPage: function(projectId, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.index(projectId, page, pageSize)).success(callback);
             },
-            count: function(pid, callback) {
-                $http(PlayRoutes.controllers.conf.VersionController.count(pid)).success(callback);
+            count: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.count(projectId)).success(callback);
             },
             save: function(version, callback) {
                 $http.post(PlayRoutes.controllers.conf.VersionController.save().url, version).success(callback)

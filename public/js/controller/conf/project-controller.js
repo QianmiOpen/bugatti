@@ -4,13 +4,22 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.projectModule', []);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', function($scope, $state, $stateParams, $modal, ProjectService, VersionService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', 'EnvService',
+        function($scope, $state, $stateParams, $modal, ProjectService, VersionService, EnvService) {
         $scope.currentPage = 1;
         $scope.pageSize = 30;
         $scope.my = false;
         if($state.current.name === 'conf.project.my') {
             $scope.my = true;
         }
+
+        // load env
+        EnvService.getAll(function(data) {
+            if (data == null || data.length == 0) {
+                return;
+            }
+            $scope.envId = data[0].id;
+        });
 
         // count
         ProjectService.count($scope.my, function(data) {
@@ -80,11 +89,13 @@ define(['angular'], function(angular) {
                 $scope.atts = data;
             });
 
+            // ---------------------------------------------
+            // 项目成员管理
+            // ---------------------------------------------
             ProjectService.members($stateParams.id, function(data) {
                 $scope.members = data;
             });
 
-            // 新增项目成员
             $scope.addMember = function(jobNo) {
                 $scope.jobNo$error = '';
                 if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
@@ -319,7 +330,7 @@ define(['angular'], function(angular) {
 
     app.controller('VersionCreateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'VersionService',
         function($scope, $filter, $stateParams, $state, VersionService) {
-            $scope.version = {pid: $stateParams.id, vs: ''}
+            $scope.version = {projectId: $stateParams.id, vs: ''}
 
             $scope.saveOrUpdate = function(version) {
                 version.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")

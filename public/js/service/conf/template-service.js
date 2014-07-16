@@ -18,8 +18,8 @@ define(['angular'], function(angular) {
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.TemplateController.delete(id)).success(callback);
             },
-            items: function(tid, callback) {
-                $http(PlayRoutes.controllers.conf.TemplateController.items(tid)).success(callback);
+            items: function(templateId, callback) {
+                $http(PlayRoutes.controllers.conf.TemplateController.items(templateId)).success(callback);
             },
             update: function(id, template, callback) {
                 $http.put(PlayRoutes.controllers.conf.TemplateController.update(id).url, template).success(callback)

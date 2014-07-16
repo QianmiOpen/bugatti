@@ -25,7 +25,7 @@ object TemplateController extends BaseController {
       "items" -> list(
         mapping(
           "id" -> optional(number),
-          "tid" -> optional(number),
+          "templateId" -> optional(number),
           "itemName" -> nonEmptyText,
           "itemDesc" -> optional(text),
           "default" -> optional(text),
@@ -40,7 +40,7 @@ object TemplateController extends BaseController {
   }
 
   def delete(id: Int) = Action {
-    ProjectHelper.countByTid(id) match {
+    ProjectHelper.countByTemplateId(id) match {
       case count if count > 0 => Ok(Json.obj("r" -> "exist")) // 项目中还存在使用情况
       case _ => Ok(Json.obj("r" -> Json.toJson(TemplateHelper.delete(id))))
     }
@@ -74,8 +74,8 @@ object TemplateController extends BaseController {
   }
 
   // 模板属性
-  def items(tid: Int) = Action { implicit request =>
-    Ok(Json.toJson(TemplateItemHelper.findByTid(tid)))
+  def items(templateId: Int) = Action { implicit request =>
+    Ok(Json.toJson(TemplateItemHelper.findByTemplateId(templateId)))
   }
 
 }

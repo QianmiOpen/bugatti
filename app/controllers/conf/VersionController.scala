@@ -26,47 +26,51 @@ object VersionController extends BaseController {
   val versionForm = Form(
     mapping(
       "id" -> optional(number),
-      "pid" -> number,
+      "projectId" -> number,
       "vs" -> nonEmptyText,
       "updated" -> default(jodaDate("yyyy-MM-dd hh:mm:ss"), DateTime.now())
     )(Version.apply)(Version.unapply)
   )
 
-  def nexusVersions(pid: Int) = Action {
+  def nexusVersions(projectId: Int) = Action {
     // 1、根据projectId获取项目attribute中的groupId、artifactId
-    val groupId = AttributeHelper.getValue(pid, "groupId").replaceAll("\\.", "/")
-    val artifactId = AttributeHelper.getValue(pid, "artifactId")
+    val groupId = AttributeHelper.getValue(projectId, "groupId").map(_.replaceAll("\\.", "/"))
+    val artifactId = AttributeHelper.getValue(projectId, "artifactId")
     Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
     // 2、查询release、snapshot版本
-    val listRelease = _makeVersion(groupId, artifactId, false)
-    val listSnapshot = _makeVersion(groupId, artifactId, true)
+    val result = (groupId, artifactId) match {
+      case (Some(gid), Some(aid)) =>
+        _makeVersion(gid, aid, false) ::: _makeVersion(gid, aid, true)
+      case _ =>
+        List.empty[String]
+    }
     // 3、拼接版本号，按照版本号逆序
-    val result = (listRelease ::: listSnapshot).sorted.reverse
-    Logger.info(s"nexus return versions : [${result}]")
-    Ok(Json.toJson(result))
+    val resultReverse = result.sorted.reverse
+    Logger.info(s"nexus return versions : [${resultReverse}]")
+    Ok(Json.toJson(resultReverse))
   }
 
   def show(id: Int) = Action {
     Ok(Json.toJson(VersionHelper.findById(id)))
   }
 
-  def index(pid: Int, page: Int, pageSize: Int) = Action {
-    Ok(Json.toJson(VersionHelper.all(pid, page, pageSize)))
+  def index(projectId: Int, page: Int, pageSize: Int) = Action {
+    Ok(Json.toJson(VersionHelper.all(projectId, page, pageSize)))
   }
 
-  def count(pid: Int) = Action {
-    Ok(Json.toJson(VersionHelper.count(pid)))
+  def count(projectId: Int) = Action {
+    Ok(Json.toJson(VersionHelper.count(projectId)))
   }
 
-  def all(pid: Int, top: Int) = Action {
-    Ok(Json.toJson(VersionHelper.all(pid, top)))
+  def all(projectId: Int, top: Int) = Action {
+    Ok(Json.toJson(VersionHelper.all(projectId, top)))
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     VersionHelper.findById(id) match {
       case Some(version) =>
-        if (!UserHelper.hasProjectSafe(version.pid, request.user)) Forbidden
-        else ConfHelper.findByVid(id).isEmpty match {
+        if (!UserHelper.hasProjectSafe(version.projectId, request.user)) Forbidden
+        else ConfHelper.findByVersionId(id).isEmpty match {
           case true =>
             Ok(Json.obj("r" -> Json.toJson(VersionHelper.delete(version))))
           case false =>
@@ -81,8 +85,8 @@ object VersionController extends BaseController {
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
-        if (!UserHelper.hasProjectSafe(versionForm.pid, request.user)) Forbidden
-        else  VersionHelper.findByPid(versionForm.pid).find(_.vs == versionForm.vs) match {
+        if (!UserHelper.hasProjectSafe(versionForm.projectId, request.user)) Forbidden
+        else  VersionHelper.findByProjectId(versionForm.projectId).find(_.vs == versionForm.vs) match {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
@@ -96,8 +100,8 @@ object VersionController extends BaseController {
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
-        if (!UserHelper.hasProjectSafe(versionForm.pid, request.user)) Forbidden
-        else VersionHelper.findByPid(versionForm.pid)
+        if (!UserHelper.hasProjectSafe(versionForm.projectId, request.user)) Forbidden
+        else VersionHelper.findByProjectId(versionForm.projectId)
           .filterNot(_.id == versionForm.id) // Some(id)
           .find(_.vs == versionForm.vs) match {
           case Some(_) =>

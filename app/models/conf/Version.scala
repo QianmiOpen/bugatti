@@ -14,16 +14,16 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  *
  * @author of546
  */
-case class Version(id: Option[Int], pid: Int, vs: String, updated: DateTime)
+case class Version(id: Option[Int], projectId: Int, vs: String, updated: DateTime)
 class VersionTable(tag: Tag) extends Table[Version](tag, "version"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def pid = column[Int]("project_id", O.NotNull)   // 项目编号
+  def projectId = column[Int]("project_id", O.NotNull)   // 项目编号
   def vs = column[String]("version", O.NotNull) // 当前版本
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
-  override def * = (id.?, pid, vs, updated) <> (Version.tupled, Version.unapply _)
-  def idx = index("idx_pid", (pid, updated))
-  def idx_vs = index("idx_pid_vs", (pid, vs), unique = true)
+  override def * = (id.?, projectId, vs, updated) <> (Version.tupled, Version.unapply _)
+  def idx = index("idx_pid", (projectId, updated))
+  def idx_vs = index("idx_pid_vs", (projectId, vs), unique = true)
 }
 object VersionHelper extends PlayCache {
 
@@ -35,31 +35,18 @@ object VersionHelper extends PlayCache {
     qVersion.filter(_.id === id).firstOption
   }
 
-  def findByPid(pid: Int): Seq[Version] = db withSession { implicit session =>
-    qVersion.filter(_.pid === pid).sortBy(_.updated desc).list
+  def findByProjectId(projectId: Int): Seq[Version] = db withSession { implicit session =>
+    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).list
   }
 
-  def findByPid_Vs(pid: Int, vs: String): Option[Version] = db withSession { implicit session =>
-    qVersion.filter(v => v.pid === pid && v.vs === vs).firstOption
+  def findByProjectId_Vs(projectId: Int, vs: String): Option[Version] = db withSession { implicit session =>
+    qVersion.filter(v => v.projectId === projectId && v.vs === vs).firstOption
   }
 
-  def count(pid: Int) = db withSession { implicit session =>
-    qVersion.filter(_.pid === pid).length.run
-  }
-
-  def all(pid: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
-    val offset = pageSize * page
-    qVersion.filter(_.pid === pid).sortBy(_.updated desc).drop(offset).take(pageSize).list
-  }
-
-  def all(pid: Int, top: Int): Seq[Version] = db withSession { implicit session =>
-    qVersion.filter(_.pid === pid).sortBy(_.updated desc).take(top).list
-  }
-
-  def findByPid_Eid(pid: Int, eid: Int): Seq[Version] = db withSession { implicit session =>
-    EnvironmentHelper.findById(eid) match {
+  def findByProjectId_EnvId(projectId: Int, envId: Int): Seq[Version] = db withSession { implicit session =>
+    EnvironmentHelper.findById(envId) match {
       case Some(env) =>
-        val list = findByPid(pid)
+        val list = findByProjectId(projectId)
         env.level match {
           case LevelEnum.unsafe => list
           case _ => list.filterNot(t => TaskTools.isSnapshot(t.id.get))
@@ -68,28 +55,42 @@ object VersionHelper extends PlayCache {
     }
   }
 
+  def count(projectId: Int) = db withSession { implicit session =>
+    qVersion.filter(_.projectId === projectId).length.run
+  }
+
+  def all(projectId: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
+    val offset = pageSize * page
+    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).drop(offset).take(pageSize).list
+  }
+
+  def all(projectId: Int, top: Int): Seq[Version] = db withSession { implicit session =>
+    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).take(top).list
+  }
+
   def create(version: Version) = db withTransaction { implicit session =>
-    val vid = qVersion.returning(qVersion.map(_.id)).insert(version)
-    ProjectHelper.findById(version.pid) match {
+    val versionId = qVersion.returning(qVersion.map(_.id)).insert(version)
+    ProjectHelper.findById(version.projectId) match {
         case Some(p) =>
-          ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(vid), Some(version.vs), Some(version.updated)))
+          ProjectHelper._update(version.projectId, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
         case None =>
     }
-    vid
+    versionId
   }
 
   def delete(version: Version): Int = db withTransaction { implicit session =>
-    ProjectHelper.findById(version.pid) match {
+    ProjectHelper.findById(version.projectId) match {
       case Some(p) =>
-        ProjectHelper._update(version.pid, Project(p.id, p.name, p.templateId, p.subTotal - 1, p.lastVid, p.lastVersion, p.lastUpdated))
+        val total = if (p.subTotal - 1 < 0) 0 else p.subTotal - 1 // prevent -1
+        ProjectHelper._update(version.projectId, p.copy(subTotal = total))
       case None =>
     }
     qVersion.filter(_.id is version.id).delete
   }
 
-  def update(id: Int, sp: Version) = db withSession { implicit session =>
-    val sp2update = sp.copy(Option(id))
-    qVersion.filter(_.id === id).update(sp2update)
+  def update(id: Int, version: Version) = db withSession { implicit session =>
+    val version2update = version.copy(Option(id))
+    qVersion.filter(_.id === id).update(version2update)
   }
 
 }
