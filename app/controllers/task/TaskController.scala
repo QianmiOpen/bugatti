@@ -1,5 +1,6 @@
 package controllers.task
 
+import controllers.BaseController
 import controllers.actor.{TaskLog, TaskProcess}
 import enums.TaskEnum
 import org.joda.time.DateTime
@@ -29,7 +30,7 @@ import play.api.libs.json.JsObject
 /**
  * 任务管理
  */
-object TaskController extends Controller {
+object TaskController extends BaseController {
 
   val stdFileDir = "/srv/salt"
 

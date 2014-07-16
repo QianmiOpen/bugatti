@@ -42,6 +42,7 @@ object AreaController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(s"mod:${FuncEnum.area}|user:${request.user.jobNo}|msg:增加区域|data:${Json.toJson(area)}")
             Ok(Json.obj("r" -> Json.toJson(AreaHelper.create(area))))
         }
     )
@@ -50,12 +51,15 @@ object AreaController extends BaseController {
   def update = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
-      area =>
+      area => {
+        ALogger.info(s"mod:${FuncEnum.area}|user:${request.user.jobNo}|msg:修改区域|data:${Json.toJson(area)}")
         Ok(Json.obj("r" -> Json.toJson(AreaHelper.update(area))))
+      }
     )
   }
 
   def delete(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
+    ALogger.info(s"mod:${FuncEnum.area}|user:${request.user.jobNo}|msg:删除区域|data:${id}")
     Ok(Json.obj("r" -> Json.toJson(AreaHelper.delete(id))))
   }
 
@@ -63,6 +67,7 @@ object AreaController extends BaseController {
     AreaHelper.findById(id) match {
       case Some(area) => {
         SaltTools.refreshHost(area.syndicName)
+        ALogger.info(s"mod:${FuncEnum.area}|user:${request.user.jobNo}|msg:刷新区域|data:${Json.toJson(area)}")
         Ok(Json.obj("r" -> Json.toJson(AreaHelper.findInfoById(id))))
       }
       case None =>{

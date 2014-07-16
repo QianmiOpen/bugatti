@@ -1,0 +1,48 @@
+<configuration>
+
+    <property resource="application.conf" />
+
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${application.home}/logs/application2.log</file>
+        <encoder>
+            <pattern>%date - [%level] - from %logger in %thread %n%message%n%xException%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%coloredLevel %logger{15} - %message%n%xException{5}</pattern>
+        </encoder>
+    </appender>
+
+    <!--<appender name="db" class="ch.qos.logback.classic.db.DBAppender">-->
+        <!--<connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">-->
+            <!--<driverClass>com.mysql.jdbc.Driver</driverClass>-->
+            <!--<url>jdbc:mysql://localhost:3306/bugatti</url>-->
+            <!--<user>bugatti</user>-->
+            <!--<password>bugatti</password>-->
+        <!--</connectionSource>-->
+    <!--</appender>-->
+    <!-- pool -->
+    <appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+        <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
+            <dataSource class="com.jolbox.bonecp.BoneCPDataSource">
+                <driverClass>com.mysql.jdbc.Driver</driverClass>
+                <jdbcUrl>jdbc:mysql://localhost:3306/bugatti</jdbcUrl>
+                <user>bugatti</user>
+                <password>bugatti</password>
+            </dataSource>
+        </connectionSource>
+    </appender>
+
+    <logger name="action_log" level="INFO" additivity="false">
+        <appender-ref ref="db" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>
