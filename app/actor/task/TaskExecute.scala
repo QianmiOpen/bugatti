@@ -1,7 +1,5 @@
 package actor.task
 
-import java.io.File
-
 import akka.actor.{Props, Actor}
 import enums.TaskEnum
 import models.conf._
@@ -12,22 +10,47 @@ import utils.TaskTools
 /**
  * Created by jinwei on 13/7/14.
  */
-object TaskExecute {
-
-}
-
 class TaskExecute extends Actor{
+  implicit val taskQueueWrites = Json.writes[TaskQueue]
+
   def receive = {
     case TaskGenerateCommand(tq) => {
       //1、获取任务名称
       val taskName = TaskTemplateHelper.findById(tq.taskTemplateId).name
       //2、insert 任务表
       val taskId = TaskHelper.addByTaskQueue(tq)
+      //获取队列信息
+      val queues = TaskQueueHelper.findQueues(tq.envId, tq.projectId)
+      val queuesJson: List[JsObject] = queues.map{
+        x =>
+          var json = Json.toJson(x)
+          //增加模板名称
+          json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
+          json.as[JsObject]
+      }
       //3、生成命令列表
       val (commandList, paramsJson) = generateCommands(taskId, tq)
+      val totalNum = commandList.length
+      val currentNum = 0
+
+      MyActor.superviseTaskActor ! ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum)
       TaskCommandHelper.create(commandList)
-      //TODO executeCommands
-      
+      //TODO executeCommands 从第1个命令开始执行
+      MyActor.commandActor ! InsertCommands(taskId, tq.envId, tq.projectId, tq.versionId, commandList)
+//      MyActor.commandActor ! ExecuteCommand(taskId, tq.envId, tq.projectId, tq.versionId, 1)
+
+    }
+    case NextTaskQueue(envId, projectId) => {
+      val taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
+      taskQueue match {
+        case Some(tq) => {
+          self ! TaskGenerateCommand(tq)
+        }
+        case _ => {
+          //没有任务，删除MyActor中的缓存
+          MyActor.superviseTaskActor ! RemoveStatus(envId, projectId)
+        }
+      }
     }
   }
 

@@ -129,9 +129,9 @@ object TaskProcess {
 //    val file = new File(s"${baseDir}/.bugatti")
 //    file.getParentFile.mkdirs()
 //    file.createNewFile()
-    val baseFilesPath = new File(s"${baseDir}/files")
-    if(!baseFilesPath.exists()) {
-      baseFilesPath.mkdirs()
+    val file = new File(s"${baseDir}/files")
+    if(!file.exists()) {
+      file.mkdirs()
     }
     if (confSeq.size > 0) {
       confSeq.foreach { xf =>
@@ -145,10 +145,10 @@ object TaskProcess {
     }
 
     Logger.info("baseDir ==>" + baseDir)
-    Logger.info("fileName ==>" + fileName)
+    Logger.info("fileName ==>"+fileName)
 
     val baseDirPath = new File(new File(baseDir).getAbsolutePath)
-    Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
+    Process(Seq("tar", "zcf", s"${fileName}.tar.gz", "files"), baseDirPath).!!
 
     Process(Seq("md5sum", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
 
