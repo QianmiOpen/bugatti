@@ -1,10 +1,9 @@
 package controllers.conf
 
-import enums.{RoleEnum}
+import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
 import models.conf.{MemberHelper, Environment, EnvironmentHelper}
 import play.api.mvc._
 import controllers.BaseController
-import enums.{FuncEnum, LevelEnum}
 import play.api.libs.json._
 import play.api.data._
 import play.api.data.Forms._
@@ -16,6 +15,9 @@ import play.api.data.Forms._
 object EnvController extends BaseController {
 
   implicit val envWrites = Json.writes[Environment]
+
+  def msg(user: String, ip: String, msg: String, data: Environment) =
+    s"mod:${ModEnum.env}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
 
   val envForm = Form(
     mapping(
@@ -53,8 +55,14 @@ object EnvController extends BaseController {
     Ok(Json.toJson(seq))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.env) {
-    Ok(Json.toJson(EnvironmentHelper.delete(id)))
+  def delete(id: Int) = AuthAction(FuncEnum.env) { implicit request =>
+    EnvironmentHelper.findById(id) match {
+      case Some(env) =>
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除环境", env))
+        Ok(Json.toJson(EnvironmentHelper.delete(id)))
+      case None =>
+        NotFound
+    }
   }
 
   def save = AuthAction(FuncEnum.env) { implicit request =>
@@ -65,6 +73,7 @@ object EnvController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境", env))
             Ok(Json.obj("r" -> Json.toJson(EnvironmentHelper.create(env))))
         }
     )
@@ -78,6 +87,7 @@ object EnvController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改环境", env))
             Ok(Json.obj("r" -> Json.toJson(EnvironmentHelper.update(id, env))))
         }
     )

@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{FuncEnum, RoleEnum}
+import enums.{ModEnum, FuncEnum, RoleEnum}
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -17,6 +17,9 @@ object UserController extends BaseController {
 
   implicit val userWrites = Json.writes[User]
   implicit val permissionWrites = Json.writes[Permission]
+
+  def msg(user: String, ip: String, msg: String, data: User) =
+    s"mod:${ModEnum.user}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
 
   val userForm = Form(
     mapping(
@@ -47,8 +50,14 @@ object UserController extends BaseController {
     Ok(Json.toJson(PermissionHelper.findByJobNo(jobNo)))
   }
 
-  def delete(jobNo: String) = AuthAction(FuncEnum.user) {
-    Ok(Json.toJson(UserHelper.delete(jobNo)))
+  def delete(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
+    UserHelper.findByJobNo(jobNo) match {
+      case Some(user) =>
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
+        Ok(Json.toJson(UserHelper.delete(jobNo)))
+      case None =>
+        NotFound
+    }
   }
 
   def save = AuthAction(FuncEnum.user) { implicit request =>
@@ -59,6 +68,7 @@ object UserController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", userForm.toUser))
             Ok(Json.obj("r" -> UserHelper.create(userForm.toUser, userForm.toPermission)))
         }
       }
@@ -69,6 +79,7 @@ object UserController extends BaseController {
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       userForm => {
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", userForm.toUser))
         Ok(Json.obj("r" -> UserHelper.update(jobNo, userForm.toUser, userForm.toPermission)))
       }
     )

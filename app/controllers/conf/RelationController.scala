@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.FuncEnum
+import enums.{ModEnum, FuncEnum}
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -12,13 +12,6 @@ import play.api.libs.json._
  */
 object RelationController extends BaseController {
   implicit val relationWrites = Json.writes[EnvironmentProjectRel]
-  //  implicit val ipWrites = Json.writes[IP]
-  //  implicit val relationFormWrites = Json.writes[EnvironmentProjectRelForm]
-//  implicit val writer = new Writes[(String, String)] {
-//    def writes(c: (String, String)): JsValue = {
-//      Json.obj("key" -> c._1,"value" -> c._2)
-//    }
-//  }
 
   val relationForm = Form(
     mapping(
@@ -39,38 +32,30 @@ object RelationController extends BaseController {
   }
 
   def ips(envId: Int) = AuthAction(FuncEnum.relation) {
-//    val env = EnvironmentHelper.findById(envId)
-//    val ip_range = env.map(_.ipRange.map(_.split(";").toList).getOrElse(Seq.empty[String])).getOrElse(Seq.empty[String]) // 格式化
-//    val rel_ips = EnvironmentProjectRelHelper.findIpsByEnvId(envId)
-//    val filter_ip = SaltUtil.getMinionsJson.filter { // 正式环境可用ip集合
-//      case (k, v) =>
-//        ip_range.exists(new SubnetUtils(_).getInfo.isInRange(k)) && // 遍历每个ip范围形成一个独立区间，然后检测外部ip是否在该区间
-//          !rel_ips.contains(k) // 已有关系中不存在
-//    }
-
-//    Ok(Json.toJson(filter_ip.toList))
-
     Ok(Json.toJson(EnvironmentProjectRelHelper.findIpsByEnvId(envId)))
   }
+
+  implicit val relationFormWrites = Json.writes[EnvRelForm]
 
   def bind = AuthAction(FuncEnum.relation) { implicit request =>
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
-      relation =>
+      relation => {
+        ALogger.info(s"mod:${ModEnum.relation}|user:${request.user.jobNo}|ip:${request.remoteAddress}|msg:绑定关系|data:${Json.toJson(relation)}")
         Ok(Json.toJson(EnvironmentProjectRelHelper.updateByProjectId(relation)))
+      }
     )
   }
 
-  def unbind(id: Int) = AuthAction(FuncEnum.relation) {
-    Ok(Json.toJson(EnvironmentProjectRelHelper.unbind(id)))
-  }
+  def unbind(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
+    EnvironmentProjectRelHelper.findById(id) match {
+      case Some(relation) =>
+        ALogger.info(s"mod:${ModEnum.relation}|user:${request.user.jobNo}|ip:${request.remoteAddress}|msg:解除关系|data:${Json.toJson(relation)}")
+        Ok(Json.toJson(EnvironmentProjectRelHelper.unbind(relation)))
+      case None =>
+        NotFound
+    }
 
-//  implicit def recordWrite: Writes[Relation] = new Writes[Relation] {
-//    def writes(rel: Relation) = {
-//      Json.obj("relation"-> rel._1,"env" -> rel._2,"project" -> rel._3)
-//    }
-//  }
-//
-//  type Relation = (EnvironmentProjectRel, String, String)
+  }
 
 }

@@ -39,15 +39,16 @@ object TemplateController extends BaseController {
     Ok(Json.toJson(TemplateHelper.findById(id)))
   }
 
+  def all = Action { implicit request =>
+    Ok(Json.toJson(TemplateHelper.all))
+  }
+
   def delete(id: Int) = Action {
     ProjectHelper.countByTemplateId(id) match {
       case count if count > 0 => Ok(Json.obj("r" -> "exist")) // 项目中还存在使用情况
-      case _ => Ok(Json.obj("r" -> Json.toJson(TemplateHelper.delete(id))))
+      case _ =>
+        Ok(Json.obj("r" -> Json.toJson(TemplateHelper.delete(id))))
     }
-  }
-
-  def all = Action { implicit request =>
-    Ok(Json.toJson(TemplateHelper.all))
   }
 
   def save = Action { implicit request =>
@@ -73,7 +74,9 @@ object TemplateController extends BaseController {
     )
   }
 
+  // --------------------------------------------
   // 模板属性
+  // --------------------------------------------
   def items(templateId: Int) = Action { implicit request =>
     Ok(Json.toJson(TemplateItemHelper.findByTemplateId(templateId)))
   }

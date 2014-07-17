@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.FuncEnum
+import enums.{ModEnum, FuncEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.Logger
@@ -22,6 +22,9 @@ import scala.io.Source
 object VersionController extends BaseController {
 
   implicit val versionWrites = Json.writes[Version]
+
+  def msg(user: String, ip: String, msg: String, data: Version) =
+    s"mod:${ModEnum.version}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
 
   val versionForm = Form(
     mapping(
@@ -72,6 +75,7 @@ object VersionController extends BaseController {
         if (!UserHelper.hasProjectSafe(version.projectId, request.user)) Forbidden
         else ConfHelper.findByVersionId(id).isEmpty match {
           case true =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除版本", version))
             Ok(Json.obj("r" -> Json.toJson(VersionHelper.delete(version))))
           case false =>
             Ok(Json.obj("r" -> "exist"))
@@ -90,6 +94,7 @@ object VersionController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增版本", versionForm))
             Ok(Json.obj("r" ->Json.toJson(VersionHelper.create(versionForm))))
         }
       }
@@ -107,6 +112,7 @@ object VersionController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改版本", versionForm))
             Ok(Json.obj("r" -> Json.toJson(VersionHelper.update(id, versionForm))))
         }
       }

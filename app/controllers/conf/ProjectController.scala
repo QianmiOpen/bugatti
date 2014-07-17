@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{RoleEnum, FuncEnum, LevelEnum}
+import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
@@ -18,6 +18,9 @@ object ProjectController extends BaseController {
 
   implicit val projectWrites = Json.writes[Project]
   implicit val attributeWrites = Json.writes[Attribute]
+
+  def msg(user: String, ip: String, msg: String, data: Project) =
+    s"mod:${ModEnum.project}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
 
   val projectForm = Form(
     mapping(
@@ -62,7 +65,9 @@ object ProjectController extends BaseController {
     else
       ProjectHelper.findById(id) match {
         case Some(project) => project.subTotal match {
-          case 0 => Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
+          case 0 =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除项目", project))
+            Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
           case _ => Ok(Json.obj("r" -> "exist"))
         }
         case None => Ok(Json.obj("r" -> "none"))
@@ -77,6 +82,7 @@ object ProjectController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增项目", projectForm.toProject))
             Ok(Json.obj("r" -> ProjectHelper.create(projectForm, request.user.jobNo)))
         }
       }
@@ -88,7 +94,9 @@ object ProjectController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
         if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
-        else Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
+        else
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改项目", projectForm.toProject))
+          Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
       }
     )
   }
@@ -115,6 +123,9 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   implicit val memberWrites = Json.writes[Member]
 
+  def msg(user: String, ip: String, msg: String, data: Member) =
+    s"mod:${ModEnum.member}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+
   def member(projectId: Int, jobNo: String) = Action {
     Ok(Json.toJson(MemberHelper.findByProjectId_JobNo(projectId, jobNo)))
   }
@@ -127,7 +138,9 @@ object ProjectController extends BaseController {
     if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
     else UserHelper.findByJobNo(jobNo) match {
       case Some(_) =>
-        Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(Member(None, projectId, LevelEnum.unsafe, jobNo)))))
+        val member = Member(None, projectId, LevelEnum.unsafe, jobNo)
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member))
+        Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(member))))
       case _ =>
         Ok(Json.obj("r" -> "none"))
     }
@@ -138,9 +151,15 @@ object ProjectController extends BaseController {
       case Some(member) =>
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
         else op match {
-          case "up" => Ok(Json.obj("r" -> MemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
-          case "down" => Ok(Json.obj("r" -> MemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
-          case "remove" => Ok(Json.obj("r" -> MemberHelper.delete(memberId)))
+          case "up" =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级成员", member))
+            Ok(Json.obj("r" -> MemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
+          case "down" =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级成员", member))
+            Ok(Json.obj("r" -> MemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
+          case "remove" =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "剔除成员", member))
+            Ok(Json.obj("r" -> MemberHelper.delete(memberId)))
           case _ => BadRequest
         }
       case None => NotFound

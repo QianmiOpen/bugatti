@@ -77,14 +77,8 @@ object EnvironmentProjectRelHelper {
     }.size
   }
 
-  def unbind(id: Int) = db withTransaction { implicit session =>
-    findById(id) match {
-      case Some(rel) =>
-        val update2rel = EnvironmentProjectRel(rel.id, rel.envId, None, rel.syndicName, rel.name, rel.ip)
-        qRelation.filter(_.id === id).update(update2rel)
-      case None =>
-        0
-    }
+  def unbind(rel: EnvironmentProjectRel) = db withTransaction { implicit session =>
+    qRelation.filter(_.id === rel.id).update(rel.copy(projectId = None))
   }
 
   def update(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>

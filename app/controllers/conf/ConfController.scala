@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.FuncEnum
+import enums.{ModEnum, FuncEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data._
@@ -15,6 +15,9 @@ object ConfController extends BaseController {
 
   implicit val confWrites = Json.writes[Conf]
   implicit val contentWrites = Json.writes[ConfContent]
+
+  def msg(user: String, ip: String, msg: String, data: Conf) =
+    s"mod:${ModEnum.conf}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
 
   val confForm = Form(
     mapping(
@@ -48,11 +51,12 @@ object ConfController extends BaseController {
     ConfHelper.findById(id) match {
       case Some(conf) =>
         if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user)) Forbidden
-        else Ok(Json.toJson(ConfHelper.delete(id)))
+        else
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除配置文件", conf))
+          Ok(Json.toJson(ConfHelper.delete(id)))
       case None =>
         NotFound
     }
-
   }
 
   def save = AuthAction(FuncEnum.project) { implicit request =>
@@ -60,7 +64,9 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
-        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
+        else
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
+          Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
@@ -70,7 +76,9 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
-        else Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
+        else
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
+          Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
   }
@@ -103,6 +111,7 @@ object ConfController extends BaseController {
   // ===========================================================================
   // 一键拷贝, todo 无事务，后期改造为队列
   // ===========================================================================
+  implicit val conFormWrites = Json.writes[CopyForm]
   case class CopyForm(target_eid: Int, target_vid: Int, envId: Int, versionId: Int, projectId: Int, ovr: Boolean)
   val copyForm = Form(
     mapping(
@@ -136,6 +145,7 @@ object ConfController extends BaseController {
             val confForm = ConfForm(None, copyForm.envId, c.projectId, copyForm.versionId, c.jobNo, Some(c.name), c.path, if (content != None) content.get.content else "", c.remark, c.updated)
             ConfHelper.create(confForm)
           }
+          ALogger.info(s"mod:${ModEnum.conf}|user:${request.user.jobNo}|ip:${request.remoteAddress}|msg:操作一键拷贝|data:${Json.toJson(copyForm)}")
           Ok(Json.obj("r" -> "ok"))
         }
       }

@@ -23,3 +23,6 @@ object FuncEnum extends Enumeration {
   implicit def enumWrites: Writes[Func] = EnumUtils.enumWrites
 
 }
+object ModEnum extends Enumeration {
+  val user, area, env, project, relation, task, conf, member, template, version = Value
+}

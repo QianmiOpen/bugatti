@@ -13,7 +13,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%coloredLevel %logger{15} - %message%n%xException{5}</pattern>
+            <pattern>%d{HH:mm:ss} [%thread] %-5p %class{36}.%method:%L - %m%n</pattern>
         </encoder>
     </appender>
 
@@ -42,7 +42,13 @@
         <appender-ref ref="DB" />
     </logger>
 
-    <root level="INFO">
+    <logger name="play" level="INFO" />
+    <logger name="application" level="INFO" />
+    <logger name="akka" level="INFO" />
+    <logger name="com.jolbox.bonecp" level="DEBUG"/>
+    <logger name="scala.slick" level="INFO"/>
+
+    <root level="DEBUG">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
