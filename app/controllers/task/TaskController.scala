@@ -36,7 +36,6 @@ object TaskController extends BaseController {
 
   val templateDir = "/srv/sls"
 
-
   /**
    * 根据项目id获取最近的5个版本号，按照时间倒序
    * 在线上环境会过滤掉SNAPSHOT版本号

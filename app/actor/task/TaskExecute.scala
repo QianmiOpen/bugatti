@@ -91,7 +91,7 @@ class TaskExecute extends Actor{
       , "confFileName" -> fileName
     )
 
-    val attributesJson = AttributeHelper.findByPid(tq.projectId).map {
+    val attributesJson = AttributeHelper.findByProjectId(tq.projectId).map {
       s =>
         paramsJson = paramsJson ++ Json.obj(s.name -> s.value)
     }

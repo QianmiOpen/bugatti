@@ -20,7 +20,7 @@ class ConfActor extends Actor{
 
   def generateConfFile(taskId: Int, envId: Int, projectId: Int, versionId: Int) = {
     val fileName = getFileName()
-    val confSeq = ConfHelper.findByEid_Pid_Vid(envId, projectId, versionId)
+    val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
     val baseDir = s"${ConfHelp.confPath}/${taskId}"
     val baseFilesPath = new File(s"${baseDir}/files")
     if(!baseFilesPath.exists()) {
