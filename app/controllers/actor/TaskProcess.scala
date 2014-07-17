@@ -64,7 +64,7 @@ object TaskProcess {
    * @return
    */
   def getAllStatus: JsValue = {
-    Logger.info(Json.prettyPrint(statusMap))
+    Logger.debug(s"TaskProcess WSSchedule ==> ${Json.prettyPrint(statusMap)}")
 //    statusMap.keys.map{
 //      key =>
 //        statusMap = statusMap ++ Json.obj(s"${key}_1" -> (statusMap \ key))
