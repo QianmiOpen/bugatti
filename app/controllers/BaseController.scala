@@ -11,7 +11,7 @@ class RequestWithUser[A](val user: User, request: Request[A]) extends WrappedReq
 
 trait BaseController extends Controller with Security {
 
-  val ALogger = play.Logger.of("action_log")
+  val ALogger = play.Logger.of("ActionLog")
 
   def AuthAction(func: Func) = new ActionBuilder[RequestWithUser] {
     def invokeBlock[A](request: Request[A], block: (RequestWithUser[A]) => Future[SimpleResult]) = {

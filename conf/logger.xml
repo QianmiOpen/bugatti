@@ -5,7 +5,7 @@
     <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${application.home}/logs/application2.log</file>
+        <file>${application.home}/logs/application.log</file>
         <encoder>
             <pattern>%date - [%level] - from %logger in %thread %n%message%n%xException%n</pattern>
         </encoder>
@@ -25,8 +25,9 @@
             <!--<password>bugatti</password>-->
         <!--</connectionSource>-->
     <!--</appender>-->
+
     <!-- pool -->
-    <appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
         <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
             <dataSource class="com.jolbox.bonecp.BoneCPDataSource">
                 <driverClass>com.mysql.jdbc.Driver</driverClass>
@@ -37,12 +38,13 @@
         </connectionSource>
     </appender>
 
-    <logger name="action_log" level="INFO" additivity="false">
-        <appender-ref ref="db" />
+    <logger name="ActionLog" level="INFO" additivity="false">
+        <appender-ref ref="DB" />
     </logger>
 
     <root level="INFO">
         <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT" />
     </root>
 
 </configuration>

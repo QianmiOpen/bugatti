@@ -70,9 +70,7 @@ object AreaController extends BaseController {
         ALogger.info(s"mod:${FuncEnum.area}|user:${request.user.jobNo}|msg:刷新区域|data:${Json.toJson(area)}")
         Ok(Json.obj("r" -> Json.toJson(AreaHelper.findInfoById(id))))
       }
-      case None =>{
-        Ok(Json.obj("r" -> Json.toJson(0)))
-      }
+      case None => Ok(Json.obj("r" -> Json.toJson(0)))
     }
   }
 
