@@ -19,7 +19,7 @@ object UserController extends BaseController {
   implicit val permissionWrites = Json.writes[Permission]
 
   def msg(user: String, ip: String, msg: String, data: User) =
-    s"mod:${ModEnum.user}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.user.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val userForm = Form(
     mapping(

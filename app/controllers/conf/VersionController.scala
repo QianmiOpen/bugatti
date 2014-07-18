@@ -24,7 +24,7 @@ object VersionController extends BaseController {
   implicit val versionWrites = Json.writes[Version]
 
   def msg(user: String, ip: String, msg: String, data: Version) =
-    s"mod:${ModEnum.version}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.version.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val versionForm = Form(
     mapping(

@@ -20,7 +20,7 @@ object ProjectController extends BaseController {
   implicit val attributeWrites = Json.writes[Attribute]
 
   def msg(user: String, ip: String, msg: String, data: Project) =
-    s"mod:${ModEnum.project}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.project.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val projectForm = Form(
     mapping(
@@ -124,7 +124,7 @@ object ProjectController extends BaseController {
   implicit val memberWrites = Json.writes[Member]
 
   def msg(user: String, ip: String, msg: String, data: Member) =
-    s"mod:${ModEnum.member}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.member.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   def member(projectId: Int, jobNo: String) = Action {
     Ok(Json.toJson(MemberHelper.findByProjectId_JobNo(projectId, jobNo)))

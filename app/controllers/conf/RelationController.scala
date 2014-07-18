@@ -41,7 +41,9 @@ object RelationController extends BaseController {
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
-        ALogger.info(s"mod:${ModEnum.relation}|user:${request.user.jobNo}|ip:${request.remoteAddress}|msg:绑定关系|data:${Json.toJson(relation)}")
+        val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
+          "ip" -> request.remoteAddress, "msg" -> "绑定关系", "data" -> Json.toJson(relation)).toString
+        ALogger.info(msg)
         Ok(Json.toJson(EnvironmentProjectRelHelper.updateByProjectId(relation)))
       }
     )
@@ -50,12 +52,13 @@ object RelationController extends BaseController {
   def unbind(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
     EnvironmentProjectRelHelper.findById(id) match {
       case Some(relation) =>
-        ALogger.info(s"mod:${ModEnum.relation}|user:${request.user.jobNo}|ip:${request.remoteAddress}|msg:解除关系|data:${Json.toJson(relation)}")
+        val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
+          "ip" -> request.remoteAddress, "msg" -> "解除关系", "data" -> Json.toJson(relation)).toString
+        ALogger.info(msg)
         Ok(Json.toJson(EnvironmentProjectRelHelper.unbind(relation)))
       case None =>
         NotFound
     }
-
   }
 
 }

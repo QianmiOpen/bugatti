@@ -40,6 +40,9 @@ require(['angular', './controller/main-controller', './directive/main-directive'
                             $state.go('home');
                         }
                     }, function() {
+                        if (toState.data.access === 'anon') {
+                            return
+                        }
                         event.preventDefault();
                         $state.go('home');
                         $rootScope.error = "Unauthorized";

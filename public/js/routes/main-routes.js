@@ -65,6 +65,12 @@ define(['angular',
             data: { access: 'anon' }
         });
 
+        $stateProvider.state('logs', {
+            url: "/logs",
+            templateUrl: "partials/logs/log.html",
+            data: { access: 'anon' }
+        });
+
     }]);
 
 });

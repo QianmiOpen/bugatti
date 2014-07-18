@@ -17,7 +17,7 @@ object EnvController extends BaseController {
   implicit val envWrites = Json.writes[Environment]
 
   def msg(user: String, ip: String, msg: String, data: Environment) =
-    s"mod:${ModEnum.env}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.env.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val envForm = Form(
     mapping(

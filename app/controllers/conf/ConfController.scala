@@ -17,7 +17,7 @@ object ConfController extends BaseController {
   implicit val contentWrites = Json.writes[ConfContent]
 
   def msg(user: String, ip: String, msg: String, data: Conf) =
-    s"mod:${ModEnum.conf}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.conf.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val confForm = Form(
     mapping(
@@ -145,7 +145,9 @@ object ConfController extends BaseController {
             val confForm = ConfForm(None, copyForm.envId, c.projectId, copyForm.versionId, c.jobNo, Some(c.name), c.path, if (content != None) content.get.content else "", c.remark, c.updated)
             ConfHelper.create(confForm)
           }
-          ALogger.info(s"mod:${ModEnum.conf}|user:${request.user.jobNo}|ip:${request.remoteAddress}|msg:操作一键拷贝|data:${Json.toJson(copyForm)}")
+          val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.remoteAddress,
+            "ip" -> request.remoteAddress, "msg" -> "一键拷贝", "data" -> Json.toJson(copyForm)).toString
+          ALogger.info(_msg)
           Ok(Json.obj("r" -> "ok"))
         }
       }

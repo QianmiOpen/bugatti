@@ -32,7 +32,7 @@ CREATE TABLE `logging_event` (
   `caller_line` char(4) NOT NULL,
   `event_id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`event_id`),
-  FULLTEXT KEY `idx_fulltext` (`formatted_message`, timestmp)
+  FULLTEXT KEY `idx_fulltext` (`formatted_message`, `timestmp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 COMMIT;
 

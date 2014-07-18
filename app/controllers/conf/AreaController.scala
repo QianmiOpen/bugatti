@@ -18,7 +18,7 @@ object AreaController extends BaseController {
   implicit val areaInfoFormat = Json.format[AreaInfo]
 
   def msg(user: String, ip: String, msg: String, data: Area) =
-    s"mod:${ModEnum.area}|user:${user}|ip:${ip}|msg:${msg}|data:${Json.toJson(data)}"
+    Json.obj("mod" -> ModEnum.area.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val areaForm = Form(
     mapping(
