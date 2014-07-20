@@ -54,8 +54,12 @@ object UserController extends BaseController {
   def delete(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
     UserHelper.findByJobNo(jobNo) match {
       case Some(user) =>
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
-        Ok(Json.toJson(UserHelper.delete(jobNo)))
+        if (request.user.role == RoleEnum.user) Forbidden
+        else if (user.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+        else {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
+          Ok(Json.toJson(UserHelper.delete(jobNo)))
+        }
       case None =>
         NotFound
     }
@@ -69,8 +73,12 @@ object UserController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", userForm.toUser))
-            Ok(Json.obj("r" -> UserHelper.create(userForm.toUser, userForm.toPermission)))
+            if (request.user.role == RoleEnum.user) Forbidden
+            else if (userForm.toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+            else {
+              ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", userForm.toUser))
+              Ok(Json.obj("r" -> UserHelper.create(userForm.toUser, userForm.toPermission)))
+            }
         }
       }
     )
@@ -80,8 +88,12 @@ object UserController extends BaseController {
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       userForm => {
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", userForm.toUser))
-        Ok(Json.obj("r" -> UserHelper.update(jobNo, userForm.toUser, userForm.toPermission)))
+        if (request.user.role == RoleEnum.user) Forbidden
+        else if (userForm.toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+        else {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", userForm.toUser))
+          Ok(Json.obj("r" -> UserHelper.update(jobNo, userForm.toUser, userForm.toPermission)))
+        }
       }
     )
   }

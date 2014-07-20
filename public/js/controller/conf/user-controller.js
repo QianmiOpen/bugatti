@@ -4,52 +4,53 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.userModule', []);
 
-    app.controller('UserCtrl', ['$scope', '$stateParams', '$state', '$modal', 'UserService',
-        function($scope, $stateParams, $state, $modal, UserService) {
-        $scope.currentPage = 1;
-        $scope.pageSize = 10;
+    app.controller('UserCtrl', ['$scope', '$stateParams', '$state', '$modal', 'UserService', 'Auth',
+        function($scope, $stateParams, $state, $modal, UserService, Auth) {
+            $scope.loginUser = Auth.user;
+            $scope.currentPage = 1;
+            $scope.pageSize = 10;
 
-        // count
-        UserService.count(function(data) {
-            $scope.totalItems = data;
-        });
+            // count
+            UserService.count(function(data) {
+                $scope.totalItems = data;
+            });
 
-        // list
-        UserService.getPage(0, $scope.pageSize, function(data) {
-            $scope.users = data;
-        });
-
-        // set page
-        $scope.setPage = function (pageNo) {
-            UserService.getPage(pageNo - 1, $scope.pageSize, function(data) {
+            // list
+            UserService.getPage(0, $scope.pageSize, function(data) {
                 $scope.users = data;
             });
-        };
 
-        // remove
-        $scope.delete = function(jobNo, index) {
-            var modalInstance = $modal.open({
-                templateUrl: 'partials/modal.html',
-                controller: function ($scope, $modalInstance) {
-                    $scope.ok = function () {
-                        UserService.remove(jobNo, function(state) {
-                            $modalInstance.close(state);
+            // set page
+            $scope.setPage = function (pageNo) {
+                UserService.getPage(pageNo - 1, $scope.pageSize, function(data) {
+                    $scope.users = data;
+                });
+            };
+
+            // remove
+            $scope.delete = function(jobNo, index) {
+                var modalInstance = $modal.open({
+                    templateUrl: 'partials/modal.html',
+                    controller: function ($scope, $modalInstance) {
+                        $scope.ok = function () {
+                            UserService.remove(jobNo, function(state) {
+                                $modalInstance.close(state);
+                            });
+                        };
+                        $scope.cancel = function () {
+                            $modalInstance.dismiss('cancel');
+                        };
+                    }
+                });
+                modalInstance.result.then(function(state) {
+                    if (state !== '0') {
+                        $scope.users.splice(index, 1);
+                        UserService.count(function(num) {
+                            $scope.totalItems = num;
                         });
-                    };
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                }
-            });
-            modalInstance.result.then(function(state) {
-                if (state !== '0') {
-                    $scope.users.splice(index, 1);
-                    UserService.count(function(num) {
-                        $scope.totalItems = num;
-                    });
-                }
-            });
-        };
+                    }
+                });
+            };
     }]);
 
     app.controller('UserShowCtrl', ['$scope', '$stateParams', 'UserService', function($scope, $stateParams, UserService) {
@@ -62,8 +63,9 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('UserCreateCtrl', ['$scope', '$stateParams', '$state', 'UserService',
-        function($scope, $stateParams, $state, UserService) {
+    app.controller('UserCreateCtrl', ['$scope', '$stateParams', '$state', 'UserService', 'Auth',
+        function($scope, $stateParams, $state, UserService, Auth) {
+            $scope.loginUser = Auth.user;
             $scope.user = {role: 'user', locked: false}
             $scope.saveOrUpdate = function(user, permission) {
                 var func = []
@@ -85,8 +87,9 @@ define(['angular'], function(angular) {
 
         }]);
 
-    app.controller('UserUpdateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'UserService',
-        function($scope, $filter, $stateParams, $state, UserService) {
+    app.controller('UserUpdateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'UserService', 'Auth',
+        function($scope, $filter, $stateParams, $state, UserService, Auth) {
+            $scope.loginUser = Auth.user;
             $scope.user, $scope.master = {};
             $scope.permission = {user:"0", area: "0", env:"0", project:"0", relation:"0", task:"0"}
             $scope.taskChecked = function(task, user) {

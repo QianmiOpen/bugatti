@@ -72,7 +72,7 @@ object Application extends ScalaController with Security {
         case Some(p) => p.functions
         case None => Seq.empty
       }
-      Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "permissions" -> ps)).withToken(token -> jobNo)
+      Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "sa" -> user.superAdmin, "permissions" -> ps)).withToken(token -> jobNo)
     } getOrElse NotFound(Json.obj("r" -> "User Not Found"))
   }
 

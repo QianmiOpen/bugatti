@@ -35,7 +35,7 @@ define(['angular',
 
     // Auth
     app.factory('Auth', ['$http', '$cookieStore', '$cookies', function ($http, $cookieStore, $cookies) {
-        var currentUser = {username: '', role: '', permissions: []};
+        var currentUser = {username: '', role: '', sa: false, permissions: []};
 
         function changeUser(user) {
             angular.extend(currentUser, user)
@@ -56,16 +56,16 @@ define(['angular',
             },
             ping: function(success, error) {
                 $http.get('/ping').success(function(r) {
-                    changeUser({username: r.jobNo, role: r.role, permissions: r.permissions});
+                    changeUser({username: r.jobNo, role: r.role, sa: r.sa, permissions: r.permissions});
                     success();
                 }).error(function(r) {
-                    changeUser({username: '', role: '', permissions: []});
+                    changeUser({username: '', role: '', sa: false, permissions: []});
                     error();
                 });
             },
             logout: function(success, error) {
                 $http.post('/logout').success(function() {
-                    changeUser({username: '', role: '', permissions: []});
+                    changeUser({username: '', role: '', sa: false, permissions: []});
                     success();
                 }).error(error);
             },

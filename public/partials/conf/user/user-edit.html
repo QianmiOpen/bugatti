@@ -37,9 +37,13 @@
                 <input type="radio" name="role" id="role-user" ng-model="user.role" value="user">
                 普通用户
             </label>
-            <label class="radio-inline">
+            <label class="radio-inline" ng-if="loginUser.sa">
                 <input type="radio" name="role" id="role-admin" ng-model="user.role" value="admin">
                 管理员
+            </label>
+            <label class="checkbox-inline" ng-if="loginUser.sa">
+                <input type="checkbox" name="superAdmin" id="superAdmin" ng-model="user.superAdmin" value="option3"> 超级管理员
+                <sup class="btn-info" href="" tooltip-placement="right" tooltip="当前用户必须为超级管理员!">?</sup>
             </label>
         </div>
     </div>
