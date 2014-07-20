@@ -12,10 +12,24 @@
     </div>
 </div>
 
+<div class="text-center"  ng-init="_viewtype = 0">
+    <label class="radio-inline">
+        <input type="radio" name="sideDiff" id="sideDiff0" ng-model="_viewtype" value="0"> 并排比较
+    </label>
+    <label class="radio-inline">
+        <input type="radio" name="sideDiff" id="sideDiff1" ng-model="_viewtype"value="1"> 嵌入比较
+    </label>
+</div>
+
+<br/>
+
 <div ng-if="log && conf"
      diff-show
      diff-base-text="{{log.content.content}}"
      diff-base-text-name="{{log.name}}"
      diff-new-text="{{conf.content.content}}"
      diff-new-text-name="{{conf.name}}"
-     diff-view-type="1"></div>
+     diff-view-type="{{_viewtype}}"></div>
+
+
+
