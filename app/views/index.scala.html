@@ -37,7 +37,7 @@
                             <a ui-sref="conf.user">配置</a>
                         </li>
                         <li access-permission="task" ui-sref-active="active"><a ui-sref="task">任务</a></li>
-                        <li ui-sref-active="active"><a ui-sref="logs">日志</a></li>
+                        <li ng-if="user.sa == true" ui-sref-active="active"><a ui-sref="logs">日志</a></li>
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
