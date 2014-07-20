@@ -73,11 +73,13 @@ object UserController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            val toUser = userForm.toUser
             if (request.user.role == RoleEnum.user) Forbidden
-            else if (userForm.toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+            else if (toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+            else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
             else {
-              ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", userForm.toUser))
-              Ok(Json.obj("r" -> UserHelper.create(userForm.toUser, userForm.toPermission)))
+              ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", toUser))
+              Ok(Json.obj("r" -> UserHelper.create(toUser, userForm.toPermission)))
             }
         }
       }
@@ -88,11 +90,13 @@ object UserController extends BaseController {
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       userForm => {
+        val toUser = userForm.toUser
         if (request.user.role == RoleEnum.user) Forbidden
-        else if (userForm.toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+        else if (toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+        else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
         else {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", userForm.toUser))
-          Ok(Json.obj("r" -> UserHelper.update(jobNo, userForm.toUser, userForm.toPermission)))
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", toUser))
+          Ok(Json.obj("r" -> UserHelper.update(jobNo, toUser, userForm.toPermission)))
         }
       }
     )
