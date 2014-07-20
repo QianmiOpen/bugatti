@@ -90,7 +90,7 @@ GET           /conf/:confId/logs/total                 controllers.conf.ConfCont
 GET           /conf/log/:id                            controllers.conf.ConfController.log(id: Int)
 
 # Relation
-GET           /relation                                controllers.conf.RelationController.index(envId: Option[Int], projectId: Option[Int], page: Int ?=0, pageSize: Int ?=10)
+GET           /relation                                controllers.conf.RelationController.index(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int ?=0, pageSize: Int ?=10)
 GET           /relation/total                          controllers.conf.RelationController.count(envId: Option[Int], projectId: Option[Int])
 GET           /relation/ips                            controllers.conf.RelationController.ips(envId: Int)
 POST          /relation                                controllers.conf.RelationController.bind

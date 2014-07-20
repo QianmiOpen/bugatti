@@ -35,3 +35,6 @@ CREATE TABLE `logging_event_property` (
 
 -- add super admin
 ALTER TABLE `app_user` ADD COLUMN super_admin ENUM('y', 'n') NOT NULL DEFAULT 'n'  COMMENT '是否为超级管理员(n:不是，y:是),同role:admin一起使用' AFTER `role`;
+
+-- add index
+ALTER TABLE environment_project_rel ADD INDEX idx_ip(ip);

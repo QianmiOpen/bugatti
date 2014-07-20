@@ -21,8 +21,8 @@ object RelationController extends BaseController {
     )(EnvRelForm.apply)(EnvRelForm.unapply)
   )
 
-  def index(envId: Option[Int], projectId: Option[Int], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
-    val result = EnvironmentProjectRelHelper.all(envId, projectId, page, pageSize)
+  def index(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
+    val result = EnvironmentProjectRelHelper.all(envId, projectId, sort, direction, page, pageSize)
     Ok(Json.toJson(result))
   }
 

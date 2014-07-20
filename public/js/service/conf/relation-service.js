@@ -7,7 +7,10 @@ define(['angular'], function(angular) {
     app.factory('RelationService', function($http) {
         return {
             getPage: function(envId, projectId, page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.RelationController.index(envId, projectId, page, pageSize)).success(callback);
+                $http(PlayRoutes.controllers.conf.RelationController.index(envId, projectId, null, null, page, pageSize)).success(callback);
+            },
+            getPageSort: function(envId, projectId, sort, direction, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.RelationController.index(envId, projectId, sort, direction, page, pageSize)).success(callback);
             },
             ips: function(envId, callback) {
                 $http(PlayRoutes.controllers.conf.RelationController.ips(envId)).success(callback);

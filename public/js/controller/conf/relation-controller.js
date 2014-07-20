@@ -40,12 +40,22 @@ define(['angular'], function(angular) {
             };
 
             $scope.select = function() {
-                if ($scope.env == null) {$scope.env ={}}
-                if ($scope.project == null) {$scope.project ={}}
+                if ($scope.env == null) {$scope.env = {}}
+                if ($scope.project == null) {$scope.project = {}}
                 RelationService.count($scope.env.id, $scope.project.id, function(data) {
                     $scope.totalItems = data;
                 });
                 $scope.setPage($scope.currentPage);
+            };
+
+            // 字段排序
+            $scope.orderBy = false;
+            $scope.sort = function(col) {
+                var sort = $scope._sort = col;
+                var direction = $scope.orderBy ? 'asc' : 'desc';
+                RelationService.getPageSort($scope.env.id, $scope.project.id, sort, direction, 0, $scope.pageSize, function(data) {
+                    $scope.relations = data;
+                });
             };
 
             // unbind

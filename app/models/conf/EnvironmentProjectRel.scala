@@ -18,6 +18,7 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
   def ip = column[String]("ip")
 
   override def * = (id.?, envId.?, projectId.?, syndicName, name, ip) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
+  index("idx_ip", ip)
 }
 
 object EnvironmentProjectRelHelper {
@@ -51,11 +52,16 @@ object EnvironmentProjectRelHelper {
     qRelation.filter(r => r.envId === envId && r.projectId.isNull).list
   }
 
-  def all(envId: Option[Int], projectId: Option[Int], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+  def all(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     val offset = pageSize * page
     var query = for { r <- qRelation } yield r
     envId.map(id => query = query.filter(_.envId === id))
     projectId.map(id => query = query.filter(_.projectId === id))
+    sort match {
+      case Some(s) if s == "ip" =>
+        query = direction match { case Some(d) if d == "desc" => query.sortBy(_.ip desc); case _ => query.sortBy(_.ip asc)}
+      case _ =>
+    }
     query.drop(offset).take(pageSize).list
   }
 
