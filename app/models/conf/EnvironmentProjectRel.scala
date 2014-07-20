@@ -18,6 +18,7 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
   def ip = column[String]("ip")
 
   override def * = (id.?, envId.?, projectId.?, syndicName, name, ip) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
+  index("idx_eid_pid", (envId, projectId))
   index("idx_ip", ip)
 }
 

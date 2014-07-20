@@ -38,3 +38,4 @@ ALTER TABLE `app_user` ADD COLUMN super_admin ENUM('y', 'n') NOT NULL DEFAULT 'n
 
 -- add index
 ALTER TABLE environment_project_rel ADD INDEX idx_ip(ip);
+ALTER TABLE environment_project_rel ADD INDEX idx_eid_pid(env_id, project_id);
