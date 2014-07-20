@@ -7,7 +7,6 @@
     <table class="table table-striped table-hover table-fixed">
         <thead>
         <tr>
-            <th width="30"><input type="checkbox" ng-model="master"></th>
             <th width="20%">环境</th>
             <th width="10%">级别</th>
             <th width="15%">nfs</th>
@@ -18,7 +17,6 @@
         </thead>
         <tbody>
         <tr ng-repeat="env in envs">
-            <td><input type="checkbox" ng-model="ids[env.id]" ng-checked="master" ng-change="checked(env.id, ids[env.id])"></td>
             <td><a ui-sref="conf.env.detail({id: env.id})">{{env.name}}</a></td>
             <td>{{env.level | level}}</td>
             <td>{{env.nfServer}}</td>
@@ -32,8 +30,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <!--<td><a ng-click="deleteBatch()" href="" ng-show="!isEmpty(ids)" class="disable"><span class="glyphicon glyphicon-trash"></span> </a></td>-->
-            <td colspan="7">&nbsp;</td>
+            <td colspan="6">&nbsp;</td>
         </tr>
         </tfoot>
     </table>
