@@ -182,7 +182,11 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.getTemplates,
         task.routes.javascript.TaskController.taskLog,
         task.routes.javascript.TaskController.taskLogFirst,
-        task.routes.javascript.TaskController.removeTaskQueue
+        task.routes.javascript.TaskController.removeTaskQueue,
+
+        // logs
+        logs.routes.javascript.LogsController.search,
+        logs.routes.javascript.LogsController.count
       )
     ).as(JAVASCRIPT)
   }

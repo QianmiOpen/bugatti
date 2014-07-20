@@ -39,6 +39,27 @@ define(['angular'], function(angular) {
         };
     });
 
+    // 日志内容转换
+    app.filter('info2json', function() {
+        return function(input, key) {
+            var info = eval('(' + input + ')')
+            if (key === 'mod') {
+                var mod = info[key];
+                if (mod === 'user') return '用户模块';
+                else if (mod === 'area') return '区域模块';
+                else if (mod === 'env') return '环境模块';
+                else if (mod === 'project') return '项目模块';
+                else if (mod === 'relation') return '关系模块';
+                else if (mod === 'task') return '任务模块';
+                else if (mod === 'conf') return '项目配置文件模块';
+                else if (mod === 'member') return '项目成员模块';
+                else if (mod === 'template') return '项目模板模块';
+                else if (mod === 'version') return '项目版本模块';
+            }
+            return info[key];
+        };
+    });
+
     // 时间提示ago
     app.filter("timeago", function () {
         //time: the time

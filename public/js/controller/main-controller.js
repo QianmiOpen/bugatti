@@ -10,7 +10,8 @@ define(['angular',
     './conf/template-controller',
     './conf/conf-controller',
     './conf/relation-controller',
-    './task/task-controller'
+    './task/task-controller',
+    './logs/logs-controller'
 ], function(angular) {
 
     /* Controllers */
@@ -22,7 +23,8 @@ define(['angular',
         'bugattiApp.controller.conf.templateModule',
         'bugattiApp.controller.conf.confModule',
         'bugattiApp.controller.conf.relationModule',
-        'bugattiApp.controller.task.taskModule'
+        'bugattiApp.controller.task.taskModule',
+        'bugattiApp.controller.logs.logsModule'
     ]);
 
     // Auth
