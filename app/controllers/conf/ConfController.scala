@@ -30,7 +30,7 @@ object ConfController extends BaseController {
       "path" -> nonEmptyText,
       "content" -> default(text, ""),
       "remark" -> optional(text),
-      "updated" -> default(jodaDate("yyyy-MM-dd hh:mm:ss"), DateTime.now())
+      "updated" -> default(jodaDate("yyyy-MM-dd HH:mm:ss"), DateTime.now())
     )(ConfForm.apply)(ConfForm.unapply)
   )
 

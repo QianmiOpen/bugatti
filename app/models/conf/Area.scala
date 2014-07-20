@@ -14,9 +14,9 @@ case class Area(id: Option[Int], name: String, syndicName: String, syndicIp: Str
 
 case class AreaTable(tag: Tag) extends Table[Area](tag, "area") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name", O.NotNull)
-  def syndicName = column[String]("syndic_name", O.NotNull)
-  def syndicIp = column[String]("syndic_ip", O.NotNull)
+  def name = column[String]("name")
+  def syndicName = column[String]("syndic_name")
+  def syndicIp = column[String]("syndic_ip")
 
   override def * = (id.?, name, syndicName, syndicIp) <>(Area.tupled, Area.unapply _)
 

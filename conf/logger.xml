@@ -36,6 +36,7 @@
                 <password>bugatti</password>
             </dataSource>
         </connectionSource>
+        <sqlDialect class="ch.qos.logback.core.db.dialect.MsSQLDialect" />
     </appender>
 
     <logger name="ActionLog" level="INFO" additivity="false">

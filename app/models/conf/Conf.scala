@@ -23,12 +23,12 @@ case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int,
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def envId = column[Int]("env_id", O.NotNull)     // 环境编号
-  def projectId = column[Int]("project_id", O.NotNull) // 项目编号
-  def versionId = column[Int]("version_id", O.NotNull) // 项目版本编号
-  def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
-  def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
-  def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(200)"))
+  def envId = column[Int]("env_id")     // 环境编号
+  def projectId = column[Int]("project_id") // 项目编号
+  def versionId = column[Int]("version_id") // 项目版本编号
+  def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
+  def name = column[String]("name", O.DBType("VARCHAR(50)"))
+  def path = column[String]("path", O.DBType("VARCHAR(200)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 

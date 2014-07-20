@@ -15,13 +15,13 @@ case class TaskScheme(id: Option[Int], envId: Int, projectId: Int, versionId: Op
 
 class TaskSchemeTable(tag: Tag) extends Table[TaskScheme](tag, "task_scheme") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def envId = column[Int]("env_id", O.NotNull)
-  def projectId = column[Int]("project_id", O.NotNull)
+  def envId = column[Int]("env_id")
+  def projectId = column[Int]("project_id")
   def versionId = column[Int]("version_id", O.Nullable)
-  def taskTemplateId = column[Int]("task_template_id",O.NotNull)
-  def status = column[TaskStatus]("status", O.NotNull)
-  def startTime = column[DateTime]("start_time", O.NotNull, O.DBType("DATETIME"))
-  def operatorId = column[Int]("operator_id", O.NotNull)
+  def taskTemplateId = column[Int]("task_template_id")
+  def status = column[TaskStatus]("status")
+  def startTime = column[DateTime]("start_time", O.DBType("DATETIME"))
+  def operatorId = column[Int]("operator_id")
 
   override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, startTime, operatorId) <> (TaskScheme.tupled, TaskScheme.unapply _)
 

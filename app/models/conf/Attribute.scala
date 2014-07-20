@@ -12,8 +12,8 @@ case class Attribute(id: Option[Int], projectId: Option[Int], name: String, valu
 
 class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def projectId = column[Int]("project_id", O.NotNull)   // 项目编号
-  def name = column[String]("name", O.NotNull)   // 属性名称（同TemplateInfo.itemName)
+  def projectId = column[Int]("project_id")   // 项目编号
+  def name = column[String]("name")   // 属性名称（同TemplateInfo.itemName)
   def value = column[String]("value", O.Nullable) // 属性值
 
   override def * = (id.?, projectId.?, name, value.?) <> (Attribute.tupled, Attribute.unapply _)

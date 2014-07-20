@@ -11,11 +11,11 @@ case class TaskTemplate (id: Option[Int], name: String, css: String, versionMenu
 
 class TaskTemplateTable(tag: Tag) extends Table[TaskTemplate](tag, "task_template"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(64)"))
-  def css = column[String]("css", O.NotNull, O.DBType("VARCHAR(64)"))
-  def versionMenu = column[Boolean]("version_menu", O.NotNull, O.Default(false))
-  def typeId = column[Int]("type_id", O.NotNull)
-  def orderNum = column[Int]("order_num", O.NotNull)
+  def name = column[String]("name", O.DBType("VARCHAR(64)"))
+  def css = column[String]("css", O.DBType("VARCHAR(64)"))
+  def versionMenu = column[Boolean]("version_menu", O.Default(false))
+  def typeId = column[Int]("type_id")
+  def orderNum = column[Int]("order_num")
 
   override def * = (id.?, name, css, versionMenu, typeId, orderNum) <> (TaskTemplate.tupled, TaskTemplate.unapply _)
 }

@@ -123,7 +123,7 @@ define(['angular'], function(angular) {
 
             $scope.save = function() {
                 $scope.conf.envId = $scope.env.id;
-                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
+                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 ConfService.save(angular.toJson($scope.conf), function(data) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });
@@ -186,7 +186,7 @@ define(['angular'], function(angular) {
             });
 
             $scope.update = function() {
-                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
+                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 ConfService.update($stateParams.cid, angular.toJson($scope.conf), function(data) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });

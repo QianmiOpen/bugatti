@@ -16,21 +16,22 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class User(jobNo: String, name: String, role: Role, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime])
-case class UserForm(jobNo: String, name: String, role: Role, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], functions: String) {
-  def toUser = User(jobNo, name, role, locked, lastIp, lastVisit)
+case class User(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime])
+case class UserForm(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], functions: String) {
+  def toUser = User(jobNo, name, role, superAdmin, locked, lastIp, lastVisit)
   def toPermission = Permission(jobNo, functions.split(",").filterNot(_.isEmpty).map(i => FuncEnum(i.toInt)).toList)
 }
 
 class UserTable(tag: Tag) extends Table[User](tag, "app_user") {
   def jobNo = column[String]("job_no", O.PrimaryKey, O.DBType("VARCHAR(16)"))
-  def name = column[String]("name", O.Nullable, O.DBType("VARCHAR(20)"))
-  def role = column[Role]("role", O.NotNull, O.Default(RoleEnum.user), O.DBType("ENUM('admin', 'user')")) // 用户角色
+  def name = column[String]("name", O.DBType("VARCHAR(20)"))
+  def role = column[Role]("role", O.Default(RoleEnum.user), O.DBType("ENUM('admin', 'user')")) // 用户角色
+  def superAdmin = column[Boolean]("super_admin", O.Default(false), O.DBType("ENUM('y', 'n')"))(MappedColumnType.base[Boolean, String](if(_) "y" else "n",  _ == "y")) // 超级管理员
   def locked = column[Boolean]("locked", O.Default(false), O.DBType("ENUM('y', 'n')"))(MappedColumnType.base[Boolean, String](if(_) "y" else "n",  _ == "y")) // 账号锁定
   def lastIp = column[String]("last_ip", O.Nullable, O.DBType("VARCHAR(40)")) // 最近登录ip
   def lastVisit = column[DateTime]("last_visit", O.Nullable, O.Default(DateTime.now())) // 最近登录时间
 
-  override def * = (jobNo, name, role, locked, lastIp.?, lastVisit.?) <> (User.tupled, User.unapply _)
+  override def * = (jobNo, name, role, superAdmin, locked, lastIp.?, lastVisit.?) <> (User.tupled, User.unapply _)
 }
 
 object UserHelper extends PlayCache {

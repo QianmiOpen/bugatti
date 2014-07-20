@@ -128,7 +128,7 @@ define(['angular'], function(angular) {
                     }
                 });
                 $scope.user.functions = func.join(",");
-                user.lastVisit = $filter('date')(user.lastVisit, "yyyy-MM-dd hh:mm:ss")
+                user.lastVisit = $filter('date')(user.lastVisit, "yyyy-MM-dd HH:mm:ss")
                 UserService.update($stateParams.id, angular.toJson(user), function(data) {
                     if (data.r >= 0) {
                         $state.go('^');

@@ -11,11 +11,11 @@ case class TaskTemplateStep(id: Option[Int], templateId: Int, name: String, sls:
 
 class TaskTemplateStepTable(tag: Tag) extends Table[TaskTemplateStep](tag, "task_template_step") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def templateId = column[Int]("template_id", O.NotNull)
-  def name = column[String]("name", O.NotNull)
-  def sls = column[String]("sls", O.NotNull, O.DBType("VARCHAR(2000)"))
-  def seconds = column[Int]("seconds", O.NotNull, O.Default(3))
-  def orderNum = column[Int]("order_num", O.NotNull)
+  def templateId = column[Int]("template_id")
+  def name = column[String]("name")
+  def sls = column[String]("sls", O.DBType("VARCHAR(2000)"))
+  def seconds = column[Int]("seconds", O.Default(3))
+  def orderNum = column[Int]("order_num")
 
   override def * = (id.?, templateId,name, sls, seconds, orderNum) <>(TaskTemplateStep.tupled, TaskTemplateStep.unapply _)
 }

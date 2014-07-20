@@ -18,12 +18,12 @@ case class ConfLog(id: Option[Int], confId: Int, envId: Int, versionId: Int, job
 
 class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def confId = column[Int]("conf_id", O.NotNull)    // 配置文件编号
-  def envId = column[Int]("env_id", O.NotNull)     // 环境编号
-  def versionId = column[Int]("version_id", O.NotNull) // 版本编号
-  def jobNo = column[String]("job_no", O.NotNull, O.DBType("VARCHAR(16)"))
-  def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(50)"))
-  def path = column[String]("path", O.NotNull, O.DBType("VARCHAR(500)"))
+  def confId = column[Int]("conf_id")    // 配置文件编号
+  def envId = column[Int]("env_id")     // 环境编号
+  def versionId = column[Int]("version_id") // 版本编号
+  def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
+  def name = column[String]("name", O.DBType("VARCHAR(50)"))
+  def path = column[String]("path", O.DBType("VARCHAR(500)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 

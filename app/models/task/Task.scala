@@ -22,14 +22,14 @@ case class Task(id: Option[Int], envId: Int, projectId: Int, versionId: Option[I
 
 case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def envId = column[Int]("env_id", O.NotNull)
-  def projectId = column[Int]("project_id", O.NotNull)
+  def envId = column[Int]("env_id")
+  def projectId = column[Int]("project_id")
   def versionId = column[Int]("version_id", O.Nullable)
-  def taskTemplateId = column[Int]("task_template_id",O.NotNull)
-  def status = column[TaskStatus]("status", O.NotNull)
+  def taskTemplateId = column[Int]("task_template_id")
+  def status = column[TaskStatus]("status")
   def startTime = column[DateTime]("start_time", O.Nullable, O.DBType("DATETIME"))
   def endTime = column[DateTime]("end_time", O.Nullable, O.DBType("DATETIME"))
-  def operatorId = column[Int]("operator_id", O.NotNull)
+  def operatorId = column[Int]("operator_id")
 
   override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
 }

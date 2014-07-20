@@ -31,7 +31,7 @@ object VersionController extends BaseController {
       "id" -> optional(number),
       "projectId" -> number,
       "vs" -> nonEmptyText,
-      "updated" -> default(jodaDate("yyyy-MM-dd hh:mm:ss"), DateTime.now())
+      "updated" -> default(jodaDate("yyyy-MM-dd HH:mm:ss"), DateTime.now())
     )(Version.apply)(Version.unapply)
   )
 

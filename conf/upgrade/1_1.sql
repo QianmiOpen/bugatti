@@ -1,20 +1,4 @@
-# Logback: the reliable, generic, fast and flexible logging framework.
-# Copyright (C) 1999-2010, QOS.ch. All rights reserved.
-#
-# See http://logback.qos.ch/license.html for the applicable licensing
-# conditions.
-# This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender.
-#
-# It is intended for MySQL databases. It has been tested on MySQL 5.1.37
-# on Linux
-
-BEGIN;
-DROP TABLE IF EXISTS `logging_event`;
-DROP TABLE IF EXISTS `logging_event_exception`;
-DROP TABLE IF EXISTS `logging_event_property`;
-COMMIT;
-
-BEGIN;
+-- This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender.
 CREATE TABLE `logging_event` (
   `timestmp` varchar(20) NOT NULL,
   `formatted_message` text NOT NULL,
@@ -34,22 +18,20 @@ CREATE TABLE `logging_event` (
   PRIMARY KEY (`event_id`),
   FULLTEXT KEY `idx_fulltext` (`formatted_message`, `timestmp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-COMMIT;
 
-BEGIN;
 CREATE TABLE `logging_event_exception` (
   `event_id` bigint(20) NOT NULL,
   `i` smallint(6) NOT NULL,
   `trace_line` varchar(254) NOT NULL,
   PRIMARY KEY (`event_id`,`i`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-COMMIT;
 
-BEGIN;
 CREATE TABLE `logging_event_property` (
   `event_id` bigint(20) NOT NULL,
   `mapped_key` varchar(254) NOT NULL,
   `mapped_value` text,
   PRIMARY KEY (`event_id`,`mapped_key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-COMMIT;
+
+-- add super admin
+ALTER TABLE `app_user` ADD COLUMN super_admin ENUM('y', 'n') NOT NULL DEFAULT 'n'  COMMENT '是否为超级管理员(n:不是，y:是),同role:admin一起使用' AFTER `role`;

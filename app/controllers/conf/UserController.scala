@@ -26,9 +26,10 @@ object UserController extends BaseController {
       "jobNo" -> nonEmptyText,
       "name" -> nonEmptyText,
       "role" -> enums.form.enum(RoleEnum),
+      "superAdmin" -> boolean,
       "locked" -> boolean,
       "lastIp" -> optional(text),
-      "lastVisit" -> optional(jodaDate("yyyy-MM-dd hh:mm:ss")),
+      "lastVisit" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
       "functions" ->  text
 //      "functions" ->  text.verifying("Bad phone number", {_.grouped(2).size == 5})
     )(UserForm.apply)(UserForm.unapply)

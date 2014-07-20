@@ -24,9 +24,9 @@ case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal:
 
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name", O.NotNull)
-  def templateId = column[Int]("template_id", O.NotNull)           // 项目模板编号
-  def subTotal = column[Int]("sub_total", O.NotNull, O.Default(0)) // 版本数量
+  def name = column[String]("name")
+  def templateId = column[Int]("template_id")           // 项目模板编号
+  def subTotal = column[Int]("sub_total", O.Default(0)) // 版本数量
   def lastVid = column[Int]("last_version_id", O.Nullable)         // 最近版本id
   def lastVersion = column[String]("last_version", O.Nullable)     // 最近版本号
   def lastUpdated= column[DateTime]("last_updated", O.Nullable, O.Default(DateTime.now()))

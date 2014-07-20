@@ -216,7 +216,7 @@ define(['angular'], function(angular) {
                     project.items.push({name: item.itemName, value: item.value})
                 });
 
-                project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd hh:mm:ss")
+                project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd HH:mm:ss")
                 ProjectService.update($stateParams.id, angular.toJson(project), function(data) {
                     if (data !== '0') {
                         $state.go("^");
@@ -333,7 +333,7 @@ define(['angular'], function(angular) {
             $scope.version = {projectId: $stateParams.id, vs: ''}
 
             $scope.saveOrUpdate = function(version) {
-                version.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
+                version.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 VersionService.save(angular.toJson(version), function(data) {
                     if (data.r >= 0) {
                         $state.go('^');
@@ -354,7 +354,7 @@ define(['angular'], function(angular) {
     app.controller('VersionUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'VersionService',
         function($scope, $stateParams, $filter, $state, VersionService) {
             $scope.saveOrUpdate = function(version) {
-                version.updated = $filter('date')(new Date(), "yyyy-MM-dd hh:mm:ss")
+                version.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
 
                 VersionService.update($stateParams.vid, angular.toJson(version), function(data) {
                     if (data.r >= 0) {

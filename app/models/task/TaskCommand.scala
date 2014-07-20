@@ -13,12 +13,12 @@ case class TaskCommand(id: Option[Int], taskId: Int, command: String, machine: S
 
 class TaskCommandTable(tag: Tag) extends Table[TaskCommand](tag, "task_command"){
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def taskId = column[Int]("task_id", O.NotNull)
-  def command = column[String]("command", O.NotNull, O.DBType("VARCHAR(2000)"))
-  def machine = column[String]("machine", O.NotNull, O.DBType("VARCHAR(100)"))
-  def sls = column[String]("sls", O.NotNull, O.DBType("VARCHAR(100)"))
-  def status = column[TaskStatus]("status", O.NotNull)
-  def orderNum = column[Int]("order_num", O.NotNull)
+  def taskId = column[Int]("task_id")
+  def command = column[String]("command", O.DBType("VARCHAR(2000)"))
+  def machine = column[String]("machine", O.DBType("VARCHAR(100)"))
+  def sls = column[String]("sls", O.DBType("VARCHAR(100)"))
+  def status = column[TaskStatus]("status")
+  def orderNum = column[Int]("order_num")
 
   override def * = (id.?, taskId, command, machine, sls, status, orderNum) <> (TaskCommand.tupled, TaskCommand.unapply _)
 }

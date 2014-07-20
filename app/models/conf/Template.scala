@@ -17,7 +17,7 @@ case class TemplateFrom(id: Option[Int], name: String, remark: Option[String], i
 }
 class TemplateTable(tag: Tag) extends Table[Template](tag, "template") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name", O.NotNull)
+  def name = column[String]("name")
   def remark = column[String]("remark", O.Nullable)
 
   override def *  = (id.?, name, remark.?) <> (Template.tupled, Template.unapply _)

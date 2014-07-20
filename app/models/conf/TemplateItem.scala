@@ -13,10 +13,10 @@ case class TemplateItem(id: Option[Int], templateId: Option[Int], itemName: Stri
 class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_item") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def templateId = column[Int]("template_id")                      // 模板编号
-  def itemName = column[String]("item_name", O.NotNull)     // 字段定义的名称
+  def itemName = column[String]("item_name")     // 字段定义的名称
   def itemDesc = column[String]("item_desc", O.Nullable)    // 字段定义的描述
   def default = column[String]("item_default", O.Nullable)
-  def order = column[Int]("order", O.NotNull, O.Default(0)) // 字段排序
+  def order = column[Int]("order", O.Default(0)) // 字段排序
 
   override def * = (id.?, templateId.?, itemName, itemDesc.?, default.?, order) <> (TemplateItem.tupled, TemplateItem.unapply _)
   def idx_order = index("idx_tid_order", (templateId, order))

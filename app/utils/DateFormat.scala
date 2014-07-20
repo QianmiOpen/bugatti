@@ -13,7 +13,7 @@ object DateFormatter {
 
   implicit object JsonDateFormatter extends Format[DateTime] {
 
-    val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
     def writes(date: DateTime): JsValue = {
       Json.toJson(

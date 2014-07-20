@@ -17,15 +17,15 @@ case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, versionId: Opt
 
 case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def envId = column[Int]("env_id", O.NotNull)
-  def projectId = column[Int]("project_id", O.NotNull)
+  def envId = column[Int]("env_id")
+  def projectId = column[Int]("project_id")
   def versionId = column[Int]("version_id", O.Nullable)
-  def taskTemplateId = column[Int]("task_template_id",O.NotNull)
-  def status = column[TaskStatus]("status", O.NotNull)
-  def importTime = column[DateTime]("import_time", O.NotNull, O.DBType("DATETIME"))
+  def taskTemplateId = column[Int]("task_template_id")
+  def status = column[TaskStatus]("status")
+  def importTime = column[DateTime]("import_time", O.DBType("DATETIME"))
   def taskId = column[Int]("task_id", O.Nullable)
   def schemeId = column[Int]("scheme_id", O.Nullable)
-  def operatorId = column[Int]("operator_id", O.NotNull)
+  def operatorId = column[Int]("operator_id")
 
   override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, importTime, taskId.?, schemeId.?, operatorId) <> (TaskQueue.tupled, TaskQueue.unapply _)
 }

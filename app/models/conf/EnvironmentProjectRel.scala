@@ -13,9 +13,9 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id", O.Nullable)
   def projectId = column[Int]("project_id", O.Nullable)
-  def syndicName = column[String]("syndic_name", O.NotNull)
-  def name = column[String]("name", O.NotNull)
-  def ip = column[String]("ip", O.NotNull)
+  def syndicName = column[String]("syndic_name")
+  def name = column[String]("name")
+  def ip = column[String]("ip")
 
   override def * = (id.?, envId.?, projectId.?, syndicName, name, ip) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
 }

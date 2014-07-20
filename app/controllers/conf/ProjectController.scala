@@ -30,7 +30,7 @@ object ProjectController extends BaseController {
       "subTotal" -> default(number, 0),
       "lastVid" -> optional(number),
       "lastVersion" -> optional(text),
-      "lastUpdated" -> optional(jodaDate("yyyy-MM-dd hh:mm:ss")),
+      "lastUpdated" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
       "items" -> list(
         mapping(
           "id" -> optional(number),
