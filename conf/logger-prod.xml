@@ -43,7 +43,7 @@
                 <password>bugatti</password>
             </dataSource>
         </connectionSource>
-        <sqlDialect class="ch.qos.logback.core.db.dialect.MsSQLDialect" />
+        <sqlDialect class="ch.qos.logback.core.db.dialect.MySQLDialect" />
     </appender>
 
     <!-- additivity=false ensures access log data only goes to the access log -->
