@@ -46,8 +46,9 @@ object EnvController extends BaseController {
     Ok(Json.toJson(EnvironmentHelper.count))
   }
 
-  def showAuth = AuthAction(FuncEnum.env) { implicit request =>
-    //管理员 & 委员长 显示所有环境
+  // 任务模块查看
+  def showAuth = AuthAction(FuncEnum.task) { implicit request =>
+    // 管理员 & 委员长 显示所有环境
     val countSafe = MemberHelper.count(request.user.jobNo, LevelEnum.safe)
     val seq =
       if (request.user.role == RoleEnum.admin || countSafe > 0) EnvironmentHelper.all()

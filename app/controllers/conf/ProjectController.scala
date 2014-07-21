@@ -101,7 +101,8 @@ object ProjectController extends BaseController {
     )
   }
 
-  def showAuth = AuthAction(FuncEnum.project) { implicit request =>
+  // 任务模块查看
+  def showAuth = AuthAction(FuncEnum.task) { implicit request =>
     val user = request.user
     if(user.role == RoleEnum.admin){
       Ok(Json.toJson(ProjectHelper.all()))
