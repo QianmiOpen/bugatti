@@ -101,7 +101,8 @@ object ProjectHelper extends PlayCache {
     qProject.returning(qProject.map(_.id)).insert(project)(session)
   }
 
-  def delete(id: Int) = db withSession { implicit session =>
+  def delete(id: Int) = db withTransaction { implicit session =>
+    EnvironmentProjectRelHelper.unbindByProjectId(Some(id))
     qProject.filter(_.id === id).delete
   }
 

@@ -3,6 +3,8 @@ package models.conf
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 
+import scala.slick.jdbc.JdbcBackend
+
 /**
  * 环境和项目的关系配置
  */
@@ -62,6 +64,7 @@ object EnvironmentProjectRelHelper {
       case Some(s) if s == "ip" =>
         query = direction match { case Some(d) if d == "desc" => query.sortBy(_.ip desc); case _ => query.sortBy(_.ip asc)}
       case _ =>
+        query = query.sortBy(_.projectId desc) // default sort by projectId
     }
     query.drop(offset).take(pageSize).list
   }
@@ -77,19 +80,22 @@ object EnvironmentProjectRelHelper {
     qRelation.returning(qRelation.map(_.id)).insert(envProjectRel)
   }
 
-  def updateByProjectId(relForm: EnvRelForm): Int = db withSession { implicit session =>
+  def bind(relForm: EnvRelForm): Int = db withSession { implicit session =>
     relForm.ids.map { id =>
-      val q = for { r <- qRelation if r.id === id } yield r.projectId
-      q.update(relForm.projectId)
+      qRelation.filter(_.id === id).map(_.projectId).update(relForm.projectId)
     }.size
+  }
+
+  def unbindByProjectId(projectId: Option[Int])(implicit session: JdbcBackend#Session) = {
+    qRelation.filter(_.projectId === projectId).map(_.projectId.?).update(None)(session)
   }
 
   def unbind(rel: EnvironmentProjectRel) = db withTransaction { implicit session =>
     qRelation.filter(_.id === rel.id).update(rel.copy(projectId = None))
   }
 
-  def update(envProjectRel: EnvironmentProjectRel) = db withSession { implicit session =>
-    qRelation.filter(_.id === envProjectRel.id).update(envProjectRel)
+  def update(rel: EnvironmentProjectRel) = db withSession { implicit session =>
+    qRelation.filter(_.id === rel.id).update(rel)
   }
 
 }

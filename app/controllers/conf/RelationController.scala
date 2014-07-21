@@ -44,7 +44,7 @@ object RelationController extends BaseController {
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
           "ip" -> request.remoteAddress, "msg" -> "绑定关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
-        Ok(Json.toJson(EnvironmentProjectRelHelper.updateByProjectId(relation)))
+        Ok(Json.toJson(EnvironmentProjectRelHelper.bind(relation)))
       }
     )
   }
