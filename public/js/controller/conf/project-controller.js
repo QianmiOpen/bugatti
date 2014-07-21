@@ -219,7 +219,7 @@ define(['angular'], function(angular) {
                 project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd HH:mm:ss")
                 ProjectService.update($stateParams.id, angular.toJson(project), function(data) {
                     if (data !== '0') {
-                        $state.go("^");
+                        $state.go("conf.project.my");
                     }
                 });
 
