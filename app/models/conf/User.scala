@@ -87,8 +87,8 @@ object UserHelper extends PlayCache {
   }
 
   def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
-    val user2update = user.copy(jobNo)
-    qUser.filter(_.jobNo === jobNo).update(user2update)(session)
+//    val user2update = user.copy(jobNo) // bug
+    qUser.filter(_.jobNo === jobNo).update(user)(session)
   }
 
   // ---------------------------------------------------
