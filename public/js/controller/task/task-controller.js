@@ -61,8 +61,6 @@ define(['angular'], function(angular) {
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
-                    console.log($scope.projectStatus)
-
                     $scope.getTemplates()
 
                 })

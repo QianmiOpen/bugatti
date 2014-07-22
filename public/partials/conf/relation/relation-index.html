@@ -25,7 +25,7 @@
             <th width="25%">项目</th>
             <th width="20%">机器名称</th>
             <th width="20%" class="header" ng-class="_sort == 'ip' ? orderBy ? 'headerSortUp' : 'headerSortDown' : ''">
-                <a href="" ng-click="sort('ip');orderBy = !orderBy">机器IP</a>
+                <a href="" ng-click="orderBy = !orderBy;sort('ip', currentPage - 1);">机器IP</a>
             </th>
             <th>操作</th>
         </tr>

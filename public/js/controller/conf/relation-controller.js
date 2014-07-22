@@ -34,9 +34,13 @@ define(['angular'], function(angular) {
                 $scope.ids = {};
                 $scope.master = false;
 
-                RelationService.getPage($scope.env.id, $scope.project.id, pageNo - 1, $scope.pageSize, function(data) {
-                    $scope.relations = data;
-                });
+                if (!angular.isDefined($scope._sort)) {
+                    RelationService.getPage($scope.env.id, $scope.project.id, pageNo - 1, $scope.pageSize, function(data) {
+                        $scope.relations = data;
+                    });
+                } else {
+                    $scope.sort($scope._sort, pageNo - 1)
+                }
             };
 
             $scope.select = function() {
@@ -50,10 +54,10 @@ define(['angular'], function(angular) {
 
             // 字段排序
             $scope.orderBy = false;
-            $scope.sort = function(col) {
+            $scope.sort = function(col, pageNo) {
                 var sort = $scope._sort = col;
                 var direction = $scope.orderBy ? 'asc' : 'desc';
-                RelationService.getPageSort($scope.env.id, $scope.project.id, sort, direction, 0, $scope.pageSize, function(data) {
+                RelationService.getPageSort($scope.env.id, $scope.project.id, sort, direction, pageNo, $scope.pageSize, function(data) {
                     $scope.relations = data;
                 });
             };
