@@ -35,4 +35,8 @@ object TaskTemplateStepHelper {
   def create(action : TaskTemplateStep) = db withSession {implicit session =>
     qTaskTemplateStep.returning(qTaskTemplateStep.map(_.id)).insert(action)
   }
+
+  def deleteStepsByTaskTemplateId(stepTemplateId: Int) = db withSession { implicit session =>
+    qTaskTemplateStep.filter(_.templateId === stepTemplateId).delete
+  }
 }
