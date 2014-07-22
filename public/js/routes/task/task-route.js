@@ -31,7 +31,7 @@ define(['angular'], function(angular) {
             url: "/log/:taskId",
             views:{
                 "@":{
-                    templateUrl:"partials/task/task.html",
+                    templateUrl:"partials/task/task-log.html",
                     controller:"TaskLogCtrl"
                 }
             }
