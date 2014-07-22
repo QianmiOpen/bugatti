@@ -36,7 +36,7 @@
                         <li ng-class="{active: $state.includes('conf')}" ng-show="user.role == 'admin'">
                             <a ui-sref="conf.user">配置</a>
                         </li>
-                        <li access-permission="task" ui-sref-active="active"><a ui-sref="task">任务</a></li>
+                        <li ng-class="{active: $state.includes('task')}" access-permission="task" ><a ui-sref="task">任务</a></li>
                         <li ng-if="user.sa == true" ui-sref-active="active"><a ui-sref="logs">日志</a></li>
                     </ul>
 
