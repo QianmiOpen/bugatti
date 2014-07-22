@@ -45,19 +45,18 @@
                     </div>
 
                 </td>
-                <!-- ========================================操作======================================== -->
+                <!-- operate -->
                 <td class="show">
                     <div class="dropdown">
-                        <!--<a ng-repeat="t in pro.templates" ng-class="showClass(t.versionMenu)" data-toggle="dropdown" ng-click="showClick(t.versionMenu, pro.id)" title="{{t.name}}" href="">-->
-                        <a ng-repeat="t in pro.templates" class="dropdown-toggle" data-toggle="dropdown" ng-click="showClick(t.versionMenu, pro.id, t.id)" title="{{t.name}}" href="">
+                        <a ng-repeat="t in pro.templates" class="dropdown-toggle" href="" ng-click="showClick(t.versionMenu, pro.id, t.id)" title="{{t.name}}">
                             <span class="{{t.css}}"></span>
                         </a>
-                        <ul class="dropdown-menu" ng-show="showVersionMenu()">
+                        <ul class="dropdown-menu" >
                             <li ng-repeat="vs in versions">
-                                <a ng-click="deploy(pro.id, vs.id)">{{vs.vs}}</a>
+                                <a href="" class="dropdown-toggle" ng-click="deploy(pro.id, vs.id)">{{vs.vs}}</a>
                             </li>
                             <li>
-                                <a ng-click="">more ...</a>
+                                <a href="" ng-click="">more ...</a>
                             </li>
                         </ul>
                     </div>

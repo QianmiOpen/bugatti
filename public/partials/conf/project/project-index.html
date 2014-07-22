@@ -46,8 +46,8 @@
             <td class="show">
                 <a ui-sref="conf.project.version.conf.list({id: project.id, vid: project.lastVid, eid: envId})" class="a-underline">{{project.lastVersion}}</a>
                 &nbsp;
-                <div class="btn-group" ng-if="project.subTotal > 0">
-                    <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" ng-click="vs_all(project.id)">
+                <div class="btn-group" dropdown ng-if="project.subTotal > 0">
+                    <button class="btn btn-default btn-xs dropdown-toggle" type="button" ng-click="vs_all(project.id)">
                         All ({{project.subTotal}}) <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
