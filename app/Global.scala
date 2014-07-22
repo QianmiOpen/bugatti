@@ -26,7 +26,7 @@ import java.util.{List => JList, Map => JMap}
 object Global extends GlobalSettings {
 
   override def beforeStart(app: Application) {
-    System.setProperty("javax.net.ssl.trustStore", "conf/certificate.jks")
+    System.setProperty("javax.net.ssl.trustStore", app.configuration.getString("ssl.trustStore").getOrElse("conf/certificate.jks"))
   }
 
   override def onStart(app: Application) {
