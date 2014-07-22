@@ -52,4 +52,7 @@ object TemplateItemHelper extends PlayCache {
     qItem.filter(_.id === id).update(info2update)
   }
 
+  def deleteItemsByTemplateId(templateId: Int) = db withSession { implicit session =>
+    qItem.filter(_.templateId === templateId).delete
+  }
 }

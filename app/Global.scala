@@ -1,4 +1,4 @@
-import java.io.{File, FileInputStream}
+import java.util.{List => JList, Map => JMap}
 
 import controllers.actor.TaskProcess
 import enums.{LevelEnum, RoleEnum}
@@ -6,19 +6,15 @@ import models.AppDB
 import models.conf._
 import models.task._
 import org.joda.time.DateTime
-import org.yaml.snakeyaml.Yaml
-import play.api._
-import play.api.Play.current
-import utils.{ConfHelp, SaltTools, GitHelp}
-import scala.slick.driver.MySQLDriver.simple._
-import scala.slick.jdbc.meta.MTable
-import scala.collection.JavaConverters._
-
+import org.pac4j.cas.client.CasClient
 import org.pac4j.core.client.Clients
 import org.pac4j.play.Config
-import org.pac4j.cas.client.CasClient
+import play.api.Play.current
+import play.api._
+import utils.{ConfHelp, FormulasHelp, SaltTools}
 
-import java.util.{List => JList, Map => JMap}
+import scala.slick.driver.MySQLDriver.simple._
+import scala.slick.jdbc.meta.MTable
 
 /**
  * 环境配置
@@ -70,7 +66,6 @@ object Global extends GlobalSettings {
           table.ddl.create
         }
 
-        AppData.initFromYaml(new File("conf/initial-data.yml"))
         AppData.initData
       }
     }
@@ -92,10 +87,10 @@ object Global extends GlobalSettings {
         AppTestData.environmentProjectRelScript
       }
 
-      AppData.initFromYaml(new File("conf/initial-test-data.yml"))
     }
 
-//    GitHelp.checkGitWorkDir(app)
+    FormulasHelp.checkGitWorkDir(app)
+
     SaltTools.refreshHostList(app)
     SaltTools.baseLogPath(app)
     ConfHelp.initConfPath(app)
@@ -123,35 +118,6 @@ object AppData {
       User("of729", "金卫", RoleEnum.admin, false, false, None, None),
       User("of9999", "龚平", RoleEnum.admin, true, false, None, None)
     ).foreach(U.insert)
-  }
-
-  def initFromYaml(file: File) = {
-    val yaml = new Yaml()
-    val io = new FileInputStream(file)
-    val templates = yaml.load(io).asInstanceOf[JMap[String, AnyRef]].get("templates").asInstanceOf[JList[JMap[String, AnyRef]]].asScala
-    templates.foreach(_initTemplate)
-  }
-
-  def _initTemplate(template: JMap[String, AnyRef]) = {
-    val templateId = TemplateHelper.create(Template(None, template.get("name").asInstanceOf[String], Some(template.get("remark").asInstanceOf[String])))
-
-    // 创建template关联的item
-    val templateItems = template.get("items").asInstanceOf[JList[JMap[String, String]]].asScala
-    templateItems.zipWithIndex.foreach { case (x: JMap[String, String], index) =>
-      TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), Some(x.get("default")), index))
-    }
-
-    // 创建template关联的actions
-    val actions = template.get("actions").asInstanceOf[JList[JMap[String, AnyRef]]].asScala
-    actions.zipWithIndex.foreach { case (action, index) =>
-
-      val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String], action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean], templateId, index + 1))
-      val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
-      steps.zipWithIndex.foreach { case (step, index) =>
-        val seconds = step.get("seconds").asInstanceOf[Int]
-        TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1))
-      }
-    }
   }
 }
 
