@@ -6,7 +6,7 @@ define(['angular'], function(angular) {
 
     function keepSession($scope, $interval, Auth) {
         var intervalPromise = $interval(function () {
-            Auth.ping(function() {});
+            Auth.ping(function() {}, function(){});
         }, 5000);
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
