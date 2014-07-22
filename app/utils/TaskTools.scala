@@ -51,7 +51,7 @@ object ConfHelp {
   var _confPath: String = ""
 
   def initConfPath(app: Application) = {
-    _confPath = app.configuration.getString("git.work.dir").getOrElse("/srv/salt")
+    _confPath = app.configuration.getString("salt.file.pkgs").getOrElse("target/pkgs")
   }
 
   def confPath = {
@@ -77,7 +77,7 @@ object FormulasHelp {
   }
 
   def checkGitWorkDir(app: Application) = {
-    _gitWorkDir = new File(app.configuration.getString("git.work.dir").getOrElse("/srv/salt"))
+    _gitWorkDir = new File(app.configuration.getString("git.work.dir").getOrElse("target/formulas"))
 
     if (app.configuration.getBoolean("git.work.init").getOrElse(true)) {
       val gitRemoteUrl = app.configuration.getString("git.work.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-formulas.git")
