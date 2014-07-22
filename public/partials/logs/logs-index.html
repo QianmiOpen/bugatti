@@ -40,7 +40,7 @@
             <td>{{d.info | info2json: 'user'}}</td>
             <td>{{d.info | info2json: 'ip'}}</td>
             <td>{{d.info | info2json: 'msg'}}</td>
-            <td>{{d.info | info2json: 'data'}}</td>
+            <td><span tooltip="{{d.info | info2json: 'data'}}">{{d.info | info2json: 'data'}}</span></td>
         </tr>
         </tbody>
         <tfoot>

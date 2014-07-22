@@ -39,12 +39,12 @@
         <tbody>
         <tr ng-repeat="project in projects | filter:searchText">
             <td><a ui-sref="conf.project.version({id: project.id})">{{project.id}}</a></td>
-            <td><a ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
+            <td><a tooltip="{{project.name}}" ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
             <td>
                 <template-show tid="{{project.templateId}}"></template-show>
             </td>
             <td class="show">
-                <a ui-sref="conf.project.version.conf.list({id: project.id, vid: project.lastVid, eid: envId})" class="a-underline">{{project.lastVersion}}</a>
+                <a tooltip="{{project.lastVersion}}" ui-sref="conf.project.version.conf.list({id: project.id, vid: project.lastVid, eid: envId})" class="a-underline">{{project.lastVersion}}</a>
                 &nbsp;
                 <div class="btn-group" dropdown ng-if="project.subTotal > 0">
                     <button class="btn btn-default btn-xs dropdown-toggle" type="button" ng-click="vs_all(project.id)">
@@ -55,7 +55,7 @@
                     </ul>
                 </div>
             </td>
-            <td>{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-show="user.role == 'admin'">
                 <a ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>

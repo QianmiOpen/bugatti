@@ -33,17 +33,17 @@
         <tbody>
         <tr ng-repeat="rel in relations">
             <td>
-                <div ng-if="rel.envId">
+                <div ng-if="rel.envId" tooltip="{{rel.envId}}">
                     <env-show eid="{{rel.envId}}"></env-show>
                 </div>
             </td>
             <td>
-                <div ng-if="rel.projectId">
+                <div ng-if="rel.projectId" tooltip="{{rel.projectId}}">
                     <project-show pid="{{rel.projectId}}"></project-show>
                 </div>
             </td>
-            <td>{{rel.name}}</td>
-            <td>{{rel.ip}}</td>
+            <td><span tooltip="{{rel.name}}">{{rel.name}}</span></td>
+            <td><span tooltip="{{rel.ip}}">{{rel.ip}}</span></td>
             <td>
                 <a ng-click="unbind(rel.id, $index)" href title="解绑">解绑</a>
             </td>

@@ -16,9 +16,9 @@
                 <span class="glyphicon glyphicon-user"></span>
                 {{log.jobNo}}</td>
             <td width="60%">
-                <a ui-sref="conf.project.version.conf.log.detail({id: $stateParams.id, vid: $stateParams.vid, cid: $stateParams.cid, lid: log.id})">{{log.path}}</a>
+                <a tooltip="{{log.path}}" ui-sref="conf.project.version.conf.log.detail({id: $stateParams.id, vid: $stateParams.vid, cid: $stateParams.cid, lid: log.id})">{{log.path}}</a>
             </td>
-            <td class="text-muted">{{log.updated | timeago }}</td>
+            <td class="text-muted"><span tooltip="{{log.updated | date:'yyyy-MM-dd HH:mm:ss'}}">{{log.updated | timeago }}</span></td>
         </tr>
         </tbody>
     </table>

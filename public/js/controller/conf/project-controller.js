@@ -7,7 +7,7 @@ define(['angular'], function(angular) {
     app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', 'EnvService',
         function($scope, $state, $stateParams, $modal, ProjectService, VersionService, EnvService) {
         $scope.currentPage = 1;
-        $scope.pageSize = 30;
+        $scope.pageSize = 20;
         $scope.my = false;
         if($state.current.name === 'conf.project.my') {
             $scope.my = true;

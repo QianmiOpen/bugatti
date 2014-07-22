@@ -12,14 +12,15 @@
     </thead>
     <tbody>
         <tr ng-repeat="user in users">
-            <td>{{user.name}}</td>
-            <td><a ui-sref="conf.user.detail({id: user.jobNo})">{{user.jobNo}}</a></td>
-            <td>{{user.role | role}}
-                {{user.superAdmin?'(超级)':''}}
+            <td><span tooltip="{{user.name}}">{{user.name}}</span></td>
+            <td><a tooltip="{{user.jobNo}}" ui-sref="conf.user.detail({id: user.jobNo})">{{user.jobNo}}</a></td>
+            <td><span tooltip="{{user.role | role}}{{user.superAdmin?'(超级)':''}}">
+                {{user.role | role}}
+                {{user.superAdmin?'(超级)':''}}</span>
             </td>
-            <td>{{user.locked | lock}}</td>
-            <td>{{user.lastIp}}</td>
-            <td>{{user.lastVisit | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td><span tooltip="{{user.locked | lock}}">{{user.locked | lock}}</span></td>
+            <td><span tooltip="{{user.lastIp}}">{{user.lastIp}}</span></td>
+            <td><span tooltip="{{user.lastVisit | date:'yyyy-MM-dd HH:mm:ss'}}">{{user.lastVisit | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td>
                 <div ng-if="(user.role == 'admin' && loginUser.sa == true)
                 || (user.role == 'user' && loginUser.role == 'admin')">
