@@ -6,7 +6,7 @@ define(['angular'], function(angular) {
 
     function keepSession($scope, $interval, Auth) {
         var intervalPromise = $interval(function () {
-            Auth.ping(function() {});
+            Auth.ping(function() {}, function() {});
         }, 5000);
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
@@ -61,8 +61,6 @@ define(['angular'], function(angular) {
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
-                    console.log($scope.projectStatus)
-
                     $scope.getTemplates()
 
                 })
@@ -234,32 +232,6 @@ define(['angular'], function(angular) {
 
         }
 
-        $scope.showClass = function(versionMenu){
-            if(versionMenu){
-                return "dropdown-toggle"
-            } else {
-                return "false"
-            }
-        }
-
-        $scope.changeDataToggle = function(projectId){
-            for(var dIndex in $scope.projectStatus){
-                var obj = $scope.projectStatus[dIndex]
-                if(obj.id == projectId){
-                    obj.dropClass = "dropdown"
-                }
-            }
-            console.table($scope.projectStatus)
-        }
-
-        $scope.showDropdown = function(versionMenu){
-            if(versionMenu){
-                return "dropdown"
-            } else {
-                return "false"
-            }
-        }
-
         $scope.showClick = function(versionMenu, projectId, templateId){
             if(!versionMenu){
                 $scope.taskQueue = {}
@@ -268,19 +240,13 @@ define(['angular'], function(angular) {
 //                $scope.taskQueue.versionId = versionId
                 $scope.taskQueue.templateId = templateId
                 TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
-                $scope.versionShow = false
             } else {//部署
                 $scope.choosedTemplateId = templateId
                 $scope.showVersion(projectId)
-                $scope.versionShow = true
             }
 
         }
 
-        //用来控制是否展示下拉菜单
-        $scope.showVersionMenu = function(){
-            return $scope.versionShow
-        }
 
 //=====================================页面跳转========================================
         $scope.goTaskQueue = function(envId, projectId){

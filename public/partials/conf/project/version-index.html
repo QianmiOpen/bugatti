@@ -23,8 +23,8 @@
         <tbody>
         <tr ng-repeat="version in versions">
             <td>{{version.id}}</td>
-            <td>{{version.vs}}</td>
-            <td>{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td><span tooltip="{{version.vs}}">{{version.vs}}</span></td>
+            <td><span tooltip="{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}">{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-show="hasProjectSafe_">
                 <a ui-sref="conf.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(version.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>

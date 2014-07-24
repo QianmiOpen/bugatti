@@ -43,4 +43,12 @@ object TaskTemplateHelper{
     qTaskTemplate.insertAll(templates: _*)
   }
 
+  def deleteTaskTemplateByTemplateId(templateId: Int) = db withSession { implicit session =>
+    qTaskTemplate.filter(_.typeId === templateId).delete
+  }
+
+  def findTaskTemplateByTemplateId(templateId: Int) = db withSession { implicit session =>
+    qTaskTemplate.filter(_.typeId === templateId).list()
+  }
+
 }

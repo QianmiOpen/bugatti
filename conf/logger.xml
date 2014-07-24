@@ -31,12 +31,12 @@
         <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
             <dataSource class="com.jolbox.bonecp.BoneCPDataSource">
                 <driverClass>com.mysql.jdbc.Driver</driverClass>
-                <jdbcUrl>jdbc:mysql://localhost:3306/bugatti</jdbcUrl>
+                <jdbcUrl>jdbc:mysql://localhost:3306/bugatti?characterEncoding=utf8</jdbcUrl>
                 <user>bugatti</user>
                 <password>bugatti</password>
             </dataSource>
         </connectionSource>
-        <sqlDialect class="ch.qos.logback.core.db.dialect.MsSQLDialect" />
+        <sqlDialect class="ch.qos.logback.core.db.dialect.MySQLDialect" />
     </appender>
 
     <logger name="ActionLog" level="INFO" additivity="false">

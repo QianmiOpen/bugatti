@@ -28,8 +28,6 @@ body {
 
 }
 
-
-
 /* Custom page CSS
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
@@ -106,6 +104,11 @@ code {
 }
 .ace_editor { height: 400px; }
 
+
+.tooltip-inner {
+    word-wrap:break-word;
+    white-space:pre-wrap;
+}
 
 
 /*.overflow-true{*/

@@ -19,15 +19,15 @@
         </thead>
         <tbody>
         <tr ng-repeat="area in areas">
-            <td>{{area.name}}</td>
+            <td><span tooltip="{{area.name}}">{{area.name}}</span></td>
             <td>
-                <a ng-click="refresh(area.id, $index)"><span class="glyphicon glyphicon-refresh"></span></a>
+                <a href="" ng-click="refresh(area.id, $index)"><span class="glyphicon glyphicon-refresh"></span></a>
             </td>
-            <td>{{area.syndicName}}</td>
-            <td>{{area.syndicIp}}</td>
-            <td>{{area.total}}</td>
-            <td>{{area.envNCount}}</td>
-            <td>{{area.projectNCount}}</td>
+            <td><span tooltip="{{area.syndicName}}">{{area.syndicName}}</span></td>
+            <td><span tooltip="{{area.syndicIp}}">{{area.syndicIp}}</span></td>
+            <td><span tooltip="{{area.total}}">{{area.total}}</span></td>
+            <td><span tooltip="{{area.envNCount}}">{{area.envNCount}}</span></td>
+            <td><span tooltip="{{area.projectNCount}}">{{area.projectNCount}}</span></td>
             <td>
                 <a ui-sref="conf.area.edit({id: area.id})"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(area.id, $index)"><span class="glyphicon glyphicon-remove"></span></a>
