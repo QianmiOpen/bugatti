@@ -1,16 +1,14 @@
 package utils
 
-import java.io.{FileInputStream, FilenameFilter, FileFilter, File}
-import java.util.{List, Map}
+import java.io.{File, FileFilter, FileInputStream}
+import java.util.{List => JList, Map => JMap}
 
 import models.conf._
-import models.task.{TaskTemplateStep, TaskTemplateStepHelper, TaskTemplate, TaskTemplateHelper}
+import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.yaml.snakeyaml.Yaml
-import play.api.{Application, Logger}
-
-import java.util.{List => JList, Map => JMap}
+import play.api.{Play, Application, Logger}
 
 import scala.collection.JavaConverters._
 
@@ -27,7 +25,7 @@ object TaskTools {
     var result = true
     VersionHelper.findById(versionId) match {
       case Some(version) => {
-        result = version.vs.contains("-SNAPSHOT")
+        result = version.vs.endsWith("-SNAPSHOT")
       }
       case _ => {
         result = false
@@ -48,15 +46,11 @@ object TaskTools {
 }
 
 object ConfHelp {
-  var _confPath: String = ""
+  val app = Play.current
 
-  def initConfPath(app: Application) = {
-    _confPath = app.configuration.getString("salt.file.pkgs").getOrElse("target/pkgs")
-  }
+  lazy val logPath = app.configuration.getString("salt.log.dir").getOrElse("target/saltlogs")
 
-  def confPath = {
-    _confPath
-  }
+  lazy val confPath: String = app.configuration.getString("salt.file.pkgs").getOrElse("target/pkgs")
 }
 
 object FormulasHelp {
@@ -96,23 +90,41 @@ object FormulasHelp {
       Logger.info(s"Init git: ${_git.getRepository}")
     }
 
-    reloadTemplates
+    //    checkoutTemplate("r201407230954")
   }
 
   def reloadTemplates() {
     if (_git != null) {
       _git.pull().call()
 
-      val templateDir = new File(s"${_gitWorkDir.getAbsolutePath}/templates")
-      templateDir.listFiles(new FileFilter {
-        override def accept(pathname: File): Boolean = pathname.getName.endsWith(".yaml")
-      }).foreach { file =>
-        initFromYaml(file)
+      val tags = _git.tagList().call()
+      val scriptNames = ScriptVersionHelper.allName()
+
+      // 加载新的tag脚本
+      tags.asScala.filterNot(tag => scriptNames.contains(tag.getName)).foreach { tag =>
+        _git.checkout().setName(tag.getName).call()
+
+//        ScriptVersionHelper.create(ScriptVersion(None, tag.getName))
+        loadTemplateFromDir(tag.getName)
       }
+
+      // 重新加载master,先讲老master更新掉
+
+      _git.checkout().setName("master").call()
+      loadTemplateFromDir("master")
     }
   }
 
-  def initFromYaml(file: File) = {
+  def loadTemplateFromDir(versionName: String) {
+    val templateDir = new File(s"${_gitWorkDir.getAbsolutePath}/templates")
+    templateDir.listFiles(new FileFilter {
+      override def accept(pathname: File): Boolean = pathname.getName.endsWith(".yaml")
+    }).foreach { file =>
+      _initFromYaml(file)
+    }
+  }
+
+  def _initFromYaml(file: File) = {
     val yaml = new Yaml()
     val io = new FileInputStream(file)
     val template = yaml.load(io).asInstanceOf[JMap[String, AnyRef]]

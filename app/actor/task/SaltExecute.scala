@@ -4,7 +4,8 @@ import java.io.{File, FileWriter}
 
 import akka.actor.Actor
 import play.api.Logger
-import utils.SaltTools
+import utils.ConfHelp
+
 import scala.sys.process._
 
 /**
@@ -13,7 +14,7 @@ import scala.sys.process._
 class SaltExecute extends Actor {
   def receive = {
     case SaltCheck(commandSeq, taskId, envId, projectId, versionId, order) => {
-      val baseLogPath = SaltTools.logPath
+      val baseLogPath = ConfHelp.logPath
       val path = s"${baseLogPath}/${taskId}/execute.log"
 
       if(doCommand(commandSeq, path)){

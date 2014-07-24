@@ -2,19 +2,19 @@ package actor.task
 
 import java.io.File
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import enums.TaskEnum
 import models.conf.VersionHelper
-import models.task.{Task, TaskHelper, TaskCommand}
-import play.api.Logger
-import utils.SaltTools
+import models.task.{Task, TaskCommand, TaskHelper}
+import utils.ConfHelp
+
 import scala.sys.process._
 
 /**
  * Created by jinwei on 14/7/14.
  */
 object CommandActor {
-  val baseLogPath = SaltTools.logPath
+  val baseLogPath = ConfHelp.logPath
   //命令执行过程
   var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
 }
