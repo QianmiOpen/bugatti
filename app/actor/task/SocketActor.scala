@@ -31,7 +31,7 @@ class SocketActor extends Actor{
   }
 
   def notifyAllSocket(js: JsValue) {
-    Logger.info("notifyAllSocket==>" + js.toString())
+    Logger.debug("notifyAllSocket==>" + js.toString())
     channel.push(js)
     //test
 //    val _baseLogPath = SaltTools.logPath
