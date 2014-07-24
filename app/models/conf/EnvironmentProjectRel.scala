@@ -55,6 +55,10 @@ object EnvironmentProjectRelHelper {
     qRelation.filter(r => r.envId === envId && r.projectId.isNull).list
   }
 
+  def allNotEmpty: Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.filter(r => r.envId.isNotNull && r.projectId.isNotNull).list
+  }
+
   def all(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     val offset = pageSize * page
     var query = for { r <- qRelation } yield r

@@ -1,5 +1,6 @@
 package controllers.task
 
+import actor.task.MyActor
 import controllers.BaseController
 import controllers.actor.{TaskLog, TaskProcess}
 import enums.TaskEnum
@@ -104,7 +105,27 @@ object TaskController extends BaseController {
     Logger.info(s"version ==> ${versionId}")
     val templateId = (tq \ "templateId").as[Int]
     val taskQueue = TaskQueue(None, envId, projectId, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
-    TaskProcess.createNewTask(taskQueue)
+    val taskQueueId = TaskQueueHelper.create(taskQueue)
+    //    TaskProcess.createNewTask(taskQueue)
+    MyActor.createNewTask(envId, projectId)
+    //test
+//    var seq = Seq.empty[TaskQueue]
+//    val doEnv = 2
+//    val doPro = 2
+//    for(i <- 1 to doEnv){
+//      for(j <- 1 to doPro){
+//        seq = seq :+ taskQueue.copy(envId = i).copy(projectId = j)
+//      }
+//    }
+//    Logger.info(s"seq ==> $seq")
+//    seq.foreach{
+//      s =>{
+//        TaskQueueHelper.create(s)
+//        EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, Option(s.envId), Option(s.projectId), "t-syndic", "d6a597315b01", "172.19.3.134"))
+//        MyActor.createNewTask(s.envId, s.projectId)
+//      }
+//    }
+    taskQueueId
   }
 
   /**

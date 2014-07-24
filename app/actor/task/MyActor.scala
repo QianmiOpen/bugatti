@@ -3,8 +3,10 @@ package actor.task
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
+import models.conf.{AreaHelper, EnvironmentProjectRelHelper}
 import models.task.{TaskCommand, TaskQueueHelper, TaskQueue}
 import org.joda.time.DateTime
 import play.api.Logger
@@ -22,13 +24,13 @@ object MyActor {
 
   implicit val timeout = Timeout(2 seconds)
 
-  val system = ActorSystem("mySystem")
+  val system = ActorSystem("mySystem", ConfigFactory.load("remotelookup"))
   //管理taskQueue中，在同一时间只有一个eid_pid的任务在执行
   val superviseTaskActor = system.actorOf(Props[MyActor], "superviseActor")
   //check salt执行结果
-  val jobActor = system.actorOf(Props[CheckJob], "checkJob")
+//  val jobActor = system.actorOf(Props[CheckJob], "checkJob")
   //taskCommand 执行过程
-  val commandActor = system.actorOf(Props[CommandActor], "commandActor")
+//  val commandActor = system.actorOf(Props[CommandActor], "commandActor")
   //socketActor
   val socketActor = system.actorOf(Props[SocketActor], "socketActor")
 
@@ -37,14 +39,19 @@ object MyActor {
 
   var statusMap = Json.obj()
 
+  // envId_projectId -> syndic_name
+  var envId_projectId_syndic = Map.empty[String, String]
+  // syndic_name -> ip
+  var syndic_ip = Map.empty[String, String]
 
+  //test
+//  generateSchedule()
 
   /**
    * 新建一个任务需要到actor的队列中处理
-   * @param tq
    */
-  def createNewTask(tq: TaskQueue) = {
-    superviseTaskActor ! CreateNewTaskActor(tq)
+  def createNewTask(envId: Int, projectId: Int) = {
+    superviseTaskActor ! CreateNewTaskActor(envId, projectId)
   }
 
   def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
@@ -73,27 +80,42 @@ object MyActor {
   def generateSchedule = {
     new WSSchedule().start(socketActor, "notify")
   }
+
+  def refreshSyndic = {
+    EnvironmentProjectRelHelper.allNotEmpty.foreach{
+      r =>
+        envId_projectId_syndic += s"${r.envId}_${r.projectId}" -> r.syndicName
+    }
+    AreaHelper.allInfo.foreach {
+      a =>
+        syndic_ip += s"${a.syndicName}" -> a.syndicIp
+    }
+  }
 }
 
 class MyActor extends Actor{
   import context._
   def receive = {
-    case CreateNewTaskActor(tq) => {
+    case CreateNewTaskActor(envId, projectId) => {
       // 增加任务队列数量
-      val key = s"${tq.envId}_${tq.projectId}"
-      incQueueNum(key, 1)
+      val key = s"${envId}_${projectId}"
+
+      Logger.info("key ==> "+key)
+
 
       if(!MyActor.envId_projectIdStatus.keySet.contains(key)){
-        val taskExecute = actorOf(Props[TaskExecute])
+        val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
         MyActor.envId_projectIdStatus += key -> TaskEnum.TaskProcess
-
-        taskExecute ! TaskGenerateCommand(tq)
+        incQueueNum(key, 1)
+        taskExecute ! TaskGenerateCommand(envId, projectId)
       }
     }
     case NextTaskQueue(envId, projectId) => {
-      MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - s"${envId}_${projectId}"
-      val taskExecute = actorOf(Props[TaskExecute])
-      taskExecute ! NextTaskQueue(envId, projectId)
+      val key = s"${envId}_${projectId}"
+//      MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+      context.child(s"taskExecute_${key}").getOrElse(
+        actorOf(Props[TaskExecute], s"taskExecute_${key}")
+      ) ! NextTaskQueue(envId, projectId)
     }
     case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum) => {
       val key = s"${tq.envId}_${tq.projectId}"
@@ -117,7 +139,7 @@ class MyActor extends Actor{
       //2、command.commandName
       //3、comamnd.machine
       val json = Json.obj("command" -> Json.obj("sls" -> sls, "machine" -> machine))
-      changeStatus(mergerStatus(key, Json.obj("command" -> json)))
+      changeStatus(mergerStatus(key, json))
     }
     case ChangeOverStatus(envId, projectId, status, endTime, version) => {
       val key = s"${envId}_${projectId}"
@@ -129,29 +151,35 @@ class MyActor extends Actor{
       changeStatus(mergerStatus(key, Json.obj("version" -> version)))
 
       //TODO NextTaskQueue
-      val taskExecute = actorOf(Props[TaskExecute])
-      taskExecute ! NextTaskQueue(envId, projectId)
+      //复用taskExecute
+      //      val taskExecute = actorSelection(s"/user/mySystem/superviseActor/taskExecute_${key}")
+      val taskExecute = actorSelection(s"/user/superviseActor/taskExecute_${key}")
+      //      val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
+
+      taskExecute ! RemoveTaskQueue()
     }
     case RemoveStatus(envId, projectId) => {
-      removeStatus(s"${envId}_${projectId}")
+      val key = s"${envId}_${projectId}"
+      removeStatus(key)
+      MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+      self ! NextTaskQueue(envId, projectId)
     }
   }
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
-    (MyActor.statusMap \ key).as[JsObject].deepMerge(js)
+    Json.obj(key -> (MyActor.statusMap \ key).as[JsObject].deepMerge(js))
   }
 
   def incQueueNum(key: String, num: Int) = {
     (MyActor.statusMap \ key).asOpt[JsObject] match {
       case Some(m) => {
         val queueNum = (m \ "queueNum").as[Int] + num
-        changeStatus(m.deepMerge(Json.obj("queueNum" -> queueNum)))
+        changeStatus(Json.obj(key -> m.deepMerge(Json.obj("queueNum" -> queueNum))))
       }
       case _ => {
         changeStatus(Json.obj(key -> Json.obj("queueNum" -> 1)))
       }
     }
-
   }
 
   def changeStatus(js: JsObject): JsValue = {
@@ -164,12 +192,9 @@ class MyActor extends Actor{
     MyActor.statusMap = MyActor.statusMap - key
   }
 
-  def changePushStatus() = {
-
-  }
 }
 
-case class CreateNewTaskActor(taskQueue: TaskQueue)
+case class CreateNewTaskActor(envId: Int, projectId: Int)
 case class NextTaskQueue(envId: Int, projectId: Int)
 
 case class ChangeTaskStatus(taskQueue: TaskQueue, taskName: String, queues: Seq[JsObject], currentNum: Int, totalNum: Int)

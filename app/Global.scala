@@ -1,5 +1,6 @@
 import java.io.{File, FileInputStream}
 
+import actor.task.MyActor
 import controllers.actor.TaskProcess
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
@@ -104,11 +105,13 @@ object Global extends GlobalSettings {
     val set = TaskQueueHelper.findEnvId_ProjectId()
     set.foreach{
       s =>
-        TaskProcess.checkQueueNum(s._1, s._2)
-        TaskProcess.executeTasks(s._1, s._2)
+//        TaskProcess.checkQueueNum(s._1, s._2)
+//        TaskProcess.executeTasks(s._1, s._2)
+        MyActor.createNewTask(s._1, s._2)
     }
 
-    TaskProcess.generateSchedule
+    MyActor.refreshSyndic
+    MyActor.generateSchedule
   }
 }
 
@@ -214,17 +217,22 @@ object AppTestData {
 
   // 环境
   def environmentScript(implicit session: Session) = {
-    Seq(
+    var seq = Seq(
       Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
-    ).foreach(EnvironmentHelper.create)
+    )
+    for(i <- 5 to 55){
+      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
+    }
+    seq.foreach(EnvironmentHelper.create)
   }
 
   def environmentProjectRelScript(implicit session: Session) = {
     Seq(
-      EnvironmentProjectRel(None, Option(3), Option(1), "t-syndic", "t-minion", "172.19.3.134")
+      EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "d6a597315b01", "172.19.3.134")
+//      EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "8e6499e6412a", "172.19.3.134")
     ).foreach(EnvironmentProjectRelHelper.create)
   }
 
@@ -250,7 +258,7 @@ object AppTestData {
 
   def areaScript(implicit session: Session) = {
     Seq (
-      Area(None, "测试", "t-syndic", "172.19.3.149"),
+      Area(None, "测试", "t-syndic", "192.168.59.3"),
       Area(None, "test-syndic", "t-syndic", "172.19.3.132"),
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
