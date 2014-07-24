@@ -1,6 +1,5 @@
-import java.util.{List => JList, Map => JMap}
 
-import controllers.actor.TaskProcess
+import actor.task.MyActor
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
 import models.conf._
@@ -11,7 +10,7 @@ import org.pac4j.core.client.Clients
 import org.pac4j.play.Config
 import play.api.Play.current
 import play.api._
-import utils.{ConfHelp, FormulasHelp, SaltTools}
+import utils.{FormulasHelp, SaltTools}
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
@@ -81,11 +80,13 @@ object Global extends GlobalSettings {
     val set = TaskQueueHelper.findEnvId_ProjectId()
     set.foreach {
       s =>
-        TaskProcess.checkQueueNum(s._1, s._2)
-        TaskProcess.executeTasks(s._1, s._2)
+        //        TaskProcess.checkQueueNum(s._1, s._2)
+        //        TaskProcess.executeTasks(s._1, s._2)
+        MyActor.createNewTask(s._1, s._2)
     }
 
-    TaskProcess.generateSchedule
+    MyActor.refreshSyndic
+    MyActor.generateSchedule
   }
 }
 
@@ -141,22 +142,26 @@ object AppTestData {
       Version(None, 1, "1.6.1-RELEASE", new DateTime(2014, 6, 26, 7, 31))
     ).foreach(VersionHelper.create)
 
-    // 环境
-    Seq(
+    var seq = Seq(
       Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
-    ).foreach(EnvironmentHelper.create)
+    )
+    //    for (i <- 5 to 55) {
+    //      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
+    //    }
+    seq.foreach(EnvironmentHelper.create)
 
     // 初始化环境关系表
     Seq(
-      EnvironmentProjectRel(None, Option(3), Option(1), "t-syndic", "t-minion", "172.19.3.134")
+      EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "d6a597315b01", "172.19.3.134")
+      //EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "8e6499e6412a", "172.19.3.134")
     ).foreach(EnvironmentProjectRelHelper.create)
 
     // 初始化区域
     Seq(
-      Area(None, "测试", "t-syndic", "172.19.3.149"),
+      Area(None, "测试", "t-syndic", "192.168.59.3"),
       Area(None, "test-syndic", "t-syndic", "172.19.3.132"),
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)

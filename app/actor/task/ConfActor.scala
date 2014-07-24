@@ -14,7 +14,8 @@ class ConfActor extends Actor{
   def receive = {
     case CopyConfFile(taskId, envId, projectId, versionId, order) => {
       generateConfFile(taskId, envId, projectId, versionId)
-      MyActor.commandActor ! ExecuteCommand(taskId, envId, projectId, Option(versionId), order + 1)
+      sender ! ExecuteCommand(taskId, envId, projectId, Option(versionId), order + 1)
+      context.stop(self)
     }
   }
 
