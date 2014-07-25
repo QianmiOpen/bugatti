@@ -40,7 +40,7 @@ class TaskExecute extends Actor{
               json.as[JsObject]
           }
           //3、生成命令列表
-          val (commandList, paramsJson) = generateCommands(taskId, tqExecute)
+          val (commandList, returnJson) = generateCommands(taskId, tqExecute)
           val totalNum = commandList.length
           val currentNum = 0
 
@@ -48,7 +48,7 @@ class TaskExecute extends Actor{
           TaskCommandHelper.create(commandList)
           //TODO executeCommands 从第1个命令开始执行
           val commandActor = context.actorOf(Props[CommandActor], s"commandActor_${tq.envId}_${tq.projectId}")
-          commandActor ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList)
+          commandActor ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList, returnJson)
         }
         case _ => {
           context.stop(self)
@@ -71,11 +71,12 @@ class TaskExecute extends Actor{
   def generateCommands(taskId: Int, tq: TaskQueue): (Seq[TaskCommand], JsObject)  = {
     val seqMachines = EnvironmentProjectRelHelper.findByEnvId_ProjectId(tq.envId, tq.projectId)
     if (seqMachines.length == 0) {
-      return (Seq.empty[TaskCommand], null)
+      return (Seq.empty[TaskCommand],  Json.obj("error" -> s"未关联机器"))
     }
     val nfsServer = EnvironmentHelper.findById(tq.envId).get.nfServer
 
-    val projectName = ProjectHelper.findById(tq.projectId).get.name
+    val project = ProjectHelper.findById(tq.projectId).get
+    val projectName = project.name
 
     val versionId = tq.versionId
     var repository = "releases"
@@ -105,7 +106,21 @@ class TaskExecute extends Actor{
       , "confFileName" -> fileName
     )
 
-    val attributesJson = AttributeHelper.findByProjectId(tq.projectId).map {
+    //envId -> Seq[template_item]
+    var latestVersion = ScriptVersionHelper.Master
+    EnvironmentHelper.findById(_envId).get.scriptVersion match {
+      case ScriptVersionHelper.Latest => {
+        latestVersion = ScriptVersionHelper.findLatest().get
+      }
+    }
+    val items = TemplateItemHelper.findByTemplateId_ScriptVersion(project.templateId, latestVersion)
+    val attrs = AttributeHelper.findByProjectId(tq.projectId)
+    val attrsName = attrs.map(_.name)
+    val errorItems = items.filterNot(t => attrsName.contains(t.itemName))
+    if(errorItems.length > 0) {
+      return (Seq.empty[TaskCommand], Json.obj("error" -> s"${errorItems} 未配置"))
+    }
+    val attributesJson = attrs.map {
       s =>
         paramsJson = paramsJson ++ Json.obj(s.name -> s.value)
     }
