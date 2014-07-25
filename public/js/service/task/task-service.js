@@ -21,8 +21,8 @@ define(['angular'], function(angular) {
             removeTaskQueue: function(qid, callback){
                 $http(PlayRoutes.controllers.task.TaskController.removeTaskQueue(qid)).success(callback)
             },
-            getTemplates: function(callback){
-                $http(PlayRoutes.controllers.task.TaskController.getTemplates()).success(callback)
+            getTemplates: function(scriptVersion, callback){
+                $http(PlayRoutes.controllers.task.TaskController.getTemplates(scriptVersion)).success(callback)
             }
         }
     });
