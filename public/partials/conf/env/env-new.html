@@ -19,6 +19,18 @@
     </div>
 
     <div class="form-group">
+        <label for="scriptVersion" class="col-sm-3 control-label">Nexus版本列表：</label>
+        <div class="col-sm-3">
+            <select name="scriptVersion" id="scriptVersion" class="form-control" ng-model="env.scriptVersion" ng-options="v as v for v in scriptVersions" required>
+            </select>
+        </div>
+        <div ng-show="form.vs.$dirty && form.vs.$invalid" class="has-error">
+            <span ng-show="form.vs.$error.required" class="control-label">请选择脚本版本</span>
+            <span ng-show="form.vs.$error.maxlength" class="control-label">超过长度</span>
+        </div>
+    </div>
+
+    <div class="form-group">
         <label for="nfServer" class="col-sm-3 control-label">nfs服务：</label>
         <div class="col-sm-5">
             <input type="text" class="form-control" ng-model="env.nfServer" name="nfServer" id="nfServer" ng-maxlength="30" placeholder="选填，nfs server ip 地址">

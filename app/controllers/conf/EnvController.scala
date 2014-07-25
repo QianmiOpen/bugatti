@@ -1,12 +1,13 @@
 package controllers.conf
 
 import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
-import models.conf.{MemberHelper, Environment, EnvironmentHelper}
+import models.conf.{ScriptVersionHelper, MemberHelper, Environment, EnvironmentHelper}
 import play.api.mvc._
 import controllers.BaseController
 import play.api.libs.json._
 import play.api.data._
 import play.api.data.Forms._
+
 /**
  * 环境管理
  *
@@ -65,6 +66,10 @@ object EnvController extends BaseController {
       case None =>
         NotFound
     }
+  }
+
+  def allScriptVersion = Action { implicit request =>
+    Ok(Json.toJson(ScriptVersionHelper.allName))
   }
 
   def save = AuthAction(FuncEnum.env) { implicit request =>

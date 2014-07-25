@@ -60,7 +60,7 @@ define(['angular'], function(angular) {
         }]);
 
     app.controller('EnvCreateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
-        $scope.env = {level: "unsafe"}
+        $scope.env = {level: "unsafe", scriptVersion: "latest"};
         $scope.saveOrUpdate = function(env) {
             EnvService.save(angular.toJson(env), function(data) {
                 if (data.r >= 0) {
@@ -71,6 +71,10 @@ define(['angular'], function(angular) {
                 }
             });
         };
+
+        EnvService.allScriptVersion(function(data) {
+            $scope.scriptVersions = data;
+        });
     }]);
 
     app.controller('EnvUpdateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
@@ -95,6 +99,10 @@ define(['angular'], function(angular) {
                 return angular.equals(env, $scope.master);
             };
             $scope.reset();
+        });
+
+        EnvService.allScriptVersion(function(data) {
+            $scope.scriptVersions = data;
         });
     }]);
 

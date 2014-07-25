@@ -39,7 +39,7 @@ object ScriptVersionHelper {
   }
 
   def allName(): Seq[String] = db withSession { implicit session =>
-    all().map(_.name)
+    all().map(_.name) ++ Seq(Latest, Master)
   }
 
   def deleteByName(name: String) = db withSession { implicit session =>
