@@ -68,7 +68,7 @@ object EnvController extends BaseController {
     }
   }
 
-  def allScriptVersion = Action { implicit request =>
+  def allScriptVersion = AuthAction(FuncEnum.env) { implicit request =>
     Ok(Json.toJson(ScriptVersionHelper.allName))
   }
 
