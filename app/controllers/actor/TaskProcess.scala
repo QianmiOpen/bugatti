@@ -2,6 +2,7 @@ package controllers.actor
 
 import java.io.{File, FileWriter, PrintWriter}
 
+import actor.ActorUtils
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -29,12 +30,13 @@ object TaskProcess {
   implicit val timeout = Timeout(2 seconds)
 
   lazy val taskSystem = {
-    ActorSystem("MyProcessSystem")
+//    ActorSystem("MyProcessSystem")
+    ActorUtils.system
   }
 
   lazy val socketActor = {
-        ActorSystem("mySocketSystem") actorOf Props[SocketActor]
-//    taskSystem actorOf Props[SocketActor]
+//        ActorSystem("mySocketSystem") actorOf Props[SocketActor]
+    taskSystem actorOf Props[SocketActor]
     //    Akka.system.actorOf(Props[SocketActor])
   }
 
