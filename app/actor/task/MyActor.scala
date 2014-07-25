@@ -77,19 +77,21 @@ object MyActor {
     }
   }
   //在global被初始化
-  def generateSchedule = {
+  def generateSchedule() = {
     new WSSchedule().start(socketActor, "notify")
   }
 
-  def refreshSyndic = {
+  def refreshSyndic() = {
     EnvironmentProjectRelHelper.allNotEmpty.foreach{
       r =>
-        envId_projectId_syndic += s"${r.envId}_${r.projectId}" -> r.syndicName
+        envId_projectId_syndic += s"${r.envId.get}_${r.projectId.get}" -> r.syndicName
     }
+    Logger.debug(s"envId_projectId_syndic ==> ${envId_projectId_syndic}")
     AreaHelper.allInfo.foreach {
       a =>
         syndic_ip += s"${a.syndicName}" -> a.syndicIp
     }
+    Logger.debug(s"syndic_ip ==> ${syndic_ip}")
   }
 }
 
@@ -190,6 +192,7 @@ class MyActor extends Actor{
 
   def removeStatus(key: String) = {
     MyActor.statusMap = MyActor.statusMap - key
+    MyActor.socketActor ! FindLastStatus(key)
   }
 
 }
@@ -201,6 +204,7 @@ case class ChangeTaskStatus(taskQueue: TaskQueue, taskName: String, queues: Seq[
 case class ChangeCommandStatus(envId: Int, projectId: Int, currentNum: Int, commandName: String, machine: String)
 case class ChangeOverStatus(envId: Int, projectId: Int, taskStatus: TaskStatus, endTime: DateTime, version: String)
 case class RemoveStatus(envId: Int, projectId: Int)
+case class FindLastStatus(key: String)
 
 class WSSchedule{
   def start(socketActor: ActorRef, notify: String): Cancellable = {

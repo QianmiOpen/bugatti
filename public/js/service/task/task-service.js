@@ -12,6 +12,9 @@ define(['angular'], function(angular) {
             getLastTaskStatus: function(envId, projects, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.findLastTaskStatus().url, {'envId': envId, 'projects': projects}).success(callback)
             },
+            findLastStatus: function(envId, projectId, callback){
+                $http(PlayRoutes.controllers.task.TaskController.findLastStatus(envId, projectId)).success(callback)
+            },
             createNewTaskQueue: function(taskQueue, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.createNewTaskQueue().url, {'taskQueue': taskQueue}).success(callback)
             },

@@ -16,6 +16,9 @@ class SocketActor extends Actor{
   val (out, channel) = Concurrent.broadcast[JsValue]
 
   def receive = {
+    case FindLastStatus(key) => {
+      notifyAllSocket(Json.obj(s"${key}_last" -> key))
+    }
     case JoinProcess(js) => {
       sender ! ConnectedSocket(out)
     }

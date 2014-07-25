@@ -252,7 +252,12 @@ class CommandActor extends Actor {
       // 组装remotePath e.g."akka.tcp://CalculatorSystem@127.0.0.1:2552/user/calculator"
       //1、根据syndic获取ip
 //      val remotePath = "akka.tcp://Spirit@192.168.59.3:2552/user/SpiritCommands"
+      val key = s"${_envId}_${_projectId}"
+      Logger.debug(s"commnadActor key ==> ${key}")
+      Logger.debug(s"commnadActor eps ==> ${MyActor.envId_projectId_syndic.get(key)}")
+      Logger.debug(s"commnadActor eps ==> ${MyActor.syndic_ip.get(MyActor.envId_projectId_syndic.get(key).getOrElse("0_0")).getOrElse("0.0.0.0")}")
       val syndicIp = MyActor.syndic_ip.get(MyActor.envId_projectId_syndic.get(s"${_envId}_${_projectId}").getOrElse("0_0")).getOrElse("0.0.0.0")
+
       val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
       //      val remotePath = "akka.tcp://Spirit@0.0.0.0:2552/user/SpiritCommands"
 //      val system = ActorSystem("LookupSystem", ConfigFactory.load("remotelookup"))

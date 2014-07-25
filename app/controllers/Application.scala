@@ -186,6 +186,7 @@ object Application extends ScalaController with Security {
 
         //task
         task.routes.javascript.TaskController.findLastTaskStatus,
+        task.routes.javascript.TaskController.findLastStatus,
         task.routes.javascript.TaskController.joinProcess,
         task.routes.javascript.TaskController.getVersions,
         task.routes.javascript.TaskController.createNewTaskQueue,

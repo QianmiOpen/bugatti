@@ -41,13 +41,17 @@ define(['angular'], function(angular) {
                 return ""
             }
         }
+        $scope.wsBool = true
         //选择tab页
         $scope.chooseEnv = function(envId){
             $scope.activeEnv = envId
             //触发查询环境下的项目列表
             $scope.showProjects()
             //过滤正在执行任务的项目集 -> 使用websocket
-            $scope.wsInvoke()
+            if($scope.wsBool){
+                $scope.wsInvoke()
+                $scope.wsBool = false
+            }
         }
 
 //=====================================项目========================================
@@ -61,6 +65,7 @@ define(['angular'], function(angular) {
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                    console.log($scope.projectStatus)
                     $scope.getTemplates()
 
                 })
@@ -106,23 +111,56 @@ define(['angular'], function(angular) {
                         var p = $scope.projectStatus[pIndex]
                         //envId + projectId
                         var key = $scope.activeEnv + "_" + p.id
+                        var key_last = key + "_last"
                         var projectObj = tsData[key]
+                        var projectObj_last = tsData[key_last]
+
                         if(projectObj != undefined){
-                            p.status.currentNum = projectObj.currentNum
-                            p.status.totalNum = projectObj.totalNum
-                            p.status.queueNum = projectObj.queueNum
-                            p.status.sls = projectObj.sls
-                            p.status.machine = projectObj.machine
-                            p.status.status = projectObj.status
-                            p.task = projectObj.task
-                            if(p.task != undefined){
-                                p.task.taskName = projectObj.taskName
-                            }
+                            /**
+                             * {"4_1":
+                             *      {"queueNum":0,
+                             *       "queues":[
+                             *          {"id":1,"envId":4,"projectId":1,"versionId":2,"taskTemplateId":7,"status":3,"importTime":1406172301000,"taskId":1,"operatorId":1,"taskTemplateName":"安装应用"}
+                             *        ],
+                             *       "status":3,
+                             *       "totalNum":9,
+                             *       "currentNum":1,
+                             *       "taskName":"安装应用",
+                             *       "command":{"sls":"加固os","machine":"d6a597315b01"}
+                             *      }
+                             *  }
+                             **/
+                            p.task = projectObj
+//                            p.status.currentNum = projectObj.currentNum
+//                            p.status.totalNum = projectObj.totalNum
+//                            p.status.queueNum = projectObj.queueNum
+//                            p.status.sls = projectObj.sls
+//                            p.status.machine = projectObj.machine
+//                            p.status.status = projectObj.status
+//                            p.task = projectObj.task
+//                            if(p.task != undefined){
+//                                p.task.taskName = projectObj.taskName
+//                            }
+                        }
+                        if(projectObj_last != undefined){
+                            $scope.findLastStatus(projectObj_last)
                         }
                     }
                     $scope.projectStatus = $scope.projectStatus.map($scope.addStatusTip)
                 })
             }
+        }
+        //获取envId_projectId最后一个任务状态
+        $scope.findLastStatus = function(data){
+            console.log(data)
+            var tmp = data.split("_")
+            console.log(tmp[0] + "," + tmp[1])
+            TaskService.findLastStatus(tmp[0], tmp[1], function(data){
+                $scope.lastTasks = data
+                $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                console.log($scope.projectStatus)
+                $scope.getTemplates()
+            })
         }
 
         //更新所有项目的status
@@ -137,29 +175,33 @@ define(['angular'], function(angular) {
 
         //合并两个数组 pros & projectStatus
         $scope.changeData = function(data){
-            data.status = {}
+            data.task = {}
+            data.task.queueNum = 0
+            data.task.status = 0
             for(var index in $scope.lastTasks){
                 var p = $scope.lastTasks[index]
+                console.log(p)
                 if(p.projectId === data.id){
-                    data.status = p
                     data.task = p
+                    data.task.queueNum = 0
                 }
             }
-            data.status.queueNum = 0
             return data
         }
         //增加状态描述
         $scope.addStatusTip = function(data){
-            if(!$scope.isObjEmpty(data.status)){
-                data.status.statusTip = $scope.explainTaskStatus(data.status.status)
+            if(!$scope.isObjEmpty(data.task)){
+                data.task.statusTip = $scope.explainTaskStatus(data.task.status)
             } else {
-                data.status.statusTip = "N/A"
+                data.task.statusTip = "N/A"
             }
             return data
         }
         //解析task status
         $scope.explainTaskStatus = function(status){
             switch(status){
+                //未查询到历史任务
+                case 0 : return "未查询到历史任务"
                 //执行成功
                 case 1 : return "执行成功"
                 //执行失败
@@ -170,10 +212,18 @@ define(['angular'], function(angular) {
         }
         //根据任务状态判断是否需要显示超链接
         $scope.showHref = function(status){
-            if(status === 3 || status == null) {
+            if(status === 3 || status == 0) {
                 return false
             } else {
                 return true
+            }
+        }
+        //未查询到任何历史任务
+        $scope.showText = function(status){
+            if(status == 0){
+                return true
+            }else {
+                return false
             }
         }
         //根据任务状态判断是否需要显示进度条
@@ -191,6 +241,22 @@ define(['angular'], function(angular) {
                 return false
             }
             return true
+        }
+
+        $scope.showVersionTitle = function(version){
+            if(version){
+                return true
+            }else{
+                return false
+            }
+        }
+
+        $scope.showTaskNameTitle = function(taskName) {
+            if(taskName){
+                return true
+            }else {
+                return false
+            }
         }
 //=====================================新建任务 （部署 + 启动 + 关闭 + 重启）========================================
         $scope.showVersion = function(pid){
@@ -240,13 +306,17 @@ define(['angular'], function(angular) {
 //                $scope.taskQueue.versionId = versionId
                 $scope.taskQueue.templateId = templateId
                 TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
+                $scope.versionShow = false
             } else {//部署
                 $scope.choosedTemplateId = templateId
                 $scope.showVersion(projectId)
+                $scope.versionShow = true
             }
-
         }
-
+        //用来控制是否展示下拉菜单
+        $scope.showVersionMenu = function(){
+            return $scope.versionShow
+        }
 
 //=====================================页面跳转========================================
         $scope.goTaskQueue = function(envId, projectId){

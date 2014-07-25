@@ -98,6 +98,7 @@ DELETE        /relation/:id                            controllers.conf.Relation
 
 # Task
 POST          /task/lastStatus                         controllers.task.TaskController.findLastTaskStatus
+GET           /task/lastStatusSpecify                  controllers.task.TaskController.findLastStatus(envId: Int, projectId: Int)
 GET           /task/joinProcess/:taskId                controllers.task.TaskController.joinProcess(taskId: Int)
 POST          /task/newTaskQueue                       controllers.task.TaskController.createNewTaskQueue
 POST          /task/removeTaskQueue                    controllers.task.TaskController.removeTaskQueue(qid: Int)

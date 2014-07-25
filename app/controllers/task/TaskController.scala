@@ -58,13 +58,8 @@ object TaskController extends BaseController {
     }
   }
 
-  def findStatus(fields: Seq[(String, JsValue)]): List[JsValue] = {
-    val jsons = Json.toJson(fields.toMap)
-    val envId = (jsons \ "envId").toString.toInt
-    val projects = (jsons \ "projects")
-    Logger.info(""+projects(0))
-    projects.as[JsArray].value
-    TaskHelper.findLastStatus(envId, projects).map{
+  def findLastStatus(envId: Int, projectId: Int) = Action{
+    val list = TaskHelper.findLastStatusByProject(envId, projectId).map{
       t => {
         var tJson = Json.toJson(t).as[JsObject]
         VersionHelper.findById(t.versionId.getOrElse(0)) match {
@@ -78,13 +73,42 @@ object TaskController extends BaseController {
             tJson = tJson ++ Json.obj("taskName" -> template.name)
           }
         }
+        Logger.debug(s"findStatus ==> ${tJson}")
+        tJson
+      }
+    }
+    Ok(Json.toJson(list))
+  }
+
+  def findStatus(fields: Seq[(String, JsValue)]): List[JsValue] = {
+    val jsons = Json.toJson(fields.toMap)
+    val envId = (jsons \ "envId").toString.toInt
+    val projects = (jsons \ "projects")
+    Logger.debug(s"${projects}")
+//    projects.as[JsArray].value
+    TaskHelper.findLastStatus(envId, projects).map{
+      t => {
+        Logger.debug(s"t ==> ${t.taskTemplateId}, ${t.versionId}")
+        var tJson = Json.toJson(t).as[JsObject]
+        VersionHelper.findById(t.versionId.getOrElse(0)) match {
+          case Some(version) => {
+            tJson = tJson ++ Json.obj("version" -> version.vs)
+          }
+          case _ => {}
+        }
+        TaskTemplateHelper.findById(t.taskTemplateId) match {
+          case template => {
+            tJson = tJson ++ Json.obj("taskName" -> template.name)
+          }
+        }
+        Logger.debug(s"findStatus ==> ${tJson}")
         tJson
       }
     }
   }
 
   def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
-    TaskProcess.join()
+    MyActor.join()
   }
 
   def createNewTaskQueue = Action(parse.json) {implicit request =>

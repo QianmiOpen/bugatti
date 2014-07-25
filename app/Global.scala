@@ -96,6 +96,10 @@ object Global extends GlobalSettings {
     SaltTools.baseLogPath(app)
     ConfHelp.initConfPath(app)
 
+
+    MyActor.refreshSyndic()
+    MyActor.generateSchedule()
+
     //查看队列表中是否有可执行任务
     val set = TaskQueueHelper.findEnvId_ProjectId()
     set.foreach{
@@ -105,8 +109,7 @@ object Global extends GlobalSettings {
         MyActor.createNewTask(s._1, s._2)
     }
 
-    MyActor.refreshSyndic
-    MyActor.generateSchedule
+
   }
 }
 
@@ -144,9 +147,9 @@ object AppTestData {
     q.ddl.create
 
     val seq = Seq(
-      Project(None, "cardbase-master", 1, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
-      Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
-      Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "cardbase-master", 2, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "cardbase-slave", 2, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi1", 2, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
       Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
       Project(None, "qianmi3", 1, 5, Option(5), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
     )
@@ -189,9 +192,10 @@ object AppTestData {
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
     )
-    for(i <- 5 to 55){
-      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
-    }
+    //压测
+//    for(i <- 5 to 55){
+//      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
+//    }
     seq.foreach(EnvironmentHelper.create)
   }
 
@@ -225,7 +229,6 @@ object AppTestData {
   def areaScript(implicit session: Session) = {
     Seq (
       Area(None, "测试", "t-syndic", "192.168.59.3"),
-      Area(None, "test-syndic", "t-syndic", "172.19.3.132"),
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
   }
