@@ -2,6 +2,7 @@ package controllers.actor
 
 import java.io.File
 
+import actor.ActorUtils
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -29,9 +30,7 @@ object TaskLog{
 
   val baseLogPath = ConfHelp.logPath
 
-  lazy val system = {
-    ActorSystem("MyLogSystem")
-  }
+  lazy val system = ActorUtils.system
 
   var actorsMap = {
     Map.empty[Int, ActorRef]

@@ -10,7 +10,7 @@ import org.pac4j.core.client.Clients
 import org.pac4j.play.Config
 import play.api.Play.current
 import play.api._
-import utils.{FormulasHelp, SaltTools}
+import utils.SaltTools
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
@@ -73,7 +73,6 @@ object Global extends GlobalSettings {
       AppTestData.initData
     }
 
-    FormulasHelp.checkGitWorkDir(app)
     SaltTools.refreshHostList(app)
 
     //查看队列表中是否有可执行任务
@@ -101,12 +100,6 @@ object AppData {
       User("of729", "金卫", RoleEnum.admin, false, false, None, None),
       User("of9999", "龚平", RoleEnum.admin, true, false, None, None)
     ).foreach(UserHelper.create)
-
-    // script version初始化
-    Seq(
-      ScriptVersion(None, ScriptVersionHelper.Master, message = Some("master分支,用于脚本开发和验证,不用于版本上线")),
-      ScriptVersion(None, ScriptVersionHelper.Latest, message = Some("latest分支,用于"))
-    ).foreach(ScriptVersionHelper.create)
   }
 }
 
