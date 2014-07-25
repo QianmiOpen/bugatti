@@ -21,7 +21,7 @@ class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_ite
 
   override def * = (id.?, templateId.?, itemName, itemDesc.?, default.?, order, scriptVersion) <> (TemplateItem.tupled, TemplateItem.unapply _)
   def idx_order = index("idx_tid_order", (templateId, order))
-  def idx_name = index("idx_name", (templateId, itemName), unique = true)
+  def idx_name = index("idx_name", (templateId, itemName, scriptVersion), unique = true)
 }
 object TemplateItemHelper extends PlayCache {
   import models.AppDB._
@@ -54,5 +54,9 @@ object TemplateItemHelper extends PlayCache {
 
   def deleteItemsByTemplateId(templateId: Int) = db withSession { implicit session =>
     qItem.filter(_.templateId === templateId).delete
+  }
+
+  def updateScriptVersion(oldVersion: String, newVersion: String) = db withSession { implicit session =>
+    qItem.filter(_.scriptVersion === oldVersion).map(_.scriptVersion).update(newVersion)
   }
 }

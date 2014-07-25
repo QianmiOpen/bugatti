@@ -1,4 +1,6 @@
 
+import actor.ActorUtils
+import actor.git.ReloadFormulasTemplate
 import actor.task.MyActor
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
@@ -60,6 +62,7 @@ object Global extends GlobalSettings {
           TableQuery[TaskTable] ::
           TableQuery[AreaTable] ::
           TableQuery[EnvironmentProjectRelTable] ::
+          TableQuery[ScriptVersionTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
@@ -72,6 +75,9 @@ object Global extends GlobalSettings {
     if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
       AppTestData.initData
     }
+
+    // 启动时reload一下所有标签
+    ActorUtils.formulasActor ! ReloadFormulasTemplate
 
     SaltTools.refreshHostList(app)
 
