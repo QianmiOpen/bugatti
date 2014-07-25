@@ -9,7 +9,7 @@ import scala.slick.jdbc.JdbcBackend
 /**
  * 项目模板描述表
  */
-case class TemplateItem(id: Option[Int], templateId: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int)
+case class TemplateItem(id: Option[Int], templateId: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int, scriptVersion: String = ScriptVersionHelper.Master)
 class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_item") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def templateId = column[Int]("template_id")                      // 模板编号
@@ -17,14 +17,14 @@ class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_ite
   def itemDesc = column[String]("item_desc", O.Nullable)    // 字段定义的描述
   def default = column[String]("item_default", O.Nullable)
   def order = column[Int]("order", O.Default(0)) // 字段排序
+  def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master))
 
-  override def * = (id.?, templateId.?, itemName, itemDesc.?, default.?, order) <> (TemplateItem.tupled, TemplateItem.unapply _)
+  override def * = (id.?, templateId.?, itemName, itemDesc.?, default.?, order, scriptVersion) <> (TemplateItem.tupled, TemplateItem.unapply _)
   def idx_order = index("idx_tid_order", (templateId, order))
   def idx_name = index("idx_name", (templateId, itemName), unique = true)
 }
 object TemplateItemHelper extends PlayCache {
   import models.AppDB._
-
   val qItem = TableQuery[TemplateItemTable]
 
   def findById(id: Int) = db withSession { implicit session =>

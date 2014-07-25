@@ -9,7 +9,7 @@ import scala.slick.driver.MySQLDriver.simple._
  *
  * @author of546
  */
-case class Environment(id: Option[Int], name: String, remark: Option[String], nfServer: Option[String], ipRange: Option[String], level: Level)
+case class Environment(id: Option[Int], name: String, remark: Option[String], nfServer: Option[String], ipRange: Option[String], level: Level, scriptVersion: String = ScriptVersionHelper.Latest)
 class EnvironmentTable(tag: Tag) extends Table[Environment](tag, "environment") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name", O.DBType("VARCHAR(30)"))
@@ -17,14 +17,13 @@ class EnvironmentTable(tag: Tag) extends Table[Environment](tag, "environment") 
   def ipRange = column[String]("ip_range", O.Nullable, O.DBType("VARCHAR(300)"))
   def remark = column[String]("remark", O.Nullable)
   def level = column[Level]("level", O.Default(LevelEnum.unsafe)) // 项目安全级别，默认为公共的。
+  def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Latest)) // 环境使用salt script的版本
 
-  override def * = (id.?, name, remark.?, nfServer.?, ipRange.?, level) <> (Environment.tupled, Environment.unapply _)
+  override def * = (id.?, name, remark.?, nfServer.?, ipRange.?, level, scriptVersion) <> (Environment.tupled, Environment.unapply _)
   def idx = index("idx_name", name, unique = true)
 }
 object EnvironmentHelper {
-
   import models.AppDB._
-
   val qEnvironment = TableQuery[EnvironmentTable]
 
   def findById(id: Int): Option[Environment] = db withSession { implicit session =>

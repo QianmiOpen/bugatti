@@ -1,5 +1,6 @@
 package actor.task
 
+import actor.ActorUtils
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -24,7 +25,7 @@ object MyActor {
 
   implicit val timeout = Timeout(2 seconds)
 
-  val system = ActorSystem("mySystem", ConfigFactory.load("remotelookup"))
+  val system = ActorUtils.system
   //管理taskQueue中，在同一时间只有一个eid_pid的任务在执行
   val superviseTaskActor = system.actorOf(Props[MyActor], "superviseActor")
   //check salt执行结果

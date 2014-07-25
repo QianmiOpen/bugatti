@@ -2,11 +2,12 @@ package actor.task
 
 import java.io.File
 
-import com.qianmi.bugatti.actors.{TimeOut, SaltResult, SaltCommand}
+import com.qianmi.bugatti.actors.{SaltCommand, SaltResult, TimeOut}
 import enums.TaskEnum
 import play.api.Logger
 import play.api.libs.json.Json
-import utils.SaltTools
+import utils.ConfHelp
+
 import scala.sys.process._
 
 /**
@@ -25,7 +26,7 @@ class LookupActor(path: String) extends Actor {
   var _versionId = Option.empty[Int]
   var _commandSeq = Seq.empty[String]
 
-  val _baseLogPath = SaltTools.logPath
+  val _baseLogPath = ConfHelp.logPath
 
 
   sendIdentifyRequest()

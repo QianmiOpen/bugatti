@@ -1,23 +1,21 @@
 package controllers.actor
 
+import java.io.File
+
+import actor.ActorUtils
 import akka.actor._
-import enums.TaskEnum
-import models.conf.ProjectHelper
-import models.task.{TaskHelper, Task}
-import play.api.libs.iteratee._
-import play.api.libs.json._
 import akka.pattern.ask
 import akka.util.Timeout
-import scala.concurrent.duration._
-import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.concurrent.Akka
-import java.io.File
-import utils.{SaltTools, Reader}
-import play.api.Logger
+import enums.TaskEnum
+import models.task.{Task, TaskHelper}
 import play.api.Play.current
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsString
-import play.api.libs.json.JsObject
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.iteratee._
+import play.api.libs.json.{JsObject, JsString, _}
+import utils.{ConfHelp, Reader}
+
+import scala.concurrent.duration._
 //import models.configure.ProjectHelper
 
 /**
@@ -30,11 +28,9 @@ object TaskLog{
 
 //  val stdFileDir = "/srv/salt"
 
-  val baseLogPath = SaltTools.logPath
+  val baseLogPath = ConfHelp.logPath
 
-  lazy val system = {
-    ActorSystem("MyLogSystem")
-  }
+  lazy val system = ActorUtils.system
 
   var actorsMap = {
     Map.empty[Int, ActorRef]

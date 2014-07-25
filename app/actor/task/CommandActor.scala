@@ -2,25 +2,23 @@ package actor.task
 
 import java.io.File
 
-import akka.actor.{ActorSystem, Props, Actor}
-import com.qianmi.bugatti.actors.{SaltResult, SaltCommand}
-import com.typesafe.config.ConfigFactory
+import akka.actor.{Actor, Props}
+import com.qianmi.bugatti.actors.SaltResult
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
-import models.task.{Task, TaskHelper, TaskCommand}
+import models.task.{Task, TaskCommand, TaskHelper}
 import play.api.Logger
-//import sample.remote.calculator.Add
-import utils.SaltTools
-import scala.sys.process._
-import scala.util.Random
+import utils.ConfHelp
+
 import scala.concurrent.duration._
+import scala.sys.process._
 
 /**
  * Created by jinwei on 14/7/14.
  */
 object CommandActor {
-  val baseLogPath = SaltTools.logPath
+  val baseLogPath = ConfHelp.logPath
   //命令执行过程
   var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
 }
@@ -262,7 +260,7 @@ class CommandActor extends Actor {
       //      val remotePath = "akka.tcp://Spirit@0.0.0.0:2552/user/SpiritCommands"
 //      val system = ActorSystem("LookupSystem", ConfigFactory.load("remotelookup"))
       Logger.info("test111")
-      import MyActor.system.dispatcher
+      import actor.task.MyActor.system.dispatcher
       //      val remotePath = "akka.tcp://CalculatorSystem@127.0.0.1:2552/user/calculator"
       //2、使用myActor创建lookupActor
       //      val lookupActor = MyActor.system.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${order}")

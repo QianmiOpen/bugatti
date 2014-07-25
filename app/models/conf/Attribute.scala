@@ -35,21 +35,11 @@ object AttributeHelper {
     }
   }
 
-  def _create(attr: List[Attribute])(implicit session: JdbcBackend#Session) = {
+  def _create(attr: Seq[Attribute])(implicit session: JdbcBackend#Session) = {
     qAttribute.insertAll(attr: _*)(session)
-  }
-
-  def delete(id: Int) = db withSession { implicit session =>
-    qAttribute.filter(_.id === id).delete
   }
 
   def _deleteByProjectId(projectId: Int)(implicit session: JdbcBackend#Session) = {
     qAttribute.filter(_.projectId === projectId).delete
   }
-
-  def update(id: Int, attr: Attribute) = db withSession { implicit session =>
-    val attr2update = attr.copy(Some(id))
-    qAttribute.filter(_.id === id).update(attr2update)
-  }
-
 }

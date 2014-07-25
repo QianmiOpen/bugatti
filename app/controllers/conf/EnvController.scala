@@ -26,7 +26,8 @@ object EnvController extends BaseController {
       "remark" -> optional(text(maxLength = 250)),
       "nfServer" -> optional(text(maxLength = 30)),
       "ipRange" -> optional(nonEmptyText(maxLength = 300)),
-      "level" -> enums.form.enum(LevelEnum)
+      "level" -> enums.form.enum(LevelEnum),
+      "scriptVersion" -> nonEmptyText(maxLength = 30)
     )(Environment.apply)(Environment.unapply)
   )
 
