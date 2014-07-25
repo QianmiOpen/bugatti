@@ -103,7 +103,7 @@ GET           /task/joinProcess/:taskId                controllers.task.TaskCont
 POST          /task/newTaskQueue                       controllers.task.TaskController.createNewTaskQueue
 POST          /task/removeTaskQueue                    controllers.task.TaskController.removeTaskQueue(qid: Int)
 POST          /task/version                            controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
-GET           /task/templates                          controllers.task.TaskController.getTemplates
+GET           /task/templates                          controllers.task.TaskController.getTemplates(scriptVersion: String)
 # Task Log
 GET           /task/log/:taskId                        controllers.task.TaskController.taskLog(taskId: Int)
 GET           /task/logHeader/:taskId/:byteSize        controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)

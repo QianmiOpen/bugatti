@@ -44,14 +44,17 @@ define(['angular'], function(angular) {
         $scope.wsBool = true
         //选择tab页
         $scope.chooseEnv = function(envId){
+            $scope.scriptVersion = ""
             $scope.activeEnv = envId
-            //触发查询环境下的项目列表
-            $scope.showProjects()
-            //过滤正在执行任务的项目集 -> 使用websocket
-            if($scope.wsBool){
-                $scope.wsInvoke()
-                $scope.wsBool = false
+            //获取模板
+            for(var index in $scope.envs){
+                var envObj = $scope.envs[index]
+                if(envObj.id == envId){
+                    $scope.scriptVersion = envObj.scriptVersion
+                }
             }
+            console.table($scope.envs)
+            $scope.getTemplates()
         }
 
 //=====================================项目========================================
@@ -61,24 +64,34 @@ define(['angular'], function(angular) {
                 for(var p in data){
                     $scope.pros.push(data[p])
                 }
+
+                //过滤正在执行任务的项目集 -> 使用websocket
+                if($scope.wsBool){
+                    $scope.wsInvoke()
+                    $scope.wsBool = false
+                }
                 //查询任务表task 返回 projectId, status, string, taskId
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
                     console.log($scope.projectStatus)
-                    $scope.getTemplates()
+                    $scope.mergeTemplates()
 
                 })
             })
         }
 
-
+        $scope.mergeTemplates = function(){
+            //按钮
+            $scope.projectStatus.map($scope.getProjectTemplates)
+        }
         $scope.getTemplates = function(){
+            console.log($scope.scriptVersion)
             //查询项目模板（操作按钮）
-            TaskService.getTemplates(function(data){
+            TaskService.getTemplates($scope.scriptVersion, function(data){
                 $scope.templates = data
-                //按钮
-                $scope.projectStatus.map($scope.getProjectTemplates)
+                //触发查询环境下的项目列表
+                $scope.showProjects()
             })
         }
 
@@ -159,7 +172,7 @@ define(['angular'], function(angular) {
                 $scope.lastTasks = data
                 $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
                 console.log($scope.projectStatus)
-                $scope.getTemplates()
+                $scope.mergeTemplates()
             })
         }
 

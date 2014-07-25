@@ -33,6 +33,10 @@ object TaskTemplateHelper{
     qTaskTemplate.filter(_.id === tid).first
   }
 
+  def findByScriptVerison(scriptVersion: String) = db withSession { implicit session =>
+    qTaskTemplate.filter(_.scriptVersion === scriptVersion).list
+  }
+
   def all = db withSession {implicit session =>
     qTaskTemplate.sortBy(x => (x.typeId, x.orderNum)).list()
   }
