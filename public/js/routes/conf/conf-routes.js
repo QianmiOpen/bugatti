@@ -37,6 +37,16 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('conf.project.version.conf.upload', {
+            url: "/upload",
+            views: {
+                "conf-info@conf.project.version.conf": {
+                    templateUrl: "partials/conf/project/uiview/conf-upload.html",
+                    controller: 'ConfUploadCtrl'
+                }
+            }
+        });
+
         $stateProvider.state('conf.project.version.conf.detail', {
             url: "/:cid",
             views: {
@@ -76,7 +86,6 @@ define(['angular'], function(angular) {
                 }
             }
         });
-
 
 
     }]);

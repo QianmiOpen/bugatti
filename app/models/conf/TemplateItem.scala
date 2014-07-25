@@ -9,7 +9,15 @@ import scala.slick.jdbc.JdbcBackend
 /**
  * 项目模板描述表
  */
-case class TemplateItem(id: Option[Int], templateId: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int, scriptVersion: String = ScriptVersionHelper.Master)
+case class TemplateItem(id: Option[Int], templateId: Option[Int], itemName: String, itemDesc: Option[String], default: Option[String], order: Int, scriptVersion: String = ScriptVersionHelper.Master) {
+  override def equals(that: Any) = {
+    that match {
+      case ti: TemplateItem => ti.itemName == this.itemName
+      case _ => false
+    }
+  }
+}
+
 class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_item") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def templateId = column[Int]("template_id")                      // 模板编号
@@ -32,7 +40,7 @@ object TemplateItemHelper extends PlayCache {
   }
 
   def findByTemplateId(templateId: Int): Seq[TemplateItem] = db withSession { implicit session =>
-    qItem.filter(_.templateId === templateId).sortBy(_.order asc).list
+    qItem.filter(_.templateId === templateId).sortBy(_.order).list.toSet.toSeq
   }
 
   def create(item: TemplateItem) = db withSession { implicit session =>

@@ -1,11 +1,14 @@
 package controllers.conf
 
-import controllers.BaseController
+import controllers.{BaseController}
 import enums.{ModEnum, FuncEnum}
 import models.conf._
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
+import play.api.libs.Files
+import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
 
 /**
@@ -19,6 +22,9 @@ object ConfController extends BaseController {
   def msg(user: String, ip: String, msg: String, data: Conf) =
     Json.obj("mod" -> ModEnum.conf.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
+  // error?
+//  implicit val func = FuncEnum.project
+
   val confForm = Form(
     mapping(
       "id" -> optional(number),
@@ -28,6 +34,7 @@ object ConfController extends BaseController {
       "jobNo" -> ignored(""),
       "name" -> optional(text),
       "path" -> nonEmptyText,
+      "fileType" -> optional(text),
       "content" -> default(text, ""),
       "remark" -> optional(text),
       "updated" -> default(jodaDate("yyyy-MM-dd HH:mm:ss"), DateTime.now())
@@ -81,6 +88,35 @@ object ConfController extends BaseController {
           Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
       }
     )
+  }
+
+  val fileMaxSizeExceeded = 1 * 1024 * 1024
+  val fileSuffixWhiteList = List("key", "conf", "properties", "ini", "xml", "txt")
+  def _checkWhiteList(fileName: String) = {
+    val suffix = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase
+    fileSuffixWhiteList.contains(suffix)
+  }
+
+  def upload = AuthAction[TemporaryFile](FuncEnum.project) { implicit request =>
+    val reqConfForm: Option[ConfForm] = confForm.bindFromRequest().fold(
+      formWithErrors => None,
+      _confForm => Some(_confForm)
+    )
+    request.body.asMultipartFormData.map { body =>
+      reqConfForm.map { _confForm =>
+        if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user)) Forbidden
+        else { // todo security if contentType
+          val result = body.files.filter(f => f.ref.file.length() < fileMaxSizeExceeded && _checkWhiteList(f.filename)).map { tempFile =>
+            val fileContent = Files.readFile(tempFile.ref.file)
+            val filePath = _confForm.path
+            val _path = if (filePath.last != '/') filePath + '/' else filePath
+            val confFormat = _confForm.copy(jobNo = request.user.jobNo, name = Some(tempFile.filename), path = _path + tempFile.filename, content = fileContent)
+            Json.obj("fileName" -> tempFile.filename, "status" -> ConfHelper.create(confFormat))
+          }
+          Ok(Json.obj("r" -> result))
+        }
+      } getOrElse(BadRequest)
+    } getOrElse(BadRequest)
   }
 
   // ===========================================================================
@@ -142,7 +178,7 @@ object ConfController extends BaseController {
           // insert all
           confs.foreach { c =>
             val content = ConfContentHelper.findById(c.id.get)
-            val confForm = ConfForm(None, copyForm.envId, c.projectId, copyForm.versionId, c.jobNo, Some(c.name), c.path, if (content != None) content.get.content else "", c.remark, c.updated)
+            val confForm = ConfForm(None, copyForm.envId, c.projectId, copyForm.versionId, c.jobNo, Some(c.name), c.path, c.fileType, if (content != None) content.get.content else "", c.remark, c.updated)
             ConfHelper.create(confForm)
           }
           val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.remoteAddress,

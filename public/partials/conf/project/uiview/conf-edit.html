@@ -1,13 +1,10 @@
 <form name="form" class="form-horizontal" novalidate>
-    <div class="navbar-text col-sm-10" style="padding-left:0px;">
+    <div class="col-sm-10 p0">
         / <input ng-model="conf.path" class="form-control" style="width:45%;display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
-        &nbsp; or &nbsp;
-        <a href="" class="navbar-link" ng-click="cancel()">cancel</a>
     </div>
 
     <div class="clearfix"></div>
-
-    <div class="col-sm-10">
+    <div class="col-sm-10 mt15 p0">
         <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
@@ -17,14 +14,15 @@
         }" ng-model="conf.content"></div>
     </div>
 
-    <div class="col-sm-10 mt15 clearfix">
+    <div class="clearfix"></div>
+    <div class="col-sm-10 mt15 p0">
         <label class="col-sm-2 control-label">描述：</label>
         <div class="col-sm-8">
             <textarea ng-model="conf.remark" class="form-control" rows="3" placeholder="对文件的备注内容，选填。" maxlength="500"></textarea>
         </div>
     </div>
 
-    <div class="col-sm-10 mt15">
+    <div class="col-sm-10 mt15 p0">
         <div class="text-right">
             <button class="btn btn-success col-sm-2 navbar-right" ng-click="update()" ng-disabled="form.$invalid"> 修改文件 </button>
             <div ng-show="form.path.$dirty && form.path.$invalid" class="has-error col-sm-8 navbar-right">

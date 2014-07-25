@@ -18,8 +18,8 @@ import scala.slick.jdbc.JdbcBackend
  */
 case class User(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime])
 case class UserForm(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], functions: String) {
-  def toUser = User(jobNo, name, role, superAdmin, locked, lastIp, lastVisit)
-  def toPermission = Permission(jobNo, functions.split(",").filterNot(_.isEmpty).map(i => FuncEnum(i.toInt)).toList)
+  def toUser = User(jobNo.toLowerCase, name, role, superAdmin, locked, lastIp, lastVisit)
+  def toPermission = Permission(jobNo.toLowerCase, functions.split(",").filterNot(_.isEmpty).map(i => FuncEnum(i.toInt)).toList)
 }
 
 class UserTable(tag: Tag) extends Table[User](tag, "app_user") {

@@ -42,10 +42,8 @@ object VersionController extends BaseController {
     Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
     // 2、查询release、snapshot版本
     val result = (groupId, artifactId) match {
-      case (Some(gid), Some(aid)) =>
-        _makeVersion(gid, aid, false) ::: _makeVersion(gid, aid, true)
-      case _ =>
-        List.empty[String]
+      case (Some(gid), Some(aid)) => _makeVersion(gid, aid, false) ::: _makeVersion(gid, aid, true)
+      case _ => List.empty[String]
     }
     // 3、拼接版本号，按照版本号逆序
     val resultReverse = result.sorted.reverse

@@ -14,7 +14,7 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class ConfLog(id: Option[Int], confId: Int, envId: Int, versionId: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
+case class ConfLog(id: Option[Int], confId: Int, envId: Int, versionId: Int, jobNo: String, name: String, path: String, fileType: Option[String], remark: Option[String], updated: DateTime)
 
 class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -22,12 +22,13 @@ class ConfLogTable(tag: Tag) extends Table[ConfLog](tag, "conf_log") {
   def envId = column[Int]("env_id")     // 环境编号
   def versionId = column[Int]("version_id") // 版本编号
   def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
-  def name = column[String]("name", O.DBType("VARCHAR(50)"))
-  def path = column[String]("path", O.DBType("VARCHAR(500)"))
+  def name = column[String]("file_name", O.DBType("VARCHAR(100)"))
+  def path = column[String]("file_path", O.DBType("VARCHAR(200)"))
+  def fileType = column[String]("file_type", O.Nullable, O.DBType("VARCHAR(50)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
-  override def * = (id.?, confId, envId, versionId, jobNo, name, path, remark.?, updated) <> (ConfLog.tupled, ConfLog.unapply _)
+  override def * = (id.?, confId, envId, versionId, jobNo, name, path, fileType.?, remark.?, updated) <> (ConfLog.tupled, ConfLog.unapply _)
 
   def idx = index("idx_cid", (confId, updated))
 }
