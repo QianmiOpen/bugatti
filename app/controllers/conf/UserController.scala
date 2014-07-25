@@ -48,17 +48,17 @@ object UserController extends BaseController {
   }
 
   def permissions(jobNo: String) = Action {
-    Ok(Json.toJson(PermissionHelper.findByJobNo(jobNo)))
+    Ok(Json.toJson(PermissionHelper.findByJobNo(jobNo.toLowerCase)))
   }
 
   def delete(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
-    UserHelper.findByJobNo(jobNo) match {
+    UserHelper.findByJobNo(jobNo.toLowerCase) match {
       case Some(user) =>
         if (request.user.role == RoleEnum.user) Forbidden
         else if (user.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
-          Ok(Json.toJson(UserHelper.delete(jobNo)))
+          Ok(Json.toJson(UserHelper.delete(user.jobNo)))
         }
       case None =>
         NotFound
@@ -96,7 +96,7 @@ object UserController extends BaseController {
         else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", toUser))
-          Ok(Json.obj("r" -> UserHelper.update(jobNo, toUser, userForm.toPermission)))
+          Ok(Json.obj("r" -> UserHelper.update(jobNo.toLowerCase, toUser, userForm.toPermission)))
         }
       }
     )

@@ -10,7 +10,10 @@ requirejs.config({
     shim: { "angular-ui-ace": [ "angular", "ace"] }
 });
 
-require(['angular', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes', 'angular-ui-router', 'angular-animate', 'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace'],
+require(['angular', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
+        'angular-ui-router', 'angular-animate',
+        'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
+        'angular-file-upload', 'angular-file-upload-shim'],
     function(angular) {
 
         // Declare app level module which depends on filters, and services

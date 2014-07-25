@@ -27,7 +27,7 @@
     </tr>
     <tr>
         <td class="text-right col-sm-3">级别：</td>
-        <td>{{env.level | level}}</td>
+        <td>{{env.level | level}}<i ng-if="env.level == 'safe'" class="star"></i></td>
     </tr>
     </tbody>
 

@@ -6,8 +6,85 @@
 <ul class="nav nav-tabs" role="tablist">
     <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs">
         <a ng-if="e.level == 'unsafe'" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}</a>
-        <a ng-if="e.level == 'safe'" has-project-safe="{{project.id}}" ng-show="hasProjectSafe_" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}</a>
+        <a ng-if="e.level == 'safe'" has-project-safe="{{project.id}}" ng-show="hasProjectSafe_" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}
+            <sup><i class="star"></i></sup>
+        </a>
     </li>
 </ul>
 
-<div ui-view="conf-info"></div>
+<div class="btn-group mtb15">
+    <button ui-sref="conf.project.version.conf.upload({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default">
+        <i class="glyphicon glyphicon-upload"></i>上传
+    </button>
+    <button ui-sref="conf.project.version.conf.create({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default">
+        <i class="glyphicon glyphicon-plus"></i>
+        新建
+    </button>
+    <button ng-click="openModal($stateParams.eid, $stateParams.vid)" type="button" class="btn btn-default">一键拷贝</button>
+    <a ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
+</div>
+
+<div class="clearfix"></div>
+
+<div ui-view="conf-info"></div>  <!-- include -->
+
+<style type="text/css">
+    .modal-copy .modal-dialog { top: 220px; width: 400px;}
+    .modal-copy .modal-dialog .modal-footer { text-align: center }
+</style>
+
+<script type="text/ng-template" id="modalCopy.html">
+    <div class="modal-header">
+        <h3 class="modal-title text-center">快捷拷贝系统已有配置文件</h3>
+    </div>
+    <div class="modal-body">
+
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="selectVersion" class="col-sm-4 control-label">版本选择：</label>
+                <div class="col-sm-8">
+                    <select id="selectVersion" class="form-control" ng-model="version" ng-options="v.id as v.vs for v in versions"></select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label">环境选择：</label>
+                <div class="col-sm-8">
+
+                    <label class="radio-inline" ng-repeat="e in envs">
+                        <input type="radio" name="env" ng-model="$parent.env" value="{{e.id}}">
+                        {{e.name}}
+                    </label>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-8">
+                    <div class="checkbox">
+                        <label>
+                            <input ng-model="override" type="checkbox"> 存在覆盖
+                            <sup class="btn-info" href="" tooltip-placement="right" tooltip="拷贝方式，存在相同文件路径名则替换!">?</sup>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group has-error" style="margin-bottom: -20px;">
+                <div class="col-sm-12 text-center">
+                    <label class="control-label">
+                        警告：将以此方式拷贝所有文件至当前环境
+                    </label>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok(env, version, override)">确认</button>
+        &nbsp;&nbsp;
+        <button class="btn btn-default" ng-click="cancel()">取消</button>
+    </div>
+</script>

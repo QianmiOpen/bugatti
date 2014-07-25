@@ -1,0 +1,53 @@
+
+<div class="upload-div">
+<form name="form" novalidate>
+    <table>
+        <tr class="form-group">
+            <td>设置上传文件路径：</td>
+            <td colspan="2"><input type="text" style="width:300px;" class="form-control" name="filePath" ng-model="filePath" placeholder="必填，例如：/conf/abc" required></td>
+            <td><div class="has-error"> <span ng-show="form.filePath.$error.required"  class="control-label">&nbsp;请填写文件路径</span></div></td>
+        </tr>
+        <tbody ng-if="filePath.length > 0">
+        <tr><td>&nbsp;</td></tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><div ng-file-select="onFileSelect($files)" data-multiple="true" onclick="this.value = null" class="upload-button">点击选择上传文件</div></td>
+        </tr>
+        <tr><td>&nbsp;</td><td>or</td></tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><div class="drop-box" ng-file-drop="onFileSelect($files)" ng-file-drop-available="dropSupported=true" ng-file-drag-over-class="dragOverClass($event)">拖拽文件到这里</div></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br/>
+    <div class="err" ng-show="errorMsg != null">{{errorMsg}}</div>
+    <br/>
+    <div ng-show="selectedFiles != null">
+        文件列表:
+        <div class="sel-file" ng-repeat="f in selectedFiles">
+            {{($index + 1) + '.'}}
+            <img ng-show="dataUrls[$index]" ng-src="{{dataUrls[$index]}}">
+            <button class="button" ng-click="start($index)" ng-show="progress[$index] < 0">Start</button>
+				<span class="upload-progress" ng-show="progress[$index] >= 0">
+					<div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
+				</span>
+            <button class="button" ng-click="abort($index)" ng-show="hasUploader($index) && progress[$index] < 100">Abort</button>
+            {{f.name}} - size: {{f.size}}B - type: {{f.type}}
+        </div>
+    </div>
+    <div class="response" ng-show="uploadResult.length > 0">
+        Server Response:
+        <ul class="list-unstyled">
+            <li ng-repeat="result in uploadResult">
+                <ul>
+                    <li ng-repeat="item in result.r">
+                        fileName: {{item.fileName}}, status: {{item.status == 1? '成功': '失败'}}
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</form>
+</div>

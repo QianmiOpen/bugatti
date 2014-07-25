@@ -81,6 +81,7 @@ GET           /conf/all                                controllers.conf.ConfCont
 GET           /conf/:id                                controllers.conf.ConfController.show(id: Int)
 DELETE        /conf/:id                                controllers.conf.ConfController.delete(id: Int)
 POST          /conf                                    controllers.conf.ConfController.save
+POST          /conf/upload                             controllers.conf.ConfController.upload
 POST          /conf/copy                               controllers.conf.ConfController.copy
 PUT           /conf/:id                                controllers.conf.ConfController.update(id: Int)
 

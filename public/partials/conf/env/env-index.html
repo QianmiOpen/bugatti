@@ -18,7 +18,10 @@
         <tbody>
         <tr ng-repeat="env in envs">
             <td><a tooltip="{{env.name}}" ui-sref="conf.env.detail({id: env.id})">{{env.name}}</a></td>
-            <td><span tooltip="{{env.level | level}}">{{env.level | level}}</span></td>
+            <td><span tooltip="{{env.level | level}}">{{env.level | level}}
+                <sup><i ng-if="env.level == 'safe'" class="star"></i></sup>
+            </span>
+            </td>
             <td><span tooltip="{{env.nfServer}}">{{env.nfServer}}</span></td>
             <td><span tooltip="{{env.ipRange}}">{{env.ipRange}}</span></td>
             <td><span tooltip="{{env.remark}}">{{env.remark}}</span></td>

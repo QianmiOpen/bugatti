@@ -93,7 +93,7 @@
         <ul>
             <li ng-repeat="m in members" ng-if="m.level == 'safe'">
                 <div class="pic">
-                    <img src="/img/user_normal.jpg" alt="test"/>
+                    <img src="/img/user_star.png" alt="test"/>
                     <div class="u_actions" ng-show="hasProjectSafe_">
                         <span class="gact" title="降为成员">
                             <a href="" ng-click="memberDown(m.id, '真的要把' + m.jobNo + '降为委员？')" title="把{{m.jobNo}}降为委员">v</a>
@@ -108,7 +108,7 @@
     </div>
 </div>
 
-<div class="panel panel-default"  >
+<div class="panel panel-default">
     <div class="panel-heading">
         委员
         &nbsp;&nbsp;

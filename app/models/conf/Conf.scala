@@ -12,9 +12,10 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  *
  * @author of546
  */
-case class Conf(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: String, path: String, remark: Option[String], updated: DateTime)
-case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: Option[String], path: String, content: String, remark: Option[String], updated: DateTime) {
-  def toConf = Conf(id, envId, projectId, versionId, jobNo, path.substring(path.lastIndexOf("/") + 1), path, remark, updated)
+case class Conf(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: String, path: String, fileType: Option[String], remark: Option[String], updated: DateTime)
+case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: Option[String], path: String, fileType: Option[String], content: String, remark: Option[String], updated: DateTime) {
+  def _name = name.map(_.toString).getOrElse(path.substring(path.lastIndexOf("/") + 1))
+  def toConf = Conf(id, envId, projectId, versionId, jobNo, _name, path, Some(path.substring(path.lastIndexOf(".") + 1)), remark, updated)
   // windows = \r\n | \n\r
   // linux, unix = \n
   // mac = \r
@@ -27,12 +28,13 @@ class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def projectId = column[Int]("project_id") // 项目编号
   def versionId = column[Int]("version_id") // 项目版本编号
   def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
-  def name = column[String]("name", O.DBType("VARCHAR(50)"))
-  def path = column[String]("path", O.DBType("VARCHAR(200)"))
+  def name = column[String]("file_name", O.DBType("VARCHAR(100)"))
+  def path = column[String]("file_path", O.DBType("VARCHAR(300)"))
+  def fileType = column[String]("file_type", O.Nullable, O.DBType("VARCHAR(50)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))
 
-  override def * = (id.?, envId, projectId, versionId, jobNo, name, path, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
+  override def * = (id.?, envId, projectId, versionId, jobNo, name, path, fileType.?, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
 
   def idx_vid = index("idx_vid", versionId)
   def idx_path = index("idx_path", (envId, versionId, path), unique = true)
@@ -74,7 +76,7 @@ object ConfHelper extends PlayCache {
   def delete(id: Int) = db withTransaction { implicit session =>
     findById(id) match {
       case Some(conf) =>
-        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.fileType, conf.remark, conf.updated))
         qConf.filter(_.id === id).delete
         ConfContentHelper.findById(id) match {
           case Some(content) =>
@@ -91,7 +93,7 @@ object ConfHelper extends PlayCache {
   def update(id: Int, confForm: ConfForm) = db withSession { implicit session =>
     findById(id) match {
       case Some(conf) =>
-        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.remark, conf.updated))
+        val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.fileType, conf.remark, conf.updated))
         qConf.filter(_.id === id).update(confForm.toConf.copy(Some(id)))
         ConfContentHelper.findById(id) match {
           case Some(content) =>

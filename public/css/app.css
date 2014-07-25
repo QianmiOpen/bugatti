@@ -54,6 +54,7 @@ code {
 }
 .m15 { margin: 15px;}
 .mt15{ margin-top: 15px;}
+.mtb15{ margin: 15px 0}
 .mt-16 {
     margin-top: -16px;
 }
@@ -108,6 +109,115 @@ code {
 .tooltip-inner {
     word-wrap:break-word;
     white-space:pre-wrap;
+}
+
+/* file upload */
+
+.upload-button {
+    width: 135px;
+    Height: 30px;
+    display: inline-block;
+    line-height: 30px;
+    padding: 0 10px;
+    background: #CCC;
+    appearance: button;
+    -moz-appearance: button; /* Firefox */
+    -webkit-appearance: button; /* Safari and Chrome */
+}
+
+.sel-file {
+    padding: 1px 5px;
+    font-size: smaller;
+    color: grey;
+}
+
+.sel-file img {
+    float: left;
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+}
+
+.response {
+    padding-top: 30px;
+}
+
+.response>ul {
+    /*list-style-type: decimal;*/
+}
+
+.response li, .response .reqh {
+    color: blue;
+    /*font-size: smaller;*/
+    padding-bottom: 5px;
+}
+
+.upload-progress {
+    display: inline-block;
+    width: 100px;
+    border: 3px groove #CCC;
+}
+
+.upload-progress div {
+    font-size: smaller;
+    background: orange;
+    width: 0;
+}
+
+.drop-box {
+    background: #F8F8F8;
+    border: 5px dashed #DDD;
+    width: 200px;
+    height: 65px;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.drop-box.dragover {
+    border: 5px dashed blue;
+}
+
+.drop-box.dragover-err {
+    border: 5px dashed red;
+}
+
+/* for IE*/
+.js-fileapi-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+button {
+    padding: 1px 5px;
+    font-size: smaller;
+    margin: 0 3px;
+}
+
+
+.sub {
+    font-size: smaller;
+    color: #777;
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+.err {
+    font-size: 12px;
+    color: #C53F00;
+    margin: 15px;
+    padding: 15px;
+    background-color: #F0F0F0;
+    border: 1px solid black;
+}
+
+.star {
+    display: inline-block;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: url(../img/star.png) no-repeat;
+    width: 16px; /* Width of new image */
+    height: 16px; /* Height of new image */
+    padding-left: 0px; /* Equal to width of new image */
 }
 
 
