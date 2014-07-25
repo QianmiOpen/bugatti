@@ -1,6 +1,7 @@
-import java.util.{List => JList, Map => JMap}
 
-import controllers.actor.TaskProcess
+import actor.ActorUtils
+import actor.git.ReloadFormulasTemplate
+import actor.task.MyActor
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
 import models.conf._
@@ -11,7 +12,7 @@ import org.pac4j.core.client.Clients
 import org.pac4j.play.Config
 import play.api.Play.current
 import play.api._
-import utils.{ConfHelp, FormulasHelp, SaltTools}
+import utils.SaltTools
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
@@ -61,163 +62,105 @@ object Global extends GlobalSettings {
           TableQuery[TaskTable] ::
           TableQuery[AreaTable] ::
           TableQuery[EnvironmentProjectRelTable] ::
+          TableQuery[ScriptVersionTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
         }
-
-        AppData.initData
       }
+
+      AppData.initData
     }
 
     if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
-      AppDB.db.withSession { implicit session =>
-        AppTestData.userScript
-        AppTestData.projectScript
-        AppTestData.memberScript
-        AppTestData.environmentScript
-        AppTestData.permissionScript
-        AppTestData.taskScript
-        AppTestData.taskCommandScript
-        AppTestData.taskQueueScript
-        AppTestData.taskSchemeScript
-        AppTestData.versionScript
-        AppTestData.attributeScript
-        AppTestData.areaScript
-        AppTestData.environmentProjectRelScript
-      }
-
+      AppTestData.initData
     }
 
-    FormulasHelp.checkGitWorkDir(app)
+    // 启动时reload一下所有标签
+    ActorUtils.formulasActor ! ReloadFormulasTemplate
 
     SaltTools.refreshHostList(app)
-    SaltTools.baseLogPath(app)
-    ConfHelp.initConfPath(app)
 
     //查看队列表中是否有可执行任务
     val set = TaskQueueHelper.findEnvId_ProjectId()
-    set.foreach{
+    set.foreach {
       s =>
-        TaskProcess.checkQueueNum(s._1, s._2)
-        TaskProcess.executeTasks(s._1, s._2)
+        //        TaskProcess.checkQueueNum(s._1, s._2)
+        //        TaskProcess.executeTasks(s._1, s._2)
+        MyActor.createNewTask(s._1, s._2)
     }
 
-    TaskProcess.generateSchedule
+    MyActor.refreshSyndic
+    MyActor.generateSchedule
   }
 }
 
 
 object AppData {
 
-  def initData(implicit session: Session) = {
-    val U = TableQuery[UserTable]
+  def initData = {
+    // 初始化超级管理员
     Seq(
       User("of546", "李允恒", RoleEnum.admin, true, false, None, None),
       User("of557", "彭毅", RoleEnum.admin, false, false, None, None),
       User("of729", "金卫", RoleEnum.admin, false, false, None, None),
       User("of9999", "龚平", RoleEnum.admin, true, false, None, None)
-    ).foreach(U.insert)
+    ).foreach(UserHelper.create)
   }
 }
 
 object AppTestData {
 
-  // 用户表初始化
-  def userScript(implicit session: Session) = {
-    val U = TableQuery[UserTable]
-//    Seq(
-//      User("of546", "李允恒", RoleEnum.admin, false, None, None),
-//      User("of557", "彭毅", RoleEnum.admin, false, None, None),
-//      User("of729", "金卫", RoleEnum.admin, false, None, None),
-//      User("of999", "龚平", RoleEnum.admin, false, None, None)
-//    ).foreach(U.insert)
-  }
+  def initData = {
 
-  // 项目表初始化
-  def projectScript(implicit session: Session) = {
-    val q = TableQuery[ProjectTable]
-    if (!MTable.getTables(q.baseTableRow.tableName).list.isEmpty) q.ddl.drop
-    q.ddl.create
-
-    val seq = Seq(
+    // 项目表初始化
+    Seq(
       Project(None, "cardbase-master", 1, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
       Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
       Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
       Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
       Project(None, "qianmi3", 1, 5, Option(5), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
-    )
-    q.insertAll(seq: _*)
-  }
+    ).foreach(ProjectHelper.create)
 
-  def attributeScript(implicit session: Session) = {
-    val q = TableQuery[AttributeTable]
-    val seq = Seq(
-      Attribute(None, Option(1), "groupId", Option("com.ofpay")),
-      Attribute(None, Option(1), "artifactId", Option("cardserverimpl")),
-      Attribute(None, Option(1), "unpacked", Option("false"))
-    )
-    q.insertAll(seq: _*)
-  }
+    AppDB.db.withSession { implicit session =>
+      // 初始化“cardbase-master”的attribute
+      AttributeHelper._create(Seq(
+        Attribute(None, Option(1), "groupId", Option("com.ofpay")),
+        Attribute(None, Option(1), "artifactId", Option("cardserverimpl")),
+        Attribute(None, Option(1), "unpacked", Option("false"))
+      ))
+    }
 
-  //版本初始化
-  def versionScript(implicit session: Session) = {
-    val q = TableQuery[VersionTable]
-    val seq = Seq(
+    //版本初始化
+    Seq(
       Version(None, 1, "1.6.4-SNAPSHOT", new DateTime(2014, 6, 30, 7, 31)),
       Version(None, 1, "1.6.3-RELEASE", new DateTime(2014, 6, 29, 7, 31)),
       Version(None, 1, "1.6.3-SNAPSHOT", new DateTime(2014, 6, 28, 7, 31)),
       Version(None, 1, "1.6.2-RELEASE", new DateTime(2014, 6, 28, 7, 31)),
       Version(None, 1, "1.6.2-SNAPSHOT", new DateTime(2014, 6, 27, 7, 31)),
       Version(None, 1, "1.6.1-RELEASE", new DateTime(2014, 6, 26, 7, 31))
-    )
-    q.insertAll(seq: _*)
-  }
+    ).foreach(VersionHelper.create)
 
-  // 成员
-  def memberScript(implicit session: Session) = {
-  }
-
-  // 环境
-  def environmentScript(implicit session: Session) = {
-    Seq(
+    var seq = Seq(
       Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
-    ).foreach(EnvironmentHelper.create)
-  }
+    )
+    //    for (i <- 5 to 55) {
+    //      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
+    //    }
+    seq.foreach(EnvironmentHelper.create)
 
-  def environmentProjectRelScript(implicit session: Session) = {
+    // 初始化环境关系表
     Seq(
-      EnvironmentProjectRel(None, Option(3), Option(1), "t-syndic", "t-minion", "172.19.3.134")
+      EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "d6a597315b01", "172.19.3.134")
+      //EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "8e6499e6412a", "172.19.3.134")
     ).foreach(EnvironmentProjectRelHelper.create)
-  }
 
-  // 权限
-  def permissionScript(implicit session: Session) = {
-  }
-
-  // 任务
-  def taskScript(implicit session: Session) = {
-  }
-
-  //任务命令关联表
-  def taskCommandScript(implicit session: Session) = {
-  }
-
-  //任务队列表
-  def taskQueueScript(implicit session: Session) = {
-  }
-
-  //定时任务表
-  def taskSchemeScript(implicit session: Session) = {
-  }
-
-  def areaScript(implicit session: Session) = {
-    Seq (
-      Area(None, "测试", "t-syndic", "172.19.3.149"),
-      Area(None, "test-syndic", "t-syndic", "172.19.3.132"),
+    // 初始化区域
+    Seq(
+      Area(None, "测试", "t-syndic", "192.168.59.3"),
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
   }

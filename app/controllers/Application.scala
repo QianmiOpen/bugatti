@@ -60,6 +60,16 @@ object Application extends ScalaController with Security {
     }
   }
 
+//  def login = Action { implicit request =>
+//    true match {
+//      case true =>
+//        val token = java.util.UUID.randomUUID().toString
+//        Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> "of729") // jobNo
+//      case _ =>
+//        Ok(html.template.ldap_callback_forbidden.render(siteDomain))
+//    }
+//  }
+
   def logout = Action { implicit request =>
     request.headers.get(AuthTokenHeader) map { token =>
       Ok.discardingToken(token)
@@ -118,6 +128,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.EnvController.update,
         conf.routes.javascript.EnvController.delete,
         conf.routes.javascript.EnvController.showAuth,
+        conf.routes.javascript.EnvController.allScriptVersion,
 
         // project
         conf.routes.javascript.ProjectController.show,
@@ -176,6 +187,7 @@ object Application extends ScalaController with Security {
 
         //task
         task.routes.javascript.TaskController.findLastTaskStatus,
+        task.routes.javascript.TaskController.findLastStatus,
         task.routes.javascript.TaskController.joinProcess,
         task.routes.javascript.TaskController.getVersions,
         task.routes.javascript.TaskController.createNewTaskQueue,

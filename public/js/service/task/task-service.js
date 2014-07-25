@@ -12,14 +12,17 @@ define(['angular'], function(angular) {
             getLastTaskStatus: function(envId, projects, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.findLastTaskStatus().url, {'envId': envId, 'projects': projects}).success(callback)
             },
+            findLastStatus: function(envId, projectId, callback){
+                $http(PlayRoutes.controllers.task.TaskController.findLastStatus(envId, projectId)).success(callback)
+            },
             createNewTaskQueue: function(taskQueue, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.createNewTaskQueue().url, {'taskQueue': taskQueue}).success(callback)
             },
             removeTaskQueue: function(qid, callback){
                 $http(PlayRoutes.controllers.task.TaskController.removeTaskQueue(qid)).success(callback)
             },
-            getTemplates: function(callback){
-                $http(PlayRoutes.controllers.task.TaskController.getTemplates()).success(callback)
+            getTemplates: function(scriptVersion, callback){
+                $http(PlayRoutes.controllers.task.TaskController.getTemplates(scriptVersion)).success(callback)
             }
         }
     });

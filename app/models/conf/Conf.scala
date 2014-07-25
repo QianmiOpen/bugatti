@@ -29,7 +29,7 @@ class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def versionId = column[Int]("version_id") // 项目版本编号
   def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
   def name = column[String]("file_name", O.DBType("VARCHAR(100)"))
-  def path = column[String]("file_path", O.DBType("VARCHAR(300)"))
+  def path = column[String]("file_path", O.DBType("VARCHAR(255)"))
   def fileType = column[String]("file_type", O.Nullable, O.DBType("VARCHAR(50)"))
   def remark = column[String]("remark", O.Nullable, O.DBType("VARCHAR(500)")) // 回复的备注内容
   def updated= column[DateTime]("updated", O.Default(DateTime.now()))

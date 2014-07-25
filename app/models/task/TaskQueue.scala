@@ -108,6 +108,11 @@ object TaskQueueHelper{
     qTaskQueue.filter(_.id === tq.id).delete
   }
 
+  def deleteById(tqId: Int): Int = db withSession{implicit session =>
+    Logger.info("remove from taskQueue")
+    qTaskQueue.filter(_.id === tqId).delete
+  }
+
   def update(tq: TaskQueue, taskId: Int) = db withSession{ implicit session =>
     qTaskQueue.filter(_.id === tq.id).update(tq.copy(status = TaskEnum.TaskProcess).copy(taskId = Option(taskId)))
   }

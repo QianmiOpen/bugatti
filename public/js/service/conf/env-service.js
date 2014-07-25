@@ -29,6 +29,9 @@ define(['angular'], function(angular) {
             },
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.EnvController.delete(id)).success(callback);
+            },
+            allScriptVersion: function(callback) {
+                $http(PlayRoutes.controllers.conf.EnvController.allScriptVersion()).success(callback);
             }
         }
     });

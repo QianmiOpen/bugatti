@@ -13,44 +13,58 @@ import utils.TaskTools
 class TaskExecute extends Actor{
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
+  var _tqId = 0
+  var _envId = 0
+  var _projectId = 0
+
   def receive = {
-    case TaskGenerateCommand(tq) => {
-      //1、获取任务名称
-      val taskName = TaskTemplateHelper.findById(tq.taskTemplateId).name
-      //2、insert 任务表
-      val taskId = TaskHelper.addByTaskQueue(tq)
-      //获取队列信息
-      val queues = TaskQueueHelper.findQueues(tq.envId, tq.projectId)
-      val queuesJson: List[JsObject] = queues.map{
-        x =>
-          var json = Json.toJson(x)
-          //增加模板名称
-          json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
-          json.as[JsObject]
-      }
-      //3、生成命令列表
-      val (commandList, paramsJson) = generateCommands(taskId, tq)
-      val totalNum = commandList.length
-      val currentNum = 0
-
-      MyActor.superviseTaskActor ! ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum)
-      TaskCommandHelper.create(commandList)
-      //TODO executeCommands 从第1个命令开始执行
-      MyActor.commandActor ! InsertCommands(taskId, tq.envId, tq.projectId, tq.versionId, commandList)
-//      MyActor.commandActor ! ExecuteCommand(taskId, tq.envId, tq.projectId, tq.versionId, 1)
-
-    }
-    case NextTaskQueue(envId, projectId) => {
-      val taskQueue = TaskQueueHelper.findExecuteTask(envId, projectId)
+    case tgc: TaskGenerateCommand => {
+      _envId = tgc.envId
+      _projectId = tgc.projectId
+      val taskQueue = TaskQueueHelper.findExecuteTask(_envId, _projectId)
       taskQueue match {
         case Some(tq) => {
-          self ! TaskGenerateCommand(tq)
+          _tqId = tq.id.get
+          val tqExecute = taskQueue.get
+          //1、获取任务名称
+          val taskName = TaskTemplateHelper.findById(tqExecute.taskTemplateId).name
+          //2、insert 任务表
+          val taskId = TaskHelper.addByTaskQueue(tqExecute)
+          //获取队列信息
+          val queues = TaskQueueHelper.findQueues(tqExecute.envId, tqExecute.projectId)
+          val queuesJson: List[JsObject] = queues.map{
+            x =>
+              var json = Json.toJson(x)
+              //增加模板名称
+              json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
+              json.as[JsObject]
+          }
+          //3、生成命令列表
+          val (commandList, paramsJson) = generateCommands(taskId, tqExecute)
+          val totalNum = commandList.length
+          val currentNum = 0
+
+          MyActor.superviseTaskActor ! ChangeTaskStatus(tqExecute, taskName, queuesJson, currentNum, totalNum)
+          TaskCommandHelper.create(commandList)
+          //TODO executeCommands 从第1个命令开始执行
+          val commandActor = context.actorOf(Props[CommandActor], s"commandActor_${tq.envId}_${tq.projectId}")
+          commandActor ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList)
         }
         case _ => {
-          //没有任务，删除MyActor中的缓存
-          MyActor.superviseTaskActor ! RemoveStatus(envId, projectId)
+          context.stop(self)
         }
       }
+    }
+
+    case next: NextTaskQueue => {
+      self ! TaskGenerateCommand(next.envId, next.projectId)
+    }
+
+    case removeTaskQueue: RemoveTaskQueue => {
+      TaskQueueHelper.deleteById(_tqId)
+          //没有任务，删除MyActor中的缓存
+      MyActor.superviseTaskActor ! RemoveStatus(_envId, _projectId)
+//      context.stop(self)
     }
   }
 
@@ -150,4 +164,5 @@ class TaskExecute extends Actor{
 }
 
 
-case class TaskGenerateCommand(taskQueue: TaskQueue)
+case class TaskGenerateCommand(envId: Int, projectId: Int)
+case class RemoveTaskQueue()

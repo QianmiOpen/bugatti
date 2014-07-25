@@ -42,7 +42,7 @@ class MyActorSpec extends Specification {
       )
       seq.foreach{
         t => {
-          MyActor.createNewTask(t)
+//          MyActor.createNewTask(t)
         }
       }
     }

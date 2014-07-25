@@ -1,7 +1,8 @@
 package controllers.actor
 
-import java.io.{FileWriter, PrintWriter, File}
+import java.io.{File, FileWriter, PrintWriter}
 
+import actor.ActorUtils
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -9,16 +10,16 @@ import enums.TaskEnum
 import models.conf._
 import models.task._
 import play.api.Logger
+import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
 import utils.DateFormatter._
-import utils.{ConfHelp, SaltTools, TaskTools}
+import utils.{ConfHelp, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
-import play.api.Play.current
 /**
  * Created by jinwei on 20/6/14.
  */
@@ -29,12 +30,13 @@ object TaskProcess {
   implicit val timeout = Timeout(2 seconds)
 
   lazy val taskSystem = {
-    ActorSystem("MyProcessSystem")
+//    ActorSystem("MyProcessSystem")
+    ActorUtils.system
   }
 
   lazy val socketActor = {
-        ActorSystem("mySocketSystem") actorOf Props[SocketActor]
-//    taskSystem actorOf Props[SocketActor]
+//        ActorSystem("mySocketSystem") actorOf Props[SocketActor]
+    taskSystem actorOf Props[SocketActor]
     //    Akka.system.actorOf(Props[SocketActor])
   }
 
@@ -255,7 +257,7 @@ object TaskProcess {
  */
 class TaskProcess extends Actor {
 
-  val baseLogPath = SaltTools.logPath
+  val baseLogPath = ConfHelp.logPath
 
   implicit val taskWrites = Json.writes[Task]
 

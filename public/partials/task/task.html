@@ -27,20 +27,21 @@
                 </td>
                 <td>
                     <a title="查看任务队列" ng-click="goTaskQueue(activeEnv, pro.id)" href="">
-                        <span class="glyphicon glyphicon-random" style="float: right">&nbsp;{{pro.status.queueNum}}&nbsp;</span>
+                        <span class="glyphicon glyphicon-random" style="float: right">&nbsp;{{pro.task.queueNum}}&nbsp;</span>
                     </a>
                     <a>
                         <span class="glyphicon glyphicon-time" style="float: right">&nbsp;0&nbsp;</span>
                     </a>
                 </td>
                 <td style="padding:10px 0px 0px 0px;">
-                    <a ng-show="showHref(pro.status.status)" ng-click="goTaskLog(pro.task.id)" href="">{{pro.task.endTime}}  {{pro.status.statusTip}}!   版本号：{{pro.task.version}}   任务: {{pro.task.taskName}}</a>
+                    <a ng-show="showHref(pro.task.status)" ng-click="goTaskLog(pro.task.id)" href="">{{pro.task.endTime}}  {{pro.task.statusTip}}!   <span ng-show="showVersionTitle(pro.task.version)">版本号：</span>{{pro.task.version}}   <span ng-show="showTaskNameTitle(pro.task.taskName)">任务:</span> {{pro.task.taskName}}</a>
+                    <span ng-show="showText(pro.task.status)">{{pro.task.endTime}}  {{pro.task.statusTip}}!   <span ng-show="showVersionTitle(pro.task.version)">版本号：</span>{{pro.task.version}}   <span ng-show="showTaskNameTitle(pro.task.taskName)">任务:</span> {{pro.task.taskName}}</span>
                     <div>
-                        <span ng-show="showProgress(pro.status.status)" >机器 {{pro.status.machine}}  {{pro.status.statusTip}} : {{pro.status.sls}} </span>
+                        <span ng-show="showProgress(pro.task.status)" >机器 {{pro.task.command.machine}}  {{pro.task.statusTip}} : {{pro.task.command.sls}} </span>
 
                     </div>
-                    <div ng-show="showProgress(pro.status.status)" class="progress progress-mb">
-                        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{pro.status.currentNum*100/pro.status.totalNum}}%;">
+                    <div ng-show="showProgress(pro.task.status)" class="progress progress-mb">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{pro.task.currentNum*100/pro.task.totalNum}}%;">
                         </div>
                     </div>
 
@@ -51,7 +52,7 @@
                         <a ng-repeat="t in pro.templates" class="dropdown-toggle" href="" ng-click="showClick(t.versionMenu, pro.id, t.id)" title="{{t.name}}">
                             <span class="{{t.css}}"></span>
                         </a>
-                        <ul class="dropdown-menu" >
+                        <ul class="dropdown-menu" ng-show="showVersionMenu()">
                             <li ng-repeat="vs in versions">
                                 <a href="" class="dropdown-toggle" ng-click="deploy(pro.id, vs.id)">{{vs.vs}}</a>
                             </li>

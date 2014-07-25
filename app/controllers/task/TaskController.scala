@@ -1,5 +1,6 @@
 package controllers.task
 
+import actor.task.MyActor
 import controllers.BaseController
 import controllers.actor.{TaskLog, TaskProcess}
 import enums.TaskEnum
@@ -57,13 +58,8 @@ object TaskController extends BaseController {
     }
   }
 
-  def findStatus(fields: Seq[(String, JsValue)]): List[JsValue] = {
-    val jsons = Json.toJson(fields.toMap)
-    val envId = (jsons \ "envId").toString.toInt
-    val projects = (jsons \ "projects")
-    Logger.info(""+projects(0))
-    projects.as[JsArray].value
-    TaskHelper.findLastStatus(envId, projects).map{
+  def findLastStatus(envId: Int, projectId: Int) = Action{
+    val list = TaskHelper.findLastStatusByProject(envId, projectId).map{
       t => {
         var tJson = Json.toJson(t).as[JsObject]
         VersionHelper.findById(t.versionId.getOrElse(0)) match {
@@ -77,13 +73,42 @@ object TaskController extends BaseController {
             tJson = tJson ++ Json.obj("taskName" -> template.name)
           }
         }
+        Logger.debug(s"findStatus ==> ${tJson}")
+        tJson
+      }
+    }
+    Ok(Json.toJson(list))
+  }
+
+  def findStatus(fields: Seq[(String, JsValue)]): List[JsValue] = {
+    val jsons = Json.toJson(fields.toMap)
+    val envId = (jsons \ "envId").toString.toInt
+    val projects = (jsons \ "projects")
+    Logger.debug(s"${projects}")
+//    projects.as[JsArray].value
+    TaskHelper.findLastStatus(envId, projects).map{
+      t => {
+        Logger.debug(s"t ==> ${t.taskTemplateId}, ${t.versionId}")
+        var tJson = Json.toJson(t).as[JsObject]
+        VersionHelper.findById(t.versionId.getOrElse(0)) match {
+          case Some(version) => {
+            tJson = tJson ++ Json.obj("version" -> version.vs)
+          }
+          case _ => {}
+        }
+        TaskTemplateHelper.findById(t.taskTemplateId) match {
+          case template => {
+            tJson = tJson ++ Json.obj("taskName" -> template.name)
+          }
+        }
+        Logger.debug(s"findStatus ==> ${tJson}")
         tJson
       }
     }
   }
 
   def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
-    TaskProcess.join()
+    MyActor.join()
   }
 
   def createNewTaskQueue = Action(parse.json) {implicit request =>
@@ -104,7 +129,27 @@ object TaskController extends BaseController {
     Logger.info(s"version ==> ${versionId}")
     val templateId = (tq \ "templateId").as[Int]
     val taskQueue = TaskQueue(None, envId, projectId, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
-    TaskProcess.createNewTask(taskQueue)
+    val taskQueueId = TaskQueueHelper.create(taskQueue)
+    //    TaskProcess.createNewTask(taskQueue)
+    MyActor.createNewTask(envId, projectId)
+    //test
+//    var seq = Seq.empty[TaskQueue]
+//    val doEnv = 2
+//    val doPro = 2
+//    for(i <- 1 to doEnv){
+//      for(j <- 1 to doPro){
+//        seq = seq :+ taskQueue.copy(envId = i).copy(projectId = j)
+//      }
+//    }
+//    Logger.info(s"seq ==> $seq")
+//    seq.foreach{
+//      s =>{
+//        TaskQueueHelper.create(s)
+//        EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, Option(s.envId), Option(s.projectId), "t-syndic", "d6a597315b01", "172.19.3.134"))
+//        MyActor.createNewTask(s.envId, s.projectId)
+//      }
+//    }
+    taskQueueId
   }
 
   /**
@@ -133,18 +178,32 @@ object TaskController extends BaseController {
   /**
    * 获取所有项目类型的模板
    */
-  def getTemplates() = Action{
+  def getTemplates(scriptVersion: String) = Action{
     var map = Map.empty[Int, Seq[TaskTemplate]]
-    TaskTemplateHelper.all.foreach{
-      template => {
-        //1、从map中获取seq，没有就创建
-        var seq = map.getOrElse(template.typeId, Seq.empty[TaskTemplate])
-        //2、添加到seq
-        seq = seq :+ template
-        //3、覆盖map
-        map += template.typeId -> seq
+    var sVersion = Option(ScriptVersionHelper.Master)
+    Logger.debug(s"scriptVersion ==> ${scriptVersion}")
+    if(scriptVersion == ScriptVersionHelper.Latest){
+      sVersion = ScriptVersionHelper.findLatest()
+    }
+    Logger.debug(s"sVersion ==> ${sVersion}")
+    sVersion match {
+      case Some(sv) => {
+        TaskTemplateHelper.findByScriptVerison(sv).foreach{
+          template => {
+            //1、从map中获取seq，没有就创建
+            var seq = map.getOrElse(template.typeId, Seq.empty[TaskTemplate])
+            //2、添加到seq
+            seq = seq :+ template
+            //3、覆盖map
+            map += template.typeId -> seq
+          }
+        }
+      }
+      case _ => {
+        //模板返回空
       }
     }
+    Logger.debug(s"templates ==> ${map}")
     Ok(map2Json(map))
   }
 

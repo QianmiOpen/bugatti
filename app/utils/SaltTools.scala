@@ -10,8 +10,6 @@ import models.conf._
  * Created by mind on 7/6/14.
  */
 object SaltTools {
-  var logPath = ""
-
   def refreshHostList(app: Application) {
     if (app.configuration.getBoolean("salt.init").getOrElse(false)) {
       refreshHostList
@@ -65,9 +63,5 @@ object SaltTools {
       val envRel = envProjectRel.copy(envId = if (env.size == 0) {None} else {env(0)._1})
       EnvironmentProjectRelHelper.update(envRel)
     }
-  }
-
-  def baseLogPath(app: Application) = {
-    logPath = app.configuration.getString("salt.log.dir").getOrElse("target/saltlogs")
   }
 }

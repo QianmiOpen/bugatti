@@ -1,9 +1,13 @@
 package actor.task
 
+import java.io.File
+
 import akka.actor.Actor
 import play.api.Logger
 import play.api.libs.iteratee.{Enumerator, Concurrent}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue}
+import utils.SaltTools
+import scala.sys.process._
 
 /**
  * Created by jinwei on 13/7/14.
@@ -12,6 +16,9 @@ class SocketActor extends Actor{
   val (out, channel) = Concurrent.broadcast[JsValue]
 
   def receive = {
+    case FindLastStatus(key) => {
+      notifyAllSocket(Json.obj(s"${key}_last" -> key))
+    }
     case JoinProcess(js) => {
       sender ! ConnectedSocket(out)
     }
@@ -27,8 +34,21 @@ class SocketActor extends Actor{
   }
 
   def notifyAllSocket(js: JsValue) {
-    Logger.info("notifyAllSocket==>" + js.toString())
+    Logger.debug("notifyAllSocket==>" + js.toString())
     channel.push(js)
+    //test
+//    val _baseLogPath = SaltTools.logPath
+//    val path = s"${_baseLogPath}/saltLogs.log"
+//    val baseFile = new File(_baseLogPath)
+//    if(!baseFile.exists()){
+//      baseFile.mkdirs()
+//    }
+//    val file = new File(path)
+//    if(!file.exists()){
+//      file.createNewFile()
+//    }
+//    (Seq("echo", Json.stringify(js)) #>> file lines)
+
   }
 }
 

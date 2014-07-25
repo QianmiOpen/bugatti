@@ -29,7 +29,8 @@ object TemplateController extends BaseController {
           "itemName" -> nonEmptyText,
           "itemDesc" -> optional(text),
           "default" -> optional(text),
-          "order" -> number
+          "order" -> number,
+          "scriptVersion" -> nonEmptyText
         )(TemplateItem.apply)(TemplateItem.unapply)
       )
     )(TemplateFrom.apply)(TemplateFrom.unapply)
