@@ -36,6 +36,7 @@ DELETE        /area/:id                                controllers.conf.AreaCont
 GET           /env                                     controllers.conf.EnvController.index(page: Int ?=0, pageSize: Int ?=10)
 GET           /env/total                               controllers.conf.EnvController.count
 GET           /env/all                                 controllers.conf.EnvController.all
+GET           /env/allScriptVersion                    controllers.conf.EnvController.allScriptVersion
 GET           /env/:id                                 controllers.conf.EnvController.show(id: Int)
 DELETE        /env/:id                                 controllers.conf.EnvController.delete(id: Int)
 POST          /env                                     controllers.conf.EnvController.save
