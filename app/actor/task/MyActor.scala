@@ -105,11 +105,12 @@ class MyActor extends Actor{
 
       Logger.info("key ==> "+key)
 
+      incQueueNum(key, 1)
 
       if(!MyActor.envId_projectIdStatus.keySet.contains(key)){
         val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
         MyActor.envId_projectIdStatus += key -> TaskEnum.TaskProcess
-        incQueueNum(key, 1)
+
         taskExecute ! TaskGenerateCommand(envId, projectId)
       }
     }
@@ -192,7 +193,14 @@ class MyActor extends Actor{
   }
 
   def removeStatus(key: String) = {
-    MyActor.statusMap = MyActor.statusMap - key
+    val queueNum = (MyActor.statusMap \ key \ "queueNum").as[Int]
+    if(queueNum == 0){
+      MyActor.statusMap = MyActor.statusMap - key
+    }else {
+      MyActor.statusMap = MyActor.statusMap - key
+      changeStatus(Json.obj(key -> Json.obj("queueNum" -> queueNum)))
+    }
+
     MyActor.socketActor ! FindLastStatus(key)
   }
 
@@ -211,7 +219,7 @@ class WSSchedule{
   def start(socketActor: ActorRef, notify: String): Cancellable = {
     Akka.system.scheduler.schedule(
       1 second,
-      1 second,
+      0.5 second,
       socketActor,
       notify
     )
