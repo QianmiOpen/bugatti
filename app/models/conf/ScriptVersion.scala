@@ -25,7 +25,7 @@ case class ScriptVersionTable(tag: Tag) extends Table[ScriptVersion](tag, "scrip
 
 object ScriptVersionHelper {
   val Latest = "latest"
-  val Master = "Master"
+  val Master = "master"
 
   import models.AppDB._
   val qScriptVersion = TableQuery[ScriptVersionTable]
@@ -47,6 +47,6 @@ object ScriptVersionHelper {
   }
 
   def findLatest(): Option[String] = db withSession { implicit session =>
-    Query(qScriptVersion.filter(_.name != "master").map(_.name).max).first
+    Query(qScriptVersion.filterNot(_.name === Master).map(_.name).max).first
   }
 }

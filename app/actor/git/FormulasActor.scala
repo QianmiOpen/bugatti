@@ -7,8 +7,8 @@ import akka.actor.{Actor, ActorLogging}
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import play.api.Play
 
@@ -32,9 +32,7 @@ class FormulasActor extends Actor with ActorLogging {
   var _git: Git = null
 
   override def receive: Receive = {
-    case ReloadFormulasTemplate => {
-      _reloadTemplates
-    }
+    case ReloadFormulasTemplate => _reloadTemplates
     case x => log.warning("Unknown message ${x}")
   }
 
@@ -73,38 +71,47 @@ class FormulasActor extends Actor with ActorLogging {
 
   def _reloadTemplates() {
     if (_git != null) {
+      _git.checkout().setName(ScriptVersionHelper.Master).call()
       _git.pull().call()
-
 
       val tags = _git.tagList().call()
       val scriptNames = ScriptVersionHelper.allName()
 
-      // 加载新的tag脚本
-      tags.asScala.filterNot(tag => scriptNames.contains(tag.getName)).foreach { tag =>
-        log.debug(s"tagName: ${tag.getName}; ${tag}")
-        _git.checkout().setName(tag.getName)
+      if (tags != null) {
+        // 加载新的tag脚本
+        tags.asScala.map(_.getName.split("/").last).filterNot(scriptNames.contains).foreach { tagName =>
+          log.debug(s"Load tag: ${tagName}")
+          _git.checkout().setName(tagName).call()
 
-//        ScriptVersionHelper.create(ScriptVersion(None, tag.getName, message = tag))
-        _loadTemplateFromDir(tag.getName)
+          ScriptVersionHelper.create(ScriptVersion(None, tagName, message = Some("")))
+          _loadTemplateFromDir(tagName)
+        }
       }
 
       // 重新加载master,先讲老master更新掉
+      log.debug(s"Load tag: ${ScriptVersionHelper.Master}")
+      val backupMasterName = s"master-bak-${DateTime.now}"
+      TemplateItemHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
+      TaskTemplateHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
 
-      _git.checkout().setName("master").call()
-      _loadTemplateFromDir("master")
+      _git.checkout().setName(ScriptVersionHelper.Master).call()
+      _loadTemplateFromDir(ScriptVersionHelper.Master)
+    } else {
+      log.warning("Reload template, but git is null")
     }
   }
 
-  def _loadTemplateFromDir(versionName: String) {
+  def _loadTemplateFromDir(tagName: String) {
     val templateDir = new File(s"${gitWorkDir.getAbsolutePath}${TemplatePath}")
     templateDir.listFiles(new FileFilter {
       override def accept(pathname: File): Boolean = pathname.getName.endsWith(TemplateSuffix)
     }).foreach { file =>
-      _initFromYaml(file)
+      log.debug(s"Load file: ${file}")
+      _initFromYaml(file, tagName)
     }
   }
 
-  def _initFromYaml(file: File) = {
+  def _initFromYaml(file: File, tagName: String) = {
     val yaml = new Yaml()
     val io = new FileInputStream(file)
     val template = yaml.load(io).asInstanceOf[JMap[String, AnyRef]]
@@ -115,13 +122,6 @@ class FormulasActor extends Actor with ActorLogging {
     val templateId = TemplateHelper.findByName(templateName) match {
       case Some(temp) => {
         val templateId = temp.id.get
-        // 删除关联数据
-        TemplateItemHelper.deleteItemsByTemplateId(templateId)
-        TaskTemplateHelper.findTaskTemplateByTemplateId(templateId).foreach { taskTemplate =>
-          TaskTemplateStepHelper.deleteStepsByTaskTemplateId(taskTemplate.id.get)
-        }
-        TaskTemplateHelper.deleteTaskTemplateByTemplateId(templateId)
-
         // 更新模板说明
         TemplateHelper.update(templateId, temp.copy(remark = Some(template.get("remark").asInstanceOf[String])))
         templateId
@@ -134,7 +134,7 @@ class FormulasActor extends Actor with ActorLogging {
     if (templateItems != null) {
       templateItems.asInstanceOf[JList[JMap[String, String]]].asScala.zipWithIndex.foreach {
         case (x: JMap[String, String], index) =>
-          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), Some(x.get("default")), index))
+          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), Some(x.get("default")), index, tagName))
       }
     }
 
@@ -143,7 +143,7 @@ class FormulasActor extends Actor with ActorLogging {
     if (actions != null) {
       actions.asInstanceOf[JList[JMap[String, AnyRef]]].asScala.zipWithIndex.foreach {
         case (action, index) =>
-          val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String], action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean], templateId, index + 1))
+          val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String], action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean], templateId, index + 1, tagName))
           val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
           steps.zipWithIndex.foreach { case (step, index) =>
             val seconds = step.get("seconds").asInstanceOf[Int]
