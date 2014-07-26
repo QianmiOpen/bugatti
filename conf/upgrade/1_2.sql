@@ -66,5 +66,5 @@ CREATE TABLE `logging_event_property` (
   PRIMARY KEY (`event_id`,`mapped_key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-ALTER TABLE `project` ADD COLUMN `global_variable` TEXT NULL COMMENT '项目全局变量';
-ALTER TABLE `environment` ADD COLUMN `global_variable` TEXT NULL COMMENT '环境全局变量';
+ALTER TABLE `project` ADD COLUMN `global_variable` TEXT NOT NULL COMMENT '项目全局变量';
+ALTER TABLE `environment` ADD COLUMN `global_variable` TEXT NOT NULL COMMENT '环境全局变量';
