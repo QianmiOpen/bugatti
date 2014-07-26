@@ -16,8 +16,9 @@ import play.api.mvc.Action
  */
 object ProjectController extends BaseController {
 
-  implicit val projectWrites = Json.writes[Project]
+  implicit val varWrites = Json.writes[Variable]
   implicit val attributeWrites = Json.writes[Attribute]
+  implicit val projectWrites = Json.writes[Project]
 
   def msg(user: String, ip: String, msg: String, data: Project) =
     Json.obj("mod" -> ModEnum.project.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
@@ -31,7 +32,13 @@ object ProjectController extends BaseController {
       "lastVid" -> optional(number),
       "lastVersion" -> optional(text),
       "lastUpdated" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
-      "items" -> list(
+      "variable" -> seq (
+        mapping(
+          "name" -> text,
+          "value" -> text
+        )(Variable.apply)(Variable.unapply)
+      ),
+      "items" -> seq(
         mapping(
           "id" -> optional(number),
           "projectId" -> optional(number),

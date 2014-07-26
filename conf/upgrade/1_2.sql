@@ -8,3 +8,5 @@ ALTER TABLE `conf_log` CHANGE `name` `file_name` VARCHAR(100) NOT NULL DEFAULT '
 ALTER TABLE `conf_log` CHANGE `path` `file_path` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '文件路径';
 
 
+ALTER TABLE `project` ADD COLUMN `global_variable` TEXT NULL COMMENT '项目全局变量';
+ALTER TABLE `environment` ADD COLUMN `global_variable` TEXT NULL COMMENT '环境全局变量';

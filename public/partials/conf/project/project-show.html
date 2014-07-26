@@ -32,15 +32,29 @@
         <td>{{project.lastUpdated | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
     </tr>
     <tr>
-        <td class="text-right col-sm-3">
-            项目属性：
-        </td>
+        <td class="text-right col-sm-3">项目属性：</td>
         <td>
             <div class="input-group  col-sm-6" ng-repeat="att in atts">
                 <span class="input-group-addon">{{att.name}}</span>
                 <input type="text" class="form-control" value="{{att.value}}" readonly>
             </div>
 
+        </td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">项目变量：</td>
+        <td>
+            <table class="table">
+                <thead>
+                    <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="v in project.globalVariable">
+                    <td>{{v.name}}</td>
+                    <td>{{v.value}}</td>
+                </tr>
+                </tbody>
+            </table>
         </td>
     </tr>
     </tbody>

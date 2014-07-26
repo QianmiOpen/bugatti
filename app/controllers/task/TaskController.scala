@@ -226,6 +226,7 @@ object TaskController extends BaseController {
     TaskLog.readHeader(taskId, byteSize)
   }
 
+  implicit val varWrites = Json.writes[Variable]
   implicit val projectWrites = Json.writes[Project]
   implicit val taskWrites = Json.writes[Task]
   implicit val versionWrites = Json.writes[Version]

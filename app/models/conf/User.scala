@@ -121,7 +121,7 @@ object UserHelper extends PlayCache {
         EnvironmentHelper.findById(envId) match {
           case Some(env) if env.level == LevelEnum.safe => if (member.level == env.level) true else false
           case Some(env) if env.level == LevelEnum.unsafe => true
-          case None => false
+          case _ => false
         }
       case _ => false
     }
