@@ -16,6 +16,7 @@ object FuncEnum extends Enumeration {
   val project = Value(4, "project")   // 项目管理
   val relation = Value(5, "relation") // 关系配置
   val task = Value(6, "task")         // 任务管理
+  val system = Value(7, "system")     // 系统管理
   implicit val enumMapper = MappedColumnType.base[Func, Int](_.id, this.apply)
 
   implicit val enumReads: Reads[Func] = EnumUtils.enumReads(FuncEnum)
@@ -24,5 +25,5 @@ object FuncEnum extends Enumeration {
 
 }
 object ModEnum extends Enumeration {
-  val user, area, env, project, relation, task, conf, member, template, version = Value
+  val user, area, env, project, relation, task, conf, member, template, version, system = Value
 }

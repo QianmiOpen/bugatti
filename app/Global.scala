@@ -1,6 +1,5 @@
 
 import actor.ActorUtils
-import actor.git.ReloadFormulasTemplate
 import actor.task.MyActor
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
@@ -77,7 +76,8 @@ object Global extends GlobalSettings {
     }
 
     // 启动时reload一下所有标签
-    ActorUtils.formulasActor ! ReloadFormulasTemplate
+    import actor.git.ScriptGitActor._
+    ActorUtils.scriptGitActor ! ReloadFormulasTemplate
 
     SaltTools.refreshHostList(app)
 

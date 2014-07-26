@@ -173,6 +173,10 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.ConfController.update,
         conf.routes.javascript.ConfController.copy,
 
+        // system
+        conf.routes.javascript.SystemController.refresh,
+        conf.routes.javascript.SystemController.buildTag,
+
         // conf logs
         conf.routes.javascript.ConfController.logs,
         conf.routes.javascript.ConfController.logsCount,
