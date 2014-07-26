@@ -43,6 +43,10 @@ object TemplateItemHelper extends PlayCache {
     qItem.filter(_.templateId === templateId).sortBy(_.order).list.toSet.toSeq
   }
 
+  def findByTemplateId_ScriptVersion(templateId: Int, scriptVersion: String): Seq[TemplateItem] = db withSession {implicit session =>
+    qItem.filter(t => t.templateId === templateId && t.scriptVersion === scriptVersion).list
+  }
+
   def create(item: TemplateItem) = db withSession { implicit session =>
     _create(item)
   }

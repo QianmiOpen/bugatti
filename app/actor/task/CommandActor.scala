@@ -9,6 +9,7 @@ import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{Task, TaskCommand, TaskHelper}
 import play.api.Logger
+import play.api.libs.json.JsObject
 import utils.ConfHelp
 
 import scala.concurrent.duration._
@@ -43,7 +44,7 @@ class CommandActor extends Actor {
       _versionId = insertCommands.versionId
 
       if(insertCommands.commandList.length == 0){
-        noCommands(_taskId, _envId, _projectId)
+        noCommands(_taskId, _envId, _projectId, insertCommands.json)
         closeSelf
       } else {
         _commands = insertCommands.commandList
@@ -156,9 +157,9 @@ class CommandActor extends Actor {
     context.stop(self) //直接关闭
   }
 
-  def noCommands(taskId: Int, envId: Int, projectId: Int) = {
+  def noCommands(taskId: Int, envId: Int, projectId: Int, json: JsObject) = {
     //error:项目未绑定机器或者模板异常
-    insertResultLog(taskId, "[error]项目未绑定机器或者模板异常")
+    insertResultLog(taskId, s"[error] ${json \ "error"}")
     TaskHelper.changeStatus(taskId, TaskEnum.TaskFailed)
     val (task, version) = getTask_VS(taskId)
     MyActor.superviseTaskActor ! ChangeOverStatus(envId, projectId, TaskEnum.TaskFailed, task.endTime.get, version)
@@ -298,7 +299,7 @@ class CommandActor extends Actor {
   }
 }
 
-case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand])
+case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject)
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int,versionId: Option[Int], order: Int)
 case class TerminateCommands(status: TaskStatus)
 //case class CheckCommandLog(taskId: Int, envId: Int, projectId: Int,versionId: Option[Int], order: Int)
