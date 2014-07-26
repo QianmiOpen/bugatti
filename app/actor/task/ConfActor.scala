@@ -15,6 +15,7 @@ class ConfActor extends Actor{
   var _json = Json.obj()
   def receive = {
     case CopyConfFile(taskId, envId, projectId, versionId, order, json) => {
+      _json = json
       generateConfFile(taskId, envId, projectId, versionId)
       sender ! ExecuteCommand(taskId, envId, projectId, Option(versionId), order + 1)
       context.stop(self)
