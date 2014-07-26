@@ -60,7 +60,7 @@ class LookupActor(path: String) extends Actor {
       self ! SaltCommand(lookupActorCommand.commandSeq, 0, ".")
     }
     case SaltCommand(commandSeq, 0, ".") => {
-      actor ! SaltCommand(commandSeq, 0, ".")
+      actor ! SaltCommand(commandSeq)
     }
 
     case executeCommand: ExecuteCommand => {
