@@ -139,7 +139,7 @@ object ProjectController extends BaseController {
     if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
     else UserHelper.findByJobNo(jobNo) match {
       case Some(_) =>
-        val member = Member(None, projectId, LevelEnum.unsafe, jobNo)
+        val member = Member(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member))
         Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(member))))
       case _ =>
