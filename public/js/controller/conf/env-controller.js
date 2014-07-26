@@ -62,6 +62,7 @@ define(['angular'], function(angular) {
     app.controller('EnvCreateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
         $scope.env = {level: "unsafe", scriptVersion: "latest"};
         $scope.saveOrUpdate = function(env) {
+            env.variable = angular.copy($scope.vars);
             EnvService.save(angular.toJson(env), function(data) {
                 if (data.r >= 0) {
                     $state.go('^');
@@ -75,10 +76,44 @@ define(['angular'], function(angular) {
         EnvService.allScriptVersion(function(data) {
             $scope.scriptVersions = data;
         });
+
+        // env variable
+        $scope.vars = [];
+        $scope.addVar = function(v) {
+            if (findInVars($scope.vars, v)) {
+                $scope.varForm.varName.$invalid = true;
+                $scope.varForm.varName.$error.unique = true;
+                return;
+            };
+            $scope.vars.push(angular.copy(v));
+            v.name = "", v.value = ""; // clean input
+            $scope.varForm.varName.$error.unique = false;
+        }
+
+        function findInVars(vars, v) {
+            var find = false;
+            angular.forEach(vars, function(vs) {
+                if (vs.name == v.name) {
+                    find = true;
+                    return;
+                }
+            });
+            return find;
+        }
+
+        $scope.editVar = function(repeat$scope) {
+            repeat$scope.mode = 'edit';
+        };
+
+        $scope.deleteVar = function(index) {
+            $scope.vars.splice(index, 1);
+        };
+
     }]);
 
     app.controller('EnvUpdateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
         $scope.saveOrUpdate = function(env) {
+            env.variable = angular.copy($scope.vars);
             EnvService.update($stateParams.id, angular.toJson(env), function(data) {
                 if (data.r >= 0) {
                     $state.go('^');
@@ -99,11 +134,46 @@ define(['angular'], function(angular) {
                 return angular.equals(env, $scope.master);
             };
             $scope.reset();
+
+            // init variable
+            $scope.vars = angular.copy(data.globalVariable);
         });
 
         EnvService.allScriptVersion(function(data) {
             $scope.scriptVersions = data;
         });
+
+        // project variable
+        $scope.addVar = function(v) {
+            if (findInVars($scope.vars, v)) {
+                $scope.varForm.varName.$invalid = true;
+                $scope.varForm.varName.$error.unique = true;
+                return;
+            };
+            $scope.vars.push(angular.copy(v));
+            v.name = "", v.value = ""; // clean input
+            $scope.varForm.varName.$error.unique = false;
+        }
+
+        function findInVars(vars, v) {
+            var find = false;
+            angular.forEach(vars, function(vs) {
+                if (vs.name == v.name) {
+                    find = true;
+                    return;
+                }
+            });
+            return find;
+        }
+
+        $scope.editVar = function(repeat$scope) {
+            repeat$scope.mode = 'edit';
+        };
+
+        $scope.deleteVar = function(index) {
+            $scope.vars.splice(index, 1);
+        };
+
     }]);
 
 });

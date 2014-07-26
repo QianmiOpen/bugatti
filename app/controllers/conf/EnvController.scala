@@ -1,7 +1,7 @@
 package controllers.conf
 
 import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
-import models.conf.{ScriptVersionHelper, MemberHelper, Environment, EnvironmentHelper}
+import models.conf._
 import play.api.mvc._
 import controllers.BaseController
 import play.api.libs.json._
@@ -15,6 +15,7 @@ import play.api.data.Forms._
  */
 object EnvController extends BaseController {
 
+  implicit val varWrites = Json.writes[Variable]
   implicit val envWrites = Json.writes[Environment]
 
   def msg(user: String, ip: String, msg: String, data: Environment) =
@@ -28,7 +29,13 @@ object EnvController extends BaseController {
       "nfServer" -> optional(text(maxLength = 30)),
       "ipRange" -> optional(nonEmptyText(maxLength = 300)),
       "level" -> enums.form.enum(LevelEnum),
-      "scriptVersion" -> nonEmptyText(maxLength = 30)
+      "scriptVersion" -> nonEmptyText(maxLength = 30),
+      "variable" -> seq (
+        mapping(
+          "name" -> text,
+          "value" -> text
+        )(Variable.apply)(Variable.unapply)
+      )
     )(Environment.apply)(Environment.unapply)
   )
 

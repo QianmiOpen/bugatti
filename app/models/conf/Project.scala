@@ -8,16 +8,8 @@ import org.joda.time.DateTime
 
 import scala.slick.driver.MySQLDriver.simple._
 import com.github.tototoshi.slick.MySQLJodaSupport._
-
 import scala.slick.jdbc.JdbcBackend
 
-/**
- * 项目
- * 项目为综合型，通过类型标示不同
- *
- * @author of546
- */
-case class Variable(name: String, value: String)
 case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable])
 case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable], items: Seq[Attribute]) {
   def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated, globalVariable)

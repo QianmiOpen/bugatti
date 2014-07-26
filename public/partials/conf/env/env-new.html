@@ -68,15 +68,78 @@
         <div class="col-sm-5">
             <label class="checkbox-inline">
                 <input type="checkbox" name="level" id="level" ng-model="env.level" ng-true-value="safe" ng-false-value="unsafe"> 安全<i class="star"></i>
-                <sup class="btn-info" href="" tooltip-placement="right" tooltip="安全环境下，仅项目所有人能操作!">?</sup>
+                <sup class="btn-info" href="" tooltip-placement="right" tooltip="安全环境下，仅环境所有人能操作!">?</sup>
             </label>
         </div>
     </div>
 
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-5">
-            <button class="btn btn-success" ng-click="saveOrUpdate(env)" ng-disabled="form.$invalid"> 保 存 </button>
-            <button ng-if="$stateParams.id" class="btn btn-link" ng-click="reset()" ng-disabled="isUnchanged(env)" >重置</button>
-        </div>
-    </div>
 </form>
+
+<form name="varForm" novalidate>
+    <table class="table table-striped border-less">
+        <thead>
+        <th>&nbsp;</th>
+        <th>环境变量名</th>
+        <th>环境变量值</th>
+        <th>&nbsp;</th>
+        </thead>
+        <tbody>
+        <tr ng-repeat="vs in vars">
+            <td class="col-sm-1">&nbsp;</td>
+            <td class="text-right col-sm-2" style="vertical-align: middle">
+                <input class="form-control" ng-show="mode == 'edit'" ng-model="vs.name" name="{{vs.name}}" required maxlength="64"/>
+                <span ng-show="mode != 'edit'">{{vs.name}}</span>
+            </td>
+            <td class="col-sm-3" style="vertical-align: middle">
+                <input class="form-control" ng-show="mode == 'edit'" ng-model="vs.value" name="{{vs.value}}" required maxlength="100"/>
+                <span ng-show="mode != 'edit'">{{vs.value}}</span>
+            </td>
+            <td>
+                <button ng-show="mode != 'edit'" ng-click="editVar(this)"><span class="glyphicon glyphicon-edit"></span></button>
+                <button ng-show="mode == 'edit'" ng-click="this.mode = null;"><span class="glyphicon glyphicon-ok"></span></button>
+                <button ng-click="deleteVar($index)"><span class="glyphicon glyphicon-remove"></span></button>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td class="col-sm-1">&nbsp;</td>
+            <td class="text-right col-sm-2">
+                <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="64" placeholder="变量名" required>
+            </td>
+            <td class="col-sm-3">
+                <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="100" placeholder="变量值" required>
+            </td>
+            <td>
+                <button type="button" ng-click="addVar(v)"  ng-disabled="varForm.$invalid" class="btn btn-success glyphicon glyphicon-saved"></button>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-sm-1">&nbsp;</td>
+            <td class="col-sm-2">
+                <div ng-show="varForm.varName.$dirty && varForm.varName.$invalid" class="has-error mt-16">
+                    <span ng-show="varForm.varName.$error.required" class="control-label">请输入变量名</span>
+                    <span ng-show="varForm.varName.$error.unique" class="control-label">变量名重复</span>
+                    <span ng-show="varForm.varName.$error.maxlength" class="control-label">变量名超过长度</span>
+                    <span ng-show="varForm.varName.$error.pattern" class="control-label">变量名不能有冒号和逗号</span>
+                </div>
+            </td>
+            <td class="col-sm-3">
+                <div ng-show="varForm.varValue.$dirty && varForm.varValue.$invalid" class="has-error mt-16">
+                    <span ng-show="varForm.varValue.$error.required" class="control-label">请输入变量值</span>
+                    <span ng-show="varForm.varValue.$error.maxlength" class="control-label">变量值超过长度</span>
+                    <span ng-show="varForm.varValue.$error.pattern" class="control-label">变量值不能有冒号和逗号</span>
+                </div>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        </tfoot>
+    </table>
+</form>
+
+<div class="form-group">
+    <div class="col-sm-offset-3 col-sm-5">
+        <button class="btn btn-success" ng-click="saveOrUpdate(env)" ng-disabled="form.$invalid"> 保 存 </button>
+        <button ng-if="$stateParams.id" class="btn btn-link" ng-click="reset()" ng-disabled="isUnchanged(env)" >重置</button>
+    </div>
+</div>
