@@ -11,22 +11,22 @@ ALTER TABLE `conf_log` CHANGE `path` `file_path` VARCHAR(255) NOT NULL DEFAULT '
 
 ALTER TABLE `app_user` CHANGE COLUMN `name` `name` varchar(20) NOT NULL;
 
-ALTER TABLE `environment` ADD COLUMN `script_version` varchar(254) NOT NULL DEFAULT 'latest' after `level`;
+ALTER TABLE `environment` ADD COLUMN `script_version` varchar(60) NOT NULL DEFAULT 'latest' after `level`;
 
 ALTER TABLE `environment_project_rel` DROP INDEX `idx_eid_pid`;
 ALTER TABLE `environment_project_rel` DROP INDEX `idx_ip`;
 
 CREATE TABLE `script_version` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(254) NOT NULL,
+  `name` varchar(60) NOT NULL,
   `update_time` timestamp NOT NULL DEFAULT '2014-07-26 14:14:53',
   `message` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`id`)) ENGINE=`InnoDB`;
 
-ALTER TABLE `task_template` ADD COLUMN `script_version` varchar(254) NOT NULL DEFAULT 'master' after `order_num`;
+ALTER TABLE `task_template` ADD COLUMN `script_version` varchar(60) NOT NULL DEFAULT 'master' after `order_num`;
 
 ALTER TABLE `template_item` DROP INDEX `idx_name`;
-ALTER TABLE `template_item` ADD COLUMN `script_version` varchar(254) NOT NULL DEFAULT 'master' after `order`;
+ALTER TABLE `template_item` ADD COLUMN `script_version` varchar(60) NOT NULL DEFAULT 'master' after `order`;
 ALTER TABLE `template_item` ADD UNIQUE `idx_name` USING BTREE (`template_id`, `item_name`, `script_version`);
 
 DROP TABLE `logging_event`;

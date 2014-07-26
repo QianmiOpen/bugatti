@@ -17,7 +17,7 @@ class TaskTemplateTable(tag: Tag) extends Table[TaskTemplate](tag, "task_templat
   def versionMenu = column[Boolean]("version_menu", O.Default(false))
   def typeId = column[Int]("type_id")
   def orderNum = column[Int]("order_num")
-  def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master))
+  def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master), O.DBType("VARCHAR(60)"))
 
   override def * = (id.?, name, css, versionMenu, typeId, orderNum, scriptVersion) <> (TaskTemplate.tupled, TaskTemplate.unapply _)
 }

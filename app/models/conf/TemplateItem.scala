@@ -25,7 +25,7 @@ class TemplateItemTable(tag: Tag) extends Table[TemplateItem](tag, "template_ite
   def itemDesc = column[String]("item_desc", O.Nullable)    // 字段定义的描述
   def default = column[String]("item_default", O.Nullable)
   def order = column[Int]("order", O.Default(0)) // 字段排序
-  def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master))
+  def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master), O.DBType("VARCHAR(60)"))
 
   override def * = (id.?, templateId.?, itemName, itemDesc.?, default.?, order, scriptVersion) <> (TemplateItem.tupled, TemplateItem.unapply _)
   def idx_order = index("idx_tid_order", (templateId, order))
