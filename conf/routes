@@ -86,6 +86,10 @@ POST          /conf/upload                             controllers.conf.ConfCont
 POST          /conf/copy                               controllers.conf.ConfController.copy
 PUT           /conf/:id                                controllers.conf.ConfController.update(id: Int)
 
+# System
+POST          /system/buildTag                         controllers.conf.SystemController.buildTag
+PUT           /system/refresh                          controllers.conf.SystemController.refresh
+
 # Conf Log
 GET           /conf/:confId/logs                       controllers.conf.ConfController.logs(confId: Int, page: Int ?=0, pageSize: Int ?=10)
 GET           /conf/:confId/logs/total                 controllers.conf.ConfController.logsCount(confId: Int)

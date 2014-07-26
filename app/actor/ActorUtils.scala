@@ -1,6 +1,6 @@
 package actor
 
-import actor.git.FormulasActor
+import actor.git.ScriptGitActor
 import akka.actor.{Props, ActorSystem}
 
 /**
@@ -9,5 +9,5 @@ import akka.actor.{Props, ActorSystem}
 object ActorUtils {
   lazy val system = ActorSystem("bugatti")
 
-  lazy val formulasActor = system.actorOf(Props[FormulasActor])
+  lazy val scriptGitActor = system.actorOf(Props[ScriptGitActor])
 }

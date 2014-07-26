@@ -4,6 +4,7 @@ import java.io.{PrintWriter, File}
 
 import akka.actor.Actor
 import models.conf.{ConfContentHelper, ConfHelper}
+import play.api.libs.json.{Json, JsObject}
 import utils.ConfHelp
 import scala.sys.process._
 
@@ -11,8 +12,10 @@ import scala.sys.process._
  * Created by jinwei on 14/7/14.
  */
 class ConfActor extends Actor{
+  var _json = Json.obj()
   def receive = {
-    case CopyConfFile(taskId, envId, projectId, versionId, order) => {
+    case CopyConfFile(taskId, envId, projectId, versionId, order, json) => {
+      _json = json
       generateConfFile(taskId, envId, projectId, versionId)
       sender ! ExecuteCommand(taskId, envId, projectId, Option(versionId), order + 1)
       context.stop(self)
@@ -20,7 +23,7 @@ class ConfActor extends Actor{
   }
 
   def generateConfFile(taskId: Int, envId: Int, projectId: Int, versionId: Int) = {
-    val fileName = getFileName()
+    val fileName = (_json \ "confFileName").as[String]
     val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
     val baseDir = s"${ConfHelp.confPath}/${taskId}"
     val baseFilesPath = new File(s"${baseDir}/files")
@@ -46,12 +49,6 @@ class ConfActor extends Actor{
     Seq("rm", "-r", s"${baseDir}/files").!!
 
   }
-
-  def getFileName() = {
-    val timestamp: Long = System.currentTimeMillis / 1000
-    s"${timestamp}"
-  }
-
 }
 
-case class CopyConfFile(taskId: Int, envId: Int, projectId: Int, versionId: Int, order: Int)
+case class CopyConfFile(taskId: Int, envId: Int, projectId: Int, versionId: Int, order: Int, json: JsObject)

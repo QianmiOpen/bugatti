@@ -94,6 +94,16 @@ class TaskExecute extends Actor{
 
     val fileName = getFileName()
 
+
+
+    //envId -> Seq[template_item]
+    var latestVersion = ScriptVersionHelper.Master
+    EnvironmentHelper.findById(_envId).get.scriptVersion match {
+      case ScriptVersionHelper.Latest => {
+        latestVersion = ScriptVersionHelper.findLatest().get
+      }
+    }
+
     var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
       , "version" -> versionName
@@ -104,15 +114,8 @@ class TaskExecute extends Actor{
       , "projectId" -> tq.projectId
       , "taskId" -> taskId
       , "confFileName" -> fileName
+      , "scriptVersion" -> latestVersion
     )
-
-    //envId -> Seq[template_item]
-    var latestVersion = ScriptVersionHelper.Master
-    EnvironmentHelper.findById(_envId).get.scriptVersion match {
-      case ScriptVersionHelper.Latest => {
-        latestVersion = ScriptVersionHelper.findLatest().get
-      }
-    }
     val items = TemplateItemHelper.findByTemplateId_ScriptVersion(project.templateId, latestVersion)
     val attrs = AttributeHelper.findByProjectId(tq.projectId)
     val attrsName = attrs.map(_.name)
