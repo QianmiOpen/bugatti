@@ -17,9 +17,10 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime])
-case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], items: List[Attribute]) {
-  def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated)
+case class Variable(name: String, value: String)
+case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable])
+case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable], items: Seq[Attribute]) {
+  def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated, globalVariable)
 }
 
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
@@ -30,10 +31,15 @@ class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def lastVid = column[Int]("last_version_id", O.Nullable)         // 最近版本id
   def lastVersion = column[String]("last_version", O.Nullable)     // 最近版本号
   def lastUpdated= column[DateTime]("last_updated", O.Nullable, O.Default(DateTime.now()))
+  def globalVariable = column[Seq[Variable]]("global_variable", O.DBType("text"))(MappedColumnType.base[Seq[Variable], String](
+    _.map(v => s"${v.name}:${v.value}").mkString(","),
+    _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => Variable(name, value) }).toList
+  ))
 
-  override def * = (id.?, name, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?) <> (Project.tupled, Project.unapply _)
+  override def * = (id.?, name, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?, globalVariable) <> (Project.tupled, Project.unapply _)
   def idx = index("idx_name", name, unique = true)
   def idx_template = index("idx_template", templateId)
+
 }
 
 object ProjectHelper extends PlayCache {

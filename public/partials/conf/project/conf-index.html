@@ -21,7 +21,7 @@
         新建
     </button>
     <button ng-click="openModal($stateParams.eid, $stateParams.vid)" type="button" class="btn btn-default">一键拷贝</button>
-    <a ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
+    <a ng-if="!$state.includes('conf.project.version.conf.list')" ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
 </div>
 
 <div class="clearfix"></div>

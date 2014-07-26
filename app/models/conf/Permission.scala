@@ -21,7 +21,7 @@ class PermissionTable(tag: Tag) extends Table[Permission](tag, "permission") {
   def functions = column[Seq[Func]]("functions", O.DBType("text"))(MappedColumnType.base[Seq[Func], String]
     (
         _.map(_.id).mkString(","),
-        _.split(",").filterNot(_.isEmpty).map(x => FuncEnum(x.toInt)).toList
+        _.split(",").filterNot(_.trim.isEmpty).map(x => FuncEnum(x.toInt)).toList
     ))
   override def * = (jobNo, functions) <> (Permission.tupled, Permission.unapply _)
 }

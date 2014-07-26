@@ -16,8 +16,9 @@ import play.api.mvc.Action
  */
 object ProjectController extends BaseController {
 
-  implicit val projectWrites = Json.writes[Project]
+  implicit val varWrites = Json.writes[Variable]
   implicit val attributeWrites = Json.writes[Attribute]
+  implicit val projectWrites = Json.writes[Project]
 
   def msg(user: String, ip: String, msg: String, data: Project) =
     Json.obj("mod" -> ModEnum.project.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
@@ -31,7 +32,13 @@ object ProjectController extends BaseController {
       "lastVid" -> optional(number),
       "lastVersion" -> optional(text),
       "lastUpdated" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
-      "items" -> list(
+      "variable" -> seq (
+        mapping(
+          "name" -> text,
+          "value" -> text
+        )(Variable.apply)(Variable.unapply)
+      ),
+      "items" -> seq(
         mapping(
           "id" -> optional(number),
           "projectId" -> optional(number),
@@ -139,7 +146,7 @@ object ProjectController extends BaseController {
     if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
     else UserHelper.findByJobNo(jobNo) match {
       case Some(_) =>
-        val member = Member(None, projectId, LevelEnum.unsafe, jobNo)
+        val member = Member(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member))
         Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(member))))
       case _ =>

@@ -33,7 +33,7 @@ object ConfController extends BaseController {
       "versionId" -> number,
       "jobNo" -> ignored(""),
       "name" -> optional(text),
-      "path" -> nonEmptyText,
+      "path" -> nonEmptyText(maxLength = 255),
       "fileType" -> optional(text),
       "content" -> default(text, ""),
       "remark" -> optional(text),

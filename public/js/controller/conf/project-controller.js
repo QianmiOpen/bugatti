@@ -169,6 +169,7 @@ define(['angular'], function(angular) {
             $scope.saveOrUpdate = function(project) {
 
                 project.items = [];
+                project.variable = angular.copy($scope.vars);
                 angular.forEach($scope.items, function(item) {
                     project.items.push({name: item.itemName, value: item.value})
                 });
@@ -203,8 +204,41 @@ define(['angular'], function(angular) {
                         }
                     })
                 });
+            };
+
+            // project variable
+            $scope.vars = [];
+            $scope.addVar = function(v) {
+                if (findInVars($scope.vars, v)) {
+                    $scope.varForm.varName.$invalid = true;
+                    $scope.varForm.varName.$error.unique = true;
+                    return;
+                };
+                $scope.vars.push(angular.copy(v));
+                v.name = "", v.value = ""; // clean input
+                $scope.varForm.varName.$error.unique = false;
             }
-    }]);
+
+            function findInVars(vars, v) {
+                var find = false;
+                angular.forEach(vars, function(vs) {
+                    if (vs.name == v.name) {
+                        find = true;
+                        return;
+                    }
+                });
+                return find;
+            }
+
+            $scope.editVar = function(repeat$scope) {
+                repeat$scope.mode = 'edit';
+            };
+
+            $scope.deleteVar = function(index) {
+                $scope.vars.splice(index, 1);
+            };
+
+        }]);
 
     app.controller('ProjectUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'ProjectService', 'TemplateService',
         function($scope, $stateParams, $filter, $state, ProjectService, TemplateService) {
@@ -212,6 +246,7 @@ define(['angular'], function(angular) {
             // update
             $scope.saveOrUpdate = function(project) {
                 project.items = [];
+                project.variable = angular.copy($scope.vars);
                 angular.forEach($scope.items, function(item) {
                     project.items.push({name: item.itemName, value: item.value})
                 });
@@ -238,7 +273,8 @@ define(['angular'], function(angular) {
 
                 $scope.change(data.templateId)
 
-
+                // init variable
+                $scope.vars = angular.copy(data.globalVariable);
             });
 
             // load template all
@@ -267,8 +303,40 @@ define(['angular'], function(angular) {
                     });
 
                 });
+            };
+
+            // project variable
+            $scope.addVar = function(v) {
+                if (findInVars($scope.vars, v)) {
+                    $scope.varForm.varName.$invalid = true;
+                    $scope.varForm.varName.$error.unique = true;
+                    return;
+                };
+                $scope.vars.push(angular.copy(v));
+                v.name = "", v.value = ""; // clean input
+                $scope.varForm.varName.$error.unique = false;
             }
-    }]);
+
+            function findInVars(vars, v) {
+                var find = false;
+                angular.forEach(vars, function(vs) {
+                    if (vs.name == v.name) {
+                        find = true;
+                        return;
+                    }
+                });
+                return find;
+            }
+
+            $scope.editVar = function(repeat$scope) {
+                repeat$scope.mode = 'edit';
+            };
+
+            $scope.deleteVar = function(index) {
+                $scope.vars.splice(index, 1);
+            };
+
+        }]);
 
 
     // ===================================================================
