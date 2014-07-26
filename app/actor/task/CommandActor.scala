@@ -9,7 +9,7 @@ import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{Task, TaskCommand, TaskHelper}
 import play.api.Logger
-import play.api.libs.json.JsObject
+import play.api.libs.json.{Json, JsObject}
 import utils.ConfHelp
 
 import scala.concurrent.duration._
@@ -31,6 +31,7 @@ class CommandActor extends Actor {
   var _projectId = 0
   var _order = 0
   var _versionId = Option.empty[Int]
+  var _returnJson = Json.obj()
 
   def receive = {
     case SaltResult(result, excuteMicroseconds) => {
@@ -42,6 +43,7 @@ class CommandActor extends Actor {
       _envId = insertCommands.envId
       _projectId = insertCommands.projectId
       _versionId = insertCommands.versionId
+      _returnJson = insertCommands.json
 
       if(insertCommands.commandList.length == 0){
         noCommands(_taskId, _envId, _projectId, insertCommands.json)
@@ -140,7 +142,7 @@ class CommandActor extends Actor {
       commandSeq(1) match {
         case "copyfile" => {
           val confActor = context.actorOf(Props[ConfActor], s"confActor_${envId}_${projectId}_${order}")
-          confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order)
+          confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson)
         }
       }
     } else {//正常的salt命令
