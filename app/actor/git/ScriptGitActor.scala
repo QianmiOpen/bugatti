@@ -1,6 +1,7 @@
 package actor.git
 
 import java.io.{File, FileFilter, FileInputStream}
+import java.text.SimpleDateFormat
 import java.util.{List => JList, Map => JMap}
 
 import akka.actor.{Actor, ActorLogging}
@@ -17,84 +18,110 @@ import scala.collection.JavaConverters._
 /**
  * Created by mind on 7/24/14.
  */
+import ScriptGitActor._
 
+object ScriptGitActor {
+  case class BuildScriptTag(tagName: String = s"r${DateFormat.format(DateTime.now.toDate)}")
+  case class ReloadFormulasTemplate()
 
-case class ReloadFormulasTemplate()
+  val DateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS")
+}
 
-
-class FormulasActor extends Actor with ActorLogging {
+class ScriptGitActor extends Actor with ActorLogging {
   val TemplateSuffix = ".yaml"
   val TemplatePath = "/templates"
+  val Ok = "Ok"
 
   val app = Play.current
-  lazy val gitWorkDir: File = new File(app.configuration.getString("git.work.dir").getOrElse("target/formulas"))
+  lazy val gitFormulasDir: File = new File(app.configuration.getString("git.formulas.dir").getOrElse("target/formulas"))
+  lazy val gitFormulasUrl = app.configuration.getString("git.formulas.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-formulas.git")
+  lazy val gitPkgsDir: File = new File(app.configuration.getString("git.pkgs.dir").getOrElse("target/pkgs"))
+  lazy val gitPkgsUrl = app.configuration.getString("git.pkgs.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-pkgs.git")
 
-  var _git: Git = null
-
-  override def receive: Receive = {
-    case ReloadFormulasTemplate => _reloadTemplates
-    case x => log.warning("Unknown message ${x}")
-  }
+  var gitFormulas: Git = null
+  var gitPkgs: Git = null
 
   override def preStart(): Unit = {
     // 启动时初始化git目录
-    if (app.configuration.getBoolean("git.work.init").getOrElse(true)) {
-      val gitRemoteUrl = app.configuration.getString("git.work.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-formulas.git")
-
-      val gitWorkDir_git = new File(s"${gitWorkDir.getAbsolutePath}/.git")
-      if (!gitWorkDir.exists() || !gitWorkDir_git.exists()) {
-        _delDir(gitWorkDir)
-        val clone = Git.cloneRepository()
-        clone.setDirectory(gitWorkDir).setURI(gitRemoteUrl)
-        clone.call()
-      }
-
-      val builder = new FileRepositoryBuilder()
-      val repo = builder.setGitDir(gitWorkDir_git).build()
-      _git = new Git(repo)
-      log.info(s"Init git: ${_git.getRepository}")
+    if (app.configuration.getBoolean("git.init").getOrElse(true)) {
+      gitFormulas = _initGitDir(gitFormulasDir, gitFormulasUrl)
+      gitPkgs = _initGitDir(gitPkgsDir, gitPkgsUrl)
     }
   }
 
-  def _delDir(dir: File) {
-    if (dir.exists()) {
-      dir.listFiles().foreach { x =>
-        if (x.isDirectory()) {
-          _delDir(x)
-        } else {
-          x.delete()
-        }
-      }
-      dir.delete()
+  def _initGitDir(workDir: File, girUrl: String) = {
+    val gitWorkDir = new File(s"${workDir.getAbsolutePath}/.git")
+    if (!workDir.exists() || !gitWorkDir.exists()) {
+      _delDir(workDir)
+      val clone = Git.cloneRepository()
+      clone.setDirectory(workDir).setURI(girUrl)
+      clone.call()
+    }
+
+    val builder = new FileRepositoryBuilder()
+    val repo = builder.setGitDir(gitWorkDir).build()
+
+    val git = new Git(repo)
+    log.info(s"Init git: ${git.getRepository}")
+    git
+  }
+
+  override def receive: Receive = {
+    case ReloadFormulasTemplate => {
+      _reloadTemplates
+      sender ! Ok
+    }
+    case BuildScriptTag(tagName) => {
+      _tagScript(tagName)
+      sender ! Ok
+    }
+    case x => log.warning(s"Unknown message ${x}")
+  }
+
+  def _tagScript(tagName: String) = {
+    if (gitFormulas != null && gitPkgs != null) {
+      // checkout到master上
+      gitFormulas.checkout().setName(ScriptVersionHelper.Master).call()
+      gitPkgs.checkout().setName(ScriptVersionHelper.Master).call()
+
+      gitFormulas.pull().call()
+      gitPkgs.pull().call()
+
+      gitFormulas.tag().setName(tagName).call()
+      gitPkgs.tag().setName(tagName).call()
+
+      gitFormulas.push().setPushTags().call()
+      gitPkgs.push().setPushTags().call()
+
+      ScriptVersionHelper.create(ScriptVersion(None, tagName, message = Some("")))
+      _loadTemplateFromDir(tagName)
     }
   }
 
   def _reloadTemplates() {
-    if (_git != null) {
-      _git.checkout().setName(ScriptVersionHelper.Master).call()
-      _git.pull().call()
+    if (gitFormulas != null) {
+      gitFormulas.checkout().setName(ScriptVersionHelper.Master).call()
+      gitFormulas.pull().call()
 
-      val tags = _git.tagList().call()
+      val tags = gitFormulas.tagList().call()
       val scriptNames = ScriptVersionHelper.allName()
 
       if (tags != null) {
         // 加载新的tag脚本
         tags.asScala.map(_.getName.split("/").last).filterNot(scriptNames.contains).foreach { tagName =>
           log.debug(s"Load tag: ${tagName}")
-          _git.checkout().setName(tagName).call()
-
           ScriptVersionHelper.create(ScriptVersion(None, tagName, message = Some("")))
+
           _loadTemplateFromDir(tagName)
         }
       }
 
       // 重新加载master,先讲老master更新掉
       log.debug(s"Load tag: ${ScriptVersionHelper.Master}")
-      val backupMasterName = s"master-bak-${DateTime.now}"
+      val backupMasterName = s"master-bak-${DateFormat.format(DateTime.now.toDate)}"
       TemplateItemHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
       TaskTemplateHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
 
-      _git.checkout().setName(ScriptVersionHelper.Master).call()
       _loadTemplateFromDir(ScriptVersionHelper.Master)
     } else {
       log.warning("Reload template, but git is null")
@@ -102,7 +129,9 @@ class FormulasActor extends Actor with ActorLogging {
   }
 
   def _loadTemplateFromDir(tagName: String) {
-    val templateDir = new File(s"${gitWorkDir.getAbsolutePath}${TemplatePath}")
+    gitFormulas.checkout().setName(tagName).call()
+
+    val templateDir = new File(s"${gitFormulasDir.getAbsolutePath}${TemplatePath}")
     templateDir.listFiles(new FileFilter {
       override def accept(pathname: File): Boolean = pathname.getName.endsWith(TemplateSuffix)
     }).foreach { file =>
@@ -150,6 +179,19 @@ class FormulasActor extends Actor with ActorLogging {
             TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1))
           }
       }
+    }
+  }
+
+  def _delDir(dir: File) {
+    if (dir.exists()) {
+      dir.listFiles().foreach { x =>
+        if (x.isDirectory()) {
+          _delDir(x)
+        } else {
+          x.delete()
+        }
+      }
+      dir.delete()
     }
   }
 }

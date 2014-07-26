@@ -10,6 +10,7 @@ define(['angular',
     './conf/template-routes',
     './conf/relation-routes',
     './conf/conf-routes',
+    './conf/system-routes',
     './task/task-route'
 ], function(angular) {
 
@@ -25,6 +26,7 @@ define(['angular',
         'bugattiApp.route.conf.templateModule',
         'bugattiApp.route.conf.relationModule',
         'bugattiApp.route.conf.confModule',
+        'bugattiApp.route.conf.systemModule',
         'bugattiApp.route.task.taskModule'
     ]);
 
