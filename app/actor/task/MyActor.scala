@@ -28,10 +28,6 @@ object MyActor {
   val system = ActorUtils.system
   //管理taskQueue中，在同一时间只有一个eid_pid的任务在执行
   val superviseTaskActor = system.actorOf(Props[MyActor], "superviseActor")
-  //check salt执行结果
-//  val jobActor = system.actorOf(Props[CheckJob], "checkJob")
-  //taskCommand 执行过程
-//  val commandActor = system.actorOf(Props[CommandActor], "commandActor")
   //socketActor
   val socketActor = system.actorOf(Props[SocketActor], "socketActor")
 
@@ -116,7 +112,6 @@ class MyActor extends Actor{
     }
     case NextTaskQueue(envId, projectId) => {
       val key = s"${envId}_${projectId}"
-//      MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
       context.child(s"taskExecute_${key}").getOrElse(
         actorOf(Props[TaskExecute], s"taskExecute_${key}")
       ) ! NextTaskQueue(envId, projectId)

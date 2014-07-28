@@ -11,6 +11,7 @@ import utils.TaskTools
  * Created by jinwei on 13/7/14.
  */
 class TaskExecute extends Actor{
+  import context._
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
   var _tqId = 0
@@ -47,8 +48,10 @@ class TaskExecute extends Actor{
           MyActor.superviseTaskActor ! ChangeTaskStatus(tqExecute, taskName, queuesJson, currentNum, totalNum)
           TaskCommandHelper.create(commandList)
           //TODO executeCommands 从第1个命令开始执行
-          val commandActor = context.actorOf(Props[CommandActor], s"commandActor_${tq.envId}_${tq.projectId}")
-          commandActor ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList, returnJson)
+          val key = s"${tq.envId}_${tq.projectId}"
+          context.child(s"commandActor_${key}").getOrElse(
+            actorOf(Props[CommandActor], s"commandActor_${key}")
+          ) ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList, returnJson)
         }
         case _ => {
           context.stop(self)
