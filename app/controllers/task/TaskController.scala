@@ -130,7 +130,6 @@ object TaskController extends BaseController {
     val templateId = (tq \ "templateId").as[Int]
     val taskQueue = TaskQueue(None, envId, projectId, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
     val taskQueueId = TaskQueueHelper.create(taskQueue)
-    //    TaskProcess.createNewTask(taskQueue)
     MyActor.createNewTask(envId, projectId)
     //test
 //    var seq = Seq.empty[TaskQueue]

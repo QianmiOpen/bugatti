@@ -81,17 +81,17 @@ object Global extends GlobalSettings {
 
     SaltTools.refreshHostList(app)
 
+
+    //需要在taskQueue执行之前被初始化
+    MyActor.refreshSyndic
+    MyActor.generateSchedule
+
     //查看队列表中是否有可执行任务
     val set = TaskQueueHelper.findEnvId_ProjectId()
     set.foreach {
       s =>
-        //        TaskProcess.checkQueueNum(s._1, s._2)
-        //        TaskProcess.executeTasks(s._1, s._2)
         MyActor.createNewTask(s._1, s._2)
     }
-
-    MyActor.refreshSyndic
-    MyActor.generateSchedule
   }
 }
 

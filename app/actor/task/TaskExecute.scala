@@ -54,6 +54,7 @@ class TaskExecute extends Actor{
           ) ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList, returnJson)
         }
         case _ => {
+          MyActor.superviseTaskActor ! RemoveStatus(_envId, _projectId)
           context.stop(self)
         }
       }
