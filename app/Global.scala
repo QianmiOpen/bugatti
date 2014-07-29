@@ -1,4 +1,6 @@
 
+import java.io.File
+
 import actor.ActorUtils
 import actor.task.MyActor
 import enums.{LevelEnum, RoleEnum}
@@ -11,6 +13,8 @@ import org.pac4j.core.client.Clients
 import org.pac4j.play.Config
 import play.api.Play.current
 import play.api._
+import play.api.libs.Files
+import utils.Directory._
 import utils.SaltTools
 
 import scala.slick.driver.MySQLDriver.simple._
@@ -23,6 +27,13 @@ object Global extends GlobalSettings {
 
   override def beforeStart(app: Application) {
     System.setProperty("javax.net.ssl.trustStore", app.configuration.getString("ssl.trustStore").getOrElse("conf/certificate.jks"))
+
+    // Create BUGATTI_HOME directory if it does not exist
+    val dir = new File(BugattiHome)
+    if (!dir.exists) {
+      dir.mkdir
+    }
+
   }
 
   override def onStart(app: Application) {
@@ -38,8 +49,9 @@ object Global extends GlobalSettings {
     val callbackUrl = app.configuration.getString("cas.callback_url").getOrElse("http://bugatti.dev.ofpay.com/callback")
     Config.setClients(new Clients(callbackUrl, casClient))
 
+    val _db = AppDB.db
     if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
-      AppDB.db.withSession { implicit session =>
+      _db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
           TableQuery[ConfLogTable] ::
           TableQuery[ConfContentTable] ::
@@ -71,6 +83,25 @@ object Global extends GlobalSettings {
       AppData.initData
     }
 
+    /**
+     * mysql bug
+     *
+    import AutoUpdate._
+    defining(getCurrentVersion()) { currentVersion =>
+      if (currentVersion == headVersion) {
+        Logger.debug("No update")
+      } else if (!versions.contains(currentVersion)) {
+        Logger.warn(s"Skip migration because ${currentVersion.versionString} is illegal version.")
+      } else {
+        _db.withSession { implicit session =>
+          versions.takeWhile(_ != currentVersion).reverse.foreach(_.update)
+          Files.writeFile(versionFile, headVersion.versionString)
+          Logger.debug(s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
+        }
+      }
+    }
+    */
+
     if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
       AppTestData.initData
     }
@@ -93,6 +124,7 @@ object Global extends GlobalSettings {
     MyActor.refreshSyndic
     MyActor.generateSchedule
   }
+
 }
 
 
@@ -164,4 +196,73 @@ object AppTestData {
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
   }
+}
+
+
+object AutoUpdate {
+
+  /**
+   * Version of Bugatti
+   *
+   * @param majorVersion 主版本号
+   * @param minorVersion 次版本号
+   */
+  case class Version(majorVersion: Int, minorVersion: Int) {
+
+    /**
+     * Execute update/MAJOR_MINOR.sql to update schema to this version.
+     * If corresponding SQL file does not exist, this method do nothing.
+     *
+     * @param session
+     */
+    def update(implicit session: Session): Unit = {
+      val sqlPath = s"upgrade/${majorVersion}_${minorVersion}.sql"
+
+      Play.resourceAsStream(sqlPath).map { in =>
+        val sql = scala.io.Source.fromInputStream(in, "UTF-8").mkString
+        Logger.debug(sqlPath + "=" + sql)
+        session.createStatement().executeUpdate(sql)
+      }
+    }
+
+    /**
+     * MAJOR.MINOR
+     */
+    val versionString = s"${majorVersion}.${minorVersion}"
+  }
+
+  val versions = Seq(
+    Version(1, 3),
+    Version(1, 2),
+    Version(1, 1),
+    Version(0, 0)
+  )
+
+  /**
+   * The head version of Bugatti.
+   */
+  val headVersion = versions.head
+
+  /**
+   * The version file (BUGATTI_HOME/version).
+   */
+  lazy val versionFile = new File(BugattiHome, "version")
+
+  /**
+   * Returns the current version from thr version file.
+   * @return
+   */
+  def getCurrentVersion(): Version = {
+    if (versionFile.exists) {
+      Files.readFile(versionFile).trim.split("\\.") match {
+        case Array(majorVersion, minorVersion) => {
+          versions.find { v =>
+            v.majorVersion == majorVersion.toInt && v.minorVersion == minorVersion.toInt
+          }.getOrElse(Version(0, 0))
+        }
+        case _ => Version(0, 0)
+      }
+    } else Version(0, 0)
+  }
+
 }
