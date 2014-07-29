@@ -102,11 +102,14 @@ class TaskExecute extends Actor{
 
     //envId -> Seq[template_item]
     var latestVersion = ScriptVersionHelper.Master
-    EnvironmentHelper.findById(_envId).get.scriptVersion match {
-      case ScriptVersionHelper.Latest => {
-        latestVersion = ScriptVersionHelper.findLatest().get
-      }
+    if(EnvironmentHelper.findById(_envId).get.scriptVersion == ScriptVersionHelper.Latest){
+      latestVersion = ScriptVersionHelper.findLatest().get
     }
+//    EnvironmentHelper.findById(_envId).get.scriptVersion match {
+//      case ScriptVersionHelper.Latest => {
+//        latestVersion = ScriptVersionHelper.findLatest().get
+//      }
+//    }
 
     var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
@@ -125,7 +128,7 @@ class TaskExecute extends Actor{
     val attrsName = attrs.map(_.name)
     val errorItems = items.filterNot(t => attrsName.contains(t.itemName))
     if(errorItems.length > 0) {
-      return (Seq.empty[TaskCommand], Json.obj("error" -> s"${errorItems} 未配置"))
+      return (Seq.empty[TaskCommand], Json.obj("error" -> s"${errorItems.map(_.itemName)} 未配置"))
     }
     val attributesJson = attrs.map {
       s =>
