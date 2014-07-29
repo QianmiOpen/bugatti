@@ -11,6 +11,7 @@ import utils.TaskTools
  * Created by jinwei on 13/7/14.
  */
 class TaskExecute extends Actor{
+  import context._
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
   var _tqId = 0
@@ -47,10 +48,13 @@ class TaskExecute extends Actor{
           MyActor.superviseTaskActor ! ChangeTaskStatus(tqExecute, taskName, queuesJson, currentNum, totalNum)
           TaskCommandHelper.create(commandList)
           //TODO executeCommands 从第1个命令开始执行
-          val commandActor = context.actorOf(Props[CommandActor], s"commandActor_${tq.envId}_${tq.projectId}")
-          commandActor ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList, returnJson)
+          val key = s"${tq.envId}_${tq.projectId}"
+          context.child(s"commandActor_${key}").getOrElse(
+            actorOf(Props[CommandActor], s"commandActor_${key}")
+          ) ! InsertCommands(taskId, tqExecute.envId, tqExecute.projectId, tq.versionId, commandList, returnJson)
         }
         case _ => {
+          MyActor.superviseTaskActor ! RemoveStatus(_envId, _projectId)
           context.stop(self)
         }
       }
@@ -98,11 +102,14 @@ class TaskExecute extends Actor{
 
     //envId -> Seq[template_item]
     var latestVersion = ScriptVersionHelper.Master
-    EnvironmentHelper.findById(_envId).get.scriptVersion match {
-      case ScriptVersionHelper.Latest => {
-        latestVersion = ScriptVersionHelper.findLatest().get
-      }
+    if(EnvironmentHelper.findById(_envId).get.scriptVersion == ScriptVersionHelper.Latest){
+      latestVersion = ScriptVersionHelper.findLatest().get
     }
+//    EnvironmentHelper.findById(_envId).get.scriptVersion match {
+//      case ScriptVersionHelper.Latest => {
+//        latestVersion = ScriptVersionHelper.findLatest().get
+//      }
+//    }
 
     var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
@@ -121,7 +128,7 @@ class TaskExecute extends Actor{
     val attrsName = attrs.map(_.name)
     val errorItems = items.filterNot(t => attrsName.contains(t.itemName))
     if(errorItems.length > 0) {
-      return (Seq.empty[TaskCommand], Json.obj("error" -> s"${errorItems} 未配置"))
+      return (Seq.empty[TaskCommand], Json.obj("error" -> s"${errorItems.map(_.itemName)} 未配置"))
     }
     val attributesJson = attrs.map {
       s =>

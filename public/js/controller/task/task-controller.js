@@ -170,7 +170,7 @@ define(['angular'], function(angular) {
             console.log(tmp[0] + "," + tmp[1])
             TaskService.findLastStatus(tmp[0], tmp[1], function(data){
                 $scope.lastTasks = data
-                $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                $scope.projectStatus = $scope.projectStatus.map($scope.changeLastData).map($scope.addStatusTip)
                 console.log($scope.projectStatus)
                 $scope.mergeTemplates()
             })
@@ -186,6 +186,17 @@ define(['angular'], function(angular) {
             }
         }
 
+        $scope.changeLastData = function(data){
+            for(var index in $scope.lastTasks){
+                var p = $scope.lastTasks[index]
+                console.log(p)
+                if(p.projectId === data.id){
+                    data.task = p
+                    data.task.queueNum = 0
+                }
+            }
+            return data
+        }
         //合并两个数组 pros & projectStatus
         $scope.changeData = function(data){
             data.task = {}

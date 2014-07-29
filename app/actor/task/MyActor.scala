@@ -28,10 +28,6 @@ object MyActor {
   val system = ActorUtils.system
   //管理taskQueue中，在同一时间只有一个eid_pid的任务在执行
   val superviseTaskActor = system.actorOf(Props[MyActor], "superviseActor")
-  //check salt执行结果
-//  val jobActor = system.actorOf(Props[CheckJob], "checkJob")
-  //taskCommand 执行过程
-//  val commandActor = system.actorOf(Props[CommandActor], "commandActor")
   //socketActor
   val socketActor = system.actorOf(Props[SocketActor], "socketActor")
 
@@ -96,30 +92,25 @@ object MyActor {
   }
 }
 
-class MyActor extends Actor{
+class MyActor extends Actor with ActorLogging {
   import context._
   def receive = {
     case CreateNewTaskActor(envId, projectId) => {
       // 增加任务队列数量
       val key = s"${envId}_${projectId}"
-
-      Logger.info("key ==> "+key)
-
       incQueueNum(key, 1)
-
-      if(!MyActor.envId_projectIdStatus.keySet.contains(key)){
-        val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
-        MyActor.envId_projectIdStatus += key -> TaskEnum.TaskProcess
-
-        taskExecute ! TaskGenerateCommand(envId, projectId)
-      }
+      self ! NextTaskQueue(envId, projectId)
     }
     case NextTaskQueue(envId, projectId) => {
       val key = s"${envId}_${projectId}"
-//      MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
-      context.child(s"taskExecute_${key}").getOrElse(
-        actorOf(Props[TaskExecute], s"taskExecute_${key}")
-      ) ! NextTaskQueue(envId, projectId)
+      log.info(s"envId_projectIdStatus before ==> ${MyActor.envId_projectIdStatus}")
+      if(!MyActor.envId_projectIdStatus.keySet.contains(key)){
+        MyActor.envId_projectIdStatus += key -> TaskEnum.TaskProcess
+        log.info(s"envId_projectIdStatus after ==> ${MyActor.envId_projectIdStatus}")
+        context.child(s"taskExecute_${key}").getOrElse(
+          actorOf(Props[TaskExecute], s"taskExecute_${key}")
+        ) ! NextTaskQueue(envId, projectId)
+      }
     }
     case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum) => {
       val key = s"${tq.envId}_${tq.projectId}"
@@ -157,16 +148,16 @@ class MyActor extends Actor{
       //TODO NextTaskQueue
       //复用taskExecute
       //      val taskExecute = actorSelection(s"/user/mySystem/superviseActor/taskExecute_${key}")
-      val taskExecute = actorSelection(s"/user/superviseActor/taskExecute_${key}")
+//      val taskExecute = actorSelection(s"/user/superviseActor/taskExecute_${key}")
       //      val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
 
-      taskExecute ! RemoveTaskQueue()
+      context.child(s"taskExecute_${key}").getOrElse(
+        actorOf(Props[TaskExecute], s"taskExecute_${key}")
+      ) ! RemoveTaskQueue()
+
     }
     case RemoveStatus(envId, projectId) => {
-      val key = s"${envId}_${projectId}"
-      removeStatus(key)
-      MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
-      self ! NextTaskQueue(envId, projectId)
+      removeStatus(envId, projectId)
     }
   }
 
@@ -188,20 +179,31 @@ class MyActor extends Actor{
 
   def changeStatus(js: JsObject): JsValue = {
     MyActor.statusMap = MyActor.statusMap ++ js
-    Logger.info("changeStatus ==>"+MyActor.statusMap.toString())
+    log.info("changeStatus ==>"+MyActor.statusMap.toString())
     MyActor.statusMap
   }
 
-  def removeStatus(key: String) = {
-    val queueNum = (MyActor.statusMap \ key \ "queueNum").as[Int]
-    if(queueNum == 0){
-      MyActor.statusMap = MyActor.statusMap - key
-    }else {
-      MyActor.statusMap = MyActor.statusMap - key
-      changeStatus(Json.obj(key -> Json.obj("queueNum" -> queueNum)))
+  def removeStatus(envId: Int, projectId: Int) = {
+    val key = s"${envId}_${projectId}"
+    val queueNum = (MyActor.statusMap \ key \ "queueNum").asOpt[Int]
+    queueNum match {
+      case Some(qm) => {
+        if(qm == 0){
+          MyActor.statusMap = MyActor.statusMap - key
+          MyActor.socketActor ! FindLastStatus(key)
+        }
+        else {
+          MyActor.statusMap = MyActor.statusMap - key
+          changeStatus(Json.obj(key -> Json.obj("queueNum" -> queueNum)))
+        }
+        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+        self ! NextTaskQueue(envId, projectId)
+      }
+      case _ => {
+        MyActor.statusMap = MyActor.statusMap - key
+        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+      }
     }
-
-    MyActor.socketActor ! FindLastStatus(key)
   }
 
 }

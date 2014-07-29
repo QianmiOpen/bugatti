@@ -112,17 +112,17 @@ object Global extends GlobalSettings {
 
     SaltTools.refreshHostList(app)
 
+
+    //需要在taskQueue执行之前被初始化
+    MyActor.refreshSyndic
+    MyActor.generateSchedule
+
     //查看队列表中是否有可执行任务
     val set = TaskQueueHelper.findEnvId_ProjectId()
     set.foreach {
       s =>
-        //        TaskProcess.checkQueueNum(s._1, s._2)
-        //        TaskProcess.executeTasks(s._1, s._2)
         MyActor.createNewTask(s._1, s._2)
     }
-
-    MyActor.refreshSyndic
-    MyActor.generateSchedule
   }
 
 }
@@ -174,10 +174,10 @@ object AppTestData {
     ).foreach(VersionHelper.create)
 
     var seq = Seq(
-      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe, "", List.empty[Variable]),
-      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe, "", List.empty[Variable]),
-      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe, "", List.empty[Variable]),
-      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, "", List.empty[Variable])
+      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
+      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
+      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
+      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable])
     )
     //    for (i <- 5 to 55) {
     //      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)

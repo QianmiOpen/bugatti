@@ -2,13 +2,12 @@ package actor.task
 
 import java.io.File
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ActorLogging, Actor, Props}
 import com.qianmi.bugatti.actors.SaltResult
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{Task, TaskCommand, TaskHelper}
-import play.api.Logger
 import play.api.libs.json.{Json, JsObject}
 import utils.ConfHelp
 
@@ -24,7 +23,7 @@ object CommandActor {
   var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
 }
 
-class CommandActor extends Actor {
+class CommandActor extends Actor with ActorLogging {
   var _commands = Seq.empty[TaskCommand]
   var _taskId = 0
   var _envId = 0
@@ -36,7 +35,7 @@ class CommandActor extends Actor {
   def receive = {
     case SaltResult(result, excuteMicroseconds) => {
       println(s"result command ==> ${result}")
-      Logger.info(s"result ==> ${result}")
+      log.info(s"result ==> ${result}")
     }
     case insertCommands: InsertCommands => {
       _taskId = insertCommands.taskId
@@ -148,28 +147,21 @@ class CommandActor extends Actor {
     } else {//正常的salt命令
       //1、根据syndic获取ip
       val key = s"${_envId}_${_projectId}"
-      Logger.debug(s"commnadActor key ==> ${key}")
-      Logger.debug(s"commnadActor eps ==> ${MyActor.envId_projectId_syndic.get(key)}")
-      Logger.debug(s"commnadActor eps ==> ${MyActor.syndic_ip.get(MyActor.envId_projectId_syndic.get(key).getOrElse("0_0")).getOrElse("0.0.0.0")}")
-      val syndicIp = MyActor.syndic_ip.get(MyActor.envId_projectId_syndic.get(s"${_envId}_${_projectId}").getOrElse("0_0")).getOrElse("0.0.0.0")
+      val syndicIp = MyActor.syndic_ip.get(MyActor.envId_projectId_syndic.get(key).getOrElse("0_0")).getOrElse("0.0.0.0")
+      log.debug(s"commnadActor key ==> ${key}")
+      log.debug(s"commnadActor eps ==> ${MyActor.envId_projectId_syndic.get(key)}")
+      log.debug(s"commnadActor syndicIp ==> ${syndicIp}")
 
       val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
-      Logger.info("test111")
+      log.info(s"remotePath ==> ${remotePath}")
       import actor.task.MyActor.system.dispatcher
       val lookupActor = context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${order}")
-      Logger.info("test222")
       //3、触发远程命令
       MyActor.system.scheduler.scheduleOnce(1.second) {
         lookupActor ! LookupActorCommand(commandSeq, taskId, envId, projectId, versionId, order)
-        Logger.info("test333")
       }
     }
-
-
   }
-
-
-
 
   def command2Seq(command: String): Seq[String] = {
     var retSeq = Seq.empty[String]
