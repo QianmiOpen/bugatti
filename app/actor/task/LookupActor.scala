@@ -4,7 +4,6 @@ import java.io.File
 
 import com.qianmi.bugatti.actors.{SaltCommand, SaltResult, TimeOut}
 import enums.TaskEnum
-import play.api.Logger
 import play.api.libs.json.Json
 import utils.ConfHelp
 
@@ -13,11 +12,11 @@ import scala.sys.process._
 /**
  * Created by jinwei on 17/7/14.
  */
-import akka.actor.{Actor, ActorIdentity, ActorRef, Identify, ReceiveTimeout, Terminated}
+import akka.actor._
 
 import scala.concurrent.duration._
 
-class LookupActor(path: String) extends Actor {
+class LookupActor(path: String) extends Actor with ActorLogging{
 
   var _taskId = 0
   var _envId = 0
@@ -63,15 +62,15 @@ class LookupActor(path: String) extends Actor {
       actor ! SaltCommand(commandSeq)
     }
 
-    case executeCommand: ExecuteCommand => {
-      actor ! executeCommand
-    }
-
-    case terminateCommands: TerminateCommands => {
-      actor ! terminateCommands
-    }
+//    case executeCommand: ExecuteCommand => {
+//      actor ! executeCommand
+//    }
+//
+//    case terminateCommands: TerminateCommands => {
+//      actor ! terminateCommands
+//    }
     case SaltResult(result, excuteMicroseconds) => {
-      Logger.info(s"result ==> ${result}")
+      log.info(s"result ==> ${result}")
       val jsonResult = Json.parse(result)
       val funType = (jsonResult \ "result" \ "fun").asOpt[String]
       funType match {
@@ -125,9 +124,9 @@ class LookupActor(path: String) extends Actor {
 
   def getCommandActor() = {
     val path = s"/user/commandActor_${_envId}_${_projectId}"
-    Logger.info(s"lookup context ==>${context.children}")
-    Logger.info(s"lookup context ==>${context.system}")
-    Logger.info(s"lookup context ==>${context.parent}")
+    log.info(s"lookup context ==>${context.children}")
+    log.info(s"lookup context ==>${context.system}")
+    log.info(s"lookup context ==>${context.parent}")
 //    val actor = context.actorSelection(path) ! Identify(path)
 //    val actorPath = MyActor.system.child(s"commandActor_${_envId}_${_projectId}")
 //    context.actorSelection(path)

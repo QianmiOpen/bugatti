@@ -115,7 +115,7 @@ object AppTestData {
 
     // 项目表初始化
     Seq(
-      Project(None, "cardbase-master", 1, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
+      Project(None, "cardbase-master", 3, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
       Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
       Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
       Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
@@ -145,7 +145,7 @@ object AppTestData {
       Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
       Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
       Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
-      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable])
+      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master, globalVariable = List.empty[Variable])
     )
     //    for (i <- 5 to 55) {
     //      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
