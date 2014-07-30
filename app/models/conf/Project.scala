@@ -1,13 +1,12 @@
 package models.conf
 
+import com.github.tototoshi.slick.MySQLJodaSupport._
 import enums.LevelEnum
-import play.api.Logger
-import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
+import play.api.Play.current
 
 import scala.slick.driver.MySQLDriver.simple._
-import com.github.tototoshi.slick.MySQLJodaSupport._
 import scala.slick.jdbc.JdbcBackend
 
 case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable])
@@ -93,6 +92,7 @@ object ProjectHelper extends PlayCache {
     val attrs = projectForm.items.map(item => item.copy(None, Some(pid)))
     AttributeHelper._create(attrs)
     MemberHelper._create(Member(None, pid, LevelEnum.safe, jobNo))
+    pid
   }
 
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
@@ -100,7 +100,9 @@ object ProjectHelper extends PlayCache {
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
-    EnvironmentProjectRelHelper.unbindByProjectId(Some(id))
+    EnvironmentProjectRelHelper._unbindByProjectId(Some(id))
+    AttributeHelper._deleteByProjectId(id)
+    MemberHelper._deleteByProjectId(id)
     qProject.filter(_.id === id).delete
   }
 

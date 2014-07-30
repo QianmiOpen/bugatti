@@ -18,5 +18,8 @@ object Directory {
     }
   }).getAbsolutePath
 
+  val RepositoryHome = s"${BugattiHome}/repositories"
+
+  def getRepositoryDir(projectId: Int): File = new File(s"${RepositoryHome}/${projectId}/.git")
 
 }

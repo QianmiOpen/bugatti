@@ -54,21 +54,11 @@ object Application extends ScalaController with Security {
             case None =>
               Forbidden(html.template.ldap_callback_forbidden.render(siteDomain))
           }
-        case None =>
+        case _ =>
           NotFound(html.template.ldap_callback_none.render(siteDomain))
       }
     }
   }
-
-//  def login = Action { implicit request =>
-//    true match {
-//      case true =>
-//        val token = java.util.UUID.randomUUID().toString
-//        Ok(html.template.ldap_callback.render(siteDomain)).withToken(token -> "of729") // jobNo
-//      case _ =>
-//        Ok(html.template.ldap_callback_forbidden.render(siteDomain))
-//    }
-//  }
 
   def logout = Action { implicit request =>
     request.headers.get(AuthTokenHeader) map { token =>

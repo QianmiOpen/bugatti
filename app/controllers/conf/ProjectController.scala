@@ -1,13 +1,18 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
+import enums.{FuncEnum, LevelEnum, ModEnum, RoleEnum}
 import models.conf._
 import org.joda.time.DateTime
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
 import play.api.libs.json._
 import play.api.mvc.Action
+
+import org.eclipse.jgit.api.Git
+import utils.Directory._
+import utils.ControlUtil._
+import utils.{LockUtil, JGitUtil}
 
 /**
  * 项目管理
@@ -73,6 +78,9 @@ object ProjectController extends BaseController {
       ProjectHelper.findById(id) match {
         case Some(project) => project.subTotal match {
           case 0 =>
+            // Remove repositories
+            org.apache.commons.io.FileUtils.deleteDirectory(getRepositoryDir(id))
+
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除项目", project))
             Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
           case _ => Ok(Json.obj("r" -> "exist"))
@@ -89,8 +97,18 @@ object ProjectController extends BaseController {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>
+            val projectId = ProjectHelper.create(projectForm, request.user.jobNo)
+            LockUtil.lock(s"${projectId}") {
+              // Create the actual repository
+              val gitDir = getRepositoryDir(projectId)
+              try {
+                JGitUtil.initRepository(gitDir)
+              } catch {
+                case ie: IllegalStateException => play.api.Logger.warn("Create Repository Error:", ie)
+              }
+            }
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增项目", projectForm.toProject))
-            Ok(Json.obj("r" -> ProjectHelper.create(projectForm, request.user.jobNo)))
+            Ok(Json.obj("r" -> projectId))
         }
       }
     )
@@ -149,7 +167,7 @@ object ProjectController extends BaseController {
         val member = Member(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member))
         Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(member))))
-      case _ =>
+      case None =>
         Ok(Json.obj("r" -> "none"))
     }
   }
