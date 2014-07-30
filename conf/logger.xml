@@ -47,7 +47,7 @@
     <logger name="application" level="DEBUG" />
     <logger name="akka" level="DEBUG" />
     <logger name="com.jolbox.bonecp" level="INFO"/>
-    <logger name="logger.scala.slick" level="INFO"/>
+    <logger name="logger.scala.slick" level="DEBUG"/>
     <logger name="scala.slick" level="INFO"/>
 
     <root level="INFO">

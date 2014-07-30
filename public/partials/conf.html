@@ -10,7 +10,7 @@
                 <li access-permission="project" ng-class="{active: $state.includes('conf.project')}"><a ui-sref="conf.project">项目管理</a></li>
                  <!--<li ng-class="{active: $state.includes('conf.template')}"><a ui-sref="conf.template">项目模板</a></li>-->
                 <li access-permission="relation" ng-class="{active: $state.includes('conf.relation')}"><a ui-sref="conf.relation">关系配置</a></li>
-                <li access-permission="system" ng-class="{active: $state.includes('conf.system')}"><a ui-sref="conf.system">系统配置</a></li>
+                <li ng-if="user.sa" access-permission="system" ng-class="{active: $state.includes('conf.system')}"><a ui-sref="conf.system">系统配置</a></li>
             </ul>
         </div>
 

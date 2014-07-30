@@ -90,7 +90,7 @@ object EnvironmentProjectRelHelper {
     }.size
   }
 
-  def unbindByProjectId(projectId: Option[Int])(implicit session: JdbcBackend#Session) = {
+  def _unbindByProjectId(projectId: Option[Int])(implicit session: JdbcBackend#Session) = {
     qRelation.filter(_.projectId === projectId).map(_.projectId.?).update(None)(session)
   }
 

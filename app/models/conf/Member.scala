@@ -67,6 +67,10 @@ object MemberHelper extends PlayCache {
     qMember.filter(_.id === id).delete
   }
 
+  def _deleteByProjectId(projectId: Int)(implicit session: JdbcBackend#Session) = {
+    qMember.filter(_.projectId === projectId).delete
+  }
+
   def update(id: Int, member: Member) = db withSession { implicit session =>
     val member2update = member.copy(Some(id))
     qMember.filter(_.id === id).update(member2update)
