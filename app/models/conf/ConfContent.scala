@@ -11,12 +11,13 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class ConfContent(id: Option[Int], content: String)
+case class ConfContent(id: Option[Int], octet: Boolean, content: Array[Byte])
 class ConfContentTable(tag: Tag) extends Table[ConfContent](tag, "conf_content") {
   def id = column[Int]("conf_id", O.PrimaryKey) // 版本配置文件编号
-  def content = column[String]("content", O.DBType("text"))
+  def octet = column[Boolean]("octet", O.Default(false))
+  def content = column[Array[Byte]]("content", O.DBType("MEDIUMBLOB"))
 
-  override def * = (id.?, content) <> (ConfContent.tupled, ConfContent.unapply _)
+  override def * = (id.?, octet, content) <> (ConfContent.tupled, ConfContent.unapply _)
 }
 object ConfContentHelper extends PlayCache {
 

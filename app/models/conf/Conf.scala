@@ -20,7 +20,8 @@ case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int,
   // linux, unix = \n
   // mac = \r
   def _nl2n(text: String) = text.replaceAll("(\r\n)|(\n\r)|\r", "\n")
-  def toContent = ConfContent(id, _nl2n(content))
+
+  def toContent = ConfContent(id, false, _nl2n(content).getBytes("UTF-8"))
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -68,6 +69,13 @@ object ConfHelper extends PlayCache {
     ConfContentHelper._create(confForm.toContent.copy(Some(id)))
   }
 
+  def create(conf: Conf, confContent: Option[ConfContent]) = db withTransaction { implicit session =>
+    val id = qConf.returning(qConf.map(_.id)).insert(conf)
+    confContent.map { _confContent =>
+      ConfContentHelper._create(_confContent.copy(Some(id)))
+    }.size
+  }
+
   def delete(conf: Conf) = db withTransaction { implicit session =>
     qConf.filter(_.id === conf.id).delete
     ConfContentHelper._delete(conf.id.get)
@@ -80,7 +88,7 @@ object ConfHelper extends PlayCache {
         qConf.filter(_.id === id).delete
         ConfContentHelper.findById(id) match {
           case Some(content) =>
-            ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))
+            ConfLogContentHelper._create(ConfLogContent(confLogId, content.octet, content.content))
             ConfContentHelper._delete(id)
           case None =>
             -2
@@ -97,7 +105,7 @@ object ConfHelper extends PlayCache {
         qConf.filter(_.id === id).update(confForm.toConf.copy(Some(id)))
         ConfContentHelper.findById(id) match {
           case Some(content) =>
-            ConfLogContentHelper._create(ConfLogContent(confLogId, content.content))
+            ConfLogContentHelper._create(ConfLogContent(confLogId, content.octet, content.content))
             ConfContentHelper._update(id, confForm.toContent)
           case None =>
             -2

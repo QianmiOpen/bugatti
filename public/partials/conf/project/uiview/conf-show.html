@@ -1,13 +1,15 @@
 <div class="col-sm-8 p0">{{conf.path}}</div>
 <div class="navbar-right btn-group btn-group-xs">
-    <button ui-sref="conf.project.version.conf.edit({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">编辑</button>
-    <button ui-sref="conf.project.version.conf.log({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">历史</button>
+
+    <button ng-if="confContent.octet == false" ui-sref="conf.project.version.conf.edit({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">编辑</button>
+    <button ng-if="confContent.octet == false" ui-sref="conf.project.version.conf.log({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">历史</button>
+
     <button ng-click="delete(conf.id)" type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
 </div>
 
 <div class="clearfix"></div>
 
-<div class="col-sm-10 mt15 p0" ng-if="conf.name">
+<div ng-if="confContent.octet == false" class="col-sm-10 mt15 p0" ng-if="conf.name">
     <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
@@ -15,6 +17,8 @@
           onChange: aceChanged
         }" ng-model="conf.content" readonly="true"></div>
 </div>
+
+<div ng-if="confContent.octet == true" class="col-sm-10 mt15 alert alert-warning">二进制文件</div>
 
 <div class="clearfix"></div>
 

@@ -1,12 +1,13 @@
 package actor.task
 
-import java.io.{PrintWriter, File}
+import java.io.File
 
 import akka.actor.Actor
 import models.conf.{ConfContentHelper, ConfHelper}
 import play.api.libs.json.{Json, JsObject}
 import utils.ConfHelp
 import scala.sys.process._
+import scalax.file.Path
 
 /**
  * Created by jinwei on 14/7/14.
@@ -35,9 +36,9 @@ class ConfActor extends Actor{
         val confContent = ConfContentHelper.findById(xf.id.get)
         val newFile = new File(s"${baseDir}/files/${xf.path}")
         newFile.getParentFile().mkdirs()
-        val io = new PrintWriter(newFile)
-        io.write(confContent.get.content)
-        io.close()
+        implicit val codec = scalax.io.Codec.UTF8
+        val f = Path(newFile)
+        f.write(confContent.get.content)
       }
     }
 

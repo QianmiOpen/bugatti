@@ -1,15 +1,17 @@
 package controllers.conf
 
+import utils.FileUtil
+import utils.ControlUtil._
 import controllers.{BaseController}
 import enums.{ModEnum, FuncEnum}
 import models.conf._
 import org.joda.time.DateTime
-import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
-import play.api.libs.Files
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
+
+import scala.io.Source
 
 /**
  * 配置文件
@@ -17,7 +19,14 @@ import play.api.libs.json._
 object ConfController extends BaseController {
 
   implicit val confWrites = Json.writes[Conf]
-  implicit val contentWrites = Json.writes[ConfContent]
+
+  implicit val writer = new Writes[ConfContent] {
+    def writes(c: ConfContent): JsValue = {
+      implicit val codec = scala.io.Codec.UTF8
+      val cs = if (c.octet) "" else Source.fromBytes(c.content).getLines().mkString("\n")
+      Json.obj("id" -> c.id, "octet" -> c.octet, "content" -> cs)
+    }
+  }
 
   def msg(user: String, ip: String, msg: String, data: Conf) =
     Json.obj("mod" -> ModEnum.conf.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
@@ -90,11 +99,12 @@ object ConfController extends BaseController {
     )
   }
 
-  val fileMaxSizeExceeded = 1 * 1024 * 1024
-  val fileSuffixWhiteList = List("key", "conf", "properties", "ini", "xml", "txt")
-  def _checkWhiteList(fileName: String) = {
-    val suffix = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase
-    fileSuffixWhiteList.contains(suffix)
+  val maxSizeExceeded = app.configuration.getInt("file.exceeded.max_size").getOrElse(10 * 1024 * 1024)
+  val octetFileType = app.configuration.getString("file.extension.octet_list").map(_.split(",").toList).getOrElse(List("key"))
+
+  def isOctet_?(filename: String, bytes: Array[Byte]) = defining(FileUtil.getContentType(filename, bytes)) { _contentType =>
+    if (_contentType == "application/octet-stream") true
+    else octetFileType.exists(_ == FileUtil.getExtension(filename))
   }
 
   def upload = AuthAction[TemporaryFile](FuncEnum.project) { implicit request =>
@@ -105,13 +115,15 @@ object ConfController extends BaseController {
     request.body.asMultipartFormData.map { body =>
       reqConfForm.map { _confForm =>
         if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user)) Forbidden
-        else { // todo security if contentType
-          val result = body.files.filter(f => f.ref.file.length() < fileMaxSizeExceeded && _checkWhiteList(f.filename)).map { tempFile =>
-            val fileContent = Files.readFile(tempFile.ref.file)
+        else {
+          val result = body.files.filter(f => f.ref.file.length() < maxSizeExceeded).map { tempFile =>
             val filePath = _confForm.path
             val _path = if (filePath.last != '/') filePath + '/' else filePath
-            val confFormat = _confForm.copy(jobNo = request.user.jobNo, name = Some(tempFile.filename), path = _path + tempFile.filename, content = fileContent)
-            Json.obj("fileName" -> tempFile.filename, "status" -> ConfHelper.create(confFormat))
+            val confFormat = _confForm.copy(jobNo = request.user.jobNo, name = Some(tempFile.filename), path = _path + tempFile.filename, content = "")
+
+            val bytes = scalax.io.Resource.fromFile(tempFile.ref.file).byteArray
+            val isOctet = isOctet_?(tempFile.filename, bytes)
+            Json.obj("fileName" -> tempFile.filename, "status" -> ConfHelper.create(confFormat.toConf, Some(ConfContent(None, isOctet, bytes))))
           }
           Ok(Json.obj("r" -> result))
         }
@@ -123,7 +135,13 @@ object ConfController extends BaseController {
   // 配置文件历史记录
   // ===========================================================================
   implicit val confLogWrites = Json.writes[ConfLog]
-  implicit val confLogContentWrites = Json.writes[ConfLogContent]
+  implicit val confLogContentWrites = new Writes[ConfLogContent] {
+    def writes(c: ConfLogContent): JsValue = {
+      implicit val codec = scala.io.Codec.UTF8
+      val cs = if (c.octet) "" else Source.fromBytes(c.content).getLines().mkString("\n")
+      Json.obj("id" -> c.id, "octet" -> c.octet, "content" -> cs)
+    }
+  }
 
   def logs(confId: Int, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(ConfLogHelper.all(confId, page, pageSize)))
@@ -178,8 +196,7 @@ object ConfController extends BaseController {
           // insert all
           confs.foreach { c =>
             val content = ConfContentHelper.findById(c.id.get)
-            val confForm = ConfForm(None, copyForm.envId, c.projectId, copyForm.versionId, c.jobNo, Some(c.name), c.path, c.fileType, if (content != None) content.get.content else "", c.remark, c.updated)
-            ConfHelper.create(confForm)
+            ConfHelper.create(c.copy(id = None, envId = copyForm.envId, versionId = copyForm.versionId), content)
           }
           val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.remoteAddress,
             "ip" -> request.remoteAddress, "msg" -> "一键拷贝", "data" -> Json.toJson(copyForm)).toString
