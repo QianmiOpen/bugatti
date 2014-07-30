@@ -2,7 +2,7 @@ package actor.task
 
 import java.io.File
 
-import com.qianmi.bugatti.actors.{SaltCommand, SaltResult, TimeOut}
+import com.qianmi.bugatti.actors.{SpiritCommand, SaltCommand, SaltResult, TimeOut}
 import enums.TaskEnum
 import play.api.libs.json.Json
 import utils.ConfHelp
@@ -58,6 +58,9 @@ class LookupActor(path: String) extends Actor with ActorLogging{
       _commandSeq = lookupActorCommand.commandSeq
       self ! SaltCommand(lookupActorCommand.commandSeq, 0, ".")
     }
+//    case sc: SpiritCommand => {
+//      actor ! sc
+//    }
     case SaltCommand(commandSeq, 0, ".") => {
       actor ! SaltCommand(commandSeq)
     }
@@ -85,7 +88,7 @@ class LookupActor(path: String) extends Actor with ActorLogging{
           val file = new File(resultLogPath)
           (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
           (Seq("echo", s"command: ${_commandSeq.mkString(" ")}\n") #>> file lines)
-          (Seq("echo", Json.stringify(jsonResult)) #>> file lines)
+          (Seq("echo", Json.prettyPrint(jsonResult)) #>> file lines)
           //2、判断是否成功
           val seqResult: Seq[Boolean] = (jsonResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
           if(!seqResult.contains(false)){ //命令执行成功
