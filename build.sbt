@@ -6,7 +6,7 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   "com.typesafe.akka" %% "akka-remote" % "2.2.2",
-  "com.qianmi.bugatti" % "spirit_2.10" % "1.0-SNAPSHOT",
+  "com.qianmi.bugatti" % "spirit_2.10" % "1.1",
   "mysql" % "mysql-connector-java" % "5.1.29",
   "com.typesafe.slick" %% "slick" % "2.0.1",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
