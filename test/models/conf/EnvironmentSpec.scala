@@ -13,7 +13,7 @@ class EnvironmentSpec extends Specification {
 
   "Environment Test" in new WithApplication {
     "insert success return 1" in new WithApplication {
-      EnvironmentHelper.create(Environment(Some(1), "测试", Some("备注"), None, None, LevelEnum.unsafe))
+//      EnvironmentHelper.create(Environment(Some(1), "测试", Some("备注"), None, None, LevelEnum.unsafe))
     }
   }
 

@@ -1,17 +1,13 @@
 package actor.task
 
-import java.io.File
-
-import akka.actor.{ActorLogging, Actor}
-import play.api.libs.iteratee.{Enumerator, Concurrent}
-import play.api.libs.json.{Json, JsValue}
-import utils.SaltTools
-import scala.sys.process._
+import akka.actor.{Actor, ActorLogging}
+import play.api.libs.iteratee.{Concurrent, Enumerator}
+import play.api.libs.json.{JsValue, Json}
 
 /**
  * Created by jinwei on 13/7/14.
  */
-class SocketActor extends Actor with ActorLogging{
+class SocketActor extends Actor with ActorLogging {
   val (out, channel) = Concurrent.broadcast[JsValue]
 
   def receive = {

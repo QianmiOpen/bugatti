@@ -29,8 +29,8 @@
             <td><span tooltip="{{area.envNCount}}">{{area.envNCount}}</span></td>
             <td><span tooltip="{{area.projectNCount}}">{{area.projectNCount}}</span></td>
             <td>
-                <a ui-sref="conf.area.edit({id: area.id})"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ng-click="delete(area.id, $index)"><span class="glyphicon glyphicon-remove"></span></a>
+                <a ui-sref="conf.area.edit({id: area.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ng-click="delete(area.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>
         </tbody>

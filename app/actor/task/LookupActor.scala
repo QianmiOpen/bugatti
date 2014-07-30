@@ -16,7 +16,7 @@ import akka.actor._
 
 import scala.concurrent.duration._
 
-class LookupActor(path: String) extends Actor with ActorLogging{
+class LookupActor(path: String) extends Actor with ActorLogging {
 
   var _taskId = 0
   var _envId = 0
@@ -41,11 +41,12 @@ class LookupActor(path: String) extends Actor with ActorLogging{
 
   def identifying: Actor.Receive = {
     case ActorIdentity(`path`, Some(actor)) =>
+      log.debug(s"ActorIdentity: ${actor}")
       context.watch(actor)
       context.become(active(actor))
-    case ActorIdentity(`path`, None) => println(s"Remote actor not available: $path")
+    case ActorIdentity(`path`, None) => log.debug(s"Remote actor not available: $path")
     case ReceiveTimeout              => sendIdentifyRequest()
-    case _                           => println("Not ready yet")
+    case _                           => log.debug("Not ready yet")
   }
 
   def active(actor: ActorRef): Actor.Receive = {
@@ -56,13 +57,15 @@ class LookupActor(path: String) extends Actor with ActorLogging{
       _order = lookupActorCommand.order
       _versionId = lookupActorCommand.versionId
       _commandSeq = lookupActorCommand.commandSeq
-      self ! SaltCommand(lookupActorCommand.commandSeq, 0, ".")
+      log.debug(s"lookupActorCommand excute; actor:${actor}")
+      actor ! SaltCommand(lookupActorCommand.commandSeq, 0, ".")
     }
 //    case sc: SpiritCommand => {
 //      actor ! sc
 //    }
     case SaltCommand(commandSeq, 0, ".") => {
       actor ! SaltCommand(commandSeq)
+      log.debug(s"SaltCommand excute: actor:${actor}")
     }
 
 //    case executeCommand: ExecuteCommand => {
@@ -106,7 +109,7 @@ class LookupActor(path: String) extends Actor with ActorLogging{
       }
     }
     case Terminated(`actor`) =>
-      println("Actor terminated")
+      log.debug("Actor terminated")
       sendIdentifyRequest()
       context.become(identifying)
     case ReceiveTimeout =>

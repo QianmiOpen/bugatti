@@ -10,7 +10,7 @@ import utils.TaskTools
 /**
  * Created by jinwei on 13/7/14.
  */
-class TaskExecute extends Actor with ActorLogging{
+class TaskExecute extends Actor with ActorLogging {
   import context._
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
@@ -98,18 +98,20 @@ class TaskExecute extends Actor with ActorLogging{
 
     val fileName = getFileName()
 
-
-
-    //envId -> Seq[template_item]
+    // 如果是latest，则获取最后的一个可用版本
     val latestVersion = EnvironmentHelper.findById(_envId).get.scriptVersion match {
-      case ScriptVersionHelper.Latest =>  ScriptVersionHelper.findLatest().get
-      case ScriptVersionHelper.Master =>  ScriptVersionHelper.Master
+      case ScriptVersionHelper.Latest => ScriptVersionHelper.findLatest().get
       case x => x
     }
-    val latestVersionJson = latestVersion match {
-      case ScriptVersionHelper.Master =>  "base"
+
+    // 如果是master，需要替换成base，在gitfs中，是需要这么映射的
+    val scriptVersion = latestVersion match {
+      case ScriptVersionHelper.Master => "base"
       case x => x
     }
+
+    log.info(s"latestVersion:${latestVersion}; scriptVersion:${scriptVersion}")
+
 
     var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
@@ -121,7 +123,7 @@ class TaskExecute extends Actor with ActorLogging{
       , "projectId" -> tq.projectId
       , "taskId" -> taskId
       , "confFileName" -> fileName
-      , "scriptVersion" -> latestVersionJson
+      , "scriptVersion" -> scriptVersion
     )
     val items = TemplateItemHelper.findByTemplateId_ScriptVersion(project.templateId, latestVersion)
     val attrs = AttributeHelper.findByProjectId(tq.projectId)
