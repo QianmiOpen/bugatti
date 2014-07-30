@@ -1,18 +1,13 @@
 package actor.task
 
-import java.io.File
-
-import akka.actor.Actor
-import play.api.Logger
-import play.api.libs.iteratee.{Enumerator, Concurrent}
-import play.api.libs.json.{Json, JsValue}
-import utils.SaltTools
-import scala.sys.process._
+import akka.actor.{Actor, ActorLogging}
+import play.api.libs.iteratee.{Concurrent, Enumerator}
+import play.api.libs.json.{JsValue, Json}
 
 /**
  * Created by jinwei on 13/7/14.
  */
-class SocketActor extends Actor{
+class SocketActor extends Actor with ActorLogging{
   val (out, channel) = Concurrent.broadcast[JsValue]
 
   def receive = {
@@ -23,7 +18,7 @@ class SocketActor extends Actor{
       sender ! ConnectedSocket(out)
     }
     case QuitProcess() => {
-      Logger.info("有一个客户端关闭了连接")
+      log.info("有一个客户端关闭了连接")
     }
     case AllTaskStatus() => {
       notifyAllSocket(MyActor.statusMap)
@@ -34,7 +29,7 @@ class SocketActor extends Actor{
   }
 
   def notifyAllSocket(js: JsValue) {
-    Logger.debug("notifyAllSocket==>" + js.toString())
+//    log.debug("notifyAllSocket==>" + js.toString())
     channel.push(js)
     //test
 //    val _baseLogPath = SaltTools.logPath

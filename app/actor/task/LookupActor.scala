@@ -4,7 +4,6 @@ import java.io.File
 
 import com.qianmi.bugatti.actors.{SaltCommand, SaltResult, TimeOut}
 import enums.TaskEnum
-import play.api.Logger
 import play.api.libs.json.Json
 import utils.ConfHelp
 
@@ -13,11 +12,11 @@ import scala.sys.process._
 /**
  * Created by jinwei on 17/7/14.
  */
-import akka.actor.{Actor, ActorIdentity, ActorRef, Identify, ReceiveTimeout, Terminated}
+import akka.actor._
 
 import scala.concurrent.duration._
 
-class LookupActor(path: String) extends Actor {
+class LookupActor(path: String) extends Actor with ActorLogging {
 
   var _taskId = 0
   var _envId = 0
@@ -42,11 +41,12 @@ class LookupActor(path: String) extends Actor {
 
   def identifying: Actor.Receive = {
     case ActorIdentity(`path`, Some(actor)) =>
+      log.debug(s"ActorIdentity: ${actor}")
       context.watch(actor)
       context.become(active(actor))
-    case ActorIdentity(`path`, None) => println(s"Remote actor not available: $path")
+    case ActorIdentity(`path`, None) => log.debug(s"Remote actor not available: $path")
     case ReceiveTimeout              => sendIdentifyRequest()
-    case _                           => println("Not ready yet")
+    case _                           => log.debug("Not ready yet")
   }
 
   def active(actor: ActorRef): Actor.Receive = {
@@ -57,10 +57,12 @@ class LookupActor(path: String) extends Actor {
       _order = lookupActorCommand.order
       _versionId = lookupActorCommand.versionId
       _commandSeq = lookupActorCommand.commandSeq
-      self ! SaltCommand(lookupActorCommand.commandSeq, 0, ".")
+      log.debug(s"lookupActorCommand excute; actor:${actor}")
+      actor ! SaltCommand(lookupActorCommand.commandSeq, 0, ".")
     }
     case SaltCommand(commandSeq, 0, ".") => {
       actor ! SaltCommand(commandSeq)
+      log.debug(s"SaltCommand excute: actor:${actor}")
     }
 
     case executeCommand: ExecuteCommand => {
@@ -71,7 +73,7 @@ class LookupActor(path: String) extends Actor {
       actor ! terminateCommands
     }
     case SaltResult(result, excuteMicroseconds) => {
-      Logger.info(s"result ==> ${result}")
+      log.info(s"result ==> ${result}")
       val jsonResult = Json.parse(result)
       val funType = (jsonResult \ "result" \ "fun").asOpt[String]
       funType match {
@@ -104,7 +106,7 @@ class LookupActor(path: String) extends Actor {
       }
     }
     case Terminated(`actor`) =>
-      println("Actor terminated")
+      log.debug("Actor terminated")
       sendIdentifyRequest()
       context.become(identifying)
     case ReceiveTimeout =>
@@ -125,9 +127,9 @@ class LookupActor(path: String) extends Actor {
 
   def getCommandActor() = {
     val path = s"/user/commandActor_${_envId}_${_projectId}"
-    Logger.info(s"lookup context ==>${context.children}")
-    Logger.info(s"lookup context ==>${context.system}")
-    Logger.info(s"lookup context ==>${context.parent}")
+    log.info(s"lookup context ==>${context.children}")
+    log.info(s"lookup context ==>${context.system}")
+    log.info(s"lookup context ==>${context.parent}")
 //    val actor = context.actorSelection(path) ! Identify(path)
 //    val actorPath = MyActor.system.child(s"commandActor_${_envId}_${_projectId}")
 //    context.actorSelection(path)

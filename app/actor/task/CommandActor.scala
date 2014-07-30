@@ -137,6 +137,7 @@ class CommandActor extends Actor with ActorLogging {
 
 
     //TODO join jid
+    log.info(s"executeSalt cmd:${cmd}")
     if(cmd.startsWith("bugatti")){
       commandSeq(1) match {
         case "copyfile" => {
@@ -154,10 +155,10 @@ class CommandActor extends Actor with ActorLogging {
 
       val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
       log.info(s"remotePath ==> ${remotePath}")
-      import actor.task.MyActor.system.dispatcher
       val lookupActor = context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${order}")
       //3、触发远程命令
-      MyActor.system.scheduler.scheduleOnce(1.second) {
+      import context._
+      context.system.scheduler.scheduleOnce(1.second) {
         lookupActor ! LookupActorCommand(commandSeq, taskId, envId, projectId, versionId, order)
       }
     }
@@ -172,7 +173,7 @@ class CommandActor extends Actor with ActorLogging {
       } else {
         retSeq = retSeq :+ c
       }
-      if (c.contains("'")) {
+      if (c.contains("'") && !c.endsWith("'")) {
         bAppend = !bAppend
       }
     }
