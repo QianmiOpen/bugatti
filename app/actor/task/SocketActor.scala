@@ -7,7 +7,7 @@ import play.api.libs.json.{JsValue, Json}
 /**
  * Created by jinwei on 13/7/14.
  */
-class SocketActor extends Actor with ActorLogging{
+class SocketActor extends Actor with ActorLogging {
   val (out, channel) = Concurrent.broadcast[JsValue]
 
   def receive = {

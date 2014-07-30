@@ -65,13 +65,13 @@ class LookupActor(path: String) extends Actor with ActorLogging {
       log.debug(s"SaltCommand excute: actor:${actor}")
     }
 
-    case executeCommand: ExecuteCommand => {
-      actor ! executeCommand
-    }
-
-    case terminateCommands: TerminateCommands => {
-      actor ! terminateCommands
-    }
+//    case executeCommand: ExecuteCommand => {
+//      actor ! executeCommand
+//    }
+//
+//    case terminateCommands: TerminateCommands => {
+//      actor ! terminateCommands
+//    }
     case SaltResult(result, excuteMicroseconds) => {
       log.info(s"result ==> ${result}")
       val jsonResult = Json.parse(result)

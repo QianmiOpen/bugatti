@@ -20,7 +20,7 @@ import scala.sys.process._
 object CommandActor {
   val baseLogPath = ConfHelp.logPath
   //命令执行过程
-  var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
+//  var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
 }
 
 class CommandActor extends Actor with ActorLogging {
@@ -134,6 +134,7 @@ class CommandActor extends Actor with ActorLogging {
     val file = new File(resultLogPath)
     val cmd = command.command
     val commandSeq = command2Seq(cmd)
+    log.info(s"executeSalt ==> ${cmd}")
 
 
     //TODO join jid

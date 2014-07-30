@@ -10,7 +10,7 @@ import utils.TaskTools
 /**
  * Created by jinwei on 13/7/14.
  */
-class TaskExecute extends Actor with  ActorLogging{
+class TaskExecute extends Actor with ActorLogging {
   import context._
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
@@ -111,6 +111,7 @@ class TaskExecute extends Actor with  ActorLogging{
     }
 
     log.info(s"latestVersion:${latestVersion}; scriptVersion:${scriptVersion}")
+
 
     var paramsJson = Json.obj(
       "nfsServer" -> nfsServer
