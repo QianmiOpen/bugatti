@@ -20,6 +20,8 @@ import utils.{ConfHelp, TaskTools}
 
 import scala.concurrent.duration._
 import scala.sys.process._
+import scalax.file.Path
+
 /**
  * Created by jinwei on 20/6/14.
  */
@@ -140,9 +142,9 @@ object TaskProcess {
         val confContent = ConfContentHelper.findById(xf.id.get)
         val newFile = new File(s"${baseDir}/files/${xf.path}")
         newFile.getParentFile().mkdirs()
-        val io = new PrintWriter(newFile)
-        io.write(confContent.get.content)
-        io.close()
+        implicit val codec = scalax.io.Codec.UTF8
+        val f = Path(newFile)
+        f.write(confContent.get.content)
       }
     }
 
