@@ -58,7 +58,9 @@ code {
 .mt-16 {
     margin-top: -16px;
 }
-
+span.header-version {
+    font-size: small;
+}
 .table-fixed {
     table-layout: fixed;
 }

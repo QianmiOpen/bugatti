@@ -1,6 +1,10 @@
-name := "bugatti2"
+import com.typesafe.config._
 
-version := "1.2-SNAPSHOT"
+val conf = ConfigFactory.parseFile(new File("conf/application-common.conf")).resolve()
+
+version := conf.getString("app.version")
+
+name := "bugatti2"
 
 libraryDependencies ++= Seq(
   jdbc,

@@ -17,9 +17,10 @@ import views._
 object Application extends ScalaController with Security {
 
   lazy val siteDomain = app.configuration.getString("site.domain").getOrElse("ofpay.com")
+  lazy val appVersion = app.configuration.getString("app.version").getOrElse("1.0")
 
   def index = Action { implicit request =>
-    Ok(html.index(siteDomain))
+    Ok(html.index(siteDomain, appVersion))
   }
 
   lazy val CacheExpiration = app.configuration.getInt("cache.expiration").getOrElse(60 /* seconds */ * 15 /* minutes */)
