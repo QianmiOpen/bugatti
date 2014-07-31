@@ -3,7 +3,7 @@ package actor.task
 import java.io.File
 
 import akka.actor.{ActorLogging, Actor, Props}
-import com.qianmi.bugatti.actors.SaltResult
+import com.qianmi.bugatti.actors.{TimeOut, SaltCommand, SaltResult}
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
@@ -32,11 +32,10 @@ class CommandActor extends Actor with ActorLogging {
   var _versionId = Option.empty[Int]
   var _returnJson = Json.obj()
 
+  val _baseLogPath = ConfHelp.logPath
+  var _commandSeq = Seq.empty[String]
+
   def receive = {
-    case SaltResult(result, excuteMicroseconds) => {
-      println(s"result command ==> ${result}")
-      log.info(s"result ==> ${result}")
-    }
     case insertCommands: InsertCommands => {
       _taskId = insertCommands.taskId
       _envId = insertCommands.envId
@@ -44,7 +43,7 @@ class CommandActor extends Actor with ActorLogging {
       _versionId = insertCommands.versionId
       _returnJson = insertCommands.json
 
-      if(insertCommands.commandList.length == 0){
+      if (insertCommands.commandList.length == 0) {
         noCommands(_taskId, _envId, _projectId, insertCommands.json)
         closeSelf
       } else {
@@ -55,7 +54,7 @@ class CommandActor extends Actor with ActorLogging {
     }
     case executeCommand: ExecuteCommand => {
       _order = executeCommand.order
-      if(_order <= _commands.length){
+      if (_order <= _commands.length) {
         val command = _commands(_order - 1)
         //TODO 推送状态
         MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine)
@@ -71,6 +70,68 @@ class CommandActor extends Actor with ActorLogging {
     case tcs: TerminateCommands => {
       terminateCommand(tcs.status)
     }
+
+    case sr: SaltResult => {
+      val srResult = sr.result
+      val executeTime = sr.excuteMicroseconds
+      log.info(s"result ==> ${srResult}")
+      val jsonResult = Json.parse(srResult)
+      val funType = (jsonResult \ "result" \ "fun").asOpt[String]
+      funType match {
+        case Some(fun) => {
+          //1、写日志
+          val baseDir = s"${`_baseLogPath`}/${`_taskId`}"
+          val resultLogPath = s"${baseDir}/result.log"
+          log.debug(s"commandActor resultLogPath ==> ${resultLogPath}")
+          val logDir = new File(baseDir)
+          if (!logDir.exists) {
+            logDir.mkdirs()
+          }
+          val file = new File(resultLogPath)
+          (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
+          (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime}\n") #>> file lines)
+          (Seq("echo", Json.prettyPrint(jsonResult)) #>> file lines)
+          //2、判断是否成功
+          val seqResult: Seq[Boolean] = (jsonResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
+          if (!seqResult.contains(false)) {
+            //命令执行成功
+            //3、调用commandActor
+            (Seq("echo", "命令执行成功") #>> file lines)
+            self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
+          } else {
+            //命令执行失败
+            (Seq("echo", "命令执行失败") #>> file lines)
+            self ! TerminateCommands(TaskEnum.TaskFailed)
+          }
+        }
+        case _ => {
+          //如果不是state.sls 则直接返回成功
+          self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
+        }
+      }
+    }
+
+    case saltTimeOut: TimeOut => {
+      self ! TerminateCommands(TaskEnum.TaskFailed)
+      commandOver("任务执行超时!")
+    }
+
+    case IdentityNone() => {
+      self ! TerminateCommands(TaskEnum.TaskFailed)
+      commandOver("远程spirit异常!")
+    }
+
+  }
+
+  def commandOver(msg: String) = {
+    val baseDir = s"${_baseLogPath}/${_taskId}"
+    val resultLogPath = s"${baseDir}/result.log"
+    val logDir = new File(baseDir)
+    if (!logDir.exists) {
+      logDir.mkdirs()
+    }
+    val file = new File(resultLogPath)
+    (Seq("echo", s"${msg}") #>> file lines)
   }
 
   def terminateCommand(status: TaskStatus) = {
@@ -133,14 +194,14 @@ class CommandActor extends Actor with ActorLogging {
     }
     val file = new File(resultLogPath)
     val cmd = command.command
-    val commandSeq = command2Seq(cmd)
+    _commandSeq = command2Seq(cmd)
     log.info(s"executeSalt ==> ${cmd}")
 
 
     //TODO join jid
     log.info(s"executeSalt cmd:${cmd}")
     if(cmd.startsWith("bugatti")){
-      commandSeq(1) match {
+      _commandSeq(1) match {
         case "copyfile" => {
           val confActor = context.actorOf(Props[ConfActor], s"confActor_${envId}_${projectId}_${order}")
           confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson)
@@ -160,7 +221,7 @@ class CommandActor extends Actor with ActorLogging {
       //3、触发远程命令
       import context._
       context.system.scheduler.scheduleOnce(1.second) {
-        lookupActor ! LookupActorCommand(commandSeq, taskId, envId, projectId, versionId, order)
+        lookupActor ! SaltCommand(_commandSeq)
       }
     }
   }
