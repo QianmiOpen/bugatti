@@ -44,14 +44,14 @@
                 <template-show tid="{{project.templateId}}"></template-show>
             </td>
             <td class="show">
-                <a tooltip="{{project.lastVersion}}" ui-sref="conf.project.version.conf.list({id: project.id, vid: project.lastVid})" class="a-underline">{{project.lastVersion}}</a>
+                <a tooltip="{{project.lastVersion}}" ui-sref="conf.project.version.conf.list({id: project.id, vid: project.lastVid, eid: envId})" class="a-underline">{{project.lastVersion}}</a>
                 &nbsp;
                 <div class="btn-group" dropdown ng-if="project.subTotal > 0">
                     <button class="btn btn-default btn-xs dropdown-toggle" type="button" ng-click="vs_all(project.id)">
                         All ({{project.subTotal}}) <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li ng-repeat="version in versions"><a ui-sref="conf.project.version.conf.list({id: project.id, vid: version.id})">{{version.vs}}</a></li>
+                        <li ng-repeat="version in versions"><a ui-sref="conf.project.version.conf.list({id: project.id, vid: version.id, eid: envId})">{{version.vs}}</a></li>
                     </ul>
                 </div>
             </td>
