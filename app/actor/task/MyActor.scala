@@ -159,6 +159,9 @@ class MyActor extends Actor with ActorLogging {
     case RemoveStatus(envId, projectId) => {
       removeStatus(envId, projectId)
     }
+    case RefreshSyndic() => {
+      MyActor.refreshSyndic()
+    }
   }
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
@@ -216,6 +219,7 @@ case class ChangeCommandStatus(envId: Int, projectId: Int, currentNum: Int, comm
 case class ChangeOverStatus(envId: Int, projectId: Int, taskStatus: TaskStatus, endTime: DateTime, version: String)
 case class RemoveStatus(envId: Int, projectId: Int)
 case class FindLastStatus(key: String)
+case class RefreshSyndic()
 
 class WSSchedule{
   def start(socketActor: ActorRef, notify: String): Cancellable = {
