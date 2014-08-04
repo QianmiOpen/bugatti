@@ -89,8 +89,8 @@ class CommandActor extends Actor with ActorLogging {
           }
           val file = new File(resultLogPath)
           (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
-          (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime}\n") #>> file lines)
-          (Seq("echo", Json.prettyPrint(jsonResult)) #>> file lines)
+          (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n") #>> file lines)
+          (Seq("echo", Json.prettyPrint(jsonResult).replaceAll("\\n", "\n")) #>> file lines)
           //2、判断是否成功
           val seqResult: Seq[Boolean] = (jsonResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
           if (!seqResult.contains(false)) {
@@ -119,6 +119,10 @@ class CommandActor extends Actor with ActorLogging {
     case IdentityNone() => {
       self ! TerminateCommands(TaskEnum.TaskFailed)
       commandOver("远程spirit异常!")
+    }
+    case ccf: ConfCopyFailed => {
+      self ! TerminateCommands(TaskEnum.TaskFailed)
+      commandOver(ccf.str)
     }
 
   }
@@ -246,3 +250,4 @@ class CommandActor extends Actor with ActorLogging {
 case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject)
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int,versionId: Option[Int], order: Int)
 case class TerminateCommands(status: TaskStatus)
+case class ConfCopyFailed(str: String)
