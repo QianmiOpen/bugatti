@@ -86,9 +86,10 @@ object Global extends GlobalSettings {
     }
 
     /**
-     * 升级脚本满足2个条件：
-     * 1.不允许有select语句
-     * 2.以 ; 分号结尾一个完整sql语句
+     * 升级脚本文件需满足3个条件：
+     * 1. 不允许有select语句
+     * 2. 不允许有注释
+     * 3. 以 ; 分号结尾一个完整sql语句
      **/
     import AutoUpdate._
     defining(getCurrentVersion()) { currentVersion =>
