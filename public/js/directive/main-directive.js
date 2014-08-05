@@ -138,10 +138,10 @@ define(['angular'], function(angular) {
                     updateCSS(pid)
                 });
                 function updateCSS(pid) {
-                    if (Auth.user.role === 'admin') {
+                    if (Auth.user.role === 'admin' && Auth.user.sa === true) {
                         $scope.hasProject_ = true;
                     }
-                    else if (Auth.user.role === 'user') {
+                    else {
                         ProjectService.member(pid, Auth.user.username, function(member) {
                             $scope.hasProject_ = true;
                         })
@@ -163,10 +163,10 @@ define(['angular'], function(angular) {
                     updateCSS(pid)
                 });
                 function updateCSS(pid) {
-                    if (Auth.user.role === 'admin') {
+                    if (Auth.user.role === 'admin' && Auth.user.sa === true) {
                         $scope.hasProjectSafe_ = true;
                     }
-                    else if (Auth.user.role === 'user') {
+                    else {
                         ProjectService.member(pid, Auth.user.username, function(member) {
                             if (member != null && member.level == 'safe') {
                                 $scope.hasProjectSafe_ = true;

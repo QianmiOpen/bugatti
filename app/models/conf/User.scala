@@ -58,7 +58,7 @@ object UserHelper extends PlayCache {
   }
 
   def create(user: User, permission: Permission) = db withTransaction { implicit session =>
-    _create(user) + PermissionHelper._create(permission)
+    _create(user.copy(jobNo = user.jobNo.toLowerCase)) + PermissionHelper._create(permission)
   }
 
   def _create(user: User)(implicit session: JdbcBackend#Session) = {
@@ -97,7 +97,7 @@ object UserHelper extends PlayCache {
 
   /* 项目委员 */
   def hasProject(projectId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin) true
+    if (user.role == RoleEnum.admin && user.superAdmin) true
     else MemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId => true
       case _ => false
@@ -106,7 +106,7 @@ object UserHelper extends PlayCache {
 
   /* 项目委员长 */
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin) true
+    if (user.role == RoleEnum.admin && user.superAdmin) true
     else MemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId && member.level == LevelEnum.safe => true
       case _ => false
@@ -115,7 +115,7 @@ object UserHelper extends PlayCache {
 
   /* 指定环境下，根据安全级别选择委员长或成员访问 */
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin) true
+    if (user.role == RoleEnum.admin && user.superAdmin) true
     else MemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId =>
         EnvironmentHelper.findById(envId) match {

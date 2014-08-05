@@ -2,7 +2,7 @@ package controllers
 
 import java.io.File
 
-import enums.RoleEnum
+import enums.{FuncEnum, RoleEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api._
@@ -56,7 +56,13 @@ object Application extends ScalaController with Security {
               Forbidden(html.template.ldap_callback_forbidden.render(siteDomain))
           }
         case _ =>
-          NotFound(html.template.ldap_callback_none.render(siteDomain))
+          val user = User(jobNo = profile.getId, name = profile.getAttributes.get("displayName").toString,
+            RoleEnum.user, superAdmin = false, locked = false, lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now))
+          val permission = Permission(jobNo = user.jobNo, List(FuncEnum.task))
+          UserHelper.create(user, permission)
+          Logger.info(s"init new user, jobNo: ${user.jobNo}.")
+          Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
+//          NotFound(html.template.ldap_callback_none.render(siteDomain))
       }
     }
   }

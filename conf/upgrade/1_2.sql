@@ -29,7 +29,7 @@ ALTER TABLE `template_item` DROP INDEX `idx_name`;
 ALTER TABLE `template_item` ADD COLUMN `script_version` varchar(60) NOT NULL DEFAULT 'master' after `order`;
 ALTER TABLE `template_item` ADD UNIQUE `idx_name` USING BTREE (`template_id`, `item_name`, `script_version`);
 
-DROP TABLE `logging_event`;
+DROP TABLE IF EXISTS `logging_event`;
 CREATE TABLE `logging_event` (
   `timestmp` varchar(20) NOT NULL,
   `formatted_message` text NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE `logging_event` (
   FULLTEXT KEY `idx_fulltext` (`formatted_message`, `timestmp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE `logging_event_exception`;
+DROP TABLE IF EXISTS `logging_event_exception`;
 CREATE TABLE `logging_event_exception` (
   `event_id` bigint(20) NOT NULL,
   `i` smallint(6) NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE `logging_event_exception` (
   PRIMARY KEY (`event_id`,`i`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE `logging_event_property`;
+DROP TABLE IF EXISTS `logging_event_property`;
 CREATE TABLE `logging_event_property` (
   `event_id` bigint(20) NOT NULL,
   `mapped_key` varchar(254) NOT NULL,
