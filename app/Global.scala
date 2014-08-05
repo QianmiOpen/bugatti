@@ -1,5 +1,7 @@
 
 import java.io.File
+import java.util.Scanner
+import utils.ControlUtil._
 
 import actor.ActorUtils
 import actor.task.MyActor
@@ -84,8 +86,10 @@ object Global extends GlobalSettings {
     }
 
     /**
-     * mysql bug
-     *
+     * 升级脚本满足2个条件：
+     * 1.不允许有select语句
+     * 2.以 ; 分号结尾一个完整sql语句
+     **/
     import AutoUpdate._
     defining(getCurrentVersion()) { currentVersion =>
       if (currentVersion == headVersion) {
@@ -100,7 +104,6 @@ object Global extends GlobalSettings {
         }
       }
     }
-    */
 
     if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
       AppTestData.initData
@@ -216,13 +219,24 @@ object AutoUpdate {
      * @param session
      */
     def update(implicit session: Session): Unit = {
-      val sqlPath = s"upgrade/${majorVersion}_${minorVersion}.sql"
+      val sqlPath = s"conf/upgrade/${majorVersion}_${minorVersion}.sql"
 
-      Play.resourceAsStream(sqlPath).map { in =>
-        val sql = scala.io.Source.fromInputStream(in, "UTF-8").mkString
-        Logger.debug(sqlPath + "=" + sql)
-        session.createStatement().executeUpdate(sql)
+      using(new Scanner(Play.getFile(sqlPath), "UTF-8")){ scanner =>
+        val sc = scanner.useDelimiter(";")
+        using(session.createStatement()){ stat =>
+          while (sc.hasNext) {
+            val sql = sc.next
+            Logger.debug(sqlPath + "=" + sql)
+            stat.executeUpdate(sql)
+          }
+        }
       }
+
+//      Play.resourceAsStream(sqlPath).map { in =>
+//        val sql = scala.io.Source.fromInputStream(in, "UTF-8").mkString
+//        Logger.debug(sqlPath + "=" + sql)
+//        session.createStatement().executeUpdate(sql)
+//      }
     }
 
     /**
