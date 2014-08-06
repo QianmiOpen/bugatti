@@ -176,7 +176,7 @@ define(['angular'], function(angular) {
 
                 ProjectService.save(angular.toJson(project), function(data) {
                     if (data.r >= 0) {
-                        $state.go('^');
+                        $state.go("conf.project.my");
                     } else if (data.r == 'exist') {
                         $scope.form.name.$invalid = true;
                         $scope.form.name.$error.exists = true;
