@@ -90,7 +90,7 @@ class CommandActor extends Actor with ActorLogging {
           val file = new File(resultLogPath)
           (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
           (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n") #>> file lines)
-          (Seq("echo", Json.prettyPrint(jsonResult).replaceAll("\\n", "\n")) #>> file lines)
+          (Seq("echo", Json.prettyPrint(jsonResult).replaceAll("""\\n""", "\r\n")) #>> file lines)
           //2、判断是否成功
           val seqResult: Seq[Boolean] = (jsonResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
           if (!seqResult.contains(false)) {
