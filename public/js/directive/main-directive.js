@@ -143,7 +143,9 @@ define(['angular'], function(angular) {
                     }
                     else {
                         ProjectService.member(pid, Auth.user.username, function(member) {
-                            $scope.hasProject_ = true;
+                            if (member != null && member != 'null') {
+                                $scope.hasProject_ = true;
+                            }
                         })
                     }
                 }

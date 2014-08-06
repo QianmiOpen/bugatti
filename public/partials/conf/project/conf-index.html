@@ -3,24 +3,24 @@
 </div>
 
 <h3 class="text-muted">{{project.name}} : {{version.vs}}</h3>
-<ul class="nav nav-tabs" role="tablist">
+<ul class="nav nav-tabs" role="tablist" >
     <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs">
         <a ng-if="e.level == 'unsafe'" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}</a>
-        <a ng-if="e.level == 'safe'" has-project-safe="{{project.id}}" ng-show="hasProjectSafe_" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}
+        <a ng-if="e.level == 'safe'" has-project-safe="{{project.id}}" ng-if="hasProjectSafe_" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}
             <sup><i class="star"></i></sup>
         </a>
     </li>
 </ul>
 
-<div class="btn-group mtb15">
-    <button ui-sref="conf.project.version.conf.upload({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default">
+<div class="btn-group mtb15" ng-if="project.id" has-project="{{project.id}}">
+    <button ng-if="hasProject_" ui-sref="conf.project.version.conf.upload({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default">
         <i class="glyphicon glyphicon-upload"></i>上传
     </button>
-    <button ui-sref="conf.project.version.conf.create({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default">
+    <button ng-if="hasProject_" ui-sref="conf.project.version.conf.create({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default">
         <i class="glyphicon glyphicon-plus"></i>
         新建
     </button>
-    <button ng-click="openModal($stateParams.eid, $stateParams.vid)" type="button" class="btn btn-default">一键拷贝</button>
+    <button ng-if="hasProject_" ng-click="openModal($stateParams.eid, $stateParams.vid)" type="button" class="btn btn-default">一键拷贝</button>
     <a ng-if="!$state.includes('conf.project.version.conf.list')" ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
 </div>
 
