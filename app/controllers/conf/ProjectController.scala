@@ -129,7 +129,7 @@ object ProjectController extends BaseController {
   // 任务模块查看
   def showAuth = AuthAction(FuncEnum.task) { implicit request =>
     val user = request.user
-    if(user.role == RoleEnum.admin){
+    if(user.role == RoleEnum.admin && user.superAdmin){
       Ok(Json.toJson(ProjectHelper.all()))
     }
     else {
