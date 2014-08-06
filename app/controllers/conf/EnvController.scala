@@ -60,7 +60,7 @@ object EnvController extends BaseController {
     // 管理员 & 委员长 显示所有环境
     val countSafe = MemberHelper.count(request.user.jobNo, LevelEnum.safe)
     val seq =
-      if (request.user.role == RoleEnum.admin || countSafe > 0) EnvironmentHelper.all()
+      if ((request.user.role == RoleEnum.admin && request.user.superAdmin) || countSafe > 0) EnvironmentHelper.all()
       else EnvironmentHelper.findByUnsafe()
     Ok(Json.toJson(seq))
   }

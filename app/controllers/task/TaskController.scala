@@ -1,8 +1,7 @@
 package controllers.task
 
-import actor.task.MyActor
+import actor.task.{TaskLog, MyActor}
 import controllers.BaseController
-import controllers.actor.{TaskLog, TaskProcess}
 import enums.TaskEnum
 import org.joda.time.DateTime
 import play.api.mvc.{Action, Controller}
@@ -163,7 +162,7 @@ object TaskController extends BaseController {
         //1、删除队列；
         TaskQueueHelper.delete(tq)
         //2、调用方法checkQueueNum修改状态；
-        TaskProcess.checkQueueNum(tq.envId, tq.projectId)
+//        TaskProcess.checkQueueNum(tq.envId, tq.projectId)
         //3、调用推送状态方法；
         //TODO TaskProcess.pushStatus()
       }
@@ -217,12 +216,13 @@ object TaskController extends BaseController {
   }
 
   def taskLog(taskId: Int) = WebSocket.async[JsValue] { request =>
-    TaskLog.show(request.session.hashCode().toString, taskId)
+    TaskLog.show(taskId)
   }
 
-  def taskLogFirst(taskId: Int, byteSize: Int) = WebSocket.using[String] { request =>
+  def taskLogFirst(taskId: Int, byteSize: Int) = Action {
     Logger.info("taskId:"+taskId+",byteSize:"+byteSize)
     TaskLog.readHeader(taskId, byteSize)
+    Ok
   }
 
   implicit val varWrites = Json.writes[Variable]

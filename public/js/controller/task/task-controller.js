@@ -374,6 +374,7 @@ define(['angular'], function(angular) {
         $scope.message = ""
         $scope.data = ""
         $scope.logFirst = ""
+        $scope.logHeader = ""
 
         $scope.receiveEvent = function(event){
             $scope.data = JSON.parse(event.data)
@@ -382,16 +383,25 @@ define(['angular'], function(angular) {
             }else{
                 $scope.$apply(function () {
                     var data = $scope.data
-                    if(!$scope.logFirstHidden && data.from == 0){
-                        $scope.logFirstHidden = true
-                    }
-                    if(data.kind == "logFirst"){
-//                       if(data.from > 0){
-                           $scope.logFirst = data.message
-//                       }
-                    }else{
-//                        $scope.message = $scope.message + $scope.TransferString(data.message)
-                        $scope.message = $scope.message + data.message
+                    if(data.taskId == taskId){
+                        if(data.kind == "logFirst"){
+                            if(!$scope.logFirstHidden && data.message.split(" ")[0] == 0){
+                                $scope.logFirstHidden = true
+                            }
+                            if($scope.logFirst.length == 0){
+                                $scope.logFirst = data.message
+                            }
+                        }else if(data.kind == "logHeader"){
+                            $scope.logFirstHidden = true
+                            if($scope.logHeader.length == 0){
+                                $scope.logHeader = data.message
+                                $scope.message = $scope.logHeader + $scope.message
+                            }
+                        }else{
+                            if($scope.message.length == 0){
+                                $scope.message = data.message
+                            }
+                        }
                     }
                 });
             }
@@ -407,19 +417,8 @@ define(['angular'], function(angular) {
         $scope.logFirstHidden = false
 
         $scope.showHiddenMessage = function(){
-            $scope.logFirstHidden = true
             var len = parseInt($scope.logFirst.split(" ")[0])
-            var logHeaderPath = PlayRoutes.controllers.task.TaskController.taskLogFirst(taskId, len).webSocketURL()
-            console.log(logHeaderPath)
-            var logHeaderSocket = new WS(logHeaderPath)
-
-            logHeaderSocket.onmessage = $scope.receiveHeaderEvent
-        }
-
-        $scope.receiveHeaderEvent = function(event){
-            $scope.$apply(function () {
-                $scope.message = event.data + $scope.message
-            })
+            TaskService.readHeader(taskId, len, function(){})
         }
 
         $scope.TransferString = function(content)

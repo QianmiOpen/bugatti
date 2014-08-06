@@ -112,7 +112,7 @@ POST          /task/version                            controllers.task.TaskCont
 GET           /task/templates                          controllers.task.TaskController.getTemplates(scriptVersion: String)
 # Task Log
 GET           /task/log/:taskId                        controllers.task.TaskController.taskLog(taskId: Int)
-GET           /task/logHeader/:taskId/:byteSize        controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)
+GET           /task/logHeader                          controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)
 
 # Logs(user action)
 POST          /logs                                    controllers.logs.LogsController.search

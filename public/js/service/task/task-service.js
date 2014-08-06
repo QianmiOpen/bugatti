@@ -23,6 +23,9 @@ define(['angular'], function(angular) {
             },
             getTemplates: function(scriptVersion, callback){
                 $http(PlayRoutes.controllers.task.TaskController.getTemplates(scriptVersion)).success(callback)
+            },
+            readHeader: function(taskId, byteSize, callback){
+                $http(PlayRoutes.controllers.task.TaskController.taskLogFirst(taskId, byteSize)).success(callback)
             }
         }
     });
