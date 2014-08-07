@@ -124,6 +124,6 @@ class AreasActor extends Actor with ActorLogging {
       sender ! areasResult.filter(_._2).map(_._1)
     }
 
-    case x => log.debug(s"Unknown ")
+    case x => log.debug(s"Unknown ${x}")
   }
 }

@@ -124,7 +124,6 @@ object Global extends GlobalSettings {
         MyActor.createNewTask(s._1, s._2)
     }
   }
-
 }
 
 

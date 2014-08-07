@@ -1,5 +1,7 @@
 package controllers.conf
 
+import actor.ActorUtils
+import actor.salt.{DeleteArea, UpdateArea, AddArea, RefreshHosts}
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
 import models.conf.{AreaInfo, AreaHelper, Area}
@@ -46,7 +48,10 @@ object AreaController extends BaseController {
             Ok(Json.obj("r" -> "exist"))
           case None =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增区域", area))
-            Ok(Json.obj("r" -> Json.toJson(AreaHelper.create(area))))
+            val areaId = AreaHelper.create(area)
+            val newArea = area.copy(id = Option(areaId))
+            ActorUtils.areas ! AddArea(newArea)
+            Ok(Json.obj("r" -> Json.toJson(areaId)))
         }
     )
   }
@@ -56,6 +61,7 @@ object AreaController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       area => {
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改区域", area))
+        ActorUtils.areas ! UpdateArea(area)
         Ok(Json.obj("r" -> Json.toJson(AreaHelper.update(area))))
       }
     )
@@ -65,6 +71,7 @@ object AreaController extends BaseController {
     AreaHelper.findById(id) match {
       case Some(area) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除区域", area))
+        ActorUtils.areas ! DeleteArea(id)
         Ok(Json.obj("r" -> Json.toJson(AreaHelper.delete(id))))
       case None =>
         NotFound
@@ -74,7 +81,7 @@ object AreaController extends BaseController {
   def refresh(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
     AreaHelper.findById(id) match {
       case Some(area) => {
-        SaltTools.refreshHost(area.syndicName)
+        ActorUtils.areaRefresh ! RefreshHosts(id)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "刷新区域", area))
         Ok(Json.obj("r" -> Json.toJson(AreaHelper.findInfoById(id))))
       }

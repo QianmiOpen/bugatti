@@ -8,7 +8,7 @@ import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{Task, TaskCommand, TaskHelper}
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
 import utils.ConfHelp
 
 import scala.concurrent.duration._
@@ -20,7 +20,7 @@ import scala.sys.process._
 object CommandActor {
   val baseLogPath = ConfHelp.logPath
   //命令执行过程
-//  var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
+  //  var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
 }
 
 class CommandActor extends Actor with ActorLogging {
@@ -76,38 +76,46 @@ class CommandActor extends Actor with ActorLogging {
       val executeTime = sr.excuteMicroseconds
       log.info(s"result ==> ${srResult}")
       val jsonResult = Json.parse(srResult)
-      val funType = (jsonResult \ "result" \ "fun").asOpt[String]
-      funType match {
-        case Some(fun) => {
-          //1、写日志
-          val baseDir = s"${`_baseLogPath`}/${`_taskId`}"
-          val resultLogPath = s"${baseDir}/result.log"
-          log.debug(s"commandActor resultLogPath ==> ${resultLogPath}")
-          val logDir = new File(baseDir)
-          if (!logDir.exists) {
-            logDir.mkdirs()
-          }
-          val file = new File(resultLogPath)
-          (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
-          (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n") #>> file lines)
-          (Seq("echo", Json.prettyPrint(jsonResult).replaceAll("""\\n""", "\r\n")) #>> file lines)
-          //2、判断是否成功
-          val seqResult: Seq[Boolean] = (jsonResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
-          if (!seqResult.contains(false)) {
-            //命令执行成功
-            //3、调用commandActor
-            (Seq("echo", "命令执行成功") #>> file lines)
-            self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
-          } else {
-            //命令执行失败
-            (Seq("echo", "命令执行失败") #>> file lines)
-            self ! TerminateCommands(TaskEnum.TaskFailed)
+      jsonResult.validate[Seq[JsObject]] match {
+        case s: JsSuccess[Seq[JsObject]] => {
+          s.get.foreach { jResult =>
+            val funType = (jResult \ "result" \ "fun").asOpt[String]
+            funType match {
+              case Some(fun) => {
+                //1、写日志
+                val baseDir = s"${`_baseLogPath`}/${`_taskId`}"
+                val resultLogPath = s"${baseDir}/result.log"
+                log.debug(s"commandActor resultLogPath ==> ${resultLogPath}")
+                val logDir = new File(baseDir)
+                if (!logDir.exists) {
+                  logDir.mkdirs()
+                }
+                val file = new File(resultLogPath)
+                (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
+                (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n") #>> file lines)
+                (Seq("echo", Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n")) #>> file lines)
+                //2、判断是否成功
+                val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
+                if (!seqResult.contains(false)) {
+                  //命令执行成功
+                  //3、调用commandActor
+                  (Seq("echo", "命令执行成功") #>> file lines)
+                  self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
+                } else {
+                  //命令执行失败
+                  (Seq("echo", "命令执行失败") #>> file lines)
+                  self ! TerminateCommands(TaskEnum.TaskFailed)
+                }
+              }
+              case _ => {
+                //如果不是state.sls 则直接返回成功
+                self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
+              }
+            }
           }
         }
-        case _ => {
-          //如果不是state.sls 则直接返回成功
-          self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
-        }
+
+        case e: JsError => log.warning(s"Errors: ${JsError.toFlatJson(e)}")
       }
     }
 
@@ -204,14 +212,15 @@ class CommandActor extends Actor with ActorLogging {
 
     //TODO join jid
     log.info(s"executeSalt cmd:${cmd}")
-    if(cmd.startsWith("bugatti")){
+    if (cmd.startsWith("bugatti")) {
       _commandSeq(1) match {
         case "copyfile" => {
           val confActor = context.actorOf(Props[ConfActor], s"confActor_${envId}_${projectId}_${order}")
           confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson)
         }
       }
-    } else {//正常的salt命令
+    } else {
+      //正常的salt命令
       //1、根据syndic获取ip
       val key = s"${_envId}_${_projectId}"
       val syndicIp = MyActor.syndic_ip.get(MyActor.envId_projectId_syndic.get(key).getOrElse("0_0")).getOrElse("0.0.0.0")
@@ -248,6 +257,9 @@ class CommandActor extends Actor with ActorLogging {
 }
 
 case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject)
-case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int,versionId: Option[Int], order: Int)
+
+case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
+
 case class TerminateCommands(status: TaskStatus)
+
 case class ConfCopyFailed(str: String)

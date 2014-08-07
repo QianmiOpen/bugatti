@@ -5,7 +5,7 @@ import java.io.File
 import akka.actor.Actor
 import models.conf.{ConfContent, ConfContentHelper, ConfHelper}
 import play.api.libs.json.{Json, JsObject}
-import utils.{TaskTools, SaltTools, ConfHelp}
+import utils.{SaltTools, TaskTools, ConfHelp}
 import scala.sys.process._
 import scalax.file.Path
 
@@ -70,6 +70,7 @@ class ConfActor extends Actor{
     Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
 
     Process(Seq("md5sum", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
+//    Process(Seq("md5", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
 
     Seq("rm", "-r", s"${baseDir}/files").!!
 
