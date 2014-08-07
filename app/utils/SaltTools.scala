@@ -1,8 +1,10 @@
 package utils
 
 import org.apache.commons.net.util.SubnetUtils
+import play.api.libs.json.JsValue
 import play.api.{Application, Logger}
 
+import scala.util.parsing.json.JSONObject
 import sys.process._
 import models.conf._
 
@@ -63,5 +65,27 @@ object SaltTools {
       val envRel = envProjectRel.copy(envId = if (env.size == 0) {None} else {env(0)._1})
       EnvironmentProjectRelHelper.update(envRel)
     }
+  }
+
+  def findErrorConf(paramsJson: JsValue, str: String): Seq[String] = {
+    var errorConf = Set.empty[String]
+    Logger.info(s"errorConf ==> ${errorConf}")
+    """\{\{ *[^}]+ *\}\}""".r.findAllIn(str).foreach{
+      key => {
+        Logger.info(s"${key}")
+        val realKey: String = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
+        Logger.info(s"${(paramsJson \ realKey).asOpt[String]}")
+        (paramsJson \ realKey).asOpt[JsValue] match {
+          case Some(j) =>
+            Logger.info(s"some ==> ${key}")
+            //ignore
+          case _ =>
+            Logger.info(s"else ==> ${key}")
+            errorConf = errorConf + realKey
+        }
+      }
+    }
+    Logger.info(s"errorConf ==> ${errorConf}")
+    errorConf.toSeq
   }
 }

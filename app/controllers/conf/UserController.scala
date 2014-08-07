@@ -60,8 +60,7 @@ object UserController extends BaseController {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
           Ok(Json.toJson(UserHelper.delete(user.jobNo)))
         }
-      case None =>
-        NotFound
+      case None => NotFound
     }
   }
 

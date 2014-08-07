@@ -1,5 +1,6 @@
 package controllers.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import controllers.BaseController
 import enums.{FuncEnum, LevelEnum, ModEnum, RoleEnum}
 import models.conf._
@@ -9,9 +10,7 @@ import play.api.data._
 import play.api.libs.json._
 import play.api.mvc.Action
 
-import org.eclipse.jgit.api.Git
 import utils.Directory._
-import utils.ControlUtil._
 import utils.{LockUtil, JGitUtil}
 
 /**
@@ -119,9 +118,14 @@ object ProjectController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
         if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
-        else
+        else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改项目", projectForm.toProject))
-          Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
+          try {
+            Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
+          } catch {
+            case me: MySQLIntegrityConstraintViolationException => Ok(Json.obj("r" -> "exist"))
+          }
+        }
       }
     )
   }
@@ -129,7 +133,7 @@ object ProjectController extends BaseController {
   // 任务模块查看
   def showAuth = AuthAction(FuncEnum.task) { implicit request =>
     val user = request.user
-    if(user.role == RoleEnum.admin){
+    if(user.role == RoleEnum.admin && user.superAdmin){
       Ok(Json.toJson(ProjectHelper.all()))
     }
     else {
