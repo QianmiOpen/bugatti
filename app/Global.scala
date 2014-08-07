@@ -113,12 +113,6 @@ object Global extends GlobalSettings {
       AppTestData.initData
     }
 
-    // 启动时reload一下所有标签
-//    import actor.git.ScriptGitActor._
-//    ActorUtils.scriptGit ! ReloadFormulasTemplate
-
-//    SaltTools.refreshHostList(app)
-
     //需要在taskQueue执行之前被初始化
     MyActor.refreshSyndic
     MyActor.generateSchedule
