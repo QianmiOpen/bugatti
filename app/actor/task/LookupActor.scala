@@ -12,14 +12,12 @@ import scala.concurrent.duration._
 
 class LookupActor(path: String) extends Actor with ActorLogging {
 
-  val _receiveTimeOut = 120
-
   sendIdentifyRequest()
 
   def sendIdentifyRequest(): Unit = {
-    context.actorSelection(path) ! Identify(path)
+    val actorS = context.actorSelection(path)
+    actorS ! Identify(path)
     import context.dispatcher
-//    context.setReceiveTimeout(_receiveTimeOut.seconds)
     context.system.scheduler.scheduleOnce(3.seconds, self, ReceiveTimeout)
   }
 
@@ -56,5 +54,4 @@ class LookupActor(path: String) extends Actor with ActorLogging {
   }
 }
 
-case class LookupActorCommand(commandSeq: Seq[String], taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 case class IdentityNone()

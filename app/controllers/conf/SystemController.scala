@@ -20,14 +20,14 @@ object SystemController extends BaseController {
   implicit val timeout = Timeout(30 seconds)
 
   def buildTag = AuthAction(FuncEnum.system) { implicit request =>
-    val result = ActorUtils.scriptGitActor ? BuildScriptTag()
+    val result = ActorUtils.scriptGit ? BuildScriptTag()
 
     Await.result(result, 30 seconds)
     Ok(Json.obj("r" -> Json.toJson(0)))
   }
 
   def refresh = AuthAction(FuncEnum.system) { implicit request =>
-    val result = ActorUtils.scriptGitActor ? ReloadFormulasTemplate
+    val result = ActorUtils.scriptGit ? ReloadFormulasTemplate
 
     Await.result(result, 30 seconds)
     Ok(Json.obj("r" -> Json.toJson(0)))
