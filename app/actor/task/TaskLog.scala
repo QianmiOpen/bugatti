@@ -28,8 +28,6 @@ object TaskLog{
 
   //建立websocket连接
   def show(taskId: Int): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
-    val task = TaskHelper.findById(taskId)
-    val logFilePath = getLogFilePath(taskId)
     (taskLogWs ? Join(taskId)).map{
       case Connected(out) => {
         val in = Iteratee.foreach[JsValue] {
@@ -45,11 +43,6 @@ object TaskLog{
         (iteratee,enumerator)
       }
     }
-  }
-
-  def getLogFilePath(taskId: Int): String = {
-    val filePath = s"${baseLogPath}/${taskId}/result.log"
-    new File(filePath).getAbsolutePath
   }
 
   def readHeader(taskId: Int, byteSize: Int) = {
@@ -87,6 +80,7 @@ class TaskLogWs extends Actor with ActorLogging {
     }
 
     case na: NotifyAll => {
+      log.info(s"notifyAll in TaskLogWs => ${na.kind}, ${na.taskId}, ${na.text}")
       notifyAll(na.kind, na.taskId, na.text)
     }
 
@@ -112,17 +106,6 @@ class TaskLogWs extends Actor with ActorLogging {
       )
     )
     logChannel.push(msg)
-    //隐藏的字节数
-//    if(_logHeaderText != ""){
-//      val msgCover = JsObject(
-//        Seq(
-//          "kind" -> JsString("logFirst")
-//          ,"from" -> JsString(_from.toString)
-//          ,"message" -> JsString(_logHeaderText)
-//        )
-//      )
-//      logChannel.push(msgCover)
-//    }
   }
 }
 
@@ -203,7 +186,7 @@ class TaskLog extends Actor with ActorLogging{
       }
       bufferStr.toString
     }else{
-      ""
+      "path为空"
     }
   }
 }
