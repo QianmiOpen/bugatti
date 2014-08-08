@@ -60,12 +60,12 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
           case Some(area) => {
             val hostList = s.get.map { hostJson =>
               ((hostJson \ "result" \ "id").validate[String].get,
-                (hostJson \ "result" \ "return").validate[Seq[String]].get.head
+                (hostJson \ "result" \ "return").validate[Seq[String]].asOpt.getOrElse(Seq("")).head
                 )
             }
 
             val addedHosts = EnvironmentProjectRelHelper.findBySyndicName(area.syndicName).map(_.name)
-            val newHosts = hostList.filterNot(x => addedHosts.contains(x._1))
+            val newHosts = hostList.filterNot(x => x._2.isEmpty).filterNot(x => addedHosts.contains(x._1))
 
             newHosts.foreach { newhost =>
               EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, None, None, area.syndicName, newhost._1, newhost._2))
