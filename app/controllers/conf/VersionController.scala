@@ -88,7 +88,7 @@ object VersionController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       versionForm => {
         if (!UserHelper.hasProjectSafe(versionForm.projectId, request.user)) Forbidden
-        else  VersionHelper.findByProjectId(versionForm.projectId).find(_.vs == versionForm.vs) match {
+        else VersionHelper.findByProjectId(versionForm.projectId).find(_.vs == versionForm.vs) match {
           case Some(_) =>
             Ok(Json.obj("r" -> "exist"))
           case None =>

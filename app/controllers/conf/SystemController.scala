@@ -2,6 +2,7 @@ package controllers.conf
 
 import actor.ActorUtils
 import actor.git.ScriptGitActor._
+import actor.salt.{RefreshFiles, ConnectedAreas, RefreshHosts}
 import akka.pattern.ask
 import akka.util.Timeout
 import controllers.BaseController
@@ -20,14 +21,32 @@ object SystemController extends BaseController {
   implicit val timeout = Timeout(30 seconds)
 
   def buildTag = AuthAction(FuncEnum.system) { implicit request =>
-    val result = ActorUtils.scriptGitActor ? BuildScriptTag()
+    val result = ActorUtils.scriptGit ? BuildScriptTag()
+
+    val future = ActorUtils.areas ? ConnectedAreas
+    val areaIds = Await.result(future, timeout.duration).asInstanceOf[Seq[Int]]
+
+    ALogger.debug(s"Auto refresh server files, areaIds: ${areaIds}")
+
+    areaIds.foreach { areaId =>
+      ActorUtils.areaRefresh ! RefreshFiles(areaId)
+    }
 
     Await.result(result, 30 seconds)
     Ok(Json.obj("r" -> Json.toJson(0)))
   }
 
   def refresh = AuthAction(FuncEnum.system) { implicit request =>
-    val result = ActorUtils.scriptGitActor ? ReloadFormulasTemplate
+    val result = ActorUtils.scriptGit ? ReloadFormulasTemplate
+
+    val future = ActorUtils.areas ? ConnectedAreas
+    val areaIds = Await.result(future, timeout.duration).asInstanceOf[Seq[Int]]
+
+    ALogger.debug(s"Auto refresh server files, areaIds: ${areaIds}")
+
+    areaIds.foreach { areaId =>
+      ActorUtils.areaRefresh ! RefreshFiles(areaId)
+    }
 
     Await.result(result, 30 seconds)
     Ok(Json.obj("r" -> Json.toJson(0)))

@@ -4,6 +4,7 @@ import java.util.Scanner
 import utils.ControlUtil._
 
 import actor.ActorUtils
+import actor.salt.AddArea
 import actor.task.MyActor
 import enums.{LevelEnum, RoleEnum}
 import models.AppDB
@@ -17,7 +18,6 @@ import play.api.Play.current
 import play.api._
 import play.api.libs.Files
 import utils.Directory._
-import utils.SaltTools
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
@@ -85,6 +85,9 @@ object Global extends GlobalSettings {
       AppData.initData
     }
 
+    // 初始化区域
+    AreaHelper.all.foreach(ActorUtils.areas ! AddArea(_))
+
     /**
      * 升级脚本文件需满足3个条件：
      * 1. 不允许有select语句
@@ -110,13 +113,6 @@ object Global extends GlobalSettings {
       AppTestData.initData
     }
 
-    // 启动时reload一下所有标签
-    import actor.git.ScriptGitActor._
-    ActorUtils.scriptGitActor ! ReloadFormulasTemplate
-
-    SaltTools.refreshHostList(app)
-
-
     //需要在taskQueue执行之前被初始化
     MyActor.refreshSyndic
     MyActor.generateSchedule
@@ -128,7 +124,6 @@ object Global extends GlobalSettings {
         MyActor.createNewTask(s._1, s._2)
     }
   }
-
 }
 
 

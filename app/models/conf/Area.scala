@@ -30,6 +30,10 @@ object AreaHelper {
   val qArea = TableQuery[AreaTable]
   val qRel = TableQuery[EnvironmentProjectRelTable]
 
+  def all: Seq[Area] = db withSession { implicit session =>
+    qArea.list()
+  }
+
   def findById(id: Int): Option[Area] = db withSession { implicit session =>
     qArea.filter(_.id === id).firstOption
   }

@@ -1,6 +1,7 @@
 package actor
 
 import actor.git.ScriptGitActor
+import actor.salt.{RefreshAreasActor, AreasActor}
 import akka.actor.{Props, ActorSystem}
 
 /**
@@ -9,5 +10,9 @@ import akka.actor.{Props, ActorSystem}
 object ActorUtils {
   lazy val system = ActorSystem("bugatti")
 
-  lazy val scriptGitActor = system.actorOf(Props[ScriptGitActor])
+  val scriptGit = system.actorOf(Props[ScriptGitActor], name = "ScriptGit")
+
+  val areas = system.actorOf(Props[AreasActor], name = "Areas")
+
+  val areaRefresh = system.actorOf(Props[RefreshAreasActor], name = "AreaRefresh")
 }

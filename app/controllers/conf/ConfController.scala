@@ -54,8 +54,7 @@ object ConfController extends BaseController {
     ConfHelper.findById(id) match {
       case Some(conf) =>
         Ok(Json.obj("conf" -> Json.toJson(conf), "confContent" -> ConfContentHelper.findById(id)))
-      case None =>
-        NotFound
+      case None => NotFound
     }
   }
 
@@ -67,11 +66,11 @@ object ConfController extends BaseController {
     ConfHelper.findById(id) match {
       case Some(conf) =>
         if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user)) Forbidden
-        else
+        else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除配置文件", conf))
           Ok(Json.toJson(ConfHelper.delete(id)))
-      case None =>
-        NotFound
+        }
+      case None => NotFound
     }
   }
 
@@ -80,9 +79,10 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
-        else
+        else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
           Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
+        }
       }
     )
   }
@@ -92,9 +92,10 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
-        else
+        else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
           Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
+        }
       }
     )
   }

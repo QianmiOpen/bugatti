@@ -1,4 +1,5 @@
 -- This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender.
+DROP TABLE IF EXISTS `logging_event`;
 CREATE TABLE `logging_event` (
   `timestmp` varchar(20) NOT NULL,
   `formatted_message` text NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE `logging_event` (
   FULLTEXT KEY `idx_fulltext` (`formatted_message`, `timestmp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `logging_event`;
 CREATE TABLE `logging_event_exception` (
   `event_id` bigint(20) NOT NULL,
   `i` smallint(6) NOT NULL,
@@ -26,6 +28,7 @@ CREATE TABLE `logging_event_exception` (
   PRIMARY KEY (`event_id`,`i`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `logging_event`;
 CREATE TABLE `logging_event_property` (
   `event_id` bigint(20) NOT NULL,
   `mapped_key` varchar(254) NOT NULL,

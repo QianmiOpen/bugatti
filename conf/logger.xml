@@ -45,10 +45,11 @@
 
     <logger name="play" level="INFO" />
     <logger name="application" level="DEBUG" />
-    <logger name="akka" level="DEBUG" />
+    <logger name="akka" level="INFO" />
     <logger name="com.jolbox.bonecp" level="INFO"/>
     <logger name="logger.scala.slick" level="DEBUG"/>
     <logger name="scala.slick" level="INFO"/>
+    <logger name="actor" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="FILE" />
