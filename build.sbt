@@ -31,6 +31,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "angular-ui-router" % "0.2.8-2",
   "org.webjars" % "angular-sanitize" % "1.2.15",
   "org.webjars" % "angular-ui-bootstrap" % "0.11.0-2",
+  "org.webjars" % "angular-ui-tree" % "2.1.5",
   "org.webjars" % "angular-file-upload" % "1.6.1",
   "org.webjars" % "ace" % "07.31.2013",
   "org.webjars" % "angular-ui-ace" % "0.1.0",
