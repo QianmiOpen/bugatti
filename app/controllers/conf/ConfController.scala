@@ -133,7 +133,7 @@ object ConfController extends BaseController {
   }
 
   // ===========================================================================
-  // 配置文件历史记录
+  // 配置文件历史记录2
   // ===========================================================================
   implicit val confLogWrites = Json.writes[ConfLog]
   implicit val confLogContentWrites = new Writes[ConfLogContent] {
