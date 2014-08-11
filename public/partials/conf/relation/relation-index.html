@@ -3,18 +3,24 @@
     <h1 class="pull-left m0">关系配置</h1>
 </div>
 
-<form class="form-inline" role="form" >
+<form class="form-inline" role="form" ng-submit="searchForm()">
     <div class="form-group">
-        <select class="form-control" ng-change="select()" ng-model="env" ng-options="e.name for e in envs">
+        <select class="form-control" ng-model="s_env" ng-options="e.id as e.name for e in envs">
             <option value="">-- 选择环境 --</option>
         </select>
     </div>
-    <div class="form-group">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="form-group">&nbsp;&nbsp;</div>
     <div class="form-group">
-        <select class="form-control" ng-change="select()" ng-model="project" ng-options="p.name for p in projects">
+        <select class="form-control" ng-model="s_project" ng-options="p.id as p.name for p in projects">
             <option value="">-- 选择项目 --</option>
         </select>
     </div>
+    <div class="form-group">&nbsp;&nbsp;</div>
+    <div class="form-group">
+        <input type="text" ng-model="s_ip" class="form-control" placeholder="机器IP">
+    </div>
+
+    <button type="submit" class="btn btn-default">搜索</button>
 </form>
 
 <div class="table-responsive">
