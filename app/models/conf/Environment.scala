@@ -34,7 +34,7 @@ object EnvironmentHelper {
     qEnvironment.filter(_.id === id).firstOption
   }
 
-  def findByUnsafe(): Seq[Environment] = db withSession {implicit session =>
+  def findByUnsafe(): Seq[Environment] = db withSession { implicit session =>
     qEnvironment.filter(_.level === LevelEnum.unsafe).list
   }
 

@@ -39,12 +39,12 @@ object UserController extends BaseController {
     Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
   }
 
-  def index(page: Int, pageSize: Int) = Action {
-    Ok(Json.toJson(UserHelper.all(page, pageSize)))
+  def index(jobNo: Option[String], page: Int, pageSize: Int) = Action {
+    Ok(Json.toJson(UserHelper.all(jobNo.filterNot(_.isEmpty), page, pageSize)))
   }
 
-  def count = Action {
-    Ok(Json.toJson(UserHelper.count))
+  def count(jobNo: Option[String]) = Action {
+    Ok(Json.toJson(UserHelper.count(jobNo.filterNot(_.isEmpty))))
   }
 
   def permissions(jobNo: String) = Action {

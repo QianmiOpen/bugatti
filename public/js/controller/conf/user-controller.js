@@ -8,21 +8,26 @@ define(['angular'], function(angular) {
         function($scope, $stateParams, $state, $modal, UserService, Auth) {
             $scope.loginUser = Auth.user;
             $scope.currentPage = 1;
-            $scope.pageSize = 10;
+            $scope.pageSize = 20;
 
-            // count
-            UserService.count(function(data) {
-                $scope.totalItems = data;
-            });
+            $scope.searchForm = function(jobNo) {
+                // count
+                UserService.count(jobNo, function(data) {
+                    $scope.totalItems = data;
+                });
 
-            // list
-            UserService.getPage(0, $scope.pageSize, function(data) {
-                $scope.users = data;
-            });
+                // list
+                UserService.getPage(jobNo, 0, $scope.pageSize, function(data) {
+                    $scope.users = data;
+                });
+            };
+
+            // default list
+            $scope.searchForm($scope.s_jobNo);
 
             // set page
             $scope.setPage = function (pageNo) {
-                UserService.getPage(pageNo - 1, $scope.pageSize, function(data) {
+                UserService.getPage($scope.s_jobNo, pageNo - 1, $scope.pageSize, function(data) {
                     $scope.users = data;
                 });
             };

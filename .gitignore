@@ -2,7 +2,7 @@
 /logs/application.log
 project/project
 project/target
-target
+target/
 tmp
 .history
 dist
@@ -18,3 +18,5 @@ dist
 # system ignore
 .DS_Store
 Thumbs.db
+
+~

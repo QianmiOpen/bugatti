@@ -16,8 +16,8 @@ GET           /callback                                org.pac4j.play.CallbackCo
 GET           /logout                                  org.pac4j.play.CallbackController.logoutAndRedirect
 
 # User
-GET           /user                                    controllers.conf.UserController.index(page: Int ?=0, pageSize: Int ?=10)
-GET           /user/total                              controllers.conf.UserController.count
+GET           /user                                    controllers.conf.UserController.index(jobNo: Option[String], page: Int ?=0, pageSize: Int ?=10)
+GET           /user/total                              controllers.conf.UserController.count(jobNo: Option[String])
 GET           /user/:jobNo                             controllers.conf.UserController.show(jobNo: String)
 GET           /user/:jobNo/permissions                 controllers.conf.UserController.permissions(jobNo: String)
 DELETE        /user/:jobNo                             controllers.conf.UserController.delete(jobNo: String)
@@ -96,8 +96,8 @@ GET           /conf/:confId/logs/total                 controllers.conf.ConfCont
 GET           /conf/log/:id                            controllers.conf.ConfController.log(id: Int)
 
 # Relation
-GET           /relation                                controllers.conf.RelationController.index(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int ?=0, pageSize: Int ?=10)
-GET           /relation/total                          controllers.conf.RelationController.count(envId: Option[Int], projectId: Option[Int])
+GET           /relation                                controllers.conf.RelationController.index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int ?=0, pageSize: Int ?=10)
+GET           /relation/total                          controllers.conf.RelationController.count(ip: Option[String], envId: Option[Int], projectId: Option[Int])
 GET           /relation/ips                            controllers.conf.RelationController.ips(envId: Int)
 POST          /relation                                controllers.conf.RelationController.bind
 DELETE        /relation/:id                            controllers.conf.RelationController.unbind(id: Int)
