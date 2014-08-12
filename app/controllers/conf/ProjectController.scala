@@ -36,12 +36,6 @@ object ProjectController extends BaseController {
       "lastVid" -> optional(number),
       "lastVersion" -> optional(text),
       "lastUpdated" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
-      "variable" -> seq (
-        mapping(
-          "name" -> text,
-          "value" -> text
-        )(Variable.apply)(Variable.unapply)
-      ),
       "items" -> seq(
         mapping(
           "id" -> optional(number),
@@ -49,6 +43,15 @@ object ProjectController extends BaseController {
           "name" -> nonEmptyText,
           "value" -> optional(text)
         )(Attribute.apply)(Attribute.unapply)
+      ),
+      "variables" -> seq(
+        mapping(
+          "id" -> optional(number),
+          "envId" -> number,
+          "projectId" -> optional(number),
+          "name" -> nonEmptyText,
+          "value" -> nonEmptyText
+        )(Variable.apply)(Variable.unapply)
       )
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
@@ -146,6 +149,13 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   def atts(projectId: Int) = AuthAction(FuncEnum.project) {
     Ok(Json.toJson(AttributeHelper.findByProjectId(projectId)))
+  }
+
+  // ----------------------------------------------------------
+  // 项目环境变量
+  // ----------------------------------------------------------
+  def vars(projectId: Int) = AuthAction(FuncEnum.project) {
+    Ok(Json.toJson(VariableHelper.findByProjectId(projectId)))
   }
 
   // ----------------------------------------------------------

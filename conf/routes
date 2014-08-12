@@ -48,6 +48,7 @@ GET           /project                                 controllers.conf.ProjectC
 GET           /project/total                           controllers.conf.ProjectController.count(projectName: Option[String], my: Boolean ?= false)
 GET           /project/all                             controllers.conf.ProjectController.all
 GET           /project/atts                            controllers.conf.ProjectController.atts(projectId: Int)
+GET           /project/vars                            controllers.conf.ProjectController.vars(projectId: Int)
 GET           /project/:id                             controllers.conf.ProjectController.show(id: Int)
 DELETE        /project/:id                             controllers.conf.ProjectController.delete(id: Int)
 POST          /project                                 controllers.conf.ProjectController.save

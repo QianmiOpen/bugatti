@@ -77,38 +77,6 @@ define(['angular'], function(angular) {
             $scope.scriptVersions = data;
         });
 
-        // env variable
-        $scope.vars = [];
-        $scope.addVar = function(v) {
-            if (findInVars($scope.vars, v)) {
-                $scope.varForm.varName.$invalid = true;
-                $scope.varForm.varName.$error.unique = true;
-                return;
-            };
-            $scope.vars.push(angular.copy(v));
-            v.name = "", v.value = ""; // clean input
-            $scope.varForm.varName.$error.unique = false;
-        }
-
-        function findInVars(vars, v) {
-            var find = false;
-            angular.forEach(vars, function(vs) {
-                if (vs.name == v.name) {
-                    find = true;
-                    return;
-                }
-            });
-            return find;
-        }
-
-        $scope.editVar = function(repeat$scope) {
-            repeat$scope.mode = 'edit';
-        };
-
-        $scope.deleteVar = function(index) {
-            $scope.vars.splice(index, 1);
-        };
-
     }]);
 
     app.controller('EnvUpdateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
@@ -142,37 +110,6 @@ define(['angular'], function(angular) {
         EnvService.allScriptVersion(function(data) {
             $scope.scriptVersions = data;
         });
-
-        // project variable
-        $scope.addVar = function(v) {
-            if (findInVars($scope.vars, v)) {
-                $scope.varForm.varName.$invalid = true;
-                $scope.varForm.varName.$error.unique = true;
-                return;
-            };
-            $scope.vars.push(angular.copy(v));
-            v.name = "", v.value = ""; // clean input
-            $scope.varForm.varName.$error.unique = false;
-        }
-
-        function findInVars(vars, v) {
-            var find = false;
-            angular.forEach(vars, function(vs) {
-                if (vs.name == v.name) {
-                    find = true;
-                    return;
-                }
-            });
-            return find;
-        }
-
-        $scope.editVar = function(repeat$scope) {
-            repeat$scope.mode = 'edit';
-        };
-
-        $scope.deleteVar = function(index) {
-            $scope.vars.splice(index, 1);
-        };
 
     }]);
 

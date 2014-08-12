@@ -33,6 +33,9 @@ define(['angular'], function(angular) {
             atts: function(projectId, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.atts(projectId)).success(callback);
             },
+            vars: function(projectId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.vars(projectId)).success(callback);
+            },
             // ------------------------------------------------
             // 项目成员
             // ------------------------------------------------

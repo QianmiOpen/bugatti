@@ -1,6 +1,7 @@
 
 import java.io.File
 import java.util.Scanner
+import actor.git.ScriptGitActor.ReloadFormulasTemplate
 import utils.ControlUtil._
 
 import actor.ActorUtils
@@ -76,6 +77,7 @@ object Global extends GlobalSettings {
           TableQuery[AreaTable] ::
           TableQuery[EnvironmentProjectRelTable] ::
           TableQuery[ScriptVersionTable] ::
+          TableQuery[VariableTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
@@ -95,7 +97,7 @@ object Global extends GlobalSettings {
      * 1. 不允许有select语句
      * 2. 不允许有注释
      * 3. 以 ; 分号结尾一个完整sql语句
-     **/
+     */
     import AutoUpdate._
     defining(getCurrentVersion()) { currentVersion =>
       if (currentVersion == headVersion) {
@@ -148,11 +150,11 @@ object AppTestData {
 
     // 项目表初始化
     Seq(
-      Project(None, "cardbase-master", 3, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
-      Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
-      Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
-      Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable]),
-      Project(None, "qianmi3", 1, 5, Option(5), Option("1.6.4-SNAPSHOT"), Option(new DateTime()), List.empty[Variable])
+      Project(None, "cardbase-master", 3, 5, Option(1), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "cardbase-slave", 1, 5, Option(2), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi1", 1, 5, Option(3), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi2", 1, 5, Option(4), Option("1.6.4-SNAPSHOT"), Option(new DateTime())),
+      Project(None, "qianmi3", 1, 5, Option(5), Option("1.6.4-SNAPSHOT"), Option(new DateTime()))
     ).foreach(ProjectHelper.create)
 
     AppDB.db.withSession { implicit session =>
@@ -175,10 +177,10 @@ object AppTestData {
     ).foreach(VersionHelper.create)
 
     var seq = Seq(
-      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
-      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
-      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe, globalVariable = List.empty[Variable]),
-      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master, globalVariable = List.empty[Variable])
+      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
+      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
+      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
+      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master)
     )
     //    for (i <- 5 to 55) {
     //      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
@@ -196,6 +198,8 @@ object AppTestData {
       Area(None, "测试", "t-syndic", "192.168.59.3"),
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
+
+    ActorUtils.scriptGit ! ReloadFormulasTemplate
   }
 }
 
@@ -224,8 +228,10 @@ object AutoUpdate {
         using(session.createStatement()){ stat =>
           while (sc.hasNext) {
             val sql = sc.next
-            Logger.debug(sqlPath + "=" + sql)
-            stat.executeUpdate(sql)
+            if (!sql.replaceAll("""\s""", "").isEmpty) {
+              Logger.debug(sqlPath + "=" + sql)
+              stat.executeUpdate(sql)
+            }
           }
         }
       }

@@ -33,22 +33,6 @@
         <td class="text-right col-sm-3">脚本版本：</td>
         <td>{{env.scriptVersion}}</td>
     </tr>
-    <tr>
-        <td class="text-right col-sm-3">环境变量：</td>
-        <td>
-            <table class="table">
-                <thead>
-                <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="v in env.globalVariable">
-                    <td>{{v.name}}</td>
-                    <td>{{v.value}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </td>
-    </tr>
     </tbody>
 
 </table>

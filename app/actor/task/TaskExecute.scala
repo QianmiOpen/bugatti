@@ -144,17 +144,18 @@ class TaskExecute extends Actor with ActorLogging {
         paramsJson = paramsJson ++ Json.obj(s.name -> s.value)
     }
 
-    //properties 按照 projectName.props.key -> value
-    environment.globalVariable.foreach{
-      e =>
-//        paramsJson = paramsJson ++ Json.obj(s"${project.name}.props.${e.name}" -> e.value)
-        paramsJson = paramsJson ++ Json.obj(e.name -> e.value)
-    }
-    project.globalVariable.foreach{
-      p =>
-//        paramsJson = paramsJson ++ Json.obj(s"${project.name}.props.${p.name}" -> p.value)
-        paramsJson = paramsJson ++ Json.obj(p.name -> p.value)
-    }
+    // todo
+//    //properties 按照 projectName.props.key -> value
+//    environment.globalVariable.foreach{
+//      e =>
+////        paramsJson = paramsJson ++ Json.obj(s"${project.name}.props.${e.name}" -> e.value)
+//        paramsJson = paramsJson ++ Json.obj(e.name -> e.value)
+//    }
+//    project.globalVariable.foreach{
+//      p =>
+////        paramsJson = paramsJson ++ Json.obj(s"${project.name}.props.${p.name}" -> p.value)
+//        paramsJson = paramsJson ++ Json.obj(p.name -> p.value)
+//    }
 
     log.debug(s"paramsJson ==> ${Json.prettyPrint(paramsJson)}")
 

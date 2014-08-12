@@ -9,9 +9,9 @@ import play.api.Play.current
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend
 
-case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable])
-case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], globalVariable: Seq[Variable], items: Seq[Attribute]) {
-  def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated, globalVariable)
+case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime])
+case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], items: Seq[Attribute], variables: Seq[Variable]) {
+  def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated)
 }
 
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
@@ -22,12 +22,8 @@ class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def lastVid = column[Int]("last_version_id", O.Nullable)         // 最近版本id
   def lastVersion = column[String]("last_version", O.Nullable)     // 最近版本号
   def lastUpdated= column[DateTime]("last_updated", O.Nullable, O.Default(DateTime.now()))
-  def globalVariable = column[Seq[Variable]]("global_variable", O.DBType("text"))(MappedColumnType.base[Seq[Variable], String](
-    _.map(v => s"${v.name}:${v.value}").mkString(","),
-    _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => Variable(name, value) }).toList
-  ))
 
-  override def * = (id.?, name, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?, globalVariable) <> (Project.tupled, Project.unapply _)
+  override def * = (id.?, name, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?) <> (Project.tupled, Project.unapply _)
   def idx = index("idx_name", name, unique = true)
   def idx_template = index("idx_template", templateId)
 
@@ -80,7 +76,6 @@ object ProjectHelper extends PlayCache {
         val query = MaybeFilter(qProject).filter(projectName)(v => b => b.name like s"${v}%").query
         query.drop(offset).take(pageSize).list
     }
-
   }
 
   def all(): Seq[Project] = db withSession { implicit session =>
@@ -92,11 +87,16 @@ object ProjectHelper extends PlayCache {
   }
 
   def create(projectForm: ProjectForm, jobNo: String) = db withTransaction { implicit session =>
-    val pid = _create(projectForm.toProject)
-    val attrs = projectForm.items.map(item => item.copy(None, Some(pid)))
+    val _projectId = _create(projectForm.toProject)
+    // variable
+    val variables = projectForm.variables.map(vb => vb.copy(None, projectId = Some(_projectId)))
+    VariableHelper._create(variables)
+    // attribute
+    val attrs = projectForm.items.map(item => item.copy(None, Some(_projectId)))
     AttributeHelper._create(attrs)
-    MemberHelper._create(Member(None, pid, LevelEnum.safe, jobNo))
-    pid
+    // member
+    MemberHelper._create(Member(None, _projectId, LevelEnum.safe, jobNo))
+    _projectId
   }
 
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
@@ -104,16 +104,28 @@ object ProjectHelper extends PlayCache {
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
+    // relation
     EnvironmentProjectRelHelper._unbindByProjectId(Some(id))
+    // attribute
     AttributeHelper._deleteByProjectId(id)
+    // member
     MemberHelper._deleteByProjectId(id)
+    // variable
+    VariableHelper._deleteByProjectId(id)
+    // project
     qProject.filter(_.id === id).delete
   }
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
+    // attribute
     AttributeHelper._deleteByProjectId(id)
     val attrs = projectForm.items.map(item => item.copy(None, Some(id)))
     AttributeHelper._create(attrs)
+    // variable
+    VariableHelper._deleteByProjectId(id)
+    val variables = projectForm.variables.map(vb => vb.copy(None, projectId = Some(id)))
+    VariableHelper._create(variables)
+    // project
     _update(id, projectForm.toProject)
   }
 

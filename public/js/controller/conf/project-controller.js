@@ -84,14 +84,33 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'ProjectService',
-        function($scope, $stateParams, $modal, ProjectService) {
+    app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
+        function($scope, $stateParams, $modal, ProjectService, EnvService) {
             ProjectService.get($stateParams.id, function(data) {
                 $scope.project = data;
             });
 
             ProjectService.atts($stateParams.id, function(data) {
                 $scope.atts = data;
+            });
+
+            // load env all
+            EnvService.getAll(function(data) {
+                if (data == null || data.length == 0) {
+                    return;
+                }
+                $scope.envs = data;
+                $scope.envChange(data[0]);
+            });
+
+            // select env
+            $scope.envChange = function(e) {
+                $scope.env = e;
+            };
+
+            // load init variable
+            ProjectService.vars($stateParams.id, function(data) {
+                $scope.vars = data;
             });
 
             // ---------------------------------------------
@@ -168,13 +187,13 @@ define(['angular'], function(angular) {
     }]);
 
 
-    app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'ProjectService', 'TemplateService',
-        function($scope, $stateParams, $state, ProjectService, TemplateService) {
+    app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'ProjectService', 'TemplateService', 'EnvService',
+        function($scope, $stateParams, $state, ProjectService, TemplateService, EnvService) {
 
             $scope.saveOrUpdate = function(project) {
 
                 project.items = [];
-                project.variable = angular.copy($scope.vars);
+                project.variables = angular.copy($scope.vars);
                 angular.forEach($scope.items, function(item) {
                     project.items.push({name: item.itemName, value: item.value})
                 });
@@ -211,10 +230,25 @@ define(['angular'], function(angular) {
                 });
             };
 
+            // load env all
+            EnvService.getAll(function(data) {
+                if (data == null || data.length == 0) {
+                    return;
+                }
+                $scope.envs = data;
+                $scope.envChange(data[0]);
+            });
+
+            // select env
+            $scope.envChange = function(e) {
+                $scope.env = e;
+            };
+
             // project variable
             $scope.vars = [];
             $scope.addVar = function(v) {
-                if (findInVars($scope.vars, v)) {
+                v.envId = $scope.env.id; // bind env
+                if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
@@ -222,36 +256,39 @@ define(['angular'], function(angular) {
                 $scope.vars.push(angular.copy(v));
                 v.name = "", v.value = ""; // clean input
                 $scope.varForm.varName.$error.unique = false;
-            }
+            };
 
             function findInVars(vars, v) {
-                var find = false;
-                angular.forEach(vars, function(vs) {
-                    if (vs.name == v.name) {
-                        find = true;
+                var find = -1;
+                angular.forEach(vars, function(_v, index) {
+                    if (_v.name == v.name && _v.envId == v.envId) {
+                        find = index;
                         return;
                     }
                 });
                 return find;
-            }
+            };
 
             $scope.editVar = function(repeat$scope) {
                 repeat$scope.mode = 'edit';
             };
 
-            $scope.deleteVar = function(index) {
-                $scope.vars.splice(index, 1);
+            $scope.deleteVar = function(v) {
+                var index = findInVars($scope.vars, v)
+                if (index != -1) {
+                    $scope.vars.splice(index, 1);
+                }
             };
 
         }]);
 
-    app.controller('ProjectUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'ProjectService', 'TemplateService',
-        function($scope, $stateParams, $filter, $state, ProjectService, TemplateService) {
+    app.controller('ProjectUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'ProjectService', 'TemplateService', 'EnvService',
+        function($scope, $stateParams, $filter, $state, ProjectService, TemplateService, EnvService) {
 
             // update
             $scope.saveOrUpdate = function(project) {
                 project.items = [];
-                project.variable = angular.copy($scope.vars);
+                project.variables = angular.copy($scope.vars);
                 angular.forEach($scope.items, function(item) {
                     project.items.push({name: item.itemName, value: item.value})
                 });
@@ -278,8 +315,11 @@ define(['angular'], function(angular) {
 
                 $scope.change(data.templateId)
 
-                // init variable
-                $scope.vars = angular.copy(data.globalVariable);
+            });
+
+            // load init variable
+            ProjectService.vars($stateParams.id, function(data) {
+                $scope.vars = data;
             });
 
             // load template all
@@ -310,9 +350,25 @@ define(['angular'], function(angular) {
                 });
             };
 
+            // load env all
+            EnvService.getAll(function(data) {
+                if (data == null || data.length == 0) {
+                    return;
+                }
+                $scope.envs = data;
+                $scope.envChange(data[0]);
+            });
+
+            // select env
+            $scope.envChange = function(e) {
+                $scope.env = e;
+            };
+
             // project variable
+            $scope.vars = [];
             $scope.addVar = function(v) {
-                if (findInVars($scope.vars, v)) {
+                v.envId = $scope.env.id; // bind env
+                if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
@@ -320,25 +376,28 @@ define(['angular'], function(angular) {
                 $scope.vars.push(angular.copy(v));
                 v.name = "", v.value = ""; // clean input
                 $scope.varForm.varName.$error.unique = false;
-            }
+            };
 
             function findInVars(vars, v) {
-                var find = false;
-                angular.forEach(vars, function(vs) {
-                    if (vs.name == v.name) {
-                        find = true;
+                var find = -1;
+                angular.forEach(vars, function(_v, index) {
+                    if (_v.name == v.name && _v.envId == v.envId) {
+                        find = index;
                         return;
                     }
                 });
                 return find;
-            }
+            };
 
             $scope.editVar = function(repeat$scope) {
                 repeat$scope.mode = 'edit';
             };
 
-            $scope.deleteVar = function(index) {
-                $scope.vars.splice(index, 1);
+            $scope.deleteVar = function(v) {
+                var index = findInVars($scope.vars, v)
+                if (index != -1) {
+                    $scope.vars.splice(index, 1);
+                }
             };
 
         }]);

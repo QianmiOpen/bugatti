@@ -43,19 +43,14 @@
     </tr>
     <tr>
         <td class="text-right col-sm-3">项目环境变量：</td>
-
         <td>
             <ul class="nav nav-tabs" role="tablist">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#">Profile</a></li>
-                <li><a href="#">Messages</a></li>
+                <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs"><a href="" ng-click="envChange(e)">{{e.name}}</a></li>
             </ul>
             <table class="table">
-                <thead>
-                    <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>
-                </thead>
                 <tbody>
-                <tr ng-repeat="v in project.globalVariable">
+                <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>
+                <tr ng-repeat="v in vars | filter: {envId: env.id}">
                     <td>{{v.name}}</td>
                     <td>{{v.value}}</td>
                 </tr>
