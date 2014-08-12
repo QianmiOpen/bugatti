@@ -53,14 +53,14 @@ object ProjectController extends BaseController {
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(my: Boolean, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def index(projectName: Option[String], my: Boolean, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) { implicit request =>
     val jobNo = if (my) Some(request.user.jobNo) else None
-    Ok(Json.toJson(ProjectHelper.all(jobNo, page, pageSize)))
+    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), jobNo, page, pageSize)))
   }
 
-  def count(my: Boolean) = AuthAction(FuncEnum.project) { implicit request =>
+  def count(projectName: Option[String], my: Boolean) = AuthAction(FuncEnum.project) { implicit request =>
     val jobNo = if (my) Some(request.user.jobNo) else None
-    Ok(Json.toJson(ProjectHelper.count(jobNo)))
+    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty), jobNo)))
   }
 
   def show(id: Int) = Action {

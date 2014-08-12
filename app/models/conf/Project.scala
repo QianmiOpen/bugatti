@@ -2,7 +2,7 @@ package models.conf
 
 import com.github.tototoshi.slick.MySQLJodaSupport._
 import enums.LevelEnum
-import models.PlayCache
+import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
 import play.api.Play.current
 
@@ -52,31 +52,35 @@ object ProjectHelper extends PlayCache {
     qProject.filter(_.templateId === templateId).length.run
   }
 
-  def count(jobNo: Option[String]): Int = db withSession { implicit session =>
+  def count(projectName: Option[String], jobNo: Option[String]): Int = db withSession { implicit session =>
     jobNo match {
       case Some(no) =>
-        val query = (for {
+        val queryJoin = (for {
           p <- qProject
           m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
+        val query = MaybeFilter(queryJoin.map(_._1)).filter(projectName)(v => b => b.name like s"${v}%").query
         query.length.run
       case None =>
-        qProject.length.run
+        MaybeFilter(qProject).filter(projectName)(v => b => b.name like s"${v}%").query.length.run
     }
   }
 
-  def all(jobNo: Option[String], page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
+  def all(projectName: Option[String], jobNo: Option[String], page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
     val offset = pageSize * page
     jobNo match {
       case Some(no) =>
-        val query = (for {
+        val queryJoin = (for {
           p <- qProject
           m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
-        query.map(_._1).drop(offset).take(pageSize).list
+        val query = MaybeFilter(queryJoin.map(_._1)).filter(projectName)(v => b => b.name like s"${v}%").query
+        query.drop(offset).take(pageSize).list
       case None =>
-        qProject.drop(offset).take(pageSize).list
+        val query = MaybeFilter(qProject).filter(projectName)(v => b => b.name like s"${v}%").query
+        query.drop(offset).take(pageSize).list
     }
+
   }
 
   def all(): Seq[Project] = db withSession { implicit session =>

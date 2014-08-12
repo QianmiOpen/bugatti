@@ -44,8 +44,8 @@ PUT           /env/:id                                 controllers.conf.EnvContr
 POST          /env/auth                                controllers.conf.EnvController.showAuth
 
 # Project
-GET           /project                                 controllers.conf.ProjectController.index(my: Boolean ?= false, page: Int ?=0, pageSize: Int ?=30)
-GET           /project/total                           controllers.conf.ProjectController.count(my: Boolean ?= false)
+GET           /project                                 controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?= false, page: Int ?=0, pageSize: Int ?=30)
+GET           /project/total                           controllers.conf.ProjectController.count(projectName: Option[String], my: Boolean ?= false)
 GET           /project/all                             controllers.conf.ProjectController.all
 GET           /project/atts                            controllers.conf.ProjectController.atts(projectId: Int)
 GET           /project/:id                             controllers.conf.ProjectController.show(id: Int)
