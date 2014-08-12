@@ -1,5 +1,7 @@
 package models.conf
 
+import actor.ActorUtils
+import actor.conf.UpdateProject
 import com.github.tototoshi.slick.MySQLJodaSupport._
 import enums.LevelEnum
 import models.{MaybeFilter, PlayCache}
@@ -82,6 +84,10 @@ object ProjectHelper extends PlayCache {
     qProject.list
   }
 
+  def allExceptSelf(id: Int): Seq[Project] = db withSession { implicit session =>
+    qProject.filterNot(_.id === id).list
+  }
+
   def create(project: Project) = db withSession { implicit session =>
     _create(project)
   }
@@ -100,7 +106,12 @@ object ProjectHelper extends PlayCache {
   }
 
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
-    qProject.returning(qProject.map(_.id)).insert(project)(session)
+    val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
+    //增加项目依赖初始关系
+    ProjectDependencyHelper.add(ProjectDependency(None, pid, -1));
+    //修改缓存
+    ActorUtils.configuarActor ! UpdateProject(pid, project.name)
+    pid
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
@@ -112,8 +123,10 @@ object ProjectHelper extends PlayCache {
     MemberHelper._deleteByProjectId(id)
     // variable
     VariableHelper._deleteByProjectId(id)
-    // project
-    qProject.filter(_.id === id).delete
+    val result = qProject.filter(_.id === id).delete
+    //删除项目依赖初始关系
+    ProjectDependencyHelper.deleteByProjectId(id)
+    result
   }
 
   def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
@@ -131,7 +144,10 @@ object ProjectHelper extends PlayCache {
 
   def _update(id: Int, project: Project)(implicit session: JdbcBackend#Session) = {
     val project2update = project.copy(Some(id))
-    qProject.filter(_.id === id).update(project2update)(session)
+    val result = qProject.filter(_.id === id).update(project2update)(session)
+    //修改缓存
+    ActorUtils.configuarActor ! UpdateProject(id, project.name)
+    result
   }
 
 }

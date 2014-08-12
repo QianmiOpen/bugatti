@@ -1,5 +1,6 @@
 package actor
 
+import actor.conf.ConfigureActor
 import actor.git.ScriptGitActor
 import actor.salt.{RefreshAreasActor, AreasActor}
 import akka.actor.{Props, ActorSystem}
@@ -15,4 +16,6 @@ object ActorUtils {
   val areas = system.actorOf(Props[AreasActor], name = "Areas")
 
   val areaRefresh = system.actorOf(Props[RefreshAreasActor], name = "AreaRefresh")
+
+  val configuarActor = system.actorOf(Props[ConfigureActor], name = "configuarActor")
 }

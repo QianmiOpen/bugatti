@@ -44,9 +44,10 @@ PUT           /env/:id                                 controllers.conf.EnvContr
 POST          /env/auth                                controllers.conf.EnvController.showAuth
 
 # Project
-GET           /project                                 controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?= false, page: Int ?=0, pageSize: Int ?=30)
-GET           /project/total                           controllers.conf.ProjectController.count(projectName: Option[String], my: Boolean ?= false)
+GET           /project                                 controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?=                false,        page:        Int                ?=0,        pageSize:        Int         ?=        30)
+GET           /project/total                           controllers.conf.ProjectController.count(projectName: Option[String], my: Boolean ?=                false)
 GET           /project/all                             controllers.conf.ProjectController.all
+GET           /project/allExceptSelf/:id               controllers.conf.ProjectController.allExceptSelf(id: Int)
 GET           /project/atts                            controllers.conf.ProjectController.atts(projectId: Int)
 GET           /project/vars                            controllers.conf.ProjectController.vars(projectId: Int)
 GET           /project/:id                             controllers.conf.ProjectController.show(id: Int)
@@ -77,6 +78,11 @@ GET           /project/version/:id                     controllers.conf.VersionC
 DELETE        /project/version/:id                     controllers.conf.VersionController.delete(id: Int)
 POST          /porject/version                         controllers.conf.VersionController.save
 PUT           /project/version/:id                     controllers.conf.VersionController.update(id: Int)
+
+# Project Dependency
+GET           /project/dependency/:id                             controllers.conf.DependencyController.show(id: Int)
+DELETE        /project/removeDependency/:parentId/:childId        controllers.conf.DependencyController.removeDependency(parentId: Int, childId: Int)
+POST          /project/addDependency                              controllers.conf.DependencyController.addDependency
 
 # Conf
 GET           /conf/all                                controllers.conf.ConfController.all(eid: Int, vid: Int)

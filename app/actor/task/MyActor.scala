@@ -14,6 +14,7 @@ import play.api.Logger
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.{Input, Done, Enumerator, Iteratee}
 import play.api.libs.json.{JsString, JsObject, Json, JsValue}
+import scala.collection.mutable
 import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.Play.current
@@ -37,9 +38,9 @@ object MyActor {
   var statusMap = Json.obj()
 
   // envId_projectId -> syndic_name
-  var envId_projectId_syndic = Map.empty[String, String]
+  private var envId_projectId_syndic = mutable.Map.empty[String, String]
   // syndic_name -> ip
-  var syndic_ip = Map.empty[String, String]
+  private var syndic_ip = mutable.Map.empty[String, String]
 
   //test
 //  generateSchedule()
@@ -79,16 +80,15 @@ object MyActor {
   }
 
   def refreshSyndic() = {
-    EnvironmentProjectRelHelper.allNotEmpty.foreach{
-      r =>
-        envId_projectId_syndic += s"${r.envId.get}_${r.projectId.get}" -> r.syndicName
-    }
-    Logger.debug(s"envId_projectId_syndic ==> ${envId_projectId_syndic}")
-    AreaHelper.allInfo.foreach {
-      a =>
-        syndic_ip += s"${a.syndicName}" -> a.syndicIp
-    }
-    Logger.debug(s"syndic_ip ==> ${syndic_ip}")
+    superviseTaskActor ! RefreshSyndic()
+  }
+
+  def get_envId_projectId_syndic(): mutable.Map[String, String] = {
+    envId_projectId_syndic.clone().asInstanceOf[mutable.Map[String, String]]
+  }
+
+  def get_syndic_ip(): mutable.Map[String, String] = {
+    syndic_ip.clone().asInstanceOf[mutable.Map[String, String]]
   }
 }
 
@@ -160,9 +160,23 @@ class MyActor extends Actor with ActorLogging {
       removeStatus(envId, projectId)
     }
     case RefreshSyndic() => {
-      MyActor.refreshSyndic()
+      refreshSyndic()
     }
   }
+
+  def refreshSyndic() = {
+    EnvironmentProjectRelHelper.allNotEmpty.foreach{
+      r =>
+        MyActor.envId_projectId_syndic += s"${r.envId.get}_${r.projectId.get}" -> r.syndicName
+    }
+    Logger.debug(s"envId_projectId_syndic ==> ${MyActor.envId_projectId_syndic}")
+    AreaHelper.allInfo.foreach {
+      a =>
+        MyActor.syndic_ip += s"${a.syndicName}" -> a.syndicIp
+    }
+    Logger.debug(s"syndic_ip ==> ${MyActor.syndic_ip}")
+  }
+
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
     Json.obj(key -> (MyActor.statusMap \ key).as[JsObject].deepMerge(js))
