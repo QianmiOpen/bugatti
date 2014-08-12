@@ -12,6 +12,9 @@ define(['angular'], function(angular) {
             getAll: function(callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.all()).success(callback);
             },
+            getExceptSelf: function(id, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.allExceptSelf(id)).success(callback);
+            },
             getAuth: function(callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.showAuth()).success(callback);
             },
@@ -79,6 +82,21 @@ define(['angular'], function(angular) {
                 $http(PlayRoutes.controllers.conf.VersionController.delete(id)).success(callback);
             }
         }
+    });
+
+    // Dependency
+    app.factory('DependencyService', function($http){
+       return {
+           get: function(id, callback) {
+               $http(PlayRoutes.controllers.conf.DependencyController.show(id)).success(callback);
+           },
+           removeDependency: function(pid, cid, callback){
+               $http(PlayRoutes.controllers.conf.DependencyController.removeDependency(pid, cid)).success(callback);
+           },
+           addDependency: function(p, c, callback){
+               $http.post(PlayRoutes.controllers.conf.DependencyController.addDependency().url, {'parent': p, 'child': c}).success(callback);
+            }
+       }
     });
 
 });

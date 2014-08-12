@@ -1,6 +1,7 @@
 
 import java.io.File
 import java.util.Scanner
+import actor.conf.ConfigureActor
 import utils.ControlUtil._
 
 import actor.ActorUtils
@@ -123,6 +124,9 @@ object Global extends GlobalSettings {
       s =>
         MyActor.createNewTask(s._1, s._2)
     }
+
+    //初始化ConfigureActor中的projectMap
+    ConfigureActor.initProjectMap
   }
 }
 

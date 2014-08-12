@@ -130,6 +130,7 @@ object Application extends ScalaController with Security {
         // project
         conf.routes.javascript.ProjectController.show,
         conf.routes.javascript.ProjectController.all,
+        conf.routes.javascript.ProjectController.allExceptSelf,
         conf.routes.javascript.ProjectController.save,
         conf.routes.javascript.ProjectController.index,
         conf.routes.javascript.ProjectController.count,
@@ -161,6 +162,11 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.VersionController.save,
         conf.routes.javascript.VersionController.update,
         conf.routes.javascript.VersionController.all,
+
+        // dependency
+        conf.routes.javascript.DependencyController.show,
+        conf.routes.javascript.DependencyController.removeDependency,
+        conf.routes.javascript.DependencyController.addDependency,
 
         // conf
         conf.routes.javascript.ConfController.all,

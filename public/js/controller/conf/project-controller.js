@@ -451,4 +451,34 @@ define(['angular'], function(angular) {
             });
     }]);
 
+    app.controller('DependencyCtrl', ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService',
+        function($scope, $stateParams, $filter, $state, DependencyService, ProjectService){
+            $scope.showDependencies = function(){
+                DependencyService.get($stateParams.id, function(data){
+                    console.log(data)
+                    $scope.groups = data
+                })
+            }
+            $scope.showDependencies()
+
+            ProjectService.getExceptSelf($stateParams.id, function(data){
+                $scope.projects = data
+            })
+
+            $scope.removeDependency = function(parent,child){
+                DependencyService.removeDependency(parent.id, child.id, function(data){
+                    console.log(data)
+                    $scope.showDependencies()
+                })
+            }
+
+            $scope.addDependency = function(parent,child){
+                DependencyService.addDependency(parent, child, function(data){
+                    console.log(data)
+                    $scope.showDependencies()
+                })
+            }
+        }
+    ])
+
 });

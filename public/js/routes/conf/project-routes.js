@@ -87,8 +87,19 @@ define(['angular'], function(angular) {
                 }
             }
         });
+        /**
+         * 项目依赖
+         */
+        $stateProvider.state('conf.project.dependency', {
+            url: "/dependency/:id",
+            views: {
+                "@conf": {
+                    templateUrl: "partials/conf/project/dependency-index.html",
+                    controller: "DependencyCtrl"
+                }
 
-
+            }
+        })
     }]);
 
 });

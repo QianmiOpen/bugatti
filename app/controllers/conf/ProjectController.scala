@@ -71,6 +71,10 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.all()))
   }
 
+  def allExceptSelf(id: Int) = Action {
+    Ok(Json.toJson(ProjectHelper.allExceptSelf(id)))
+  }
+
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
     else

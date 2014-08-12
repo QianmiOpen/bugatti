@@ -4,15 +4,20 @@
 
 requirejs.config({
     paths: {
-        "ace": webjars.path('ace', 'src-min-noconflict/ace'),
-        "angular-ui-ace" : webjars.path('angular-ui-ace', 'ui-ace')
+        "ace": webjars.path('ace', 'src-min-noconflict/ace')
+        ,"angular-ui-ace" : webjars.path('angular-ui-ace', 'ui-ace')
+        ,"angular-ui-tree": webjars.path('angular-ui-tree', 'angular-ui-tree')
     },
-    shim: { "angular-ui-ace": [ "angular", "ace"] }
+    shim: {
+        "angular-ui-ace": [ "angular", "ace"]
+        ,"angular-ui-tree": [ "angular"]
+    }
 });
 
 require(['angular', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
         'angular-ui-router', 'angular-animate',
         'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
+        'angular-ui-tree',
         'angular-file-upload', 'angular-file-upload-shim'],
     function(angular) {
 
@@ -21,6 +26,7 @@ require(['angular', './controller/main-controller', './directive/main-directive'
             'ui.router',
             'ui.ace',
             'ui.bootstrap',
+            'ui.tree',
             'ngSanitize',
             'ngAnimate',
             'ngCookies',

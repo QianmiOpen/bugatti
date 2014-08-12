@@ -58,11 +58,13 @@
             <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-if="user.role == 'admin'">
                 <a  ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                <a  ui-sref="conf.project.dependency({id: project.id})" title="依赖"><span class="glyphicon glyphicon-link"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
             <td ng-if="user.role != 'admin'">
                 <div ng-if="project.id" has-project-safe="{{project.id}}">
                     <a ng-show="hasProjectSafe_" ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a ng-show="hasProjectSafe_" ui-sref="conf.project.dependency({id: project.id})" title="依赖"><span class="glyphicon glyphicon-link"></span></a>
                     <a ng-show="hasProjectSafe_" ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
             </td>
