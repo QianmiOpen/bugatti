@@ -1,28 +1,17 @@
 <div class="page-header clearfix">
     <button class="btn btn-primary pull-right" ui-sref="conf.project.create">新增</button></td>
-    <h1 class="pull-left m0">我的项目管理</h1>
+    <h1 class="pull-left m0">我的项目管理
+        <sub><a ui-sref="conf.project" ui-sref-opts="{reload: true}" class="small" >项目列表</a></sub>
+    </h1>
 </div>
 
-<div class="row">
-    <div class="col-sm-6 col-centered">
-        <div class="input-group">
-            <span class="input-group-addon">搜索</span>
-            <input ng-model="searchText" type="text" class="form-control" placeholder="输入项目信息可快速检索"/>
-        </div>
-        <div class="text-right" style="margin: 5px 20px 0 0">
-            <!--
-            <a class="a-underline" href="#">高级搜索</a>
-            |-->
-            <a class="a-underline" ui-sref="api">API指南</a>
-            |
-            <a class="a-underline" ui-sref="help">帮助文档</a>
-        </div>
+<form class="form-inline" role="form" ng-submit="searchForm(s_projectName)" >
+    <div class="form-group">
+        项目名称：<input type="text" ng-model="s_projectName" class="form-control" placeholder="项目名称">
     </div>
-</div>
 
-<h3 class="text-muted">搜索结果
-    <button ui-sref="conf.project" ui-sref-opts="{reload: true}" type="button" class="btn btn-xs btn-default" >项目列表</button>
-</h3>
+    <button type="submit" class="btn btn-default">搜索</button>
+</form>
 
 <div class="table-responsive">
     <table class="table table-striped table-hover table-fixed">
@@ -37,7 +26,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="project in projects | filter:searchText">
+        <tr ng-repeat="project in projects">
             <td><a ui-sref="conf.project.version({id: project.id})">{{project.id}}</a></td>
             <td><a tooltip="{{project.name}}" ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
             <td>

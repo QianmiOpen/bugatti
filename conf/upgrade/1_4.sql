@@ -1,3 +1,7 @@
+ALTER TABLE `environment` DROP `global_variable`;
+
+ALTER TABLE `project` DROP `global_variable`;
+
 DROP TABLE IF EXISTS `project_dependency`;
 CREATE TABLE `project_dependency` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

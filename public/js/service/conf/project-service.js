@@ -18,11 +18,11 @@ define(['angular'], function(angular) {
             getAuth: function(callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.showAuth()).success(callback);
             },
-            getPage: function(my, page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.index(my, page, pageSize)).success(callback);
+            getPage: function(projectName, my, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.index(projectName, my, page, pageSize)).success(callback);
             },
-            count: function(my, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.count(my)).success(callback);
+            count: function(projectName, my, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.count(projectName, my)).success(callback);
             },
             save: function(project, callback) {
                 $http.post(PlayRoutes.controllers.conf.ProjectController.save().url, project).success(callback)

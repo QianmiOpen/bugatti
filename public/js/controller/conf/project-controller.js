@@ -21,15 +21,20 @@ define(['angular'], function(angular) {
             $scope.envId = data[0].id;
         });
 
-        // count
-        ProjectService.count($scope.my, function(data) {
-            $scope.totalItems = data;
-        });
+        $scope.searchForm = function(projectName) {
 
-        // list
-        ProjectService.getPage($scope.my, 0, $scope.pageSize, function(data) {
-            $scope.projects = data;
-        });
+            // count
+            ProjectService.count(projectName, $scope.my, function(data) {
+                $scope.totalItems = data;
+            });
+
+            // list
+            ProjectService.getPage(projectName, $scope.my, 0, $scope.pageSize, function(data) {
+                $scope.projects = data;
+            });
+        }
+
+        $scope.searchForm($scope.s_projectName);
 
         // page
         $scope.setPage = function (pageNo) {

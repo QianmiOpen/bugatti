@@ -87,7 +87,9 @@ object Global extends GlobalSettings {
     }
 
     // 初始化区域
-    AreaHelper.all.foreach(ActorUtils.areas ! AddArea(_))
+    if (app.configuration.getBoolean("area.init").getOrElse(true)) {
+      AreaHelper.all.foreach(ActorUtils.areas ! AddArea(_))
+    }
 
     /**
      * 升级脚本文件需满足3个条件：

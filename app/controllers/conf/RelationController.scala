@@ -22,13 +22,14 @@ object RelationController extends BaseController {
     )(EnvRelForm.apply)(EnvRelForm.unapply)
   )
 
-  def index(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
-    val result = EnvironmentProjectRelHelper.all(envId, projectId, sort, direction, page, pageSize)
+  def index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
+    val result = EnvironmentProjectRelHelper.all(
+      ip.filterNot(_.isEmpty), envId, projectId, sort, direction, page, pageSize)
     Ok(Json.toJson(result))
   }
 
-  def count(envId: Option[Int], projectId: Option[Int]) = AuthAction(FuncEnum.relation) {
-    val result = EnvironmentProjectRelHelper.count(envId, projectId)
+  def count(ip: Option[String], envId: Option[Int], projectId: Option[Int]) = AuthAction(FuncEnum.relation) {
+    val result = EnvironmentProjectRelHelper.count(ip.filterNot(_.isEmpty), envId, projectId)
     Ok(Json.toJson(result))
   }
 

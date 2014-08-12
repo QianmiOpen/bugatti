@@ -3,7 +3,7 @@ package models.conf
 import play.api.Play.current
 import enums.{LevelEnum, FuncEnum, RoleEnum}
 import enums.RoleEnum.Role
-import models.PlayCache
+import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
 
 import scala.slick.driver.MySQLDriver.simple._
@@ -44,13 +44,15 @@ object UserHelper extends PlayCache {
     qUser.filter(_.jobNo === jobNo).firstOption
   }
 
-  def count: Int = db withSession { implicit session =>
-    qUser.length.run
+  def count(jobNo: Option[String]): Int = db withSession { implicit session =>
+    val query = MaybeFilter(qUser).filter(jobNo)(v => b => b.jobNo === v).query
+    query.length.run
   }
 
-  def all(page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
+  def all(jobNo: Option[String], page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
     val offset = pageSize * page
-    qUser.drop(offset).take(pageSize).list
+    val query = MaybeFilter(qUser).filter(jobNo)(v => b => b.jobNo === v).query
+    query.drop(offset).take(pageSize).list
   }
 
   def create(user: User) = db withSession { implicit session =>

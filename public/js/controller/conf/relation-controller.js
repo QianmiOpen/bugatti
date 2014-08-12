@@ -20,14 +20,19 @@ define(['angular'], function(angular) {
 
             $scope.env = $scope.project = {};
 
-            // count
-            RelationService.count($scope.env.id, $scope.project.id, function(data) {
-                $scope.totalItems = data;
-            });
+            $scope.searchForm = function() {
 
-            RelationService.getPage($scope.env.id, $scope.project.id, 0, $scope.pageSize, function(data) {
-                $scope.relations = data;
-            });
+                // count
+                RelationService.count($scope.s_ip, $scope.s_env, $scope.s_project, function(data) {
+                    $scope.totalItems = data;
+                });
+
+                RelationService.getPage($scope.s_ip, $scope.s_env, $scope.s_project, 0, $scope.pageSize, function(data) {
+                    $scope.relations = data;
+                });
+            };
+
+            $scope.searchForm();
 
             $scope.setPage = function (pageNo) {
                 $scope.currentPage = pageNo;
@@ -35,7 +40,7 @@ define(['angular'], function(angular) {
                 $scope.master = false;
 
                 if (!angular.isDefined($scope._sort)) {
-                    RelationService.getPage($scope.env.id, $scope.project.id, pageNo - 1, $scope.pageSize, function(data) {
+                    RelationService.getPage($scope.s_ip, $scope.s_env, $scope.s_project, pageNo - 1, $scope.pageSize, function(data) {
                         $scope.relations = data;
                     });
                 } else {
@@ -43,21 +48,12 @@ define(['angular'], function(angular) {
                 }
             };
 
-            $scope.select = function() {
-                if ($scope.env == null) {$scope.env = {}}
-                if ($scope.project == null) {$scope.project = {}}
-                RelationService.count($scope.env.id, $scope.project.id, function(data) {
-                    $scope.totalItems = data;
-                });
-                $scope.setPage($scope.currentPage);
-            };
-
             // 字段排序
             $scope.orderBy = false;
             $scope.sort = function(col, pageNo) {
                 var sort = $scope._sort = col;
                 var direction = $scope.orderBy ? 'asc' : 'desc';
-                RelationService.getPageSort($scope.env.id, $scope.project.id, sort, direction, pageNo, $scope.pageSize, function(data) {
+                RelationService.getPageSort($scope.s_ip, $scope.s_env, $scope.s_project, sort, direction, pageNo, $scope.pageSize, function(data) {
                     $scope.relations = data;
                 });
             };

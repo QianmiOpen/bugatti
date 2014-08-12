@@ -1,5 +1,7 @@
 package models.conf
 
+import models.MaybeFilter
+
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 
@@ -59,11 +61,12 @@ object EnvironmentProjectRelHelper {
     qRelation.filter(r => r.envId.isNotNull && r.projectId.isNotNull).list
   }
 
-  def all(envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+  def all(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     val offset = pageSize * page
-    var query = for { r <- qRelation } yield r
-    envId.map(id => query = query.filter(_.envId === id))
-    projectId.map(id => query = query.filter(_.projectId === id))
+    var query = MaybeFilter(qRelation)
+      .filter(envId)(v => b => b.envId === v)
+      .filter(projectId)(v => b => b.projectId === projectId)
+      .filter(ip)(v => b => b.ip === ip).query
     sort match {
       case Some(s) if s == "ip" =>
         query = direction match { case Some(d) if d == "desc" => query.sortBy(_.ip desc); case _ => query.sortBy(_.ip asc)}
@@ -73,10 +76,11 @@ object EnvironmentProjectRelHelper {
     query.drop(offset).take(pageSize).list
   }
 
-  def count(envId: Option[Int], projectId: Option[Int]): Int = db withSession { implicit session =>
-    var query = for { r <- qRelation } yield r
-    envId.map(id => query = query.filter(_.envId === id))
-    projectId.map(id => query = query.filter(_.projectId === id))
+  def count(ip: Option[String], envId: Option[Int], projectId: Option[Int]): Int = db withSession { implicit session =>
+    val query = MaybeFilter(qRelation)
+      .filter(envId)(v => b => b.envId === v)
+      .filter(projectId)(v => b => b.projectId === projectId)
+      .filter(ip)(v => b => b.ip === ip).query
     query.length.run
   }
   

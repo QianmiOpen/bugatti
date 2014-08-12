@@ -9,11 +9,11 @@ define(['angular'], function(angular) {
             get: function(jobNo, callback) {
                 $http(PlayRoutes.controllers.conf.UserController.show(jobNo)).success(callback);
             },
-            getPage: function(page, pageSize, callback) {
-                $http(PlayRoutes.controllers.conf.UserController.index(page, pageSize)).success(callback);
+            getPage: function(jobNo, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.conf.UserController.index(jobNo, page, pageSize)).success(callback);
             },
-            count: function(callback) {
-                $http(PlayRoutes.controllers.conf.UserController.count()).success(callback);
+            count: function(jobNo, callback) {
+                $http(PlayRoutes.controllers.conf.UserController.count(jobNo)).success(callback);
             },
             permissions: function(jobNo, callback) {
                 $http(PlayRoutes.controllers.conf.UserController.permissions(jobNo)).success(callback);
