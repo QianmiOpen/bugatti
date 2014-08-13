@@ -109,7 +109,7 @@ object TaskLog{
     val path = getLogFilePath(taskId)
     val file = new File(path)
     val reader = new Reader()
-    val str = reader.reader(file, 0, byteSize)._1
+    val str = reader.reader(file, 0L, byteSize.toLong)._1
 
     val in = Iteratee.consume[String]()
 //    Logger.info("file head:"+ str)

@@ -593,7 +593,7 @@ class TaskProcess extends Actor {
     var result = sls.sls
     keys.map {
       key =>
-        result = result.replaceAll("\\{\\{" + key + "\\}\\}", TaskTools.trimQuotes((paramsJson \ key).toString))
+        result = result.replaceAll(s"""{{${key}}}""", TaskTools.trimQuotes((paramsJson \ key).toString))
     }
     result
   }
