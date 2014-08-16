@@ -331,7 +331,7 @@ define(['angular'], function(angular) {
                 };
                 $scope.reset();
 
-                $scope.change(data.templateId)
+                $scope.templateChange(data.templateId)
 
             });
 
@@ -346,12 +346,16 @@ define(['angular'], function(angular) {
             });
 
             // template change
-            $scope.change = function(x) {
+            $scope.templateChange = function(tid) {
                 $scope.items = [];
-                if (angular.isUndefined(x)) {
+                if (angular.isUndefined(tid)) {
                     return;
                 }
-                TemplateService.items(x, function(data) {
+                if (angular.isUndefined($scope.env)) {
+                    return;
+                }
+                var currScriptVersion = $scope.env.scriptVersion
+                TemplateService.itemAttrs(tid, currScriptVersion, function(data) {
                     $scope.items = data;
                     // attrs
                     ProjectService.atts($stateParams.id, function(attdata) {
@@ -364,7 +368,20 @@ define(['angular'], function(angular) {
                             });
                         });
                     });
+                });
 
+                TemplateService.itemVars(tid, currScriptVersion, function(data) {
+                    var _vars = angular.copy($scope.vars);
+                    angular.forEach(_vars, function(v, index) {
+                        if (v.name.indexOf('t.') === 0) {
+                            delete _vars[index]; // delete object is null
+                        }
+                    });
+                    _vars = _vars.filter(function(e){return e}); // clear null
+                    angular.forEach(data, function(d) {
+                        _vars.unshift({name: d.itemName, value: '', envId: $scope.env.id});  // first add
+                    });
+                    $scope.vars = _vars;
                 });
             };
 
@@ -378,8 +395,9 @@ define(['angular'], function(angular) {
             });
 
             // select env
-            $scope.envChange = function(e) {
+            $scope.envChange = function(e, tid) {
                 $scope.env = e;
+                $scope.templateChange(tid);
             };
 
             // project variable
@@ -392,7 +410,7 @@ define(['angular'], function(angular) {
                     return;
                 };
                 $scope.vars.push(angular.copy(v));
-                v.name = "", v.value = ""; // clean input
+                v.name = "", v.value = ""; // clear input value
                 $scope.varForm.varName.$error.unique = false;
             };
 

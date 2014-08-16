@@ -69,7 +69,7 @@
                  <td>
                      <button ng-show="mode != 'edit'" ng-click="editVar(this)"><span class="glyphicon glyphicon-edit"></span></button>
                      <button ng-show="mode == 'edit'" ng-click="this.mode = null;"><span class="glyphicon glyphicon-ok"></span></button>
-                     <button ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
+                     <button ng-disabled="vs.name.indexOf('t.') === 0" ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
                  </td>
              </tr>
              </tbody>
