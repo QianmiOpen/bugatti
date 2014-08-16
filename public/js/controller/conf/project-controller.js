@@ -214,12 +214,16 @@ define(['angular'], function(angular) {
             });
 
             // template change
-            $scope.change = function(x) {
+            $scope.templateChange = function(tid) {
                 $scope.items = [];
-                if(typeof x === 'undefined') {
+                if (angular.isUndefined(tid)) {
                     return;
                 }
-                TemplateService.items(x, function(data) {
+                if (angular.isUndefined($scope.env)) {
+                    return;
+                }
+                var currScriptVersion = $scope.env.scriptVersion
+                TemplateService.itemAttrs(tid, currScriptVersion, function(data) {
                     $scope.items = data;
                     // default init <input> ng-model value
                     angular.forEach($scope.items, function(item) {
@@ -227,6 +231,19 @@ define(['angular'], function(angular) {
                             item.value = item.default;
                         }
                     })
+                });
+                TemplateService.itemVars(tid, currScriptVersion, function(data) {
+                    var _vars = angular.copy($scope.vars);
+                    angular.forEach(_vars, function(v, index) {
+                        if (v.name.indexOf('t.') === 0) {
+                            delete _vars[index]; // delete object is null
+                        }
+                    });
+                    _vars = _vars.filter(function(e){return e}); // clear null
+                    angular.forEach(data, function(d) {
+                        _vars.unshift({name: d.itemName, value: '', envId: $scope.env.id});  // first add
+                    });
+                    $scope.vars = _vars;
                 });
             };
 
@@ -240,21 +257,22 @@ define(['angular'], function(angular) {
             });
 
             // select env
-            $scope.envChange = function(e) {
+            $scope.envChange = function(e, tid) {
                 $scope.env = e;
+                $scope.templateChange(tid);
             };
 
             // project variable
             $scope.vars = [];
             $scope.addVar = function(v) {
-                v.envId = $scope.env.id; // bind env
+                v.envId = $scope.env.id;   // bind env
                 if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
                 };
                 $scope.vars.push(angular.copy(v));
-                v.name = "", v.value = ""; // clean input
+                v.name = "", v.value = ""; // clear input value
                 $scope.varForm.varName.$error.unique = false;
             };
 
@@ -330,7 +348,7 @@ define(['angular'], function(angular) {
             // template change
             $scope.change = function(x) {
                 $scope.items = [];
-                if(typeof x === 'undefined') {
+                if (angular.isUndefined(x)) {
                     return;
                 }
                 TemplateService.items(x, function(data) {

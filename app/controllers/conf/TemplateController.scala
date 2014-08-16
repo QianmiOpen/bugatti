@@ -1,6 +1,8 @@
 package controllers.conf
 
 import controllers.BaseController
+import enums.ItemTypeEnum
+import enums.ItemTypeEnum.ItemType
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -28,6 +30,7 @@ object TemplateController extends BaseController {
           "templateId" -> optional(number),
           "itemName" -> nonEmptyText,
           "itemDesc" -> optional(text),
+          "itemType" -> enums.form.enum(ItemTypeEnum),
           "default" -> optional(text),
           "order" -> number,
           "scriptVersion" -> nonEmptyText
@@ -80,6 +83,14 @@ object TemplateController extends BaseController {
   // --------------------------------------------
   def items(templateId: Int) = Action { implicit request =>
     Ok(Json.toJson(TemplateItemHelper.findByTemplateId(templateId)))
+  }
+
+  def itemAttrs(templateId: Int, scriptVersion: String) = Action { implicit request =>
+    Ok(Json.toJson(TemplateItemHelper.findByItemType(templateId, scriptVersion, ItemTypeEnum.attribute)))
+  }
+
+  def itemVars(templateId: Int, scriptVersion: String) = Action { implicit request =>
+    Ok(Json.toJson(TemplateItemHelper.findByItemType(templateId, scriptVersion, ItemTypeEnum.variable)))
   }
 
 }

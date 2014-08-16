@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.{List => JList, Map => JMap}
 
 import akka.actor.{Actor, ActorLogging}
+import enums.ItemTypeEnum
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
 import org.eclipse.jgit.api.Git
@@ -163,7 +164,7 @@ class ScriptGitActor extends Actor with ActorLogging {
     if (templateItems != null) {
       templateItems.asInstanceOf[JList[JMap[String, String]]].asScala.zipWithIndex.foreach {
         case (x: JMap[String, String], index) =>
-          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), Some(x.get("default")), index, tagName))
+          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), ItemTypeEnum.withName(x.get("itemType")), Some(x.get("default")), index, tagName))
       }
     }
 

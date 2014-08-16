@@ -50,7 +50,7 @@ object ProjectController extends BaseController {
           "envId" -> number,
           "projectId" -> optional(number),
           "name" -> nonEmptyText,
-          "value" -> nonEmptyText
+          "value" -> text
         )(Variable.apply)(Variable.unapply)
       )
     )(ProjectForm.apply)(ProjectForm.unapply)

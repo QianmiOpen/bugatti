@@ -18,11 +18,18 @@ define(['angular'], function(angular) {
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.TemplateController.delete(id)).success(callback);
             },
+            update: function(id, template, callback) {
+                $http.put(PlayRoutes.controllers.conf.TemplateController.update(id).url, template).success(callback)
+            },
+            // template items
             items: function(templateId, callback) {
                 $http(PlayRoutes.controllers.conf.TemplateController.items(templateId)).success(callback);
             },
-            update: function(id, template, callback) {
-                $http.put(PlayRoutes.controllers.conf.TemplateController.update(id).url, template).success(callback)
+            itemAttrs: function(templateId, scriptVersion, callback) {
+                $http(PlayRoutes.controllers.conf.TemplateController.itemAttrs(templateId, scriptVersion)).success(callback);
+            },
+            itemVars: function(templateId, scriptVersion, callback) {
+                $http(PlayRoutes.controllers.conf.TemplateController.itemVars(templateId, scriptVersion)).success(callback);
             }
         }
     });

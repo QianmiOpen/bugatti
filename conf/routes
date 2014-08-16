@@ -63,8 +63,10 @@ PUT           /project/member/:memberId                controllers.conf.ProjectC
 
 # Template
 GET           /tempalte/all                            controllers.conf.TemplateController.all
-GET           /tempalte/:id                            controllers.conf.TemplateController.show(id: Int)
+GET           /tempalte/itemAttrs                      controllers.conf.TemplateController.itemAttrs(templateId: Int, scriptVersion: String)
+GET           /tempalte/itemVars                       controllers.conf.TemplateController.itemVars(templateId: Int, scriptVersion: String)
 GET           /tempalte/:templateId/items              controllers.conf.TemplateController.items(templateId: Int)
+GET           /tempalte/:id                            controllers.conf.TemplateController.show(id: Int)
 DELETE        /tempalte/:id                            controllers.conf.TemplateController.delete(id: Int)
 POST          /template                                controllers.conf.TemplateController.save
 PUT           /template/:id                            controllers.conf.TemplateController.update(id: Int)

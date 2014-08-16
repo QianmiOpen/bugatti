@@ -155,6 +155,8 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.TemplateController.update,
         // template item
         conf.routes.javascript.TemplateController.items,
+        conf.routes.javascript.TemplateController.itemAttrs,
+        conf.routes.javascript.TemplateController.itemVars,
 
         // version
         conf.routes.javascript.VersionController.nexusVersions,
