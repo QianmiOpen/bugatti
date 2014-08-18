@@ -4,6 +4,7 @@ import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
 import models.conf._
 import org.joda.time.DateTime
+import utils.ControlUtil._
 import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
@@ -123,15 +124,11 @@ object VersionController extends BaseController {
     val branch = if (isSnapshot) "snapshots" else "releases"
     val url = s"${NexusRepUrl}/${branch}/${groupId}/${artifactId}"
     Logger.info(s"request version url = [${url}]")
-    try {
-      val source = Source.fromURL(url)
+    using(Source.fromURL(url)){ source =>
       val reg = """<a href=".+">([^/]+)/</a>""".r
       for (regMatch <- reg.findAllMatchIn(source.mkString)) {
         list += regMatch.group(1).toString
       }
-      source.close
-    } catch {
-      case ex: Exception => Logger.error(s"request version error : ${ex}")
     }
     Logger.info(s"request version result : [${list}]")
     list.toList

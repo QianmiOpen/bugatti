@@ -79,9 +79,6 @@ define(['angular'], function(angular) {
                 }
             });
         };
-
-
-
     }]);
 
     app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
@@ -185,7 +182,6 @@ define(['angular'], function(angular) {
                 }
             };
     }]);
-
 
     app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'ProjectService', 'TemplateService', 'EnvService',
         function($scope, $stateParams, $state, ProjectService, TemplateService, EnvService) {
