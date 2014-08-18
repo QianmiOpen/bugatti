@@ -103,10 +103,7 @@ class TaskExecute extends Actor with ActorLogging {
     val environment = EnvironmentHelper.findById(_envId).get
 
     // 如果是latest，则获取最后的一个可用版本
-    val latestVersion = environment.scriptVersion match {
-      case ScriptVersionHelper.Latest => ScriptVersionHelper.findLatest().get
-      case x => x
-    }
+    val latestVersion = ScriptVersionHelper.findRealVersion(environment.scriptVersion)
 
     // 如果是master，需要替换成base，在gitfs中，是需要这么映射的
     val scriptVersion = latestVersion match {

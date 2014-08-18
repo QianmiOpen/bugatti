@@ -49,4 +49,12 @@ object ScriptVersionHelper {
   def findLatest(): Option[String] = db withSession { implicit session =>
     Query(qScriptVersion.map(_.name).max).first
   }
+
+  def findRealVersion(currentVersion: String): String = {
+    currentVersion match {
+      case Latest => findLatest.get // todo
+      case x => x
+    }
+  }
+
 }

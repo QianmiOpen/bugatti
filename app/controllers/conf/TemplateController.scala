@@ -86,11 +86,13 @@ object TemplateController extends BaseController {
   }
 
   def itemAttrs(templateId: Int, scriptVersion: String) = Action { implicit request =>
-    Ok(Json.toJson(TemplateItemHelper.findByItemType(templateId, scriptVersion, ItemTypeEnum.attribute)))
+    val realVersion = ScriptVersionHelper.findRealVersion(scriptVersion)
+    Ok(Json.toJson(TemplateItemHelper.findByItemType(templateId, realVersion, ItemTypeEnum.attribute)))
   }
 
   def itemVars(templateId: Int, scriptVersion: String) = Action { implicit request =>
-    Ok(Json.toJson(TemplateItemHelper.findByItemType(templateId, scriptVersion, ItemTypeEnum.variable)))
+    val realVersion = ScriptVersionHelper.findRealVersion(scriptVersion)
+    Ok(Json.toJson(TemplateItemHelper.findByItemType(templateId, realVersion, ItemTypeEnum.variable)))
   }
 
 }

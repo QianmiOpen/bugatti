@@ -50,7 +50,6 @@ define(['angular'], function(angular) {
             })
         };
 
-
         // remove
         $scope.delete = function(id, index) {
             var modalInstance = $modal.open({
@@ -433,7 +432,6 @@ define(['angular'], function(angular) {
             };
 
         }]);
-
 
     // ===================================================================
     // ------------------------------项目版本-----------------------------—
