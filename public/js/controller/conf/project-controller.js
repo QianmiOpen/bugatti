@@ -102,12 +102,13 @@ define(['angular'], function(angular) {
             // select env
             $scope.envChange = function(e) {
                 $scope.env = e;
-            };
 
-            // load init variable
-            ProjectService.vars($stateParams.id, function(data) {
-                $scope.vars = data;
-            });
+                // load init variable
+                ProjectService.vars($stateParams.id, function(data) {
+                    $scope.vars = data;
+                });
+
+            };
 
             // ---------------------------------------------
             // 项目成员管理
@@ -260,15 +261,35 @@ define(['angular'], function(angular) {
             // project variable
             $scope.vars = [];
             $scope.addVar = function(v) {
-                v.envId = $scope.env.id;   // bind env
+                $scope.varForm.varName.$error.unique = false;
+                $scope.varForm.varName.$error.required = false;
+                $scope.varForm.varValue.$error.required = false;
+
                 if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
                 };
+                if (v.name.trim().length < 1 && v.value.trim().length < 1) {
+                    $scope.varForm.varName.$invalid = true;
+                    $scope.varForm.varValue.$invalid = true;
+                    $scope.varForm.varName.$error.required = true;
+                    $scope.varForm.varValue.$error.required = true;
+                    return;
+                }
+                if (v.name.trim().length < 1 ) {
+                    $scope.varForm.varName.$invalid = true;
+                    $scope.varForm.varName.$error.required = true;
+                    return;
+                }
+                if (v.value.trim().length < 1) {
+                    $scope.varForm.varValue.$invalid = true;
+                    $scope.varForm.varValue.$error.required = true;
+                    return;
+                }
+                v.envId = $scope.env.id;   // bind env
                 $scope.vars.push(angular.copy(v));
                 v.name = "", v.value = ""; // clear input value
-                $scope.varForm.varName.$error.unique = false;
             };
 
             function findInVars(vars, v) {
@@ -326,13 +347,6 @@ define(['angular'], function(angular) {
                 };
                 $scope.reset();
 
-                $scope.templateChange(data.templateId)
-
-            });
-
-            // load init variable
-            ProjectService.vars($stateParams.id, function(data) {
-                $scope.vars = data;
             });
 
             // load template all
@@ -353,9 +367,9 @@ define(['angular'], function(angular) {
                 TemplateService.itemAttrs(tid, currScriptVersion, function(data) {
                     $scope.items = data;
                     // attrs
-                    ProjectService.atts($stateParams.id, function(attdata) {
+                    ProjectService.atts($stateParams.id, function(project_attrs) {
                         angular.forEach($scope.items, function(item) {
-                            angular.forEach(attdata, function(att) {
+                            angular.forEach(project_attrs, function(att) {
                                 if (att.name == item.itemName) {
                                     item.value = att.value;
                                     return;
@@ -365,7 +379,7 @@ define(['angular'], function(angular) {
                     });
                 });
 
-                TemplateService.itemVars(tid, currScriptVersion, function(data) {
+                TemplateService.itemVars(tid, currScriptVersion, function(item_vars) {
                     var _vars = angular.copy($scope.vars);
                     angular.forEach(_vars, function(v, index) {
                         if (v.name.indexOf('t.') === 0) {
@@ -373,8 +387,20 @@ define(['angular'], function(angular) {
                         }
                     });
                     _vars = _vars.filter(function(e){return e}); // clear null
-                    angular.forEach(data, function(d) {
-                        _vars.unshift({name: d.itemName, value: '', envId: $scope.env.id});  // first add
+
+                    // load init variable
+                    ProjectService.vars($stateParams.id, $scope.env.id, function(project_vars) {
+                        if (project_vars.length < 1) {
+                            angular.forEach(item_vars, function(iv) {
+                                _vars.unshift({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                            });
+                        }
+                        else {
+                            angular.forEach(project_vars, function(pv) {
+                                _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                            });
+                        }
+
                     });
                     $scope.vars = _vars;
                 });
@@ -386,7 +412,7 @@ define(['angular'], function(angular) {
                     return;
                 }
                 $scope.envs = data;
-                $scope.envChange(data[0]);
+                $scope.envChange(data[0], $scope.project.templateId);
             });
 
             // select env
@@ -398,15 +424,35 @@ define(['angular'], function(angular) {
             // project variable
             $scope.vars = [];
             $scope.addVar = function(v) {
-                v.envId = $scope.env.id; // bind env
+                $scope.varForm.varName.$error.unique = false;
+                $scope.varForm.varName.$error.required = false;
+                $scope.varForm.varValue.$error.required = false;
+
                 if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
                 };
+                if (v.name.trim().length < 1 && v.value.trim().length < 1) {
+                    $scope.varForm.varName.$invalid = true;
+                    $scope.varForm.varValue.$invalid = true;
+                    $scope.varForm.varName.$error.required = true;
+                    $scope.varForm.varValue.$error.required = true;
+                    return;
+                }
+                if (v.name.trim().length < 1 ) {
+                    $scope.varForm.varName.$invalid = true;
+                    $scope.varForm.varName.$error.required = true;
+                    return;
+                }
+                if (v.value.trim().length < 1) {
+                    $scope.varForm.varValue.$invalid = true;
+                    $scope.varForm.varValue.$error.required = true;
+                    return;
+                }
+                v.envId = $scope.env.id;   // bind env
                 $scope.vars.push(angular.copy(v));
                 v.name = "", v.value = ""; // clear input value
-                $scope.varForm.varName.$error.unique = false;
             };
 
             function findInVars(vars, v) {

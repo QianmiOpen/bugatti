@@ -63,20 +63,20 @@
                      <span ng-if="mode != 'edit'">{{vs.name}}</span>
                  </td>
                  <td class="col-sm-4" style="vertical-align: middle">
-                     <input class="form-control" ng-if="mode == 'edit'" ng-model="vs.value" name="{{vs.value}}" maxlength="200"/>
-                     <span ng-if="mode != 'edit'">{{vs.value}}</span>
+                     <input class="form-control" ng-show="mode == 'edit'" ng-model="vs.value" name="{{vs.value}}" maxlength="200" required/>
+                     <span ng-show="mode != 'edit'">{{vs.value}}</span>
                  </td>
                  <td>
                      <button ng-show="mode != 'edit'" ng-click="editVar(this)"><span class="glyphicon glyphicon-edit"></span></button>
-                     <button ng-show="mode == 'edit'" ng-click="this.mode = null;"><span class="glyphicon glyphicon-ok"></span></button>
-                     <button ng-disabled="vs.name.indexOf('t.') === 0" ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
+                     <button ng-show="mode == 'edit'" ng-click="this.mode = null;" ng-disabled="varForm.$invalid"><span class="glyphicon glyphicon-ok"></span></button>
+                     <button ng-if="vs.name.indexOf('t.') !== 0" ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
                  </td>
              </tr>
              </tbody>
-             <tfoot>
+             <tfoot ng-init="v = { name: '', value: ''}">
                  <tr>
                      <td class="text-right col-sm-4" style="padding-left: 0">
-                         <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t\.).*$/i" required>
+                         <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t\.).*$/i" >
                      </td>
                      <td class="col-sm-4" style="padding-left: 0">
                          <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="200" placeholder="变量值">
@@ -87,7 +87,7 @@
                  </tr>
                  <tr>
                      <td class="col-sm-4">
-                         <div ng-show="varForm.varName.$dirty && varForm.varName.$invalid" class="has-error mt-16">
+                         <div ng-show="varForm.varName.$invalid" class="has-error mt-16">
                              <span ng-show="varForm.varName.$error.required" class="control-label">请输入变量名</span>
                              <span ng-show="varForm.varName.$error.unique" class="control-label">变量名重复</span>
                              <span ng-show="varForm.varName.$error.maxlength" class="control-label">变量名超过长度</span>
@@ -95,7 +95,7 @@
                          </div>
                      </td>
                      <td class="col-sm-4">
-                         <div ng-show="varForm.varValue.$dirty && varForm.varValue.$invalid" class="has-error mt-16">
+                         <div ng-show="varForm.varValue.$invalid" class="has-error mt-16">
                              <span ng-show="varForm.varValue.$error.required" class="control-label">请输入变量值</span>
                              <span ng-show="varForm.varValue.$error.maxlength" class="control-label">变量值超过长度</span>
                              <span ng-show="varForm.varValue.$error.pattern" class="control-label">变量值不能有冒号和逗号</span>
@@ -111,7 +111,7 @@
 
 <div class="form-group">
     <div class="col-sm-offset-3 col-sm-5">
-        <button class="btn btn-success" ng-click="saveOrUpdate(project)" ng-disabled="form.$invalid"> 保 存 </button>
+        <button class="btn btn-success" ng-click="saveOrUpdate(project)" ng-disabled="form.$invalid || varForm.$invalid"> 保 存 </button>
         <button ng-if="$stateParams.id" class="btn btn-link" ng-click="reset()" ng-disabled="isUnchanged(project)" >重置</button>
     </div>
 </div>

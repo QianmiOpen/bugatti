@@ -33,11 +33,12 @@ define(['angular'], function(angular) {
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.delete(id)).success(callback);
             },
+            // ------------------------------------------------
             atts: function(projectId, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.atts(projectId)).success(callback);
             },
-            vars: function(projectId, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.vars(projectId)).success(callback);
+            vars: function(projectId, envId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.vars(projectId, envId)).success(callback);
             },
             // ------------------------------------------------
             // 项目成员

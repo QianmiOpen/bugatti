@@ -50,7 +50,7 @@ object ProjectController extends BaseController {
           "envId" -> number,
           "projectId" -> optional(number),
           "name" -> nonEmptyText,
-          "value" -> text
+          "value" -> nonEmptyText
         )(Variable.apply)(Variable.unapply)
       )
     )(ProjectForm.apply)(ProjectForm.unapply)
@@ -158,8 +158,8 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   // 项目环境变量
   // ----------------------------------------------------------
-  def vars(projectId: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(VariableHelper.findByProjectId(projectId)))
+  def vars(projectId: Int, envId: Int) = AuthAction(FuncEnum.project) {
+    Ok(Json.toJson(VariableHelper.findByEnvId_ProjectId(envId, projectId)))
   }
 
   // ----------------------------------------------------------
