@@ -13,10 +13,18 @@
         @Html(org.webjars.play.RequireJS.setup("js/app"))
         <script type="text/javascript">
         document.domain = "@siteDomain";
+
+        // MSIE
+        window.onload = function() {
+            if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
+                document.body.innerHTML = "不支持IE浏览器";
+            }
+        }
         </script>
+
     </head>
     <body>
-            <!-- Fixed navbar -->
+        <!-- Fixed navbar -->
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-controller="NavCtrl">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -57,7 +65,6 @@
                 <p class="text-muted text-right">&copy;千米网 2014.</p>
             </div>
         </div>
-
         <script type="text/javascript" src="@routes.Application.javascriptRoutes"></script>
         <!-- jsDiff -->
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("diffview.css"))">
