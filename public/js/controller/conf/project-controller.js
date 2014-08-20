@@ -105,7 +105,7 @@ define(['angular'], function(angular) {
 
                 // load init variable
                 ProjectService.vars($stateParams.id, $scope.env.id, function(data) {
-                    $scope.vars = data.reverse();
+                    $scope.vars = data;
                 });
 
             };
@@ -407,13 +407,13 @@ define(['angular'], function(angular) {
                     ProjectService.vars($stateParams.id, $scope.env.id, function(project_vars) {
                         if (project_vars.length < 1) {
                             angular.forEach(item_vars, function(iv) {
-                                _vars.unshift({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                                _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
                             });
                         }
                         else {
                             angular.forEach(project_vars, function(pv) {
                                 if (findInVars(_vars, pv) === -1) {
-                                    _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                    _vars.push({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
                                 }
                             });
                         }
