@@ -265,6 +265,11 @@ define(['angular'], function(angular) {
                 $scope.varForm.varName.$error.required = false;
                 $scope.varForm.varValue.$error.required = false;
 
+                if (angular.isUndefined($scope.env.id )) {
+                    return;
+                }
+                v.envId = $scope.env.id;   // bind env
+
                 if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
@@ -287,7 +292,7 @@ define(['angular'], function(angular) {
                     $scope.varForm.varValue.$error.required = true;
                     return;
                 }
-                v.envId = $scope.env.id;   // bind env
+
                 $scope.vars.push(angular.copy(v));
                 v.name = "", v.value = ""; // clear input value
             };
@@ -347,6 +352,15 @@ define(['angular'], function(angular) {
                 };
                 $scope.reset();
 
+
+                // load env all
+                EnvService.getAll(function(data) {
+                    if (data == null || data.length == 0) {
+                        return;
+                    }
+                    $scope.envs = data;
+                    $scope.envChange(data[0], $scope.project.templateId);
+                });
             });
 
             // load template all
@@ -408,17 +422,6 @@ define(['angular'], function(angular) {
                 });
             };
 
-            // load env all
-            EnvService.getAll(function(data) {
-                if (data == null || data.length == 0) {
-                    return;
-                }
-                $scope.envs = data;
-                if ($scope.project.templateId) {
-                    $scope.envChange(data[0], $scope.project.templateId);
-                }
-            });
-
             // select env
             $scope.envChange = function(e, tid) {
                 $scope.env = e;
@@ -431,6 +434,11 @@ define(['angular'], function(angular) {
                 $scope.varForm.varName.$error.unique = false;
                 $scope.varForm.varName.$error.required = false;
                 $scope.varForm.varValue.$error.required = false;
+
+                if (angular.isUndefined($scope.env.id )) {
+                    return;
+                }
+                v.envId = $scope.env.id;   // bind env
 
                 if (findInVars($scope.vars, v) != -1) {
                     $scope.varForm.varName.$invalid = true;
@@ -454,7 +462,6 @@ define(['angular'], function(angular) {
                     $scope.varForm.varValue.$error.required = true;
                     return;
                 }
-                v.envId = $scope.env.id;   // bind env
                 $scope.vars.push(angular.copy(v));
                 v.name = "", v.value = ""; // clear input value
             };

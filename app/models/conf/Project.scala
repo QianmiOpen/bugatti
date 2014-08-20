@@ -129,7 +129,7 @@ object ProjectHelper extends PlayCache {
     result
   }
 
-  def update(id: Int, envId: Int, projectForm: ProjectForm) = db withSession { implicit session =>
+  def update(id: Int, envId: Int, projectForm: ProjectForm) = db withTransaction { implicit session =>
     // attribute
     val attrs = AttributeHelper.findByProjectId(id)
     projectForm.items.filterNot(pa => attrs.exists( _a => _a.projectId == Some(id) && _a.name == pa.name)).foreach { attr =>
