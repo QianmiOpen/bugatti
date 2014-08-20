@@ -27,3 +27,16 @@ ALTER TABLE `template_item` ADD COLUMN `item_type` ENUM('attr', 'var') NOT NULL 
 
 ALTER TABLE `template_item` DROP INDEX `idx_tid_order`;
 ALTER TABLE `template_item` ADD INDEX `idx_tid_order` USING BTREE(`template_id`, `script_version`, `order`);
+
+
+CREATE TABLE template_alias
+(
+  `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `template_id` INT NOT NULL,
+  `name` VARCHAR(254) NOT NULL,
+  `value` VARCHAR(254) NOT NULL,
+  `description` VARCHAR(254) NOT NULL,
+  `script_version` VARCHAR(254) DEFAULT 'master' NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `task_template` ADD COLUMN `action_type` ENUM('project', 'host') NOT NULL DEFAULT 'project' COMMENT '动作类型';
