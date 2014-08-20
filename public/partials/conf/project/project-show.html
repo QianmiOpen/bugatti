@@ -14,12 +14,6 @@
         <td>{{project.name}}</td>
     </tr>
     <tr>
-        <td class="text-right col-sm-3">项目模板：</td>
-        <td ng-if="project.templateId">
-            <template-show tid="{{project.templateId}}"></template-show>
-        </td>
-    </tr>
-    <tr>
         <td class="text-right col-sm-3">版本数：</td>
         <td><a ui-sref="conf.project.version({id: project.id})">{{project.subTotal}}</a></td>
     </tr>
@@ -30,6 +24,12 @@
     <tr>
         <td class="text-right col-sm-3">最近版本时间：</td>
         <td>{{project.lastUpdated | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">项目模板：</td>
+        <td ng-if="project.templateId">
+            <template-show tid="{{project.templateId}}"></template-show>
+        </td>
     </tr>
     <tr>
         <td class="text-right col-sm-3">项目属性：</td>
@@ -47,10 +47,10 @@
             <ul class="nav nav-tabs b0" role="tablist" >
                 <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs"><a href="" ng-click="envChange(e)">{{e.name}}</a></li>
             </ul>
-            <table class="table">
+            <table class="table table-striped border-less m0">
                 <tbody>
                 <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>
-                <tr ng-repeat="v in vars | filter: {envId: env.id}">
+                <tr ng-repeat="v in vars | filter: {envId: env.id}" ng-class="{warning: v.name.indexOf('t.') === 0}">
                     <td>{{v.name}}</td>
                     <td>{{v.value}}</td>
                 </tr>

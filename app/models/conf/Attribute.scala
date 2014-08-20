@@ -35,6 +35,14 @@ object AttributeHelper {
     }
   }
 
+  def _update(attribute: Attribute)(implicit session: JdbcBackend#Session) = {
+    qAttribute.filter(_.id === attribute.id).update(attribute)
+  }
+
+  def _create(attribute: Attribute)(implicit session: JdbcBackend#Session) = {
+    qAttribute.insert(attribute)
+  }
+
   def _create(attr: Seq[Attribute])(implicit session: JdbcBackend#Session) = {
     qAttribute.insertAll(attr: _*)(session)
   }

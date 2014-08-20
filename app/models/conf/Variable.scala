@@ -54,4 +54,8 @@ object VariableHelper extends PlayCache {
     qVariable.filter(_.projectId === projectId).delete(session)
   }
 
+  def _deleteByEnvId_ProjectId(envId: Int, projectId: Int)(implicit session: JdbcBackend#Session) = {
+    qVariable.filter(v => v.envId ===envId && v.projectId === projectId).delete(session)
+  }
+
 }

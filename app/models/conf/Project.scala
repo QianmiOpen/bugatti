@@ -129,15 +129,22 @@ object ProjectHelper extends PlayCache {
     result
   }
 
-  def update(id: Int, projectForm: ProjectForm) = db withSession { implicit session =>
+  def update(id: Int, envId: Int, projectForm: ProjectForm) = db withSession { implicit session =>
     // attribute
-    AttributeHelper._deleteByProjectId(id)
-    val attrs = projectForm.items.map(item => item.copy(None, Some(id)))
-    AttributeHelper._create(attrs)
+    val attrs = AttributeHelper.findByProjectId(id)
+    projectForm.items.filterNot(pa => attrs.exists( _a => _a.projectId == Some(id) && _a.name == pa.name)).foreach { attr =>
+      AttributeHelper._create(attr.copy(None, Some(id)))
+    }
+
+    projectForm.items.filter(pa => attrs.exists(_a => _a.projectId == Some(id) && _a.name == pa.name)).foreach { attr =>
+      AttributeHelper._update(attr.copy(projectId = Some(id))) // id
+    }
+
     // variable
-    VariableHelper._deleteByProjectId(id)
-    val variables = projectForm.variables.map(vb => vb.copy(None, projectId = Some(id)))
+    VariableHelper._deleteByEnvId_ProjectId(envId, id)
+    val variables = projectForm.variables.filter(_.envId == envId).map(vb => vb.copy(None, projectId = Some(id)))
     VariableHelper._create(variables)
+
     // project
     _update(id, projectForm.toProject)
   }

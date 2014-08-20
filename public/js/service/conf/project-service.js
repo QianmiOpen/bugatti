@@ -27,8 +27,8 @@ define(['angular'], function(angular) {
             save: function(project, callback) {
                 $http.post(PlayRoutes.controllers.conf.ProjectController.save().url, project).success(callback)
             },
-            update: function(id, project, callback) {
-                $http.put(PlayRoutes.controllers.conf.ProjectController.update(id).url, project).success(callback)
+            update: function(projectId, envId, project, callback) {
+                $http.put(PlayRoutes.controllers.conf.ProjectController.update(projectId, envId).url, project).success(callback)
             },
             remove: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.delete(id)).success(callback);

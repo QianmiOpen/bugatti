@@ -120,15 +120,15 @@ object ProjectController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def update(projectId: Int, envId: Int) = AuthAction(FuncEnum.project) { implicit request =>
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       projectForm => {
-        if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
+        if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改项目", projectForm.toProject))
           try {
-            Ok(Json.obj("r" -> ProjectHelper.update(id, projectForm)))
+            Ok(Json.obj("r" -> ProjectHelper.update(projectId, envId, projectForm)))
           } catch {
             case me: MySQLIntegrityConstraintViolationException => Ok(Json.obj("r" -> "exist"))
           }

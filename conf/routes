@@ -53,7 +53,7 @@ GET           /project/vars                            controllers.conf.ProjectC
 GET           /project/:id                             controllers.conf.ProjectController.show(id: Int)
 DELETE        /project/:id                             controllers.conf.ProjectController.delete(id: Int)
 POST          /project                                 controllers.conf.ProjectController.save
-PUT           /project/:id                             controllers.conf.ProjectController.update(id: Int)
+PUT           /project/:projectId                      controllers.conf.ProjectController.update(projectId: Int, envId: Int)
 POST          /project/auth                            controllers.conf.ProjectController.showAuth
 # Project member
 GET           /project/:projectId/member               controllers.conf.ProjectController.members(projectId: Int)

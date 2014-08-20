@@ -104,8 +104,8 @@ define(['angular'], function(angular) {
                 $scope.env = e;
 
                 // load init variable
-                ProjectService.vars($stateParams.id, function(data) {
-                    $scope.vars = data;
+                ProjectService.vars($stateParams.id, $scope.env.id, function(data) {
+                    $scope.vars = data.reverse();
                 });
 
             };
@@ -324,11 +324,11 @@ define(['angular'], function(angular) {
                 project.items = [];
                 project.variables = angular.copy($scope.vars);
                 angular.forEach($scope.items, function(item) {
-                    project.items.push({name: item.itemName, value: item.value})
+                    project.items.push({name: item.itemName, value: item.value, id: item.id})
                 });
 
                 project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd HH:mm:ss")
-                ProjectService.update($stateParams.id, angular.toJson(project), function(data) {
+                ProjectService.update($stateParams.id, $scope.env.id, angular.toJson(project), function(data) {
                     if (data !== '0') {
                         $state.go("conf.project.my");
                     }
@@ -372,6 +372,7 @@ define(['angular'], function(angular) {
                             angular.forEach(project_attrs, function(att) {
                                 if (att.name == item.itemName) {
                                     item.value = att.value;
+                                    item.id = att.id;
                                     return;
                                 }
                             });
@@ -397,10 +398,11 @@ define(['angular'], function(angular) {
                         }
                         else {
                             angular.forEach(project_vars, function(pv) {
-                                _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                if (findInVars(_vars, pv) === -1) {
+                                    _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                }
                             });
                         }
-
                     });
                     $scope.vars = _vars;
                 });
@@ -412,7 +414,9 @@ define(['angular'], function(angular) {
                     return;
                 }
                 $scope.envs = data;
-                $scope.envChange(data[0], $scope.project.templateId);
+                if ($scope.project.templateId) {
+                    $scope.envChange(data[0], $scope.project.templateId);
+                }
             });
 
             // select env
