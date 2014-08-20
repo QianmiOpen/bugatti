@@ -5,7 +5,8 @@ import java.text.SimpleDateFormat
 import java.util.{List => JList, Map => JMap}
 
 import akka.actor.{Actor, ActorLogging}
-import enums.ItemTypeEnum
+import enums.ActionTypeEnum._
+import enums.{ActionTypeEnum, ItemTypeEnum}
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
 import org.eclipse.jgit.api.Git
@@ -117,11 +118,12 @@ class ScriptGitActor extends Actor with ActorLogging {
         }
       }
 
-      // 重新加载master,先讲老master更新掉
+      // 重新加载master,先将老master更新掉
       log.debug(s"Load tag: ${ScriptVersionHelper.Master}")
       val backupMasterName = s"master-bak-${DateFormat.format(DateTime.now.toDate)}"
       TemplateItemHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
       TaskTemplateHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
+      TemplateAliasHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
 
       _loadTemplateFromDir(ScriptVersionHelper.Master)
     } else {
@@ -148,7 +150,6 @@ class ScriptGitActor extends Actor with ActorLogging {
 
     val templateName = template.get("name").asInstanceOf[String]
 
-
     val templateId = TemplateHelper.findByName(templateName) match {
       case Some(temp) => {
         val templateId = temp.id.get
@@ -159,12 +160,22 @@ class ScriptGitActor extends Actor with ActorLogging {
       case None => TemplateHelper.create(Template(None, templateName, Some(template.get("remark").asInstanceOf[String])))
     }
 
+    // 创建template关联的alias
+    var templateAliass = template.get("aliass")
+    if (templateAliass != null) {
+      templateAliass.asInstanceOf[JList[JMap[String, String]]].asScala.foreach { alias =>
+        TemplateAliasHelper.create(TemplateAlias(None, Some(templateId), alias.get("aliasName"), alias.get("aliasValue"), alias.get("aliasDesc"), tagName))
+      }
+    }
+
     // 创建template关联的item
     val templateItems = template.get("items")
     if (templateItems != null) {
       templateItems.asInstanceOf[JList[JMap[String, String]]].asScala.zipWithIndex.foreach {
         case (x: JMap[String, String], index) =>
-          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")), ItemTypeEnum.withName(x.get("itemType")), Some(x.get("default")), index, tagName))
+          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")),
+            ItemTypeEnum.withName(Option(x.get("itemType")).getOrElse(ItemTypeEnum.attribute.toString)),
+            Some(x.get("default")), index, tagName))
       }
     }
 
@@ -173,7 +184,11 @@ class ScriptGitActor extends Actor with ActorLogging {
     if (actions != null) {
       actions.asInstanceOf[JList[JMap[String, AnyRef]]].asScala.zipWithIndex.foreach {
         case (action, index) =>
-          val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String], action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean], templateId, index + 1, tagName))
+          val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String],
+            action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean],
+            templateId, index + 1, tagName,
+            ActionTypeEnum.withName(Option(action.get("actionType")).getOrElse(ActionTypeEnum.project.toString).asInstanceOf[String])))
+
           val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
           steps.zipWithIndex.foreach { case (step, index) =>
             val seconds = step.get("seconds").asInstanceOf[Int]

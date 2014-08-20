@@ -79,6 +79,8 @@ object Global extends GlobalSettings {
           TableQuery[EnvironmentProjectRelTable] ::
           TableQuery[ScriptVersionTable] ::
           TableQuery[VariableTable] ::
+          TableQuery[ProjectDependencyTable] ::
+          TableQuery[TemplateAliasTable] ::
           Nil foreach { table =>
           if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
           table.ddl.create
@@ -141,7 +143,7 @@ object AppData {
     // 初始化超级管理员
     Seq(
       User("of546", "李允恒", RoleEnum.admin, true, false, None, None),
-      User("of557", "彭毅", RoleEnum.admin, false, false, None, None),
+      User("of557", "彭毅", RoleEnum.admin, true, false, None, None),
       User("of729", "金卫", RoleEnum.admin, false, false, None, None),
       User("of9999", "龚平", RoleEnum.admin, true, false, None, None)
     ).foreach(UserHelper.create)
