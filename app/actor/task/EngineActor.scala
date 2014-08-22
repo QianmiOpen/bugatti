@@ -19,26 +19,17 @@ import utils.TaskTools._
 /**
  * Created by jinwei on 21/8/14.
  */
-class EngineActor(timeout: Int) extends Actor with ActorLogging{
+class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
   import context._
 
   val _reg = """\{\{ *[^}]+ *\}\}""".r
 
-  var _key = ""
-  var _errors = Set.empty[String]
-
-  var _seq = Seq.empty[TaskCommand]
+  val TimeOutSeconds = timeout seconds
 
   var timeOutSchedule: Cancellable = _
 
-  val TimeOutSeconds = timeout seconds
-
-  var _fileName = ""
-  var _taskId = 0
-  var _envId = 0
-  var _projectId = 0
-  var _versionId = 0
+  var _lastReplaceKey = ""
 
   override def preStart(): Unit = {
     timeOutSchedule = context.system.scheduler.scheduleOnce(TimeOutSeconds, self, TimeOut)
@@ -52,79 +43,83 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging{
 
   def receive = {
     case replaceCommand: ReplaceCommand => {
-      val taskObj = replaceCommand.taskObj
-      val templateStep = replaceCommand.templateStep
-      val hostname = replaceCommand.cluster
-      val engine = createEngine(taskObj, hostname)
+      val hostname = replaceCommand.hostName
+      val taskId = replaceCommand.taskObj.taskId.toInt
+      val engine = createEngine(replaceCommand.taskObj, hostname)
 
-      templateStep.foreach {
-        t =>
-          var command = t.sls
-          _reg.findAllIn(command).foreach{
-            key =>
-              _key = key
-              val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-              try{
-                val value = engine.eval(realkey).toString()
-                command = command.replaceAll(_key, value)
-              }catch {
-                case e: Exception => _errors += _key
-              }
+      var taskCommandSeq = Seq.empty[TaskCommand]
+      var errors = Set.empty[String]
+
+      replaceCommand.templateStep.foreach { templateStep =>
+        var command = templateStep.sls
+        _reg.findAllIn(command).foreach { key =>
+          _lastReplaceKey = key
+          val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
+          try {
+            val value = engine.eval(realkey).toString()
+            command = command.replaceAll(key, value)
+          } catch {
+            case e: Exception => errors += key
           }
-          _seq :+ TaskCommand(None, replaceCommand.taskId, command, hostname, t.name, TaskEnum.TaskWait, t.orderNum)
+        }
+
+        taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, command, hostname, templateStep.name, TaskEnum.TaskWait, templateStep.orderNum)
       }
-      if(_errors isEmpty){
-        sender ! SuccessReplaceCommand(_seq)
-        timeOutSchedule.cancel()
-      }else {
-        sender ! ErrorReplaceCommand(_errors)
-        timeOutSchedule.cancel()
+
+      if (errors isEmpty) {
+        sender ! SuccessReplaceCommand(taskCommandSeq)
+      } else {
+        sender ! ErrorReplaceCommand(errors)
       }
+
       context.stop(self)
     }
 
     case rc: ReplaceConfigure => {
-      _fileName = s"${rc.taskObj.confFileName}_${rc.cluster}"
-      _taskId = rc.taskObj.taskId.toInt
-      _envId = rc.envId
-      _projectId = rc.projectId
-      _versionId = rc.versionId
+      val fileName = s"${rc.taskObj.confFileName}_${rc.hostName}"
+      val task = rc.taskObj
+      val taskId = task.taskId.toInt
+      val envId = task.env.id.toInt
+      val projectId = task.project.id.toInt
+      val versionId = task.version.get.id.toInt
 
-      val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(rc.envId, rc.projectId, rc.versionId)
-      val baseDir = s"${ConfHelp.confPath}/${_taskId}"
+      val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
+      val baseDir = s"${ConfHelp.confPath}/${taskId}"
       val baseFilesPath = new File(s"${baseDir}/files")
+
       if (!baseFilesPath.exists()) {
         baseFilesPath.mkdirs()
       }
-      val e = createEngine(rc.taskObj, rc.cluster)
+
+      val e = createEngine(rc.taskObj, rc.hostName)
 
       val (isSuccess, str) = replaceConfSeq(baseDir, confSeq, e)
 
       val baseDirPath = new File(new File(baseDir).getAbsolutePath)
-      Process(Seq("tar", "zcf", s"../${_fileName}.tar.gz", "."), baseFilesPath).!!
+      Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
 
-      Process(Seq("md5sum", s"${_fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${_fileName}.tar.gz.md5") !
+      Process(Seq("md5sum", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
       //    Process(Seq("md5", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
 
       Seq("rm", "-r", s"${baseDir}/files").!!
 
-      if(isSuccess){
-        sender ! SuccessReplaceConf(_taskId, _envId, _projectId, Option(_versionId))
-      }else {
+      if (isSuccess) {
+        sender ! SuccessReplaceConf(taskId, envId, projectId, Option(versionId))
+      } else {
         sender ! ErrorReplaceConf(str)
       }
       context.stop(self)
     }
 
     case TimeOut => {
-      sender ! TimeoutReplace(_key)
+      sender ! TimeoutReplace(_lastReplaceKey)
       context.stop(self)
     }
 
     case _ =>
   }
 
-  def createEngine(taskObj: Task_v, hostname: String): ScriptEngine = {
+  private def createEngine(taskObj: Task_v, hostname: String): ScriptEngine = {
     val engine = new ScriptEngineManager().getEngineByName("js")
 
     engine.eval(s"var __t__ = ${Json.toJson(taskObj).toString}")
@@ -135,7 +130,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging{
     engine.eval("var alias = {};")
 
     try {
-      taskObj.alias.foreach{case (key, value) => engine.eval(s"alias.${key} = ${value}")}
+      taskObj.alias.foreach { case (key, value) => engine.eval(s"alias.${key} = ${value}")}
     } catch {
       case e: ScriptException => log.error(e.toString)
     }
@@ -174,35 +169,39 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging{
         }
       }
       (true, s"配置文件替换成功!")
-    }else{
+    } else {
       (true, "没有任何配置文件!")
     }
   }
 
   def fillConfFile(conf: ConfContent, e: ScriptEngine): (Boolean, String) = {
-    if(!conf.octet){
+    var errors = Set.empty[String]
+    if (!conf.octet) {
       var content = new String(conf.content, "UTF8")
-      _reg.findAllIn(content).foreach{
+      _reg.findAllIn(content).foreach {
         key =>
-          _key = key
+          _lastReplaceKey = key
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          try{
+          try {
             val value = e.eval(realkey).toString()
-            content = content.replaceAll(_key, value)
-          }catch {
-            case e: Exception => _errors += _key
+            content = content.replaceAll(_lastReplaceKey, value)
+          } catch {
+            case e: Exception =>
+              errors += key
+              log.info(e.toString)
           }
       }
-      if(_errors isEmpty){
+      if (errors isEmpty) {
         (true, content)
-      }else {
-        (false, _errors.mkString(","))
+      } else {
+        (false, errors.mkString(","))
       }
-    }else{
+    } else {
       return (true, "")
     }
   }
 }
 
-case class ReplaceCommand(taskId: Int, taskObj: Task_v, templateStep: Seq[TaskTemplateStep], cluster: String)
-case class ReplaceConfigure(envId: Int, projectId: Int, versionId: Int, taskObj: Task_v, cluster: String)
+case class ReplaceCommand(taskObj: Task_v, templateStep: Seq[TaskTemplateStep], hostName: String)
+
+case class ReplaceConfigure(taskObj: Task_v, hostName: String)

@@ -16,6 +16,7 @@ object TaskTools {
   implicit val hostFormat = Json.format[Host_v]
   implicit val envFormat = Json.format[Environment_v]
   implicit val projectFormat = Json.format[Project_v]
+  implicit val versionFormat = Json.format[Version_v]
   implicit val taskFormat = Json.format[Task_v]
 
   /**
@@ -38,9 +39,9 @@ object TaskTools {
   }
 
   def isSnapshot(version: String): Boolean = {
-    if(version.endsWith("-SNAPSHOT")){
+    if (version.endsWith("-SNAPSHOT")) {
       true
-    }else{
+    } else {
       false
     }
   }
@@ -60,7 +61,7 @@ object TaskTools {
     val latestVersion = getLatestVersion(envId)
     val templateId = ProjectHelper.findById(projectId).get.templateId
     val itemMap = mutable.Map.empty[String, String]
-    TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, latestVersion).foreach{ t => itemMap.put(t.itemName, t.itemName)}
+    TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, latestVersion).foreach { t => itemMap.put(t.itemName, t.itemName)}
     itemMap
   }
 
@@ -74,7 +75,7 @@ object TaskTools {
     latestVersion
   }
 
-  def propertyRule(str: String)= {
+  def propertyRule(str: String) = {
     str.contains("\\.t\\.")
     str.startsWith("")
   }
@@ -84,7 +85,7 @@ object TaskTools {
    * @param pid
    * @return
    */
-  def findDependencies(pid: Int): Seq[Int]= {
+  def findDependencies(pid: Int): Seq[Int] = {
     ProjectDependencyHelper.findByProjectId(pid).map(_.dependencyId).filter(_ != -1)
   }
 
@@ -102,23 +103,23 @@ object TaskTools {
   def getProperties(envId: Int, projectId: Int, templateId: Int, realVersion: String): Map[String, String] = {
     //1、根据projectId获取attribute
     var tempAttrs = TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, realVersion).map(_.itemName)
-    val attrMap = AttributeHelper.findByProjectId(projectId).filter(a=>tempAttrs.contains(a.name)).map{a => a.name -> a.value.get}.toMap
+    val attrMap = AttributeHelper.findByProjectId(projectId).filter(a => tempAttrs.contains(a.name)).map { a => a.name -> a.value.get}.toMap
 
     //2、根据envId + projectId 获取variable
-    val varMap = VariableHelper.findByEnvId_ProjectId(envId, projectId).filter(v => !v.name.startsWith("t_") || tempAttrs.contains(v.name)).map{v => v.name -> v.value}.toMap
+    val varMap = VariableHelper.findByEnvId_ProjectId(envId, projectId).filter(v => !v.name.startsWith("t_") || tempAttrs.contains(v.name)).map { v => v.name -> v.value}.toMap
 
     //5、attribute + variable
     attrMap ++ varMap
   }
 
-  def findCluster(envId: Int, projectId: Int): Seq[EnvironmentProjectRel]= {
+  def findCluster(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = {
     EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)
   }
 
-  def findProject(envId: Int, projectId: Int, realVersion: String): Project_v= {
+  def findProject(envId: Int, projectId: Int, realVersion: String): Project_v = {
     val project = ProjectHelper.findById(projectId).get
 
-    val hosts = findCluster(envId, projectId).map{
+    val hosts = findCluster(envId, projectId).map {
       c =>
         Host_v(c.name, c.ip, Option(getProperties(envId, projectId, project.templateId, realVersion)))
     }.toArray
@@ -126,15 +127,15 @@ object TaskTools {
     Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, None)
   }
 
-  def findDependencies_v(envId: Int, projectId: Int, templateId: Int, realVersion: String): Map[String, Project_v]= {
-    findDependencies(projectId).map{
+  def findDependencies_v(envId: Int, projectId: Int, realVersion: String): Map[String, Project_v] = {
+    findDependencies(projectId).map {
       pid =>
         val project = ProjectHelper.findById(pid).get
-        val hosts = findCluster(envId, project.id.get).map{
+        val hosts = findCluster(envId, project.id.get).map {
           c =>
             Host_v(c.name, c.ip, None)
         }.toArray
-        val attrs = getProperties(envId, project.id.get, templateId, realVersion).filter{t => t._1.startsWith("t_")}
+        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion).filter { t => t._1.startsWith("t_")}
         project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs))
     }.toMap
   }
@@ -151,7 +152,7 @@ object TaskTools {
   }
 
   def findAlias(templateId: Int, scriptVersion: String): Map[String, String] = {
-    TemplateAliasHelper.findByTemplateId_Version(templateId, scriptVersion).map{ x => x.name -> x.value}.toMap
+    TemplateAliasHelper.findByTemplateId_Version(templateId, scriptVersion).map { x => x.name -> x.value}.toMap
   }
 
   /**
@@ -159,36 +160,47 @@ object TaskTools {
    * @param taskId
    * @param envId
    * @param projectId
-   * @param version
+   * @param versionId
    * @return
    */
-  def generateTaskObject(taskId: Int, envId: Int, projectId: Int, version: Option[String]): Task_v= {
+  def generateTaskObject(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int]): Task_v = {
+    val version: Option[Version_v] = versionId match {
+      case Some(id) =>
+        VersionHelper.findById(id).map { vs =>
+          Version_v(vs.id.get.toString, vs.vs)
+        }
+      case None => None
+    }
+
     val env = findEnvironment_v(envId)
 
     val repository = version match {
       case Some(v) => {
-        if(isSnapshot(v)) { Option("snapshots")} else { Option("releases") }
+        if (isSnapshot(v.name)) {
+          Option("snapshots")
+        } else {
+          Option("releases")
+        }
       }
-      case _ => { None }
+      case _ => None
     }
     val project = findProject(envId, projectId, env.realVersion)
     val alias = findAlias(project.templateId.toInt, env.realVersion)
-    val d = findDependencies_v(envId, projectId, project.templateId.toInt, env.realVersion)
+    val d = findDependencies_v(envId, projectId, env.realVersion)
     Task_v(s"$taskId", version, repository, s"${getFileName()}", None, alias, env, project, d)
   }
 
-  def generateCurrent(machine: String, task: Task_v): Host_v= {
-    task.project.hosts.filter{t => t.name == machine}(0)
+  def generateCurrent(machine: String, task: Task_v): Host_v = {
+    task.project.hosts.filter { t => t.name == machine}(0)
   }
 
-  def generateCurrent(num: Int, task: Task_v): Host_v= {
+  def generateCurrent(num: Int, task: Task_v): Host_v = {
     task.project.hosts(num)
   }
 
-  def generateCodeCompleter(envId: Int, projectId: Int, versionId: Int)= {
-    val version = VersionHelper.findById(versionId)
-    val task = generateTaskObject(0, envId, projectId, version.map(_.vs))
-    if(task.project.hosts nonEmpty){
+  def generateCodeCompleter(envId: Int, projectId: Int, versionId: Int) = {
+    val task = generateTaskObject(0, envId, projectId, Some(versionId))
+    if (task.project.hosts nonEmpty) {
       val engine = new ScriptEngineManager().getEngineByName("js")
       val w = new StringWriter
       engine.getContext.setWriter(w)
@@ -198,13 +210,13 @@ object TaskTools {
       engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
       engine.eval("var alias = {};")
       try {
-        task.alias.foreach{case (key, value) => engine.eval(s"alias.${key} = ${value};")}
+        task.alias.foreach { case (key, value) => engine.eval(s"alias.${key} = ${value};")}
       } catch {
         case e: ScriptException => Logger.error(e.toString)
       }
       engine.eval("var current = project.hosts[0];")
 
-      try{
+      try {
         engine.eval(
           """
             | function pushMap(obj, prefix, m) {
@@ -257,8 +269,13 @@ object ConfHelp {
 }
 
 case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]])
+
 case class Environment_v(id: String, name: String, nfsServer: String, scriptVersion: String, realVersion: String)
+
 case class Project_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]])
-case class Task_v(taskId: String, version: Option[String], repository: Option[String], confFileName: String, current: Option[Host_v], alias: Map[String, String], env: Environment_v, project: Project_v, dependence: Map[String, Project_v])
+
+case class Version_v(id: String, name: String)
+
+case class Task_v(taskId: String, version: Option[Version_v], repository: Option[String], confFileName: String, current: Option[Host_v], alias: Map[String, String], env: Environment_v, project: Project_v, dependence: Map[String, Project_v])
 
 

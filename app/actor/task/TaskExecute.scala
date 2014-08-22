@@ -58,19 +58,7 @@ class TaskExecute extends Actor with ActorLogging {
           }
 
           try{
-            _taskObj = tq.versionId match {
-              case Some(vid) => {
-                VersionHelper.findById(vid) match {
-                  case Some(version) =>
-                    TaskTools.generateTaskObject(_taskId, tq.envId, tq.projectId, Option(version.vs))
-                  case _ =>
-                    throw new Exception(s"未知项目版本 versionId: ${vid}")
-                }
-              }
-              case _ => {
-                TaskTools.generateTaskObject(_taskId, tq.envId, tq.projectId, None)
-              }
-            }
+            _taskObj = TaskTools.generateTaskObject(_taskId, tq.envId, tq.projectId, tq.versionId)
           }catch {
             case e: Exception => {
               _commandList = Seq.empty[TaskCommand]

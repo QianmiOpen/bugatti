@@ -10,7 +10,7 @@ import utils.Task_v
 class ClusterActor extends Actor with ActorLogging{
   def receive = {
     case gcc: GenerateClusterCommands => {
-      context.actorOf(Props(classOf[EngineActor], 3), s"engineActor_${gcc.cluster}") ! ReplaceCommand(gcc.taskId, gcc.taskObj, gcc.templateStep, gcc.cluster)
+      context.actorOf(Props(classOf[EngineActor], 3)) ! ReplaceCommand(gcc.taskObj, gcc.templateStep, gcc.cluster)
     }
     case success: SuccessReplaceCommand => {
       sender ! SuccessReplaceCommand(success.commandList)
@@ -21,7 +21,7 @@ class ClusterActor extends Actor with ActorLogging{
       context.stop(self)
     }
     case gcc: GenerateClusterConfs => {
-      context.actorOf(Props(classOf[EngineActor], 15), s"engineActor_${gcc.cluster}") ! ReplaceConfigure(gcc.envId, gcc.projectId, gcc.versionId, gcc.taskObj, gcc.cluster)
+      context.actorOf(Props(classOf[EngineActor], 15)) ! ReplaceConfigure(gcc.taskObj, gcc.cluster)
     }
     case successConf: SuccessReplaceConf => {
       sender ! successConf
