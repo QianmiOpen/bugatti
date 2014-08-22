@@ -50,7 +50,7 @@
             <table class="table table-striped border-less m0">
                 <tbody>
                 <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>
-                <tr ng-repeat="v in vars | filter: {envId: env.id}" ng-class="{warning: v.name.indexOf('t.') === 0}">
+                <tr ng-repeat="v in vars | filter: {envId: env.id}" ng-class="{warning: v.name.indexOf('t_') === 0}">
                     <td>{{v.name}}</td>
                     <td>{{v.value}}</td>
                 </tr>

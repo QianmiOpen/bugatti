@@ -57,9 +57,9 @@
 
          <table class="table table-striped border-less m0">
              <tbody>
-             <tr ng-repeat="vs in vars | filter: {envId: env.id}" ng-class="{warning: vs.name.indexOf('t.') === 0}">
+             <tr ng-repeat="vs in vars | filter: {envId: env.id}" ng-class="{warning: vs.name.indexOf('t_') === 0}">
                  <td class="col-sm-4" style="vertical-align: middle">
-                     <input class="form-control" ng-if="mode == 'edit'" ng-disabled="vs.name.indexOf('t.') === 0" ng-model="vs.name" name="{{vs.name}}" maxlength="200" required/>
+                     <input class="form-control" ng-if="mode == 'edit'" ng-disabled="vs.name.indexOf('t_') === 0" ng-model="vs.name" name="{{vs.name}}" maxlength="200" required/>
                      <span ng-if="mode != 'edit'">{{vs.name}}</span>
                  </td>
                  <td class="col-sm-4" style="vertical-align: middle">
@@ -69,14 +69,14 @@
                  <td>
                      <button ng-show="mode != 'edit'" ng-click="editVar(this)"><span class="glyphicon glyphicon-edit"></span></button>
                      <button ng-show="mode == 'edit'" ng-click="this.mode = null;" ng-disabled="varForm.$invalid"><span class="glyphicon glyphicon-ok"></span></button>
-                     <button ng-if="vs.name.indexOf('t.') !== 0" ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
+                     <button ng-if="vs.name.indexOf('t_') !== 0" ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
                  </td>
              </tr>
              </tbody>
              <tfoot ng-init="v = { name: '', value: ''}">
                  <tr>
                      <td class="text-right col-sm-4" style="padding-left: 0">
-                         <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t\.).*$/i" >
+                         <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t_).*$/i" >
                      </td>
                      <td class="col-sm-4" style="padding-left: 0">
                          <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="200" placeholder="变量值">

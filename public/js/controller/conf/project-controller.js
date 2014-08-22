@@ -231,7 +231,7 @@ define(['angular'], function(angular) {
                 TemplateService.itemVars(tid, currScriptVersion, function(data) {
                     var _vars = angular.copy($scope.vars);
                     angular.forEach(_vars, function(v, index) {
-                        if (v.name.indexOf('t.') === 0) {
+                        if (v.name.indexOf('t_') === 0) {
                             delete _vars[index]; // delete object is null
                         }
                     });
@@ -397,7 +397,7 @@ define(['angular'], function(angular) {
                 TemplateService.itemVars(tid, currScriptVersion, function(item_vars) {
                     var _vars = angular.copy($scope.vars);
                     angular.forEach(_vars, function(v, index) {
-                        if (v.name.indexOf('t.') === 0) {
+                        if (v.name.indexOf('t_') === 0) {
                             delete _vars[index]; // delete object is null
                         }
                     });
