@@ -127,12 +127,39 @@ define(['angular'], function(angular) {
                 });
             };
 
+            $scope.completers = ConfService.completer($scope.env.id, $stateParams.id, $stateParams.vid, function(data) {
+                console.log(data.r);
+            });
 
             var langTools = ace.require("ace/ext/language_tools");
             $scope.aceLoaded = function(_editor) {
-                _editor.setOptions({enableBasicAutocompletion: true});
+                _editor.setOptions({
+                    enableBasicAutocompletion: true
+                });
 
-                var rhymeCompleter = {
+                _editor.commands.bindKey("f1|command-enter", "startAutocomplete");
+                _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
+//                _editor.commands.on("afterExec", function(e){
+//                    console.log('e=', e);
+//                    if (e.command.name == "insertstring"&&/^({{)$/.test(e.args)) {
+//                        editor.execCommand("startAutocomplete")
+//                    }
+//                })
+
+                _editor.on("mousedown", function(e) {
+                    // Store the Row/column values
+                    console.log(e)
+                });
+
+                _editor.getSession().on('changeCursor', function(e) {
+                    if (editor.$mouseHandler.isMousePressed) {
+                        console.log('cursor=', e)
+                    }
+                    // remove last stored values
+                    // Store the Row/column values
+                });
+
+                var codeCompleter = {
                     getCompletions: function(editor, session, pos, prefix, callback) {
                         if (prefix.length === 0) { callback(null, []); return }
 
@@ -149,8 +176,8 @@ define(['angular'], function(angular) {
                             return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                         }));
                     }
-                }
-                langTools.addCompleter(rhymeCompleter);
+                };
+                langTools.addCompleter(codeCompleter);
             };
 
     }]);

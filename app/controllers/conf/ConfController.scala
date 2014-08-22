@@ -1,6 +1,6 @@
 package controllers.conf
 
-import utils.FileUtil
+import utils.{TaskTools, FileUtil}
 import utils.ControlUtil._
 import controllers.{BaseController}
 import enums.{ModEnum, FuncEnum}
@@ -130,6 +130,10 @@ object ConfController extends BaseController {
         }
       } getOrElse(BadRequest)
     } getOrElse(BadRequest)
+  }
+
+  def completer(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project) { implicit request =>
+    Ok(Json.obj("r" -> TaskTools.generateCodeCompleter(envId, projectId, versionId.toString)))
   }
 
   // ===========================================================================

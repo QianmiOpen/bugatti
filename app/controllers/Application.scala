@@ -180,6 +180,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.ConfController.delete,
         conf.routes.javascript.ConfController.update,
         conf.routes.javascript.ConfController.copy,
+        conf.routes.javascript.ConfController.completer,
 
         // system
         conf.routes.javascript.SystemController.refresh,
