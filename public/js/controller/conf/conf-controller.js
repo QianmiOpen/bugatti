@@ -125,11 +125,11 @@ define(['angular'], function(angular) {
                 });
             };
 
-            var wordList = [];
+            $scope.wordList = [];
             $scope.completers = ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                 var obj = eval('(' + data.r + ')');
                 for (var prop in obj) {
-                    wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                    $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                 }
             });
 
@@ -145,7 +145,7 @@ define(['angular'], function(angular) {
                 var codeCompleter = {
                     getCompletions: function(editor, session, pos, prefix, callback) {
                         if (prefix.length === 0) { callback(null, []); return }
-                        callback(null, wordList.map(function(ea) {
+                        callback(null, $scope.wordList.map(function(ea) {
                             return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                         }));
                     }
