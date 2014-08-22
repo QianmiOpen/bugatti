@@ -94,7 +94,7 @@ object TaskTools {
    * @return
    */
   def findDependencies(pid: Int): Seq[Int]= {
-    ProjectDependencyHelper.findByProjectId(pid).map(_.dependencyId)
+    ProjectDependencyHelper.findByProjectId(pid).map(_.dependencyId).filter(_ != -1)
   }
 
   def getFileName() = {
