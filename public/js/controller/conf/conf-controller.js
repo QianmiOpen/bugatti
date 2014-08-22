@@ -125,7 +125,34 @@ define(['angular'], function(angular) {
                 ConfService.save(angular.toJson($scope.conf), function(data) {
                     $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });
-            }
+            };
+
+
+            var langTools = ace.require("ace/ext/language_tools");
+            $scope.aceLoaded = function(_editor) {
+                _editor.setOptions({enableBasicAutocompletion: true});
+
+                var rhymeCompleter = {
+                    getCompletions: function(editor, session, pos, prefix, callback) {
+                        if (prefix.length === 0) { callback(null, []); return }
+
+                        var wordList = [
+                            {"word": "d",  "score":0,  meta: 'object'},
+                            {"word": "d.cardbase", "score":0, meta: 'object'},
+                            {"word": "d.cardbase.name",  "score":0,  meta: 'cardbase'},
+                            {"word": "d.cardbase.hosts[0].attrs.aa", "score":0, meta: '66-1'},
+                            {"word": "c", "score":0, meta: 'object'},
+                            {"word": "c.name", "score":0, meta: 'lin-66-1'}
+                        ];
+
+                        callback(null, wordList.map(function(ea) {
+                            return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
+                        }));
+                    }
+                }
+                langTools.addCompleter(rhymeCompleter);
+            };
+
     }]);
 
 
