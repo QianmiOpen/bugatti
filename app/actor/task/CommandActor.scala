@@ -9,7 +9,7 @@ import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{Task, TaskCommand, TaskHelper}
 import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
-import utils.ConfHelp
+import utils.{Task_v, ConfHelp}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -35,6 +35,8 @@ class CommandActor extends Actor with ActorLogging {
   val _baseLogPath = ConfHelp.logPath
   var _commandSeq = Seq.empty[String]
 
+  var _taskObj: Task_v = null
+
   def receive = {
     case insertCommands: InsertCommands => {
       _taskId = insertCommands.taskId
@@ -42,13 +44,13 @@ class CommandActor extends Actor with ActorLogging {
       _projectId = insertCommands.projectId
       _versionId = insertCommands.versionId
       _returnJson = insertCommands.json
+      _taskObj = insertCommands.taskObj
 
       if (insertCommands.commandList.length == 0) {
         noCommands(_taskId, _envId, _projectId, insertCommands.json)
         closeSelf
       } else {
         _commands = insertCommands.commandList
-        //      CommandActor.envId_projectIdCommands += s"${envId}_${projectId}" -> commands
         self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, 1)
       }
     }
@@ -206,6 +208,7 @@ class CommandActor extends Actor with ActorLogging {
     }
     val file = new File(resultLogPath)
     val cmd = command.command
+    val hostname = command.machine
     _commandSeq = command2Seq(cmd)
     log.info(s"executeSalt ==> ${cmd}")
 
@@ -216,7 +219,7 @@ class CommandActor extends Actor with ActorLogging {
       _commandSeq(1) match {
         case "copyfile" => {
           val confActor = context.actorOf(Props[ConfActor], s"confActor_${envId}_${projectId}_${order}")
-          confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson)
+          confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson, hostname, _taskObj)
         }
       }
     } else {
@@ -256,7 +259,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 }
 
-case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject)
+case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: Task_v)
 
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 
