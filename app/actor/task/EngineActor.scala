@@ -1,7 +1,7 @@
 package actor.task
 
 import java.io.File
-import javax.script.{ScriptEngine, ScriptEngineManager}
+import javax.script.{ScriptException, ScriptEngine, ScriptEngineManager}
 
 import akka.actor.{Cancellable, Actor, ActorLogging}
 import com.qianmi.bugatti.actors.TimeOut
@@ -133,7 +133,13 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging{
 
     engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
     engine.eval("var alias = {};")
-    taskObj.alias.foreach{case (key, value) => engine.eval(s"alias.${key} = ${value}")}
+
+    try {
+      taskObj.alias.foreach{case (key, value) => engine.eval(s"alias.${key} = ${value}")}
+    } catch {
+      case e: ScriptException => log.error(e.toString)
+    }
+
     engine.eval(s"var current = ${Json.toJson(TaskTools.generateCurrent(hostname, taskObj))}")
     engine.eval(s"var confFileName = ${taskObj.confFileName}_${hostname}")
 
