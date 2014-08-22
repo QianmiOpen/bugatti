@@ -155,7 +155,6 @@ define(['angular'], function(angular) {
 
     }]);
 
-
     app.controller('ConfShowCtrl', ['$scope', '$state', '$stateParams', '$modal',
         'ConfService',
         function($scope, $state, $stateParams, $modal, ConfService) {
@@ -220,6 +219,34 @@ define(['angular'], function(angular) {
 
             $scope.cancel = function() {
                 $state.go('conf.project.version.conf.detail', {cid: $stateParams.cid})
+            };
+
+            $scope.wordList = [];
+            $scope.completers = ConfService.completer($stateParams.eid, $stateParams.id, $stateParams.vid, function(data) {
+                var obj = eval('(' + data.r + ')');
+                for (var prop in obj) {
+                    $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                }
+            });
+
+            var langTools = ace.require("ace/ext/language_tools");
+            $scope.aceLoaded = function(_editor) {
+                _editor.setOptions({
+                    enableBasicAutocompletion: true
+                });
+
+                _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
+                _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
+
+                var codeCompleter = {
+                    getCompletions: function(editor, session, pos, prefix, callback) {
+                        if (prefix.length === 0) { callback(null, []); return }
+                        callback(null, $scope.wordList.map(function(ea) {
+                            return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
+                        }));
+                    }
+                };
+                langTools.addCompleter(codeCompleter);
             };
     }]);
 
