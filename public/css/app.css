@@ -114,6 +114,15 @@ span.header-version {
     white-space:pre-wrap;
 }
 
+.word-list {
+    max-height: 550px;
+    overflow: auto;
+
+}
+.word-list-item {
+    word-break:break-all;
+}
+
 /* file upload */
 
 .upload-button {

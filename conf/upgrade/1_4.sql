@@ -40,3 +40,27 @@ CREATE TABLE template_alias
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `task_template` ADD COLUMN `action_type` ENUM('project', 'host') NOT NULL DEFAULT 'project' COMMENT '动作类型';
+
+ALTER TABLE `app_user` ENGINE = InnoDB;
+ALTER TABLE `area` ENGINE = InnoDB;
+ALTER TABLE `attribute` ENGINE = InnoDB;
+ALTER TABLE `conf` ENGINE = InnoDB;
+ALTER TABLE `conf_log` ENGINE = InnoDB;
+ALTER TABLE `environment` ENGINE = InnoDB;
+ALTER TABLE `environment_project_rel` ENGINE = InnoDB;
+ALTER TABLE `member` ENGINE = InnoDB;
+ALTER TABLE `permission` ENGINE = InnoDB;
+ALTER TABLE `project` ENGINE = InnoDB;
+ALTER TABLE `project_dependency` ENGINE = InnoDB;
+ALTER TABLE `variable` ENGINE = InnoDB;
+ALTER TABLE `version` ENGINE = InnoDB;
+ALTER TABLE `script_version` ENGINE = InnoDB;
+ALTER TABLE `template` ENGINE = InnoDB;
+ALTER TABLE `template_item` ENGINE = InnoDB;
+ALTER TABLE `template_alias` ENGINE = InnoDB;
+ALTER TABLE `task` ENGINE = InnoDB;
+ALTER TABLE `task_command` ENGINE = InnoDB;
+ALTER TABLE `task_queue` ENGINE = InnoDB;
+ALTER TABLE `task_scheme` ENGINE = InnoDB;
+ALTER TABLE `task_template` ENGINE = InnoDB;
+ALTER TABLE `task_template_step` ENGINE = InnoDB;
