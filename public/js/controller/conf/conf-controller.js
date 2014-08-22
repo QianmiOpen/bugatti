@@ -110,25 +110,27 @@ define(['angular'], function(angular) {
             }
     }]);
 
-    app.controller('ConfCreateCtrl', ['$scope', '$filter', '$state', '$stateParams', '$modal',
-        'ConfService', 'EnvService', 'ProjectService', 'VersionService',
-        function($scope, $filter, $state, $stateParams, $modal, ConfService, EnvService, ProjectService, VersionService) {
-            $scope.conf = {projectId: $stateParams.id, versionId: $stateParams.vid};
+    app.controller('ConfCreateCtrl', ['$scope', '$filter', '$state', '$stateParams', '$modal', 'ConfService',
+        function($scope, $filter, $state, $stateParams, $modal, ConfService) {
+            $scope.conf = {envId: $stateParams.eid, projectId: $stateParams.id, versionId: $stateParams.vid};
 
             $scope.cancel = function() {
-                $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+                $state.go('conf.project.version.conf.list', {eid: $scope.conf.envId})
             };
 
             $scope.save = function() {
-                $scope.conf.envId = $scope.env.id;
                 $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 ConfService.save(angular.toJson($scope.conf), function(data) {
-                    $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+                    $state.go('conf.project.version.conf.list', {eid: $scope.conf.envId})
                 });
             };
 
-            $scope.completers = ConfService.completer($scope.env.id, $stateParams.id, $stateParams.vid, function(data) {
-                console.log(data.r);
+            var wordList = [];
+            $scope.completers = ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
+                var obj = eval('(' + data.r + ')');
+                for (var prop in obj) {
+                    wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                }
             });
 
             var langTools = ace.require("ace/ext/language_tools");
@@ -137,41 +139,12 @@ define(['angular'], function(angular) {
                     enableBasicAutocompletion: true
                 });
 
-                _editor.commands.bindKey("f1|command-enter", "startAutocomplete");
                 _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
-//                _editor.commands.on("afterExec", function(e){
-//                    console.log('e=', e);
-//                    if (e.command.name == "insertstring"&&/^({{)$/.test(e.args)) {
-//                        editor.execCommand("startAutocomplete")
-//                    }
-//                })
-
-                _editor.on("mousedown", function(e) {
-                    // Store the Row/column values
-                    console.log(e)
-                });
-
-                _editor.getSession().on('changeCursor', function(e) {
-                    if (editor.$mouseHandler.isMousePressed) {
-                        console.log('cursor=', e)
-                    }
-                    // remove last stored values
-                    // Store the Row/column values
-                });
+                _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
 
                 var codeCompleter = {
                     getCompletions: function(editor, session, pos, prefix, callback) {
                         if (prefix.length === 0) { callback(null, []); return }
-
-                        var wordList = [
-                            {"word": "d",  "score":0,  meta: 'object'},
-                            {"word": "d.cardbase", "score":0, meta: 'object'},
-                            {"word": "d.cardbase.name",  "score":0,  meta: 'cardbase'},
-                            {"word": "d.cardbase.hosts[0].attrs.aa", "score":0, meta: '66-1'},
-                            {"word": "c", "score":0, meta: 'object'},
-                            {"word": "c.name", "score":0, meta: 'lin-66-1'}
-                        ];
-
                         callback(null, wordList.map(function(ea) {
                             return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                         }));
