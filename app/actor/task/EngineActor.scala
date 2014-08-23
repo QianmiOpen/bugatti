@@ -43,7 +43,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
   def receive = {
     case replaceCommand: ReplaceCommand => {
-      val hostname = replaceCommand.hostName
+      val hostname = replaceCommand.hostname
       val taskId = replaceCommand.taskObj.taskId.toInt
       val engine = createEngine(replaceCommand.taskObj, hostname)
 
@@ -76,7 +76,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     }
 
     case rc: ReplaceConfigure => {
-      val fileName = s"${rc.taskObj.confFileName}_${rc.hostName}"
+      val fileName = s"${rc.taskObj.confFileName}_${rc.hostname}"
       val task = rc.taskObj
       val taskId = task.taskId.toInt
       val envId = task.env.id.toInt
@@ -91,7 +91,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         baseFilesPath.mkdirs()
       }
 
-      val e = createEngine(rc.taskObj, rc.hostName)
+      val e = createEngine(rc.taskObj, rc.hostname)
 
       val (isSuccess, str) = replaceConfSeq(baseDir, confSeq, e)
 
@@ -202,6 +202,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: Task_v, templateStep: Seq[TaskTemplateStep], hostName: String)
+case class ReplaceCommand(taskObj: Task_v, templateStep: Seq[TaskTemplateStep], hostname: String)
 
-case class ReplaceConfigure(taskObj: Task_v, hostName: String)
+case class ReplaceConfigure(taskObj: Task_v, hostname: String)
