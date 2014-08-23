@@ -80,7 +80,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       val task = rc.taskObj
       val taskId = task.taskId.toInt
       val envId = task.env.id.toInt
-      val projectId = task.project.id.toInt
+      val projectId = task.id.toInt
       val versionId = task.version.get.id.toInt
 
       val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
@@ -119,7 +119,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     case _ =>
   }
 
-  private def createEngine(taskObj: Task_v, hostname: String): ScriptEngine = {
+  private def createEngine(taskObj: ProjectTask_v, hostname: String): ScriptEngine = {
     val engine = new ScriptEngineManager().getEngineByName("js")
 
     engine.eval(s"var __t__ = ${Json.toJson(taskObj).toString}")
@@ -202,6 +202,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: Task_v, templateStep: Seq[TaskTemplateStep], hostname: String)
+case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String)
 
-case class ReplaceConfigure(taskObj: Task_v, hostname: String)
+case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String)

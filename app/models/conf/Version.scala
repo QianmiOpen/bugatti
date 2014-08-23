@@ -29,6 +29,8 @@ object VersionHelper extends PlayCache {
 
   import models.AppDB._
 
+  val SNAPSHOTSUFFIX = "-SNAPSHOT"
+
   val qVersion = TableQuery[VersionTable]
 
   def findById(id: Int) = db withSession { implicit session =>
@@ -49,7 +51,7 @@ object VersionHelper extends PlayCache {
         val list = findByProjectId(projectId)
         env.level match {
           case LevelEnum.unsafe => list
-          case _ => list.filterNot(t => TaskTools.isSnapshot(t.id.get))
+          case _ => list.filterNot(t => t.vs.endsWith(SNAPSHOTSUFFIX))
         }
       case None => Nil
     }

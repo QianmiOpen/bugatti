@@ -9,7 +9,7 @@ import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{Task, TaskCommand, TaskHelper}
 import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
-import utils.{Task_v, ConfHelp}
+import utils.{ProjectTask_v, ConfHelp}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -35,7 +35,7 @@ class CommandActor extends Actor with ActorLogging {
   val _baseLogPath = ConfHelp.logPath
   var _commandSeq = Seq.empty[String]
 
-  var _taskObj: Task_v = null
+  var _taskObj: ProjectTask_v = null
 
   def receive = {
     case insertCommands: InsertCommands => {
@@ -259,7 +259,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 }
 
-case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: Task_v)
+case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v)
 
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 
