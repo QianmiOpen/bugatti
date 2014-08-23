@@ -68,7 +68,7 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
             val newHosts = hostList.filterNot(x => x._2.isEmpty).filterNot(x => addedHosts.contains(x._1))
 
             newHosts.foreach { newhost =>
-              EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, None, None, area.syndicName, newhost._1, newhost._2, Seq.empty[Variable])) // todo no empty
+              EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, None, None, area.syndicName, newhost._1, newhost._2, Seq.empty[Variable]))
             }
 
             refreshSetHostEnv(area.syndicName)

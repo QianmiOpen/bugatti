@@ -90,7 +90,7 @@ object TaskTools {
   def findProject(envId: Int, projectId: Int, realVersion: String): Project_v = {
     val project = ProjectHelper.findById(projectId).get
 
-    val hosts = findHosts(envId, projectId).map(c => Host_v(c.name, c.ip, None))
+    val hosts = findHosts(envId, projectId).map(c => Host_v(c.name, c.ip, Some(c.globalVariable.map(v => v.name -> v.value).toMap)))
 
     val attrs = getProperties(envId, projectId, project.templateId, realVersion)
     Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Some(attrs))
