@@ -1,20 +1,17 @@
 package actor.task
 
 import java.io.File
-import javax.script.{ScriptException, ScriptEngine, ScriptEngineManager}
 
-import akka.actor.{Cancellable, Actor, ActorLogging}
+import akka.actor.{Actor, ActorLogging, Cancellable}
 import com.qianmi.bugatti.actors.TimeOut
 import enums.TaskEnum
 import models.conf.{Conf, ConfContent, ConfContentHelper, ConfHelper}
 import models.task.{TaskCommand, TaskTemplateStep}
-import play.api.libs.json.Json
 import utils._
-import scala.concurrent.duration._
-import scalax.file.Path
-import scala.sys.process._
 
-import utils.TaskTools._
+import scala.concurrent.duration._
+import scala.sys.process._
+import scalax.file.Path
 
 /**
  * Created by jinwei on 21/8/14.
@@ -45,7 +42,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     case replaceCommand: ReplaceCommand => {
       val hostname = replaceCommand.hostname
       val taskId = replaceCommand.taskObj.taskId.toInt
-      val engine = createEngine(replaceCommand.taskObj, hostname)
+      val engine = new ScriptEngineUtil(replaceCommand.taskObj, Some(hostname))
 
       var taskCommandSeq = Seq.empty[TaskCommand]
       var errors = Set.empty[String]
@@ -55,11 +52,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         _reg.findAllIn(command).foreach { key =>
           _lastReplaceKey = key
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          try {
-            val value = engine.eval(realkey).toString()
-            command = command.replaceAll(key, value)
-          } catch {
-            case e: Exception => errors += key
+          val (ret, value) = engine.eval(realkey)
+          if (ret) {
+            command = command.replaceAll(s"\\{\\{${realkey}\\}\\}", value)
+          } else {
+            errors += s"${key}: ${value}"
+            log.error(value)
           }
         }
 
@@ -69,7 +67,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       if (errors isEmpty) {
         sender ! SuccessReplaceCommand(taskCommandSeq)
       } else {
-        sender ! ErrorReplaceCommand(errors)
+        sender ! ErrorReplaceCommand(errors.mkString("""\\\n"""))
       }
 
       context.stop(self)
@@ -80,7 +78,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       val task = rc.taskObj
       val taskId = task.taskId.toInt
       val envId = task.env.id.toInt
-      val projectId = task.project.id.toInt
+      val projectId = task.id.toInt
       val versionId = task.version.get.id.toInt
 
       val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
@@ -91,9 +89,9 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         baseFilesPath.mkdirs()
       }
 
-      val e = createEngine(rc.taskObj, rc.hostname)
+      val engine = new ScriptEngineUtil(rc.taskObj, Some(rc.hostname))
 
-      val (isSuccess, str) = replaceConfSeq(baseDir, confSeq, e)
+      val (isSuccess, str) = replaceConfSeq(baseDir, confSeq, engine)
 
       val baseDirPath = new File(new File(baseDir).getAbsolutePath)
       Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
@@ -119,35 +117,13 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     case _ =>
   }
 
-  private def createEngine(taskObj: Task_v, hostname: String): ScriptEngine = {
-    val engine = new ScriptEngineManager().getEngineByName("js")
-
-    engine.eval(s"var __t__ = ${Json.toJson(taskObj).toString}")
-
-    log.info(engine.eval("JSON.stringify(__t__)").toString)
-
-    engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
-    engine.eval("var alias = {};")
-
-    try {
-      taskObj.alias.foreach { case (key, value) => engine.eval(s"alias.${key} = ${value}")}
-    } catch {
-      case e: ScriptException => log.error(e.toString)
-    }
-
-    engine.eval(s"var current = ${Json.toJson(TaskTools.generateCurrent(hostname, taskObj))}")
-    engine.eval(s"var confFileName = ${taskObj.confFileName}_${hostname}")
-
-    engine
-  }
-
-  def replaceConfSeq(baseDir: String, confSeq: Seq[Conf], e: ScriptEngine): (Boolean, String) = {
+  def replaceConfSeq(baseDir: String, confSeq: Seq[Conf], engine: ScriptEngineUtil): (Boolean, String) = {
     if (confSeq.size > 0) {
       confSeq.foreach { xf =>
         val confContent = ConfContentHelper.findById(xf.id.get)
         confContent match {
           case Some(conf) =>
-            val (isSuccess, str) = fillConfFile(conf, e)
+            val (isSuccess, str) = fillConfFile(conf, engine)
             if (isSuccess) {
               val newFile = new File(s"${baseDir}/files/${xf.path}")
               newFile.getParentFile().mkdirs()
@@ -174,7 +150,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     }
   }
 
-  def fillConfFile(conf: ConfContent, e: ScriptEngine): (Boolean, String) = {
+  def fillConfFile(conf: ConfContent, engine: ScriptEngineUtil): (Boolean, String) = {
     var errors = Set.empty[String]
     if (!conf.octet) {
       var content = new String(conf.content, "UTF8")
@@ -182,19 +158,18 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         key =>
           _lastReplaceKey = key
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          try {
-            val value = e.eval(realkey).toString()
-            content = content.replaceAll(_lastReplaceKey, value)
-          } catch {
-            case e: Exception =>
-              errors += key
-              log.info(e.toString)
+          val (ret, value) = engine.eval(realkey)
+          if (ret) {
+            content = content.replaceAll(s"\\{\\{${realkey}\\}\\}", value)
+          } else {
+            errors += s"${key}: ${value}"
+            log.info(value)
           }
       }
       if (errors isEmpty) {
         (true, content)
       } else {
-        (false, errors.mkString(","))
+        (false, errors.mkString("""\\\n"""))
       }
     } else {
       return (true, "")
@@ -202,6 +177,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: Task_v, templateStep: Seq[TaskTemplateStep], hostname: String)
+case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String)
 
-case class ReplaceConfigure(taskObj: Task_v, hostname: String)
+case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String)

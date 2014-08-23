@@ -2,7 +2,7 @@ package actor.task
 
 import akka.actor.{Props, ActorLogging, Actor}
 import models.task.{TaskCommand, TaskTemplateStep}
-import utils.Task_v
+import utils.ProjectTask_v
 
 /**
  * Created by jinwei on 21/8/14.
@@ -13,36 +13,37 @@ class ClusterActor extends Actor with ActorLogging{
       context.actorOf(Props(classOf[EngineActor], 3)) ! ReplaceCommand(gcc.taskObj, gcc.templateStep, gcc.hostname)
     }
     case success: SuccessReplaceCommand => {
-      sender ! SuccessReplaceCommand(success.commandList)
+      context.parent ! SuccessReplaceCommand(success.commandList)
       context.stop(self)
     }
     case error: ErrorReplaceCommand => {
-      sender ! ErrorReplaceCommand(error.keys)
+      log.info(s"cluster errorCommand")
+      context.parent ! error
       context.stop(self)
     }
     case gcc: GenerateClusterConfs => {
       context.actorOf(Props(classOf[EngineActor], 15)) ! ReplaceConfigure(gcc.taskObj, gcc.hostname)
     }
     case successConf: SuccessReplaceConf => {
-      sender ! successConf
+      context.parent ! successConf
     }
     case errorConf: ErrorReplaceConf => {
-      sender ! errorConf
+      context.parent ! errorConf
       context.stop(self)
     }
     case timeout: TimeoutReplace => {
-      sender ! TimeoutReplace(timeout.key)
+      context.parent ! TimeoutReplace(timeout.key)
       context.stop(self)
     }
     case _ =>
   }
 }
 
-case class GenerateClusterCommands(taskId: Int, taskObj: Task_v, templateStep: Seq[TaskTemplateStep], hostname: String)
+case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String)
 case class SuccessReplaceCommand(commandList: Seq[TaskCommand])
-case class ErrorReplaceCommand(keys: Set[String])
+case class ErrorReplaceCommand(keys: String)
 
-case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: Task_v, hostname: String)
+case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: ProjectTask_v, hostname: String)
 case class SuccessReplaceConf(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int])
 case class ErrorReplaceConf(str: String)
 

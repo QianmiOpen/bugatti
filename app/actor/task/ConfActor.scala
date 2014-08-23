@@ -5,7 +5,7 @@ import java.io.File
 import akka.actor.{Props, Actor}
 import models.conf.{ConfContent, ConfContentHelper, ConfHelper}
 import play.api.libs.json.{Json, JsObject}
-import utils.{Task_v, SaltTools, TaskTools, ConfHelp}
+import utils.{ProjectTask_v, SaltTools, TaskTools, ConfHelp}
 import scala.sys.process._
 import scalax.file.Path
 
@@ -16,7 +16,7 @@ class ConfActor extends Actor{
   var _json = Json.obj()
   val _reg = """\{\{ *[^}]+ *\}\}""".r
   var _hostname = ""
-  var _taskObj: Task_v = null
+  var _taskObj: ProjectTask_v = null
   var _envId = 0
   var _projectId = 0
   var _versionId = 0
@@ -41,21 +41,21 @@ class ConfActor extends Actor{
     }
 
     case successConf: SuccessReplaceConf => {
-      sender ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, _order + 1)
+      context.parent ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, _order + 1)
       context.stop(self)
     }
 
     case errorConf: ErrorReplaceConf => {
-      sender ! ConfCopyFailed(errorConf.str)
+      context.parent ! ConfCopyFailed(errorConf.str)
       context.stop(self)
     }
 
     case timeout: TimeoutReplace => {
-      sender ! ConfCopyFailed(s"${timeout.key} 表达式执行超时!")
+      context.parent ! ConfCopyFailed(s"${timeout.key} 表达式执行超时!")
       context.stop(self)
     }
   }
 }
 
-case class CopyConfFile(taskId: Int, envId: Int, projectId: Int, versionId: Int, order: Int, json: JsObject, hostname: String, taskObj: Task_v)
+case class CopyConfFile(taskId: Int, envId: Int, projectId: Int, versionId: Int, order: Int, json: JsObject, hostname: String, taskObj: ProjectTask_v)
 case class GenerateConf()
