@@ -18,7 +18,7 @@ class ClusterActor extends Actor with ActorLogging{
     }
     case error: ErrorReplaceCommand => {
       log.info(s"cluster errorCommand")
-      context.parent ! ErrorReplaceCommand(error.keys)
+      context.parent ! error
       context.stop(self)
     }
     case gcc: GenerateClusterConfs => {
@@ -41,7 +41,7 @@ class ClusterActor extends Actor with ActorLogging{
 
 case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String)
 case class SuccessReplaceCommand(commandList: Seq[TaskCommand])
-case class ErrorReplaceCommand(keys: Set[String])
+case class ErrorReplaceCommand(keys: String)
 
 case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: ProjectTask_v, hostname: String)
 case class SuccessReplaceConf(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int])

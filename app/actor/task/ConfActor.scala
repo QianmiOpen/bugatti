@@ -41,17 +41,17 @@ class ConfActor extends Actor{
     }
 
     case successConf: SuccessReplaceConf => {
-      sender ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, _order + 1)
+      context.parent ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, _order + 1)
       context.stop(self)
     }
 
     case errorConf: ErrorReplaceConf => {
-      sender ! ConfCopyFailed(errorConf.str)
+      context.parent ! ConfCopyFailed(errorConf.str)
       context.stop(self)
     }
 
     case timeout: TimeoutReplace => {
-      sender ! ConfCopyFailed(s"${timeout.key} 表达式执行超时!")
+      context.parent ! ConfCopyFailed(s"${timeout.key} 表达式执行超时!")
       context.stop(self)
     }
   }

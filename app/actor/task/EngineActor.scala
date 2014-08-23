@@ -1,20 +1,17 @@
 package actor.task
 
 import java.io.File
-import javax.script.{ScriptException, ScriptEngine, ScriptEngineManager}
 
-import akka.actor.{Cancellable, Actor, ActorLogging}
+import akka.actor.{Actor, ActorLogging, Cancellable}
 import com.qianmi.bugatti.actors.TimeOut
 import enums.TaskEnum
 import models.conf.{Conf, ConfContent, ConfContentHelper, ConfHelper}
 import models.task.{TaskCommand, TaskTemplateStep}
-import play.api.libs.json.Json
 import utils._
-import scala.concurrent.duration._
-import scalax.file.Path
-import scala.sys.process._
 
-import utils.TaskTools._
+import scala.concurrent.duration._
+import scala.sys.process._
+import scalax.file.Path
 
 /**
  * Created by jinwei on 21/8/14.
@@ -57,10 +54,10 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
           val (ret, value) = engine.eval(realkey)
           if (ret) {
-            command = command.replaceAll(key, value)
+            command = command.replaceAll(s"\\{\\{${realkey}\\}\\}", value)
           } else {
-            errors += key
-            log.info(value)
+            errors += s"${key}: ${value}"
+            log.error(value)
           }
         }
 
@@ -70,7 +67,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       if (errors isEmpty) {
         sender ! SuccessReplaceCommand(taskCommandSeq)
       } else {
-        sender ! ErrorReplaceCommand(errors)
+        sender ! ErrorReplaceCommand(errors.mkString("""\\\n"""))
       }
 
       context.stop(self)
@@ -163,16 +160,16 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
           val (ret, value) = engine.eval(realkey)
           if (ret) {
-            content = content.replaceAll(_lastReplaceKey, value)
+            content = content.replaceAll(s"\\{\\{${realkey}\\}\\}", value)
           } else {
-            errors += key
+            errors += s"${key}: ${value}"
             log.info(value)
           }
       }
       if (errors isEmpty) {
         (true, content)
       } else {
-        (false, errors.mkString(","))
+        (false, errors.mkString("""\\\n"""))
       }
     } else {
       return (true, "")

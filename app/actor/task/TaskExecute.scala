@@ -115,7 +115,7 @@ class TaskExecute extends Actor with ActorLogging {
     case errorReplace: ErrorReplaceCommand => {
       log.info(s"TaskExecute errorCommand")
       _commandList = Seq.empty[TaskCommand]
-      _json = Json.obj("error" -> s"${errorReplace.keys.mkString(",")} 变量异常!")
+      _json = Json.obj("error" -> s"变量异常! ${errorReplace.keys}")
       self ! GenerateCommands()
     }
 
