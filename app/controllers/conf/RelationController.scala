@@ -12,6 +12,7 @@ import play.api.libs.json._
  * @author of546
  */
 object RelationController extends BaseController {
+  implicit val variableWrites = Json.writes[Variable]
   implicit val relationWrites = Json.writes[EnvironmentProjectRel]
 
   val relationForm = Form(

@@ -10,7 +10,9 @@ import scala.slick.jdbc.JdbcBackend
  * 项目环境变量
  */
 
-case class Variable(id: Option[Int], envId: Int, projectId: Option[Int], name: String, value: String)
+case class Variable(id: Option[Int], envId: Option[Int], projectId: Option[Int], name: String, value: String) {
+  def this(name: String, value: String) = this(None, None, None, name, value)
+}
 
 class VariableTable(tag: Tag) extends Table[Variable](tag, "variable") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -19,7 +21,7 @@ class VariableTable(tag: Tag) extends Table[Variable](tag, "variable") {
   def name = column[String]("name", O.DBType("varchar(254)"))
   def value = column[String]("value")
 
-  override def * = (id.?, envId, projectId.?, name, value) <> (Variable.tupled, Variable.unapply _)
+  override def * = (id.?, envId.?, projectId.?, name, value) <> (Variable.tupled, Variable.unapply _)
 
   def idx = index("idx_name", (envId, projectId, name), unique = true)
 }

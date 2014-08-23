@@ -10,7 +10,7 @@ import scala.slick.jdbc.JdbcBackend
 /**
  * 环境和项目的关系配置
  */
-case class EnvironmentProjectRel(id: Option[Int], envId: Option[Int], projectId: Option[Int], syndicName: String, name: String, ip: String)
+case class EnvironmentProjectRel(id: Option[Int], envId: Option[Int], projectId: Option[Int], syndicName: String, name: String, ip: String, globalVariable: Seq[Variable])
 case class EnvRelForm(envId: Int, projectId: Int, ids: Seq[Int])
 
 class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](tag, "environment_project_rel") {
@@ -20,8 +20,12 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
   def syndicName = column[String]("syndic_name")
   def name = column[String]("name")
   def ip = column[String]("ip")
+  def globalVariable = column[Seq[Variable]]("global_variable", O.DBType("text"))(MappedColumnType.base[Seq[Variable], String](
+    _.map(v => s"${v.name}:${v.value}").mkString(","),
+    _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
+  ))
 
-  override def * = (id.?, envId.?, projectId.?, syndicName, name, ip) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
+  override def * = (id.?, envId.?, projectId.?, syndicName, name, ip, globalVariable) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
   index("idx_eid_pid", (envId, projectId))
   index("idx_ip", ip)
 }

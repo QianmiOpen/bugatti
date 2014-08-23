@@ -4,7 +4,7 @@ import actor.ActorUtils
 import akka.actor.{ActorRef, Actor, ActorLogging}
 import akka.event.LoggingReceive
 import com.qianmi.bugatti.actors.{TimeOut, SaltResult, SaltCommand}
-import models.conf.{EnvironmentHelper, EnvironmentProjectRel, EnvironmentProjectRelHelper, AreaHelper}
+import models.conf._
 import org.apache.commons.net.util.SubnetUtils
 import play.api.libs.json.{JsObject, JsError, JsSuccess, Json}
 
@@ -68,7 +68,7 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
             val newHosts = hostList.filterNot(x => x._2.isEmpty).filterNot(x => addedHosts.contains(x._1))
 
             newHosts.foreach { newhost =>
-              EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, None, None, area.syndicName, newhost._1, newhost._2))
+              EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, None, None, area.syndicName, newhost._1, newhost._2, Seq.empty[Variable])) // todo no empty
             }
 
             refreshSetHostEnv(area.syndicName)

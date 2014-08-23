@@ -1,13 +1,13 @@
-<configuration>
+<configuration scan="true" scanPeriod="60 seconds">
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
-        <file>${user.dir}/web/logs/error.log</file>
+        <file>${user.dir}/logs/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- Daily rollover with compression -->
-            <fileNamePattern>error-log-%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <fileNamePattern>${user.dir}/logs/error-log-%d{yyyy-MM-dd}.gz</fileNamePattern>
             <!-- keep 30 days worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -17,9 +17,9 @@
     </appender>
 
     <appender name="ACCESS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${user.dir}/web/logs/access.log</file>
+        <file>${user.dir}/logs/access.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>access-log.%i.log</fileNamePattern>
+            <fileNamePattern>${user.dir}/logs/access-log.%i.log</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>10</maxIndex>
         </rollingPolicy>

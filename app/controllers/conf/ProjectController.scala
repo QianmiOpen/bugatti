@@ -47,7 +47,7 @@ object ProjectController extends BaseController {
       "variables" -> seq(
         mapping(
           "id" -> optional(number),
-          "envId" -> number,
+          "envId" -> optional(number),
           "projectId" -> optional(number),
           "name" -> nonEmptyText,
           "value" -> nonEmptyText

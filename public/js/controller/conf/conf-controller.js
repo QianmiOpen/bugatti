@@ -82,7 +82,6 @@ define(['angular'], function(angular) {
 
     // 一键拷贝弹出框
     var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, curr_eid, curr_vid) {
-
         $scope.envs = envs;
         if ($scope.envs.length) $scope.env = $scope.envs[0].id;
 
@@ -293,9 +292,9 @@ define(['angular'], function(angular) {
 
     app.controller('ConfUploadCtrl', ['$scope', '$state', '$stateParams', '$timeout', '$http', '$upload',
         function($scope, $state, $stateParams, $timeout, $http, $upload) {
-        var pid = $stateParams.id;
-        var vid = $stateParams.vid;
-        var eid = $stateParams.eid;
+            var pid = $stateParams.id;
+            var vid = $stateParams.vid;
+            var eid = $stateParams.eid;
 
             $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
             $scope.uploadRightAway = true;
