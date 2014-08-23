@@ -34,6 +34,9 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
             | for (__i = 0; __i < hosts.length; __i++) {
             |   if (hosts[__i].name === "$name") {
             |     var cHost = hosts[__i];
+            |     for (__attr in cHost.attrs) {
+            |       attrs[__attr] = cHost.attrs[__attr]
+            |     }
             |     break;
             |   }
             | }
