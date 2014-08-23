@@ -21,7 +21,7 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
   def name = column[String]("name")
   def ip = column[String]("ip")
   def globalVariable = column[Seq[Variable]]("global_variable", O.DBType("text"))(MappedColumnType.base[Seq[Variable], String](
-    _.map(v => s"${v.name}:${v.value}").mkString(","),
+    _.filter(!_.value.isEmpty).map(v => s"${v.name}:${v.value}").mkString(","),
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
   ))
 

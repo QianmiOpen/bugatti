@@ -52,6 +52,7 @@
             <td><span tooltip="{{rel.ip}}">{{rel.ip}}</span></td>
             <td>
                 <a ng-click="unbind(rel.id, $index)" href title="解绑">解绑</a>
+                <a ui-sref="conf.relation.detail({id: rel.id})" title="机器环境变量">环境变量</a>
             </td>
         </tr>
         </tbody>

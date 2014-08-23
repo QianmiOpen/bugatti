@@ -149,4 +149,51 @@ define(['angular'], function(angular) {
             };
     }]);
 
+    app.controller('RelationShowCtrl', ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService',
+        function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService) {
+            RelationService.get($stateParams.id, function(data) {
+                $scope.relation = data;
+                if ($scope.relation) {
+                    ProjectService.vars($scope.relation.projectId, $scope.relation.envId, function(project_vars) {
+                        $scope.vars = project_vars;
+                        angular.forEach($scope.vars, function(pv) {
+                            pv.meta = pv.value;
+                            var defVar = findInVars($scope.relation.globalVariable, pv);
+                            if (defVar !== '') {
+                                pv.meta = defVar;
+                                pv.value = defVar;
+                            } else {
+                                pv.value = '';
+                            }
+                        });
+                    });
+                }
+            });
+
+            function findInVars(vars, v) {
+                var find = '';
+                angular.forEach(vars, function(_v, index) {
+                    if (_v.name == v.name) {
+                        find = v.value;
+                        return;
+                    }
+                });
+                return find;
+            };
+
+            $scope.saveOrUpdate = function(vars) {
+                $scope.relation.globalVariable = [];
+                angular.forEach(vars, function(v) {
+                    $scope.relation.globalVariable.push({name: v.name, value: v.value})
+                });
+
+                RelationService.update($stateParams.id, $scope.relation, function(data) {
+                    $state.go("conf.relation");
+                });
+
+            };
+
+
+        }]);
+
 });

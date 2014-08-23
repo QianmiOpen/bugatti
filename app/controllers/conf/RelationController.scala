@@ -7,6 +7,8 @@ import models.conf._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json._
+import play.api.mvc.Action
+
 /**
  * 项目于环境关系配置
  * @author of546
@@ -23,6 +25,30 @@ object RelationController extends BaseController {
     )(EnvRelForm.apply)(EnvRelForm.unapply)
   )
 
+  val varRelForm = Form(
+    mapping(
+      "id" -> optional(number),
+      "envId" -> optional(number),
+      "projectId" -> optional(number),
+      "syndicName" -> text,
+      "name" -> text,
+      "ip" -> text,
+      "globalVariable" -> seq (
+        mapping(
+          "id" -> optional(number),
+          "envId" -> optional(number),
+          "projectId" -> optional(number),
+          "name" -> text,
+          "value" -> text
+        )(Variable.apply)(Variable.unapply)
+      )
+    )(EnvironmentProjectRel.apply)(EnvironmentProjectRel.unapply)
+  )
+
+  def show(id: Int) = Action {
+    Ok(Json.toJson(EnvironmentProjectRelHelper.findById(id)))
+  }
+
   def index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
     val result = EnvironmentProjectRelHelper.all(
       ip.filterNot(_.isEmpty), envId, projectId, sort, direction, page, pageSize)
@@ -36,6 +62,15 @@ object RelationController extends BaseController {
 
   def ips(envId: Int) = AuthAction(FuncEnum.relation) {
     Ok(Json.toJson(EnvironmentProjectRelHelper.findIpsByEnvId(envId)))
+  }
+
+  def update(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
+    varRelForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
+      relation => {
+        Ok(Json.obj("r" -> EnvironmentProjectRelHelper.update(relation)))
+      }
+    )
   }
 
   implicit val relationFormWrites = Json.writes[EnvRelForm]
@@ -69,5 +104,7 @@ object RelationController extends BaseController {
         NotFound
     }
   }
+
+
 
 }

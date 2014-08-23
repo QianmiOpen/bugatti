@@ -192,11 +192,13 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.ConfController.log,
 
         // relation
+        conf.routes.javascript.RelationController.show,
         conf.routes.javascript.RelationController.index,
         conf.routes.javascript.RelationController.count,
         conf.routes.javascript.RelationController.ips,
         conf.routes.javascript.RelationController.bind,
         conf.routes.javascript.RelationController.unbind,
+        conf.routes.javascript.RelationController.update,
 
         //task
         task.routes.javascript.TaskController.findLastTaskStatus,

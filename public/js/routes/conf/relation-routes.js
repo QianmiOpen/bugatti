@@ -25,6 +25,17 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('conf.relation.detail', {
+            url: "/:id",
+            views: {
+                "@conf": {
+                    templateUrl: "partials/conf/relation/relation-show.html",
+                    controller: "RelationShowCtrl"
+                }
+            }
+        });
+
+
     }]);
 
 });

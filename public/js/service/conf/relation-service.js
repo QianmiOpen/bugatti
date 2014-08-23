@@ -6,6 +6,9 @@ define(['angular'], function(angular) {
 
     app.factory('RelationService', function($http) {
         return {
+            get: function(id, callback) {
+                $http(PlayRoutes.controllers.conf.RelationController.show(id)).success(callback);
+            },
             getPage: function(ip, envId, projectId, page, pageSize, callback) {
                 $http(PlayRoutes.controllers.conf.RelationController.index(ip, envId, projectId, null, null, page, pageSize)).success(callback);
             },
@@ -23,6 +26,9 @@ define(['angular'], function(angular) {
             },
             bind: function(relation, callback) {
                 $http.post(PlayRoutes.controllers.conf.RelationController.bind().url, relation).success(callback)
+            },
+            update: function(id, relation, callback) {
+                $http.put(PlayRoutes.controllers.conf.RelationController.update(id).url, relation).success(callback)
             }
         }
     });

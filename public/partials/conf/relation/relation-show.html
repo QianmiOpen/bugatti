@@ -1,0 +1,59 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button>
+    <h1 class="pull-left m0">机器详情</h1>
+</div>
+
+<table class="table table-striped border-less m0">
+    <tbody>
+    <tr>
+        <td class="text-right col-sm-3">编号：</td>
+        <td>{{relation.id}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">环境：</td>
+        <td ng-if="relation.envId">
+            <env-show eid="{{relation.envId}}"></env-show>
+        </td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">项目：</td>
+        <td ng-if="relation.projectId">
+            <project-show pid="{{relation.projectId}}"></project-show>
+        </td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">机器名称：</td>
+        <td>{{relation.name}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">机器ip：</td>
+        <td>{{relation.ip}}</td>
+    </tr>
+    <tr>
+        <td class="text-right col-sm-3">机器变量：</td>
+        <td>
+        <form name="varForm" novalidate>
+            <table class="table table-striped border-less">
+                <thead>
+                    <th class=" col-sm-3">变量名</th>
+                    <th class="col-sm-4">变量值</th>
+                    <th>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="v in vars">
+                        <td>
+                            <input type="text" class="form-control" ng-model="v.name" disabled>
+                        </td>
+                        <td >
+                            <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="100" placeholder="{{v.meta}}">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-success" ng-click="saveOrUpdate(vars)" ng-disabled="form.$invalid"> 保 存 </button>
+        </form>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
