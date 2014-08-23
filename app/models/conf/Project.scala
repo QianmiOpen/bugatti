@@ -142,7 +142,7 @@ object ProjectHelper extends PlayCache {
 
     // variable
     VariableHelper._deleteByEnvId_ProjectId(envId, id)
-    val variables = projectForm.variables.filter(_.envId == envId).map(vb => vb.copy(None, projectId = Some(id)))
+    val variables = projectForm.variables.filter(_.envId == Some(envId)).map(vb => vb.copy(None, projectId = Some(id)))
     VariableHelper._create(variables)
 
     // project

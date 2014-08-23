@@ -73,7 +73,7 @@
                  </td>
              </tr>
              </tbody>
-             <tfoot ng-init="v = { name: '', value: ''}">
+             <tfoot ng-init="v = { name: '', value: '', envId: env.id}">
                  <tr>
                      <td class="text-right col-sm-4" style="padding-left: 0">
                          <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t_).*$/i" >

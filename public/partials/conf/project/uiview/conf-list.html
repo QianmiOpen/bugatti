@@ -5,7 +5,7 @@
         <tbody>
         <tr class="active" ng-repeat="conf in confs">
             <td width="25%"><a tooltip="{{conf.name}}" ui-sref="conf.project.version.conf.detail({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})">{{conf.name}}</a></td>
-            <td class="text-muted"><span tooltip="{{conf.path}}">{{conf.path}}</span></td>
+            <td class="text-muted"><span tooltip="{{conf.path}}">~/tomcat/{{conf.path}}</span></td>
             <td class="text-muted" width="15%"><span tooltip="{{conf.updated | date:'yyyy-MM-dd HH:mm:ss'}}">{{conf.updated | timeago }}</span></td>
         </tr>
         </tbody>
