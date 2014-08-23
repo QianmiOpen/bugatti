@@ -48,7 +48,12 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
 
   def eval(script: String): (Boolean, String) = {
     try {
-      (true, engine.eval(script).toString)
+      val ret = engine.eval(script)
+      if (ret == null || ret.toString.length == 0) {
+        (false, s"$script is null.")
+      } else {
+        (true, ret.toString)
+      }
     } catch {
       case e: ScriptException => {
         (false, e.toString)
