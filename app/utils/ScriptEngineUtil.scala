@@ -38,7 +38,7 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
             |   }
             | }
           """.stripMargin)
-        engine.eval(s"var confFileName = ${projectTask.confFileName}_$name")
+        engine.eval(s"var confFileName = '${projectTask.confFileName}_$name'")
       }
       case None => {
         engine.eval("var cHost = hosts[0];")
