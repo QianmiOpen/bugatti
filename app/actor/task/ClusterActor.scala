@@ -13,25 +13,26 @@ class ClusterActor extends Actor with ActorLogging{
       context.actorOf(Props(classOf[EngineActor], 3)) ! ReplaceCommand(gcc.taskObj, gcc.templateStep, gcc.hostname)
     }
     case success: SuccessReplaceCommand => {
-      sender ! SuccessReplaceCommand(success.commandList)
+      context.parent ! SuccessReplaceCommand(success.commandList)
       context.stop(self)
     }
     case error: ErrorReplaceCommand => {
-      sender ! ErrorReplaceCommand(error.keys)
+      log.info(s"cluster errorCommand")
+      context.parent ! ErrorReplaceCommand(error.keys)
       context.stop(self)
     }
     case gcc: GenerateClusterConfs => {
       context.actorOf(Props(classOf[EngineActor], 15)) ! ReplaceConfigure(gcc.taskObj, gcc.hostname)
     }
     case successConf: SuccessReplaceConf => {
-      sender ! successConf
+      context.parent ! successConf
     }
     case errorConf: ErrorReplaceConf => {
-      sender ! errorConf
+      context.parent ! errorConf
       context.stop(self)
     }
     case timeout: TimeoutReplace => {
-      sender ! TimeoutReplace(timeout.key)
+      context.parent ! TimeoutReplace(timeout.key)
       context.stop(self)
     }
     case _ =>

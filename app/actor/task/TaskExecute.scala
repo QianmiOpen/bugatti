@@ -63,6 +63,8 @@ class TaskExecute extends Actor with ActorLogging {
             case e: Exception => {
               _commandList = Seq.empty[TaskCommand]
               _json = Json.obj("error" -> e.getMessage())
+              log.error(e.toString)
+              log.error(e.getMessage)
             }
           }
 
@@ -70,6 +72,7 @@ class TaskExecute extends Actor with ActorLogging {
           if (seqMachines.length == 0) {
             _commandList = Seq.empty[TaskCommand]
             _json = Json.obj("error" -> s"未关联机器")
+            log.error(Json.prettyPrint(_json))
           }
           //3、生成命令列表
           _templateStep = TaskTemplateStepHelper.findStepsByTemplateId(_tqExecute.taskTemplateId)
@@ -90,7 +93,9 @@ class TaskExecute extends Actor with ActorLogging {
     }
 
     case gcommand: GenerateCommands => {
-      if(_hostsIndex < _hosts.length-1 && _json.keys.size == 0){
+      log.info(s"_hostIndex ==> ${_hostsIndex}")
+      log.info(s"_hosts ==> ${_hosts}")
+      if(_hostsIndex <= _hosts.length-1 && _json.keys.size == 0){
         val cluster = _hosts(_hostsIndex).name
         val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${_envId}_${_projectId}_${cluster}")
         clusterActor ! GenerateClusterCommands(_taskId, _taskObj, _templateStep, cluster)
@@ -108,6 +113,7 @@ class TaskExecute extends Actor with ActorLogging {
     }
 
     case errorReplace: ErrorReplaceCommand => {
+      log.info(s"TaskExecute errorCommand")
       _commandList = Seq.empty[TaskCommand]
       _json = Json.obj("error" -> s"${errorReplace.keys.mkString(",")} 变量异常!")
       self ! GenerateCommands()
@@ -154,6 +160,7 @@ class TaskExecute extends Actor with ActorLogging {
         val realKey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
         result = result.replaceAll(key, TaskTools.trimQuotes((paramsJson \ realKey).toString))
     }
+
     result
   }
 }

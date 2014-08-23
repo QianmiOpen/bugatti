@@ -52,26 +52,32 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
       replaceCommand.templateStep.foreach { templateStep =>
         var command = templateStep.sls
+        log.info(s"engine command ==> $command")
         _reg.findAllIn(command).foreach { key =>
+          log.info(s"keys iteraters: ${key}")
           _lastReplaceKey = key
-          val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
           try {
-            val value = engine.eval(realkey).toString()
+            val realKey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
+            log.info(s"realKey : ${realKey}")
+            log.info(s"engine realKey : ${engine.eval(realKey)}")
+            val value = engine.eval(s"${realKey}").toString()
             command = command.replaceAll(key, value)
           } catch {
-            case e: Exception => errors += key
+            case e: Exception =>
+              log.error(e.toString)
+              errors += key
           }
         }
 
         taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, command, hostname, templateStep.name, TaskEnum.TaskWait, templateStep.orderNum)
       }
-
+      log.info(s"commands seq: ${taskCommandSeq}")
+      log.info(s"commands errors: ${errors}")
       if (errors isEmpty) {
         sender ! SuccessReplaceCommand(taskCommandSeq)
       } else {
         sender ! ErrorReplaceCommand(errors)
       }
-
       context.stop(self)
     }
 
@@ -131,12 +137,16 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
     try {
       taskObj.alias.foreach { case (key, value) => engine.eval(s"alias.${key} = ${value}")}
-    } catch {
+    }
+    catch {
       case e: ScriptException => log.error(e.toString)
     }
 
     engine.eval(s"var current = ${Json.toJson(TaskTools.generateCurrent(hostname, taskObj))}")
-    engine.eval(s"var confFileName = ${taskObj.confFileName}_${hostname}")
+    engine.eval(s"var confFileName = '${taskObj.confFileName}_${hostname}'")
+
+    log.info(s"this.current: ${engine.eval("JSON.stringify(this.current)")}")
+    log.info(s"this.alias: ${engine.eval("JSON.stringify(this.alias)")}")
 
     engine
   }
