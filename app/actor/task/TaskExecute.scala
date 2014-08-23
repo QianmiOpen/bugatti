@@ -5,7 +5,7 @@ import enums.TaskEnum
 import models.conf._
 import models.task._
 import play.api.libs.json.{JsValue, Json, JsObject}
-import utils.{Task_v, SaltTools, TaskTools}
+import utils.{ProjectTask_v, SaltTools, TaskTools}
 
 /**
  * Created by jinwei on 13/7/14.
@@ -24,7 +24,7 @@ class TaskExecute extends Actor with ActorLogging {
   var _hostsIndex = 0
 
   var _templateStep = Seq.empty[TaskTemplateStep]
-  var _taskObj: Task_v = null
+  var _taskObj: ProjectTask_v = null
 
   var (_commandList, _json) = (Seq.empty[TaskCommand], Json.obj())
 
