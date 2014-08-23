@@ -1,11 +1,9 @@
 package utils
 
-import java.io.StringWriter
-import javax.script.{ScriptException, ScriptEngineManager}
-
 import models.conf._
+import play.api.Play
 import play.api.libs.json.Json
-import play.api.{Logger, Play}
+
 import scala.collection.mutable
 
 /**
@@ -160,64 +158,18 @@ object TaskTools {
   def generateCodeCompleter(envId: Int, projectId: Int, versionId: Int) = {
     val task = generateTaskObject(0, envId, projectId, Some(versionId))
     if (task.hosts nonEmpty) {
-      val engine = new ScriptEngineManager().getEngineByName("js")
-      val w = new StringWriter
-      engine.getContext.setWriter(w)
-
-      engine.eval(s"var __t__ = ${Json.toJson(task).toString}")
-      println(engine.eval("JSON.stringify(__t__)"))
-      engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
-      engine.eval("var alias = {};")
-      try {
-        task.alias.foreach { case (key, value) => engine.eval(s"alias.${key} = ${value};")}
-      } catch {
-        case e: ScriptException => Logger.error(e.toString)
+      val (ret, result) = new ScriptEngineUtil(task, None).getAttrs()
+      if (ret) {
+        result
+      } else {
+        s"""{"$result", "error"}"""
       }
-      engine.eval("var cHost = hosts[0];")
-
-      try {
-        engine.eval(
-          """
-            | function pushMap(obj, prefix, m) {
-            |   for (__o in obj) {
-            |     if (typeof obj[__o] === 'object'
-            |      && (__o != 'JavaAdapter' && __o != 'context' && __o.substring(0, 2) != '__')) {
-            |       if (Array.isArray(obj[__o])) {
-            |         m[prefix + __o] = 'array';
-            |         var __arr = obj[__o];
-            |         var __p = prefix + __o;
-            |         for (__a in __arr) {
-            |           pushMap(__arr[__a], __p + '[' + __a + '].', m);
-            |         }
-            |       } else {
-            |         m[prefix + __o] = 'object';
-            |         pushMap(obj[__o], prefix + __o + '.', m);
-            |       }
-            |     }
-            |     if (typeof obj[__o] === 'string' && __o.substring(0, 2) != '__') {
-            |       m[prefix + __o] = obj[__o];
-            |     }
-            |   }
-            | }
-            |
-            | var __m__ = {}
-            |
-            | pushMap(this, "", __m__)
-            |
-            | println(JSON.stringify(__m__))
-          """.stripMargin)
-      } catch {
-        case exception: ScriptException => {
-          Logger.error(exception.toString)
-        }
-      }
-      w.toString
     } else {
       "{'没有关联机器!':'error'}"
     }
   }
-
 }
+
 
 object ConfHelp {
   val app = Play.current

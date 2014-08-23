@@ -45,7 +45,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     case replaceCommand: ReplaceCommand => {
       val hostname = replaceCommand.hostname
       val taskId = replaceCommand.taskObj.taskId.toInt
-      val engine = createEngine(replaceCommand.taskObj, hostname)
+      val engine = new ScriptEngineUtil(replaceCommand.taskObj, Some(hostname))
 
       var taskCommandSeq = Seq.empty[TaskCommand]
       var errors = Set.empty[String]
@@ -55,11 +55,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         _reg.findAllIn(command).foreach { key =>
           _lastReplaceKey = key
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          try {
-            val value = engine.eval(realkey).toString()
+          val (ret, value) = engine.eval(realkey)
+          if (ret) {
             command = command.replaceAll(key, value)
-          } catch {
-            case e: Exception => errors += key
+          } else {
+            errors += key
+            log.info(value)
           }
         }
 
@@ -91,9 +92,9 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         baseFilesPath.mkdirs()
       }
 
-      val e = createEngine(rc.taskObj, rc.hostname)
+      val engine = new ScriptEngineUtil(rc.taskObj, Some(rc.hostname))
 
-      val (isSuccess, str) = replaceConfSeq(baseDir, confSeq, e)
+      val (isSuccess, str) = replaceConfSeq(baseDir, confSeq, engine)
 
       val baseDirPath = new File(new File(baseDir).getAbsolutePath)
       Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
@@ -119,35 +120,13 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     case _ =>
   }
 
-  private def createEngine(taskObj: ProjectTask_v, hostname: String): ScriptEngine = {
-    val engine = new ScriptEngineManager().getEngineByName("js")
-
-    engine.eval(s"var __t__ = ${Json.toJson(taskObj).toString}")
-
-    log.info(engine.eval("JSON.stringify(__t__)").toString)
-
-    engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
-    engine.eval("var alias = {};")
-
-    try {
-      taskObj.alias.foreach { case (key, value) => engine.eval(s"alias.${key} = ${value}")}
-    } catch {
-      case e: ScriptException => log.error(e.toString)
-    }
-
-    engine.eval(s"var current = ${Json.toJson(TaskTools.generateCurrent(hostname, taskObj))}")
-    engine.eval(s"var confFileName = ${taskObj.confFileName}_${hostname}")
-
-    engine
-  }
-
-  def replaceConfSeq(baseDir: String, confSeq: Seq[Conf], e: ScriptEngine): (Boolean, String) = {
+  def replaceConfSeq(baseDir: String, confSeq: Seq[Conf], engine: ScriptEngineUtil): (Boolean, String) = {
     if (confSeq.size > 0) {
       confSeq.foreach { xf =>
         val confContent = ConfContentHelper.findById(xf.id.get)
         confContent match {
           case Some(conf) =>
-            val (isSuccess, str) = fillConfFile(conf, e)
+            val (isSuccess, str) = fillConfFile(conf, engine)
             if (isSuccess) {
               val newFile = new File(s"${baseDir}/files/${xf.path}")
               newFile.getParentFile().mkdirs()
@@ -174,7 +153,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     }
   }
 
-  def fillConfFile(conf: ConfContent, e: ScriptEngine): (Boolean, String) = {
+  def fillConfFile(conf: ConfContent, engine: ScriptEngineUtil): (Boolean, String) = {
     var errors = Set.empty[String]
     if (!conf.octet) {
       var content = new String(conf.content, "UTF8")
@@ -182,13 +161,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         key =>
           _lastReplaceKey = key
           val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          try {
-            val value = e.eval(realkey).toString()
+          val (ret, value) = engine.eval(realkey)
+          if (ret) {
             content = content.replaceAll(_lastReplaceKey, value)
-          } catch {
-            case e: Exception =>
-              errors += key
-              log.info(e.toString)
+          } else {
+            errors += key
+            log.info(value)
           }
       }
       if (errors isEmpty) {
