@@ -16,7 +16,7 @@ class ProjectDependencyTable(tag: Tag) extends Table[ProjectDependency](tag, "pr
   def dependencyId = column[Int]("dependency_id", O.NotNull)
   override def * = (id.?, projectId, dependencyId) <> (ProjectDependency.tupled, ProjectDependency.unapply _)
 
-  def idx_path = index("idx_relation", (projectId, dependencyId), unique = true)
+  def idx_path = index("idx_pDependency", (projectId, dependencyId), unique = true)
 }
 
 object ProjectDependencyHelper {
