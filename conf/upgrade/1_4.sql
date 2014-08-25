@@ -42,3 +42,5 @@ CREATE TABLE template_alias
 ALTER TABLE `task_template` ADD COLUMN `action_type` ENUM('project', 'host') NOT NULL DEFAULT 'project' COMMENT '动作类型';
 
 ALTER TABLE `environment_project_rel` ADD COLUMN `global_variable` TEXT NOT NULL COMMENT '机器变量';
+
+ALTER TABLE `template` ADD COLUMN `dependent_project` VARCHAR(254) NOT NULL DEFAULT '' COMMENT '模板依赖项目id列表';
