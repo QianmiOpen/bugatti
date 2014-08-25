@@ -97,7 +97,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
 
       Process(Seq("md5sum", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
-      //    Process(Seq("md5", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
+//      Process(Seq("md5", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
 
       Seq("rm", "-r", s"${baseDir}/files").!!
 
