@@ -37,6 +37,7 @@ object ProjectHelper extends PlayCache {
 
   val qProject = TableQuery[ProjectTable]
   val qMember = TableQuery[MemberTable]
+  val qpd = TableQuery[ProjectDependencyTable]
 
   def findById(id: Int): Option[Project] = db withSession { implicit session =>
     qProject.filter(_.id === id).firstOption
@@ -107,8 +108,6 @@ object ProjectHelper extends PlayCache {
 
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
     val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
-    //增加项目依赖初始关系
-    ProjectDependencyHelper.add(ProjectDependency(None, pid, -1));
     //修改缓存
     ActorUtils.configuarActor ! UpdateProject(pid, project.name)
     pid
@@ -155,6 +154,14 @@ object ProjectHelper extends PlayCache {
     //修改缓存
     ActorUtils.configuarActor ! UpdateProject(id, project.name)
     result
+  }
+
+//  ====================================================
+
+  def findDependencyProjects(id: Int): Seq[Project]= db withSession { implicit session =>
+    (for{
+      (p, pd) <- qProject innerJoin qpd on(_.id === _.dependencyId) if pd.projectId === id
+    } yield p).list
   }
 
 }

@@ -73,7 +73,7 @@ object TaskTools {
    */
   def getProperties(envId: Int, projectId: Int, templateId: Int, realVersion: String): Map[String, String] = {
     //根据projectId获取attribute
-    var tempAttrs = TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, realVersion).map(_.itemName)
+    val tempAttrs = TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, realVersion).map(_.itemName)
     val attrMap = AttributeHelper.findByProjectId(projectId).filter(a => tempAttrs.contains(a.name)).map { a => a.name -> a.value.get}.toMap
 
     //根据envId + projectId 获取variable

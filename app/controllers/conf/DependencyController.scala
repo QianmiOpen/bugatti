@@ -13,37 +13,20 @@ import play.api.mvc.Action
  */
 object DependencyController extends BaseController{
 
-  implicit def pd2dn(pds: Seq[ProjectDependency]): Seq[DependencyNest] = {
-    pds.map{
-      pd =>
-        DependencyNest(pd.projectId, ConfigureActor.get_projectMap.get(pd.projectId).getOrElse("未知项目"), Seq.empty[DependencyNest])
+  implicit def p2dn(pList: Seq[Project]): Seq[DependencyNest] = {
+    pList.map{
+      p =>
+        DependencyNest(p.id.get, p.name, Seq.empty[DependencyNest])
     }.toSet.toSeq
   }
 
   def show(id: Int) = Action{
-    val seq = ProjectDependencyHelper.all
-    val pdSeq = findSubProjects(id, seq)
-    var subProjects = Seq.empty[ProjectDependency]
-    pdSeq.foreach{
-      p =>
-        subProjects = subProjects ++ findSubProjects(p.dependencyId, seq)
-    }
+    val subProjects = ProjectHelper.findDependencyProjects(id)
     val result = Seq(
       DependencyNest(id, ProjectHelper.findById(id).get.name, subProjects)
     )
     Logger.info(s"${Json.prettyPrint(Json.toJson(result))}")
     Ok(Json.toJson(result))
-  }
-
-  def findSubProjects(pId: Int, seq: Seq[ProjectDependency]): Seq[ProjectDependency] = {
-    var seqProjects = Seq.empty[ProjectDependency]
-    seq.foreach{
-      p =>
-        if(p.projectId == pId){
-          seqProjects = seqProjects :+ p
-        }
-    }
-    seqProjects
   }
 
   def removeDependency(parentId: Int, childId: Int) = Action {

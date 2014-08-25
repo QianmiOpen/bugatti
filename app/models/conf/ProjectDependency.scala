@@ -15,6 +15,8 @@ class ProjectDependencyTable(tag: Tag) extends Table[ProjectDependency](tag, "pr
   def projectId = column[Int]("project_id", O.NotNull)
   def dependencyId = column[Int]("dependency_id", O.NotNull)
   override def * = (id.?, projectId, dependencyId) <> (ProjectDependency.tupled, ProjectDependency.unapply _)
+
+  def idx_path = index("idx_relation", (projectId, dependencyId), unique = true)
 }
 
 object ProjectDependencyHelper {
@@ -47,7 +49,6 @@ object ProjectDependencyHelper {
 
   def addByP_C(parent: DependencyNest, child: Project) = db withSession { implicit session =>
     val result = qpd.insert(ProjectDependency(None, parent.id, child.id.get))
-    qpd.filter(t => t.projectId === parent.id && t.dependencyId === -1)
     result
   }
 }
