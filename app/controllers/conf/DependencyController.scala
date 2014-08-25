@@ -13,17 +13,21 @@ import play.api.mvc.Action
  */
 object DependencyController extends BaseController{
 
-  implicit def p2dn(pList: Seq[Project]): Seq[DependencyNest] = {
-    pList.map{
-      p =>
-        DependencyNest(p.id.get, p.name, Seq.empty[DependencyNest])
-    }.toSet.toSeq
-  }
-
   def show(id: Int) = Action{
+    val project = ProjectHelper.findById(id).get
     val subProjects = ProjectHelper.findDependencyProjects(id)
+    val dependencyProjectIds = TemplateHelper.findById(project.templateId).get.dependentProjectIds
+    Logger.info(s"${dependencyProjectIds.mkString(",")}")
+    val dependencyNests = subProjects.map{
+      s =>
+        if(dependencyProjectIds.contains(s.id.get)){
+          DependencyNest(s.id.get, s.name, false, Seq.empty[DependencyNest])
+        }else {
+          DependencyNest(s.id.get, s.name, true, Seq.empty[DependencyNest])
+        }
+    }
     val result = Seq(
-      DependencyNest(id, ProjectHelper.findById(id).get.name, subProjects)
+      DependencyNest(id, project.name, false, dependencyNests)
     )
     Logger.info(s"${Json.prettyPrint(Json.toJson(result))}")
     Ok(Json.toJson(result))
@@ -55,4 +59,4 @@ object DependencyController extends BaseController{
 }
 
 
-case class DependencyNest(id: Int, name: String, dependency: Seq[DependencyNest])
+case class DependencyNest(id: Int, name: String, canRemove: Boolean , dependency: Seq[DependencyNest])
