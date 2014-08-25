@@ -26,31 +26,6 @@ object TaskTools {
     s.trim.stripPrefix("\"").stripSuffix("\"").trim
   }
 
-  def findTemplateItem(envId: Int, projectId: Int): mutable.Map[String, String] = {
-    //3、根据envId -> script_version, projectId -> template_id
-    //4、根据script_version,template_id -> template_item
-    val latestVersion = getLatestVersion(envId)
-    val templateId = ProjectHelper.findById(projectId).get.templateId
-    val itemMap = mutable.Map.empty[String, String]
-    TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, latestVersion).foreach { t => itemMap.put(t.itemName, t.itemName)}
-    itemMap
-  }
-
-  def getLatestVersion(envId: Int): String = {
-    val environment = EnvironmentHelper.findById(envId).get
-    // 如果是latest，则获取最后的一个可用版本
-    val latestVersion = environment.scriptVersion match {
-      case ScriptVersionHelper.Latest => ScriptVersionHelper.findLatest().get
-      case x => x
-    }
-    latestVersion
-  }
-
-  def propertyRule(str: String) = {
-    str.contains("\\.t\\.")
-    str.startsWith("")
-  }
-
   /**
    * 项目依赖
    * @param pid
@@ -74,7 +49,7 @@ object TaskTools {
   def getProperties(envId: Int, projectId: Int, templateId: Int, realVersion: String): Map[String, String] = {
     //根据projectId获取attribute
     var tempAttrs = TemplateItemHelper.findByTemplateId_ScriptVersion(templateId, realVersion).map(_.itemName)
-    val attrMap = AttributeHelper.findByProjectId(projectId).filter(a => tempAttrs.contains(a.name)).map { a => a.name -> a.value.get}.toMap
+    val attrMap = AttributeHelper.findByProjectId(projectId).filter(a => tempAttrs.contains(a.name)).map { a => a.name -> a.value.getOrElse("")}.toMap
 
     //根据envId + projectId 获取variable
     val varMap = VariableHelper.findByEnvId_ProjectId(envId, projectId).filter(v => !v.name.startsWith("t_") || tempAttrs.contains(v.name)).map { v => v.name -> v.value}.toMap
