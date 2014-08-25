@@ -5,24 +5,32 @@ import models.PlayCache
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend
+import scala.slick.lifted.ProvenShape
 
 /**
  * 项目模板
  *
  * @author of546
  */
-case class Template(id: Option[Int], name: String, remark: Option[String])
+case class Template(id: Option[Int], name: String, remark: Option[String], dependentProjectIds: Seq[Int])
 case class TemplateFrom(id: Option[Int], name: String, remark: Option[String], items: List[TemplateItem]) {
-  def toTemplate = Template(id, name, remark)
+  def toTemplate = Template(id, name, remark, Seq.empty)
 }
+
 class TemplateTable(tag: Tag) extends Table[Template](tag, "template") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name")
   def remark = column[String]("remark", O.Nullable)
+  def dependentProjectIds = column[Seq[Int]]("dependent_project", O.DBType("VARCHAR(254)"))(MappedColumnType.base[Seq[Int], String](
+    _.mkString(","), _ match {
+      case e if e.isEmpty => Seq.empty
+      case x => x.split(",").map(_.toInt).toSeq
+    }))
 
-  override def *  = (id.?, name, remark.?) <> (Template.tupled, Template.unapply _)
+  override def *  = (id.?, name, remark.?, dependentProjectIds) <> (Template.tupled, Template.unapply _)
   def idx = index("idx_name", name, unique = true)
 }
+
 object TemplateHelper extends PlayCache {
 
   import models.AppDB._

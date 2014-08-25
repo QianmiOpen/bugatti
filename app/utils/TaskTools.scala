@@ -4,8 +4,6 @@ import models.conf._
 import play.api.Play
 import play.api.libs.json.Json
 
-import scala.collection.mutable
-
 /**
  * Created by jinwei on 1/7/14.
  */

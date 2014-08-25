@@ -143,6 +143,14 @@ class ScriptGitActor extends Actor with ActorLogging {
     }
   }
 
+  def _getProjectIdsFromProjectName(projectNames: String): Seq[Int] = {
+    if (projectNames == null) {
+      Seq.empty
+    } else {
+      projectNames.trim.split(",").map(p => ProjectHelper.findByName(p.trim)).map(_.get.id.get)
+    }
+  }
+
   def _initFromYaml(file: File, tagName: String) = {
     val yaml = new Yaml()
     val io = new FileInputStream(file)
@@ -154,10 +162,23 @@ class ScriptGitActor extends Actor with ActorLogging {
       case Some(temp) => {
         val templateId = temp.id.get
         // 更新模板说明
-        TemplateHelper.update(templateId, temp.copy(remark = Some(template.get("remark").asInstanceOf[String])))
+        val tempObj = temp.copy(remark = Some(template.get("remark").asInstanceOf[String]),
+          dependentProjectIds = _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String]))
+
+        TemplateHelper.update(templateId, tempObj)
+        // 更新项目依赖
+        ProjectHelper.allByTemplateId(templateId).foreach { project =>
+          val projectId = project.id.get
+          val projectDepIds = ProjectDependencyHelper.findByProjectId(projectId).map(_.dependencyId)
+          tempObj.dependentProjectIds.filterNot(pid => projectDepIds.contains(pid)).foreach { pid =>
+            ProjectDependencyHelper.add(ProjectDependency(None, projectId, pid))
+          }
+        }
+
         templateId
       }
-      case None => TemplateHelper.create(Template(None, templateName, Some(template.get("remark").asInstanceOf[String])))
+      case None => TemplateHelper.create(Template(None, templateName, Some(template.get("remark").asInstanceOf[String]),
+          _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])))
     }
 
     // 创建template关联的alias

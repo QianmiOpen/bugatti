@@ -89,6 +89,10 @@ object ProjectHelper extends PlayCache {
     qProject.filterNot(_.id === id).list
   }
 
+  def allByTemplateId(templateId: Int): Seq[Project] = db withSession { implicit session =>
+    qProject.filter(_.templateId === templateId).list
+  }
+
   def create(project: Project) = db withSession { implicit session =>
     _create(project)
   }
@@ -108,6 +112,15 @@ object ProjectHelper extends PlayCache {
 
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
     val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
+<<<<<<< HEAD
+=======
+    //增加项目依赖初始关系
+    TemplateHelper.findById(project.templateId) match {
+      case Some(template) =>
+        ProjectDependencyHelper.insertWithSeq(template.dependentProjectIds.map(x => ProjectDependency(None, pid, x)))
+      case None => // ignore
+    }
+
     //修改缓存
     ActorUtils.configuarActor ! UpdateProject(pid, project.name)
     pid
