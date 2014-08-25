@@ -21,8 +21,6 @@ CREATE TABLE `project_dependency` (
 
 ALTER TABLE `project_dependency` ADD UNIQUE `idx_relation` USING BTREE (`project_id`, `dependency_id`);
 
-insert into project_dependency(project_id, dependency_id) select id, -1 from project;
-
 ALTER TABLE `template_item` ADD COLUMN `item_type` ENUM('attr', 'var') NOT NULL DEFAULT 'attr' COMMENT '类型' AFTER `item_desc`;
 
 ALTER TABLE `template_item` DROP INDEX `idx_tid_order`;
