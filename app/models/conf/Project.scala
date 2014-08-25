@@ -112,15 +112,12 @@ object ProjectHelper extends PlayCache {
 
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
     val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
-<<<<<<< HEAD
-=======
     //增加项目依赖初始关系
     TemplateHelper.findById(project.templateId) match {
       case Some(template) =>
         ProjectDependencyHelper.insertWithSeq(template.dependentProjectIds.map(x => ProjectDependency(None, pid, x)))
       case None => // ignore
     }
-
     //修改缓存
     ActorUtils.configuarActor ! UpdateProject(pid, project.name)
     pid
