@@ -2,7 +2,7 @@ package actor.task
 
 import java.io.File
 
-import akka.actor.{Actor, ActorLogging, Cancellable}
+import akka.actor._
 import com.qianmi.bugatti.actors.TimeOut
 import enums.TaskEnum
 import models.conf.{Conf, ConfContent, ConfContentHelper, ConfHelper}
@@ -29,10 +29,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   var _lastReplaceKey = ""
 
   override def preStart(): Unit = {
+    log.info(s"preStart is invoked!")
     timeOutSchedule = context.system.scheduler.scheduleOnce(TimeOutSeconds, self, TimeOut)
   }
 
   override def postStop(): Unit = {
+    log.info(s"postStop is invoked!")
     if (timeOutSchedule != null) {
       timeOutSchedule.cancel()
     }
@@ -97,7 +99,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       Process(Seq("tar", "zcf", s"../${fileName}.tar.gz", "."), baseFilesPath).!!
 
       Process(Seq("md5sum", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
-//      Process(Seq("md5", s"${fileName}.tar.gz"), baseDirPath) #> new File(s"${baseDirPath}/${fileName}.tar.gz.md5") !
 
       Seq("rm", "-r", s"${baseDir}/files").!!
 
@@ -110,7 +111,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     }
 
     case TimeOut => {
-      sender ! TimeoutReplace(_lastReplaceKey)
+      context.parent ! TimeoutReplace(_lastReplaceKey)
       context.stop(self)
     }
 
