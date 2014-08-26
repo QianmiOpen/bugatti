@@ -47,7 +47,6 @@ define(['angular'], function(angular){
                 $scope.totalItems = data;
             });
             LogsService.search(angular.toJson(paramLogs), start, $scope.pageSize, function(data) {
-                console.log('data='+data);
                 $scope.data = data;
             });
         };

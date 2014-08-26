@@ -14,7 +14,7 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
  */
 case class Conf(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: String, path: String, fileType: Option[String], remark: Option[String], updated: DateTime)
 case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int, jobNo: String, name: Option[String], path: String, fileType: Option[String], content: String, remark: Option[String], updated: DateTime) {
-  def _name = name.map(_.toString).getOrElse(path.substring(path.lastIndexOf("/") + 1))
+  def _name = path.substring(path.lastIndexOf("/") + 1)
   def toConf = Conf(id, envId, projectId, versionId, jobNo, _name, path, Some(path.substring(path.lastIndexOf(".") + 1)), remark, updated)
   // windows = \r\n | \n\r
   // linux, unix = \n
