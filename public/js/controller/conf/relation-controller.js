@@ -174,7 +174,7 @@ define(['angular'], function(angular) {
                 var find = '';
                 angular.forEach(vars, function(_v, index) {
                     if (_v.name == v.name) {
-                        find = v.value;
+                        find = _v.value;
                         return;
                     }
                 });
