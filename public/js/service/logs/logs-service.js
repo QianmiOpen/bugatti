@@ -5,8 +5,8 @@ define(['angular'], function(angular){
 
     app.factory('LogsService', function($http) {
         return {
-            search: function(logs, callback) {
-                $http.post(PlayRoutes.controllers.logs.LogsController.search().url, logs).success(callback);
+            search: function(logs, page, pageSize, callback) {
+                $http.post(PlayRoutes.controllers.logs.LogsController.search(page, pageSize).url, logs).success(callback);
             },
             count: function(logs, callback) {
                 $http.post(PlayRoutes.controllers.logs.LogsController.count().url, logs).success(callback);

@@ -30,11 +30,11 @@ object LogsController extends BaseController {
     )(Logs.apply)(Logs.unapply)
   )
 
-  def search = Action { implicit request =>
+  def search(page: Int, pageSize: Int) = Action { implicit request =>
     logsForm.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
       logs => {
-        Ok(Json.toJson(LogsHelper.searchLogs(logs)))
+        Ok(Json.toJson(LogsHelper.searchLogs(logs, page, pageSize)))
       }
     )
   }

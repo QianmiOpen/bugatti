@@ -13,25 +13,26 @@ object LogsHelper {
 
   import models.AppDB._
 
-  def searchLogs(logs: Logs): Seq[(Int, String, String)] = db withSession { implicit session =>
+  def searchLogs(logs: Logs, page: Int, pageSize: Int): Seq[(Int, String, String)] = db withSession { implicit session =>
+    val offset = pageSize * page
     val select = "select event_id, timestmp, formatted_message from logging_event "
     val and = " and timestmp > ? and timestmp < ? order by event_id desc"
     (logs.jobNo, logs.mode) match {
       case (Some(jobNo), Some(mode)) =>
         val sql = Q[(String, String, String), (Int, String, String)] +
-          select + """where formatted_message like ?""" + and
+          select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}"
         sql.list(s"""{"mod":"${mode}","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
       case (Some(jobNo), None) =>
         val sql = Q[(String, String, String), (Int, String, String)] +
-          select + """where formatted_message like ?""" + and
+          select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}"
         sql.list(s"""{"mod":"%","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
       case (None, Some(mode)) =>
         val sql = Q[(String, String, String), (Int, String, String)] +
-          select + """where formatted_message like ?""" + and
+          select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}"
         sql.list(s"""{"mod":"${mode}","user":"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
       case (None, None) =>
         val sql = Q[(String, String), (Int, String, String)] +
-          select + and.replaceFirst("and", "where")
+          select + and.replaceFirst("and", "where") + s" limit ${offset}, ${pageSize}"
         sql.list(logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
     }
   }
