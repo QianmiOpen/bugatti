@@ -2,5 +2,5 @@
     <pre>当前页: {{currentPage}} / {{numPages}}，共 {{totalItems}} 条记录。</pre>
 </div>
 <div class="text-center">
-    <pagination boundary-links="true" ng-change="setPage(currentPage)" items-per-page="pageSize" total-items="totalItems" ng-model="currentPage" num-pages="numPages" class="pagination m0" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    <pagination boundary-links="true" ng-change="setPage(currentPage)" items-per-page="pageSize" total-items="totalItems" ng-model="currentPage" max-size="10" num-pages="numPages" class="pagination m0" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 </div>

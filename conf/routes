@@ -127,7 +127,7 @@ GET           /task/log/:taskId                                   controllers.ta
 GET           /task/logHeader                                     controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)
 
 # Logs(user action)
-POST          /logs                                               controllers.logs.LogsController.search
+POST          /logs                                               controllers.logs.LogsController.search(page: Int ?=0, pageSize: Int ?=10)
 POST          /logs/total                                         controllers.logs.LogsController.count
 
 # Open API

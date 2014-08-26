@@ -4,6 +4,9 @@ define(['angular'], function(angular){
     var app = angular.module('bugattiApp.controller.logs.logsModule', []);
 
     app.controller('LogsCtrl', ['$scope', '$filter', '$modal', 'LogsService', function($scope, $filter, $modal, LogsService){
+        $scope.currentPage = 1;
+        $scope.pageSize = 20;
+
         var date = new Date();
         $scope.logs = {
             startTime: $filter('date')(date.setYear(date.getFullYear() - 1), 'yyyy-MM-dd'),
@@ -35,15 +38,22 @@ define(['angular'], function(angular){
             {'key': '项目版本模块', 'val':'version'}
         ];
 
-        $scope.submit = function() {
+        $scope.submit = function(pageNo) {
             var paramLogs = angular.copy($scope.logs)
             paramLogs.startTime = paramLogs.startTime + ' 00:00:00'
             paramLogs.endTime = paramLogs.endTime + ' 23:59:59'
-            LogsService.search(angular.toJson(paramLogs), function(data) {
+            var start = angular.isUndefined(pageNo) ? 0 : pageNo - 1;
+            LogsService.count(angular.toJson(paramLogs), function(data) {
+                $scope.totalItems = data;
+            });
+            LogsService.search(angular.toJson(paramLogs), start, $scope.pageSize, function(data) {
                 $scope.data = data;
             });
         };
 
+        $scope.setPage = function (pageNo) {
+            $scope.submit(pageNo);
+        }
 
     }]);
 

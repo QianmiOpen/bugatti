@@ -39,6 +39,8 @@
         <tr>
             <td>
                 <div class="text-right">
+                    <button type="button" class="btn btn-link" back-button>取消</button>
+                    &nbsp;&nbsp;
                     <button class="btn btn-success col-sm-2 navbar-right" ng-click="update()" ng-disabled="form.$invalid"> 修改文件 </button>
                     <div ng-show="form.path.$dirty && form.path.$invalid" class="has-error col-sm-8 navbar-right">
                         <span ng-show="form.path.$error.required" class="control-label">请输入文件（路径）名称</span>

@@ -38,7 +38,7 @@ define(['angular'], function(angular) {
 
         // page
         $scope.setPage = function (pageNo) {
-            ProjectService.getPage($scope.my, pageNo - 1, $scope.pageSize, function(data) {
+            ProjectService.getPage($scope.s_projectName, $scope.my, pageNo - 1, $scope.pageSize, function(data) {
                 $scope.projects = data;
             });
         };
