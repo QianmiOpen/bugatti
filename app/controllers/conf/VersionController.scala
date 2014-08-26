@@ -38,8 +38,8 @@ object VersionController extends BaseController {
 
   def nexusVersions(projectId: Int) = Action {
     // 1、根据projectId获取项目attribute中的groupId、artifactId
-    val groupId = AttributeHelper.getValue(projectId, "groupId").map(_.replaceAll("\\.", "/"))
-    val artifactId = AttributeHelper.getValue(projectId, "artifactId")
+    val groupId = AttributeHelper.getValue(projectId, "t_groupId").map(_.replaceAll("\\.", "/"))
+    val artifactId = AttributeHelper.getValue(projectId, "t_artifactId")
     Logger.info(s"groupId: ${groupId}, artifactId: ${artifactId}")
     // 2、查询release、snapshot版本
     val result = (groupId, artifactId) match {

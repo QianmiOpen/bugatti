@@ -166,9 +166,9 @@ object AppTestData {
     AppDB.db.withSession { implicit session =>
       // 初始化“cardbase-master”的attribute
       AttributeHelper._create(Seq(
-        Attribute(None, Option(1), "groupId", Option("com.ofpay")),
-        Attribute(None, Option(1), "artifactId", Option("cardserverimpl")),
-        Attribute(None, Option(1), "unpacked", Option("false"))
+        Attribute(None, Option(1), "t_groupId", Option("com.ofpay")),
+        Attribute(None, Option(1), "t_artifactId", Option("cardserverimpl")),
+        Attribute(None, Option(1), "t_unpacked", Option("false"))
       ))
     }
 
