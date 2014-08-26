@@ -31,16 +31,6 @@
     </div>
 
     <div class="form-group">
-        <label for="nfServer" class="col-sm-3 control-label">nfs服务：</label>
-        <div class="col-sm-5">
-            <input type="text" class="form-control" ng-model="env.nfServer" name="nfServer" id="nfServer" ng-maxlength="30" placeholder="选填，nfs server ip 地址">
-        </div>
-        <div ng-show="form.nfServer.$dirty && form.nfServer.$invalid" class="has-error">
-            <span ng-show="form.nfServer.$error.maxlength" class="control-label">超过长度</span>
-        </div>
-    </div>
-
-    <div class="form-group">
         <label for="ipRange" class="col-sm-3 control-label">ip范围：</label>
         <div class="col-sm-5">
             <input type="text" class="form-control" ng-model="env.ipRange" name="ipRange" id="ipRange" ng-maxlength="300" required
