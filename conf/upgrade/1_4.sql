@@ -42,3 +42,5 @@ ALTER TABLE `task_template` ADD COLUMN `action_type` ENUM('project', 'host') NOT
 ALTER TABLE `environment_project_rel` ADD COLUMN `global_variable` TEXT NOT NULL COMMENT '机器变量';
 
 ALTER TABLE `template` ADD COLUMN `dependent_project` VARCHAR(254) NOT NULL DEFAULT '' COMMENT '模板依赖项目id列表';
+
+ALTER TABLE `attribute` ADD UNIQUE `idx_name` USING BTREE (`project_id`, `name`);

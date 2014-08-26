@@ -18,6 +18,8 @@ class AttributeTable(tag: Tag) extends Table[Attribute](tag, "attribute") {
 
   override def * = (id.?, projectId.?, name, value.?) <> (Attribute.tupled, Attribute.unapply _)
   def idx = index("idx_pid", projectId)
+  def idx_name = index("idx_name", (projectId, name), unique = true)
+
 }
 
 object AttributeHelper {

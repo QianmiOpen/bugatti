@@ -147,7 +147,8 @@ class ScriptGitActor extends Actor with ActorLogging {
     if (projectNames == null) {
       Seq.empty
     } else {
-      projectNames.trim.split(",").map(p => ProjectHelper.findByName(p.trim)).map(_.get.id.get)
+      projectNames.trim.split(",").filter(_.nonEmpty)
+        .map(p => ProjectHelper.findByName(p.trim)).filter(_.nonEmpty).map(_.get.id.get)
     }
   }
 

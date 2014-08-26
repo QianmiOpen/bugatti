@@ -3,6 +3,8 @@ import java.io.File
 import java.util.Scanner
 import actor.git.ScriptGitActor.ReloadFormulasTemplate
 import actor.conf.ConfigureActor
+import play.api.mvc.RequestHeader
+import play.api.mvc.Results._
 import utils.ControlUtil._
 
 import actor.ActorUtils
@@ -21,6 +23,7 @@ import play.api._
 import play.api.libs.Files
 import utils.Directory._
 
+import scala.concurrent.Future
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
 
@@ -28,6 +31,11 @@ import scala.slick.jdbc.meta.MTable
  * 环境配置
  */
 object Global extends GlobalSettings {
+
+  override def onError(request: RequestHeader, ex: Throwable) = ex.getCause match {
+    case _: NoSuchElementException  => Future.successful(BadRequest("Bad Request: " + ""))
+    case _ => super.onError(request, ex)
+  }
 
   override def beforeStart(app: Application) {
     System.setProperty("javax.net.ssl.trustStore", app.configuration.getString("ssl.trustStore").getOrElse("conf/certificate.jks"))
@@ -166,9 +174,9 @@ object AppTestData {
     AppDB.db.withSession { implicit session =>
       // 初始化“cardbase-master”的attribute
       AttributeHelper._create(Seq(
-        Attribute(None, Option(1), "groupId", Option("com.ofpay")),
-        Attribute(None, Option(1), "artifactId", Option("cardserverimpl")),
-        Attribute(None, Option(1), "unpacked", Option("false"))
+        Attribute(None, Option(1), "t_groupId", Option("com.ofpay")),
+        Attribute(None, Option(1), "t_artifactId", Option("cardserverimpl")),
+        Attribute(None, Option(1), "t_unpacked", Option("false"))
       ))
     }
 
@@ -234,7 +242,7 @@ object AutoUpdate {
         using(session.createStatement()){ stat =>
           while (sc.hasNext) {
             val sql = sc.next
-            if (!sql.replaceAll("""\s""", "").isEmpty) {
+            if (sql.replaceAll("""\s""", "").nonEmpty) {
               Logger.debug(sqlPath + "=" + sql)
               stat.executeUpdate(sql)
             }
