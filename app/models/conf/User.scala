@@ -60,7 +60,7 @@ object UserHelper extends PlayCache {
   }
 
   def create(user: User, permission: Permission) = db withTransaction { implicit session =>
-    _create(user.copy(jobNo = user.jobNo.toLowerCase)) + PermissionHelper._create(permission)
+    _create(user) + PermissionHelper._create(permission)
   }
 
   def _create(user: User)(implicit session: JdbcBackend#Session) = {

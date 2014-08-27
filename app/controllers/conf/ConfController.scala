@@ -203,7 +203,7 @@ object ConfController extends BaseController {
             val content = ConfContentHelper.findById(c.id.get)
             ConfHelper.create(c.copy(id = None, envId = copyForm.envId, versionId = copyForm.versionId), content)
           }
-          val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.remoteAddress,
+          val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.user.jobNo,
             "ip" -> request.remoteAddress, "msg" -> "一键拷贝", "data" -> Json.toJson(copyForm)).toString
           ALogger.info(_msg)
           Ok(Json.obj("r" -> "ok"))
