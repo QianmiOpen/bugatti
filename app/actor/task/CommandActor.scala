@@ -98,7 +98,8 @@ class CommandActor extends Actor with ActorLogging {
                 (Seq("echo", Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n")) #>> file lines)
                 //2、判断是否成功
                 val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
-                if (!seqResult.contains(false)) {
+                val exeResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "success").map(js => js.as[Boolean])
+                if (!seqResult.contains(false) && !exeResult.contains(false)) {
                   //命令执行成功
                   //3、调用commandActor
                   (Seq("echo", "命令执行成功") #>> file lines)
