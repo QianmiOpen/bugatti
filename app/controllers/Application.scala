@@ -56,7 +56,7 @@ object Application extends ScalaController with Security {
               Forbidden(html.template.ldap_callback_forbidden.render(siteDomain))
           }
         case _ =>
-          val user = User(jobNo = profile.getId, name = profile.getAttributes.get("displayName").toString,
+          val user = User(jobNo = profile.getId.toLowerCase, name = profile.getAttributes.get("displayName").toString,
             RoleEnum.user, superAdmin = false, locked = false, lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now))
           val permission = Permission(jobNo = user.jobNo, List(FuncEnum.task))
           UserHelper.create(user, permission)

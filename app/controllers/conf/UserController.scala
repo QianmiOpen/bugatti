@@ -78,7 +78,7 @@ object UserController extends BaseController {
             else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
             else {
               ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", toUser))
-              Ok(Json.obj("r" -> UserHelper.create(toUser, userForm.toPermission)))
+              Ok(Json.obj("r" -> UserHelper.create(toUser.copy(jobNo = toUser.jobNo.toLowerCase), userForm.toPermission)))
             }
         }
       }
