@@ -117,7 +117,7 @@ object TaskTools {
     val project = findProject(envId, projectId, env.realVersion)
     val alias = findAlias(project.templateId.toInt, env.realVersion)
     val d = findDependencies_v(envId, projectId, env.realVersion)
-    new ProjectTask_v(project, alias, d, env, s"$taskId", version, s"${getFileName()}", None)
+    new ProjectTask_v(project, alias, d, env, s"$taskId", version, s"${getFileName()}", None, ConfHelp.system)
   }
 
   def generateCurrent(machine: String, task: ProjectTask_v): Host_v = {
@@ -150,6 +150,12 @@ object ConfHelp {
   lazy val logPath = app.configuration.getString("salt.log.dir").getOrElse("target/saltlogs")
 
   lazy val confPath: String = app.configuration.getString("salt.file.pkgs").getOrElse("target/pkgs")
+
+  lazy val system: Map[String, String] = {
+    app.configuration.keys.filter(_.startsWith("bugatti.system.")).map { key =>
+      key.replace("bugatti.system.", "") -> app.configuration.getString(key).getOrElse("")
+    }.toMap
+  }
 }
 
 case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]])
@@ -162,9 +168,9 @@ case class Version_v(id: String, name: String)
 
 case class ProjectTask_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]],
                          alias: Map[String, String], dependence: Map[String, Project_v], env: Environment_v,
-                         taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v]) {
+                         taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String]) {
   def this(project: Project_v, alias: Map[String, String], dependence: Map[String, Project_v], env: Environment_v,
-           taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v]) =
+           taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String]) =
     this(project.id, project.templateId, project.name, project.hosts, project.attrs,
-      alias, dependence, env, taskId, version, confFileName, cHost)
+      alias, dependence, env, taskId, version, confFileName, cHost, system)
 }
