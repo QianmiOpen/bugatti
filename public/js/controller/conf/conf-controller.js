@@ -36,68 +36,7 @@ define(['angular'], function(angular) {
                 $scope.env = e;
             };
 
-            // ----------------------------------------------------
-            // 一键拷贝
-            // ----------------------------------------------------
-
-            VersionService.top($stateParams.id, function(data) {
-                $scope.versions = data;
-            });
-
-            $scope.openModal = function(curr_eid, curr_vid) {
-                var modalInstance = $modal.open({
-                    templateUrl: 'modalCopy.html',
-                    windowClass: 'modal-copy',
-                    controller: ModalInstanceCtrl,
-                    resolve: {
-                        envs: function () {
-                            return $scope.envs;
-                        },
-                        versions : function() {
-                            return $scope.versions;
-                        },
-                        curr_eid: function () {
-                            return curr_eid;
-                        },
-                        curr_vid: function() {
-                            return curr_vid;
-                        }
-                    }
-                });
-
-                modalInstance.result.then(function (param) {
-                    param.projectId = $stateParams.id;
-                    var thisEid = param.envId;
-                    ConfService.copy(angular.toJson(param), function(data) {
-                        if (data.r === 'ok') {
-                            $state.go('conf.project.version.conf.list', {eid: thisEid}, {reload: true})
-                        }
-                    });
-                }, function () {
-                    console.info('Modal dismissed at: ' + new Date());
-                });
-
-            }
     }]);
-
-    // 一键拷贝弹出框
-    var ModalInstanceCtrl = function ($scope, $modalInstance, envs, versions, curr_eid, curr_vid) {
-        $scope.envs = envs;
-        if ($scope.envs.length) $scope.env = $scope.envs[0].id;
-
-        $scope.versions = versions;
-        if ($scope.versions.length) $scope.version = $scope.versions[0].id;
-
-        $scope.override = false;
-
-        $scope.ok = function (selEnv, selVer, selOver) {
-            $modalInstance.close({target_eid: selEnv, target_vid: selVer, envId: curr_eid, versionId: curr_vid, ovr: selOver});
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    };
 
     app.controller('ConfListCtrl', ['$scope', '$state', '$stateParams', '$modal',
         'ConfService',
@@ -246,6 +185,37 @@ define(['angular'], function(angular) {
                     }
                 };
                 langTools.addCompleter(codeCompleter);
+            };
+    }]);
+
+    // ----------------------------------------------------
+    // 一键拷贝
+    // ----------------------------------------------------
+    app.controller('ConfCopyCtrl', ['$scope', '$state', '$filter', '$stateParams', 'ConfService', 'VersionService',
+        function($scope, $state, $filter, $stateParams, ConfService, VersionService) {
+
+            $scope.copyParam = {projectId: $stateParams.id, target_eid: null, target_vid: null, envId: $stateParams.eid, versionId: $stateParams.vid, ovr: false};
+
+            VersionService.top($stateParams.id, function(data) {
+                $scope.versions = data;
+
+                // default current version
+                var find = false;
+                angular.forEach($scope.versions, function(v) {
+                    if (!find && v.id == $scope.copyParam.versionId) {
+                        $scope.copyParam.target_vid = v.id;
+                        find = true;
+                        return;
+                    }
+                });
+            });
+
+            $scope.ok = function (param) {
+                ConfService.copy(angular.toJson(param), function(data) {
+                    if (data.r === 'ok') {
+                        $state.go('conf.project.version.conf.list', {eid: param.envId}, {reload: true})
+                    }
+                });
             };
     }]);
 
