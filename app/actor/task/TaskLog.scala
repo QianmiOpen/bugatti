@@ -144,7 +144,7 @@ class TaskLog extends Actor with ActorLogging{
     case rh: ReadHeader => {
       val file = new File(_path)
       if(_logHeadStr.length == 0){
-        _logHeadStr = _reader.reader(file, 0, rh.byteSize)._1
+        _logHeadStr = _reader.reader(file, 0L, rh.byteSize.toLong)._1
       }
       context.parent ! NotifyAll("logHeader", rh.taskId, _logHeadStr)
     }

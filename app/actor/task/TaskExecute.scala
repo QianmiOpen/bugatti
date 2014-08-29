@@ -137,14 +137,42 @@ class TaskExecute extends Actor with ActorLogging {
     }
 
     case removeTaskQueue: RemoveTaskQueue => {
+      val key = s"${_envId}_${_projectId}"
+      context.child(s"commandActor_${key}") match {
+        case Some(actor) => {
+          context.stop(actor)
+        }
+        case _ =>
+      }
       TaskQueueHelper.deleteById(_tqId)
       //没有任务，删除MyActor中的缓存
       MyActor.superviseTaskActor ! RemoveStatus(_envId, _projectId)
     }
+
+    case tc: TerminateCommands => {
+      TaskHelper.changeStatus(_taskId, tc.status)
+      val (task, version) = getTask_VS(_taskId)
+      MyActor.superviseTaskActor ! ChangeOverStatus(_envId, _projectId, tc.status, task.endTime.get, version)
+
+    }
+
   }
 
   def generateTaskCommand(sls: TaskTemplateStep, taskId: Int): TaskCommand = {
     TaskCommand(None, taskId, sls.sls, "machine", sls.name, TaskEnum.TaskWait, sls.orderNum)
+  }
+
+  def getTask_VS(taskId: Int): (Task, String) = {
+    //TODO refactor
+    val task = TaskHelper.findById(taskId)
+    var version = ""
+    task.versionId match {
+      case Some(vid) => {
+        version = VersionHelper.findById(vid).get.vs
+      }
+      case _ =>
+    }
+    (task, version)
   }
 
   /**

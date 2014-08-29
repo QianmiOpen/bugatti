@@ -160,7 +160,7 @@ class CommandActor extends Actor with ActorLogging {
     MyActor.superviseTaskActor ! ChangeOverStatus(_envId, _projectId, status, task.endTime.get, version)
 
     closeLookup
-    closeSelf
+//    closeSelf
   }
 
   def closeLookup = {
@@ -239,7 +239,7 @@ class CommandActor extends Actor with ActorLogging {
 
       val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
       log.info(s"remotePath ==> ${remotePath}")
-      val lookupActor = context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${order}")
+      val lookupActor = context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${_taskId}_${order}")
       //3、触发远程命令
       import context._
       context.system.scheduler.scheduleOnce(1.second) {

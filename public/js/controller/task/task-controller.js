@@ -352,7 +352,11 @@ define(['angular'], function(angular) {
             $state.go('.log', {taskId: taskId})
         }
 
-
+//=====================================终止任务========================================
+        $scope.forceTerminate = function(pid){
+            console.log(pid)
+            TaskService.forceTerminate($scope.activeEnv, pid, function(data){})
+        }
     }]);
 
     app.controller('TaskLogCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
