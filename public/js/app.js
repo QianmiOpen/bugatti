@@ -16,7 +16,7 @@ requirejs.config({
     }
 });
 
-require(['angular', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
+require(['angular', 'jquery', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
         'angular-ui-router', 'angular-animate',
         'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
         'angular-ui-tree', 'ext-language-tools',

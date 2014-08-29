@@ -47,6 +47,16 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('conf.project.version.conf.copy', {
+            url: "/copy",
+            views: {
+                "conf-info@conf.project.version.conf": {
+                    templateUrl: "partials/conf/project/uiview/conf-copy.html",
+                    controller: 'ConfCopyCtrl'
+                }
+            }
+        });
+
         $stateProvider.state('conf.project.version.conf.detail', {
             url: "/:cid",
             views: {

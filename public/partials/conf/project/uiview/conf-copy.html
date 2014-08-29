@@ -1,0 +1,48 @@
+
+<form name="form" class="form-horizontal" novalidate>
+    <div class="form-group">
+        <label for="selectVersion" class="col-sm-2 control-label">版本选择：</label>
+        <div class="col-sm-5">
+            <select id="selectVersion" class="form-control" ng-model="copyParam.target_vid" ng-options="v.id as v.vs for v in versions" required></select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">环境选择：</label>
+        <div class="col-sm-5">
+            <label class="radio-inline" ng-repeat="e in envs">
+                <input type="radio" name="env" ng-model="copyParam.target_eid" value="{{e.id}}" required>
+                {{e.name}}
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-5">
+            <div class="checkbox">
+                <label>
+                    <input ng-model="copyParam.ovr" type="checkbox"> 存在覆盖
+                    <sup class="btn-info" href="" tooltip-placement="right" tooltip="拷贝方式，存在相同文件路径名则替换!">?</sup>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group has-error">
+        <div class="col-sm-7 text-center">
+            <label class="control-label">
+                警告：将以此方式拷贝所有文件至当前环境
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-5">
+            <button class="btn btn-success" ng-click="ok(copyParam)" ng-disabled="form.$invalid">确认</button>
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-link" back-button>取消</button>
+        </div>
+    </div>
+
+</form>
+
