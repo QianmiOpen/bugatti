@@ -26,6 +26,9 @@ define(['angular'], function(angular) {
             },
             readHeader: function(taskId, byteSize, callback){
                 $http(PlayRoutes.controllers.task.TaskController.taskLogFirst(taskId, byteSize)).success(callback)
+            },
+            forceTerminate: function(envId, projectId, callback){
+                $http(PlayRoutes.controllers.task.TaskController.forceTerminate(envId, projectId)).success(callback)
             }
         }
     });

@@ -74,6 +74,11 @@ object MyActor {
       }
     }
   }
+
+  def forceTerminate(envId: Int, projectId: Int): Unit ={
+    superviseTaskActor ! ForceTerminate(envId, projectId)
+  }
+
   //在global被初始化
   def generateSchedule() = {
     new WSSchedule().start(socketActor, "notify")
@@ -156,9 +161,18 @@ class MyActor extends Actor with ActorLogging {
       ) ! RemoveTaskQueue()
 
     }
+
+    case ForceTerminate(envId, projectId) => {
+      val key = s"${envId}_${projectId}"
+      context.child(s"taskExecute_${key}").getOrElse(
+        actorOf(Props[TaskExecute], s"taskExecute_${key}")
+      ) ! TerminateCommands(TaskEnum.TaskFailed)
+    }
+
     case RemoveStatus(envId, projectId) => {
       removeStatus(envId, projectId)
     }
+
     case RefreshSyndic() => {
       refreshSyndic()
     }
@@ -234,6 +248,8 @@ case class ChangeOverStatus(envId: Int, projectId: Int, taskStatus: TaskStatus, 
 case class RemoveStatus(envId: Int, projectId: Int)
 case class FindLastStatus(key: String)
 case class RefreshSyndic()
+
+case class ForceTerminate(envId: Int, projectId: Int)
 
 class WSSchedule{
   def start(socketActor: ActorRef, notify: String): Cancellable = {

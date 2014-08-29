@@ -14,7 +14,7 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
 
   engine.eval(s"var __t__ = ${Json.toJson(projectTask).toString}")
 
-  println(engine.eval("JSON.stringify(__t__)"))
+  Logger.debug(s"${engine.eval("JSON.stringify(__t__)")}")
   engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
   engine.eval("var alias = {};")
 

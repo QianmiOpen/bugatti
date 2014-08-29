@@ -1,5 +1,6 @@
 package controllers.task
 
+import actor.ActorUtils
 import actor.task.{TaskLog, MyActor}
 import controllers.BaseController
 import enums.TaskEnum
@@ -222,6 +223,11 @@ object TaskController extends BaseController {
   def taskLogFirst(taskId: Int, byteSize: Int) = Action {
     Logger.info("taskId:"+taskId+",byteSize:"+byteSize)
     TaskLog.readHeader(taskId, byteSize)
+    Ok
+  }
+
+  def forceTerminate(envId: Int, projectId: Int) = Action {
+    MyActor.forceTerminate(envId, projectId)
     Ok
   }
 
