@@ -42,7 +42,7 @@ class TaskExecute extends Actor with ActorLogging {
       taskQueue match {
         case Some(tq) => {
           _tqId = tq.id.get
-          _tqExecute = taskQueue.get
+          _tqExecute = tq
           //1、获取任务名称
           _taskName = TaskTemplateHelper.findById(_tqExecute.taskTemplateId).name
           //2、insert 任务表
@@ -77,6 +77,8 @@ class TaskExecute extends Actor with ActorLogging {
           //3、生成命令列表
           _templateStep = TaskTemplateStepHelper.findStepsByTemplateId(_tqExecute.taskTemplateId)
           _totalNum = _hosts.length * _templateStep.length
+          _hostsIndex = 0
+          _commandList = Seq.empty[TaskCommand]
           self ! GenerateCommands()
           MyActor.superviseTaskActor ! ChangeTaskStatus(_tqExecute, _taskName, _queuesJson, 0, _totalNum)
         }
@@ -98,6 +100,8 @@ class TaskExecute extends Actor with ActorLogging {
       if(_hostsIndex <= _hosts.length-1 && _json.keys.size == 0){
         val cluster = _hosts(_hostsIndex).name
         val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${_envId}_${_projectId}_${cluster}")
+        log.info(s"TaskExecute.gcc.templateStep ==> ${_templateStep}")
+        log.info(s"TaskExecute.gcc.taskId ==> ${_taskId}")
         clusterActor ! GenerateClusterCommands(_taskId, _taskObj, _templateStep, cluster)
         _hostsIndex = _hostsIndex + 1
       }else {
@@ -109,6 +113,7 @@ class TaskExecute extends Actor with ActorLogging {
 
     case successReplace: SuccessReplaceCommand => {
       _commandList = _commandList ++ successReplace.commandList
+      log.info(s"successReplace ==> ${_commandList}")
       self ! GenerateCommands()
     }
 

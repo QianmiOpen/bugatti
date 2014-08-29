@@ -13,6 +13,8 @@ import utils.{ProjectTask_v, ConfHelp}
 
 import scala.concurrent.duration._
 import scala.sys.process._
+import scalax.file.Path
+import scalax.io.StandardOpenOption._
 
 /**
  * Created by jinwei on 14/7/14.
@@ -76,7 +78,7 @@ class CommandActor extends Actor with ActorLogging {
     case sr: SaltResult => {
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
-      log.info(s"result ==> ${srResult}")
+      log.debug(s"result.size ==> ${srResult.size}")
       val jsonResult = Json.parse(srResult)
       jsonResult.validate[Seq[JsObject]] match {
         case s: JsSuccess[Seq[JsObject]] => {
@@ -93,9 +95,11 @@ class CommandActor extends Actor with ActorLogging {
                   logDir.mkdirs()
                 }
                 val file = new File(resultLogPath)
-                (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
-                (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n") #>> file lines)
-                (Seq("echo", Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n")) #>> file lines)
+                implicit val codec = scalax.io.Codec.UTF8
+                val f = Path(file).outputStream(WriteAppend: _*)
+                f.write(s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}")
+                //                (Seq("echo", s"command: ${_commandSeq.mkString(" ")} 执行时间：${executeTime} ms\n") #>> file lines)
+                //                (Seq("echo", Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n")) #>> file lines)
                 //2、判断是否成功
                 val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
                 val exeResult: Seq[Boolean] = (jResult \ "result" \\ "success").map(js => js.as[Boolean])
@@ -109,6 +113,7 @@ class CommandActor extends Actor with ActorLogging {
                   (Seq("echo", "命令执行失败") #>> file lines)
                   self ! TerminateCommands(TaskEnum.TaskFailed)
                 }
+                (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
               }
               case _ => {
                 //如果不是state.sls 则直接返回成功
