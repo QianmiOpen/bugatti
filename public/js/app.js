@@ -24,7 +24,7 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
     function(angular) {
 
         // Declare app level module which depends on filters, and services
-        angular.module('bugattiApp', [
+        var module = angular.module('bugattiApp', [
             'ui.router',
             'ui.ace',
             'ui.bootstrap',
@@ -37,7 +37,9 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
             'bugattiApp.directives',
             'bugattiApp.services',
             'bugattiApp.controllers'
-            ]).run(['$rootScope', '$state', '$stateParams', 'Auth', function($rootScope,   $state,   $stateParams, Auth) {
+            ]);
+
+        module.run(['$rootScope', '$state', '$stateParams', 'Auth', function($rootScope,   $state,   $stateParams, Auth) {
                 $rootScope.$state = $state;
                 $rootScope.$stateParams = $stateParams;
 
@@ -61,6 +63,29 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
                 });
 
             }]);
+
+        module.config(["$httpProvider", function($httpProvider) {
+            var interceptor = ["$rootScope", "$q", "$timeout", function($rootScope, $q, $timeout) {
+                return function(promise) {
+                    return promise.then(
+                        function(response) {
+                            return response;
+                        },
+                        function(response) { // error
+                            if (response.status == 400) {
+                                alert('参数错误');
+                            } else if (response.status == 404) {
+                                alert('项目不存在');
+                            } else if (response.status == 409) {
+                                alert('项目已存在');
+                            }
+                            return $q.reject(response);
+                        }
+                    );
+                };
+            }];
+            $httpProvider.responseInterceptors.push(interceptor);
+        }]);
 
         angular.bootstrap(document, ['bugattiApp']);
 

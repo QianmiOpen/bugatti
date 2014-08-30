@@ -23,7 +23,7 @@ define(['angular'], function(angular){
                 }
             });
             modalInstance.result.then(function(state) {
-                if (state !== '0') {
+                if (state.r === 'ok') {
                     $scope.areas.splice(index, 1);
                 }
             });
@@ -44,8 +44,8 @@ define(['angular'], function(angular){
                 }
             });
             modalInstance.result.then(function(state) {
-                if (state.r !== '0') {
-                    $scope.areas[index] = state.r;
+                if (state.r === 'ok') {
+                    $scope.areas[index] = state.msg;
                 }
             });
         }
@@ -55,9 +55,9 @@ define(['angular'], function(angular){
         $scope.area = {}
         $scope.saveOrUpdate = function(area) {
             AreaService.save(angular.toJson(area), function(data) {
-               if (data.r > 0) {
+               if (data.r === 'ok') {
                    $state.go("^");
-               } else if (data.r == 'exist') {
+               } else if (data.r === 'exist') {
                    $scope.form.name.$invalid = true;
                    $scope.form.name.$error.exists = true;
                }
@@ -69,9 +69,9 @@ define(['angular'], function(angular){
         $scope.saveOrUpdate = function(area) {
             area.id = $stateParams.id;
             AreaService.update(angular.toJson(area), function(data) {
-                if (data.r === 1) {
+                if (data.r === 'ok') {
                     $state.go('^');
-                } else if (data.r == 'exist') {
+                } else if (data.r === 'exist') {
                     $scope.form.name.$invalid = true;
                     $scope.form.name.$error.exists = true;
                 }

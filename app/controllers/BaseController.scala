@@ -41,4 +41,23 @@ trait BaseController extends Controller with Security {
     PermissionHelper.findByJobNo(jobNo) map { p => p.functions.exists(_ == func) }
   }
 
+
+  // 页面返回
+
+  def resultSuccess(data: play.api.libs.json.JsValue): play.api.libs.json.JsObject = {
+    play.api.libs.json.Json.obj("r" -> "ok", "msg" -> data)
+  }
+
+  def resultFail(message: play.api.libs.json.JsValue): play.api.libs.json.JsObject = {
+    play.api.libs.json.Json.obj("r" -> "error", "msg" -> message)
+  }
+
+  def resultExists(): play.api.libs.json.JsObject = {
+    play.api.libs.json.Json.obj("r" -> "exist")
+  }
+
+  def resultNone(): play.api.libs.json.JsObject = {
+    play.api.libs.json.Json.obj("r" -> "none")
+  }
+
 }

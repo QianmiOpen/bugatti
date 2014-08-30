@@ -41,28 +41,27 @@ object AreaController extends BaseController {
 
   def save = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(resultFail(formWithErrors.errorsAsJson)),
       area =>
         AreaHelper.findByName(area.name) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
+          case Some(_) => Ok(resultExists)
           case None =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增区域", area))
             val areaId = AreaHelper.create(area)
             val newArea = area.copy(id = Option(areaId))
             ActorUtils.areas ! AddArea(newArea)
-            Ok(Json.obj("r" -> Json.toJson(areaId)))
+            Ok(resultSuccess(Json.toJson(areaId)))
         }
     )
   }
 
   def update = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(resultFail(formWithErrors.errorsAsJson)),
       area => {
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改区域", area))
         ActorUtils.areas ! UpdateArea(area)
-        Ok(Json.obj("r" -> Json.toJson(AreaHelper.update(area))))
+        Ok(resultSuccess(Json.toJson(AreaHelper.update(area))))
       }
     )
   }
@@ -72,9 +71,8 @@ object AreaController extends BaseController {
       case Some(area) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除区域", area))
         ActorUtils.areas ! DeleteArea(id)
-        Ok(Json.obj("r" -> Json.toJson(AreaHelper.delete(id))))
-      case None =>
-        NotFound
+        Ok(resultSuccess(Json.toJson(AreaHelper.delete(id))))
+      case None => NotFound(resultNone)
     }
   }
 
@@ -83,9 +81,9 @@ object AreaController extends BaseController {
       case Some(area) => {
         ActorUtils.areaRefresh ! RefreshHosts(id)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "刷新区域", area))
-        Ok(Json.obj("r" -> Json.toJson(AreaHelper.findInfoById(id))))
+        Ok(resultSuccess(Json.toJson(AreaHelper.findInfoById(id))))
       }
-      case None => Ok(Json.obj("r" -> Json.toJson(0)))
+      case None => NotFound(resultNone)
     }
   }
 
