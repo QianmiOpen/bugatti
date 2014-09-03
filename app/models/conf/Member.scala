@@ -1,5 +1,7 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import exceptions.UniqueNameException
 import play.api.Play.current
 import models.PlayCache
 import enums.LevelEnum
@@ -59,8 +61,13 @@ object MemberHelper extends PlayCache {
     _create(member)
   }
 
+  @throws[UniqueNameException]
   def _create(member: Member)(implicit session: JdbcBackend#Session) = {
-    qMember.returning(qMember.map(_.id)).insert(member)(session)
+    try {
+      qMember.returning(qMember.map(_.id)).insert(member)(session)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
   def delete(id: Int) = db withSession { implicit session =>
@@ -71,9 +78,14 @@ object MemberHelper extends PlayCache {
     qMember.filter(_.projectId === projectId).delete
   }
 
+  @throws[UniqueNameException]
   def update(id: Int, member: Member) = db withSession { implicit session =>
-    val member2update = member.copy(Some(id))
-    qMember.filter(_.id === id).update(member2update)
+    try {
+      val member2update = member.copy(Some(id))
+      qMember.filter(_.id === id).update(member2update)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
 }

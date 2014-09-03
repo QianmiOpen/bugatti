@@ -1,5 +1,7 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import exceptions.UniqueNameException
 import play.api.Play.current
 import enums.LevelEnum
 import enums.LevelEnum.Level
@@ -51,17 +53,27 @@ object EnvironmentHelper {
     qEnvironment.list
   }
 
+  @throws[UniqueNameException]
   def create(environment: Environment) = db withSession { implicit session =>
-    qEnvironment.returning(qEnvironment.map(_.id)).insert(environment)
+    try {
+      qEnvironment.returning(qEnvironment.map(_.id)).insert(environment)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
   def delete(id: Int) = db withSession { implicit session =>
     qEnvironment.filter(_.id === id).delete
   }
 
+  @throws[UniqueNameException]
   def update(id: Int, env: Environment) = db withSession { implicit session =>
-    val envToUpdate = env.copy(Some(id))
-    qEnvironment.filter(_.id === id).update(envToUpdate)
+    try {
+      val envToUpdate = env.copy(Some(id))
+      qEnvironment.filter(_.id === id).update(envToUpdate)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
 }

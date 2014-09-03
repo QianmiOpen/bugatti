@@ -1,5 +1,7 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import exceptions.UniqueNameException
 import play.api.Play.current
 import models.PlayCache
 
@@ -58,8 +60,13 @@ object TemplateHelper extends PlayCache {
     items.map(item => TemplateItemHelper._create(item.copy(None, Some(templateId)))).size
   }
 
+  @throws[UniqueNameException]
   def _create(template: Template)(implicit session: JdbcBackend#Session) = {
-    qTemplate.returning(qTemplate.map(_.id)).insert(template)(session)
+    try {
+      qTemplate.returning(qTemplate.map(_.id)).insert(template)(session)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
@@ -81,9 +88,14 @@ object TemplateHelper extends PlayCache {
     items.map(item => TemplateItemHelper._create(item.copy(None, Some(id)))).size
   }
 
+  @throws[UniqueNameException]
   def _update(id: Int, template: Template)(implicit session: JdbcBackend#Session) = {
     val template2update = template.copy(Some(id))
-    qTemplate.filter(_.id === id).update(template2update)(session)
+    try {
+      qTemplate.filter(_.id === id).update(template2update)(session)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
 }

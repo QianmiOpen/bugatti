@@ -3,7 +3,7 @@
 define(['angular'], function(angular){
     var app = angular.module('bugattiApp.controller.conf.areaModule', []);
 
-    app.controller('AreaCtrl', ['$scope', '$modal', 'AreaService', function($scope, $modal, AreaService){
+    app.controller('AreaCtrl', ['$scope', '$modal', '$window', 'AreaService', function($scope, $modal, $window, AreaService){
         AreaService.getAll(function(data){
            $scope.areas = data;
         });
@@ -13,8 +13,8 @@ define(['angular'], function(angular){
                 templateUrl: "partials/modal.html",
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function() {
-                        AreaService.delete(id, function(state) {
-                            $modalInstance.close(state);
+                        AreaService.delete(id, function(data) {
+                            $modalInstance.close(data);
                         });
                     };
                     $scope.cancel = function() {
@@ -22,10 +22,8 @@ define(['angular'], function(angular){
                     };
                 }
             });
-            modalInstance.result.then(function(state) {
-                if (state.r === 'ok') {
-                    $scope.areas.splice(index, 1);
-                }
+            modalInstance.result.then(function(data) {
+                $scope.areas.splice(index, 1);
             });
         };
 
@@ -34,8 +32,8 @@ define(['angular'], function(angular){
                 templateUrl: "partials/modal.html",
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function() {
-                        AreaService.refresh(id, function(state) {
-                            $modalInstance.close(state);
+                        AreaService.refresh(id, function(data) {
+                            $modalInstance.close(data);
                         });
                     };
                     $scope.cancel = function() {
@@ -43,10 +41,8 @@ define(['angular'], function(angular){
                     };
                 }
             });
-            modalInstance.result.then(function(state) {
-                if (state.r === 'ok') {
-                    $scope.areas[index] = state.msg;
-                }
+            modalInstance.result.then(function(data) {
+                $scope.areas[index] = data;
             });
         }
     }]);
@@ -55,12 +51,15 @@ define(['angular'], function(angular){
         $scope.area = {}
         $scope.saveOrUpdate = function(area) {
             AreaService.save(angular.toJson(area), function(data) {
-               if (data.r === 'ok') {
-                   $state.go("^");
-               } else if (data.r === 'exist') {
-                   $scope.form.name.$invalid = true;
-                   $scope.form.name.$error.exists = true;
-               }
+                if (data.r === 'exist' && data.u === '1') {
+                    $scope.form.name.$invalid = true;
+                    $scope.form.name.$error.exists = true;
+                } else if (data.r === 'exist' && data.u === '2') {
+                    $scope.form.syndicName.$invalid = true;
+                    $scope.form.syndicName.$error.exists = true;
+                } else {
+                    $state.go('^');
+                }
             });
         }
     }]);
@@ -68,12 +67,20 @@ define(['angular'], function(angular){
     app.controller("AreaUpdateCtrl", ["$scope", "$stateParams", "$state", "AreaService", function($scope, $stateParams, $state, AreaService) {
         $scope.saveOrUpdate = function(area) {
             area.id = $stateParams.id;
+
+            // reset error tips
+            $scope.form.name.$error.exists = false;
+            $scope.form.syndicName.$error.exists = false;
+
             AreaService.update(angular.toJson(area), function(data) {
-                if (data.r === 'ok') {
-                    $state.go('^');
-                } else if (data.r === 'exist') {
+                if (data.r === 'exist' && data.u === '1') {
                     $scope.form.name.$invalid = true;
                     $scope.form.name.$error.exists = true;
+                } else if (data.r === 'exist' && data.u === '2') {
+                    $scope.form.syndicName.$invalid = true;
+                    $scope.form.syndicName.$error.exists = true;
+                } else {
+                    $state.go('^');
                 }
             });
         };

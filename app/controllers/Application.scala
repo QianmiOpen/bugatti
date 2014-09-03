@@ -70,7 +70,7 @@ object Application extends ScalaController with Security {
   def logout = Action { implicit request =>
     request.headers.get(AuthTokenHeader) map { token =>
       Ok.discardingToken(token)
-    } getOrElse BadRequest(Json.obj("r" -> "No Token"))
+    } getOrElse BadRequest("No Token")
   }
 
   def ping = HasToken() { token => jobNo => implicit request =>
@@ -80,7 +80,7 @@ object Application extends ScalaController with Security {
         case None => Seq.empty
       }
       Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "sa" -> user.superAdmin, "permissions" -> ps)).withToken(token -> jobNo)
-    } getOrElse NotFound(Json.obj("r" -> "User Not Found"))
+    } getOrElse NotFound("User Not Found")
   }
 
   def pkgs(pkg: String) = Action { implicit request =>

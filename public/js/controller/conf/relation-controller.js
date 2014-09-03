@@ -64,8 +64,8 @@ define(['angular'], function(angular) {
                     templateUrl: 'partials/modal.html',
                     controller: function ($scope, $modalInstance) {
                         $scope.ok = function () {
-                            RelationService.unbind(id, function(state) {
-                                $modalInstance.close(state);
+                            RelationService.unbind(id, function(data) {
+                                $modalInstance.close(data);
                             });
                         };
                         $scope.cancel = function () {
@@ -73,13 +73,11 @@ define(['angular'], function(angular) {
                         };
                     }
                 });
-                modalInstance.result.then(function(state) {
-                    if (state !== 0) {
-                        $scope.setPage($scope.currentPage);
-                        RelationService.count($scope.env.id, $scope.project.id, function(num) {
-                            $scope.totalItems = num;
-                        });
-                    }
+                modalInstance.result.then(function(data) {
+                    $scope.setPage($scope.currentPage);
+                    RelationService.count($scope.s_ip, $scope.s_env, $scope.s_project, function(num) {
+                        $scope.totalItems = num;
+                    });
                 });
             };
 
@@ -144,7 +142,7 @@ define(['angular'], function(angular) {
                 relation.projectId = $scope.project.id;
 
                 RelationService.bind(angular.toJson(relation), function(data) {
-                    if (data !== 0) $state.go("^");
+                    $state.go("^");
                 });
             };
     }]);
@@ -154,6 +152,9 @@ define(['angular'], function(angular) {
             RelationService.get($stateParams.id, function(data) {
                 $scope.relation = data;
                 if ($scope.relation) {
+                    if (angular.isUndefined($scope.relation.projectId) || angular.isUndefined($scope.relation.envId) ) {
+                        return;
+                    }
                     ProjectService.vars($scope.relation.projectId, $scope.relation.envId, function(project_vars) {
                         $scope.vars = project_vars;
                         angular.forEach($scope.vars, function(pv) {

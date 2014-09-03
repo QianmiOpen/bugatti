@@ -22,7 +22,6 @@ define(['angular'], function(angular) {
         });
 
         $scope.searchForm = function(projectName) {
-
             // count
             ProjectService.count(projectName, $scope.my, function(data) {
                 $scope.totalItems = data;
@@ -56,8 +55,8 @@ define(['angular'], function(angular) {
                 templateUrl: 'partials/modal.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function () {
-                        ProjectService.remove(id, function(state) {
-                            $modalInstance.close(state);
+                        ProjectService.remove(id, function(data) {
+                            $modalInstance.close(data);
                         });
                     };
                     $scope.cancel = function () {
@@ -66,15 +65,13 @@ define(['angular'], function(angular) {
                 }
             });
             modalInstance.result.then(function(data) {
-                if (data.r >= 0) {
+                if (data.r == 'exist') {
+                    alert('还有版本存在该项目，请删除后再操作。。。')
+                } else {
                     $scope.projects.splice(index, 1);
-                    ProjectService.count($scope.my, function(num) {
+                    ProjectService.count($scope.s_projectName, $scope.my, function(num) {
                         $scope.totalItems = num;
                     });
-                } else if (data.r == 'exist') {
-                    alert('还有版本存在该项目，请删除后再操作。。。')
-                } else if (data.r == 'none') {
-                    alert('不存在的项目？')
                 }
             });
         };
@@ -135,15 +132,13 @@ define(['angular'], function(angular) {
                 }
 
                 ProjectService.saveMember($stateParams.id, jobNo, function(data) {
-                    if (data.r === 'none') {
-                        $scope.jobNo$error = '不存在的用户，请在用户管理添加';
-                    } else if (data.r > 0) {
+                    if (data.r === 'exist') {
+                        $scope.jobNo$error = '已存在用户';
+                    } else if (data > 0) {
                         ProjectService.members($stateParams.id, function(data) {
                             $scope.members = data;
                             $scope.jobNo$error = '';
                         });
-                    } else {
-                        $scope.jobNo$error = '添加错误';
                     }
                 });
             }
@@ -151,33 +146,27 @@ define(['angular'], function(angular) {
             $scope.memberUp = function(mid, msg) {
                 if (confirm(msg)) {
                     ProjectService.updateMember(mid, "up", function(data) {
-                        if (data.r > 0) {
-                            ProjectService.members($stateParams.id, function(data) {
-                                $scope.members = data;
-                            });
-                        }
+                        ProjectService.members($stateParams.id, function(data) {
+                            $scope.members = data;
+                        });
                     });
                 }
             };
             $scope.memberDown = function(mid, msg) {
                 if (confirm(msg)) {
                     ProjectService.updateMember(mid, "down", function(data) {
-                        if (data.r > 0) {
-                            ProjectService.members($stateParams.id, function(data) {
-                                $scope.members = data;
-                            });
-                        }
+                        ProjectService.members($stateParams.id, function(data) {
+                            $scope.members = data;
+                        });
                     });
                 }
             };
             $scope.memberRemove = function(mid, msg) {
                 if (confirm(msg)) {
                     ProjectService.updateMember(mid, "remove", function(data) {
-                        if (data.r > 0) {
-                            ProjectService.members($stateParams.id, function(data) {
-                                $scope.members = data;
-                            });
-                        }
+                        ProjectService.members($stateParams.id, function(data) {
+                            $scope.members = data;
+                        });
                     });
                 }
             };
@@ -195,11 +184,11 @@ define(['angular'], function(angular) {
                 });
 
                 ProjectService.save(angular.toJson(project), function(data) {
-                    if (data.r >= 0) {
-                        $state.go("conf.project.my");
-                    } else if (data.r == 'exist') {
+                    if (data.r === 'exist') {
                         $scope.form.name.$invalid = true;
                         $scope.form.name.$error.exists = true;
+                    } else {
+                        $state.go("conf.project.my");
                     }
                 });
             };
@@ -334,7 +323,10 @@ define(['angular'], function(angular) {
 
                 project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd HH:mm:ss")
                 ProjectService.update($stateParams.id, $scope.env.id, angular.toJson(project), function(data) {
-                    if (data !== '0') {
+                    if (data.r === 'exist') {
+                        $scope.form.name.$invalid = true;
+                        $scope.form.name.$error.exists = true;
+                    } else {
                         $state.go("conf.project.my");
                     }
                 });
@@ -522,8 +514,8 @@ define(['angular'], function(angular) {
                     templateUrl: 'partials/modal.html',
                     controller: function ($scope, $modalInstance) {
                         $scope.ok = function () {
-                            VersionService.remove(id, function(state) {
-                                $modalInstance.close(state);
+                            VersionService.remove(id, function(data) {
+                                $modalInstance.close(data);
                             });
                         };
                         $scope.cancel = function () {
@@ -532,15 +524,13 @@ define(['angular'], function(angular) {
                     }
                 });
                 modalInstance.result.then(function(data) {
-                    if (data.r >= 0) {
+                    if (data.r === 'exist') {
+                        alert('还有配置在使用该版本，请删除后再操作。。。')
+                    } else {
                         $scope.versions.splice(index, 1);
                         VersionService.count($stateParams.id, function(num) {
                             $scope.totalItems = num;
                         });
-                    } else if (data.r == 'exist') {
-                        alert('还有配置在使用该版本，请删除后再操作。。。')
-                    } else if (data.r == 'none') {
-                        alert('不存在的版本？')
                     }
                 });
             };
@@ -554,11 +544,11 @@ define(['angular'], function(angular) {
             $scope.saveOrUpdate = function(version) {
                 version.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 VersionService.save(angular.toJson(version), function(data) {
-                    if (data.r >= 0) {
-                        $state.go('^');
-                    } else if (data.r == 'exist') {
+                    if (data.r === 'exist') {
                         $scope.form.vs.$invalid = true;
                         $scope.form.vs.$error.exists = true;
+                    } else {
+                        $state.go('^');
                     }
                 });
             };
@@ -576,11 +566,11 @@ define(['angular'], function(angular) {
                 version.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
 
                 VersionService.update($stateParams.vid, angular.toJson(version), function(data) {
-                    if (data.r >= 0) {
-                        $state.go('^');
-                    } else if (data.r == 'exist') {
+                    if (data.r === 'exist') {
                         $scope.form.vs.$invalid = true;
                         $scope.form.vs.$error.exists = true;
+                    } else {
+                        $state.go('^');
                     }
                 });
             };
@@ -606,7 +596,6 @@ define(['angular'], function(angular) {
         function($scope, $stateParams, $filter, $state, DependencyService, ProjectService){
             $scope.showDependencies = function(){
                 DependencyService.get($stateParams.id, function(data){
-                    console.log(data)
                     $scope.groups = data
                 })
             }
@@ -618,14 +607,12 @@ define(['angular'], function(angular) {
 
             $scope.removeDependency = function(parent,child){
                 DependencyService.removeDependency(parent.id, child.id, function(data){
-                    console.log(data)
                     $scope.showDependencies()
                 })
             }
 
             $scope.addDependency = function(parent,child){
                 DependencyService.addDependency(parent, child, function(data){
-                    console.log(data)
                     $scope.showDependencies()
                 })
             }

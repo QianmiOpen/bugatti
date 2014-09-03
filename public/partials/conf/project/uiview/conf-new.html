@@ -4,6 +4,12 @@
             <td class="col-sm-9" style="vertical-align: middle">
                 <span style="color: #999">~/</span>
                 <input ng-model="conf.path" class="form-control" style="width:70%; display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
+                <span class="has-error" ng-show="form.path.$dirty && form.path.$invalid">
+                    <span ng-show="form.path.$error.required" class="control-label">请输入文件（路径）名称</span>
+                    <span ng-show="form.path.$error.maxlength" class="control-label">（路径）名称超过长度</span>
+                    <span ng-show="form.path.$error.pattern" class="control-label">无效的（路径）名称</span>
+                    <span ng-show="form.path.$error.exists" class="control-label">文件冲突</span>
+                </span>
             </td>
             <td rowspan="4">
                 <div class="panel panel-default">
@@ -40,11 +46,6 @@
             <td>
                 <div class="text-right">
                     <button class="btn btn-success col-sm-2 navbar-right" ng-click="save()" ng-disabled="form.$invalid"> 添加新文件 </button>
-                    <div ng-show="form.path.$dirty && form.path.$invalid" class="has-error col-sm-8 navbar-right">
-                        <span ng-show="form.path.$error.required" class="control-label">请输入文件（路径）名称</span>
-                        <span ng-show="form.path.$error.maxlength" class="control-label">（路径）名称超过长度</span>
-                        <span ng-show="form.path.$error.pattern" class="control-label">无效的（路径）名称</span>
-                    </div>
                 </div>
             </td>
         </tr>

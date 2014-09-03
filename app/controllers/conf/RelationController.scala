@@ -68,7 +68,7 @@ object RelationController extends BaseController {
     varRelForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
-        Ok(Json.obj("r" -> EnvironmentProjectRelHelper.update(relation)))
+        Ok(Json.toJson(EnvironmentProjectRelHelper.update(relation)))
       }
     )
   }
@@ -100,8 +100,7 @@ object RelationController extends BaseController {
         //刷新缓存
         MyActor.superviseTaskActor ! RefreshSyndic()
         Ok(Json.toJson(result))
-      case None =>
-        NotFound
+      case None => NotFound
     }
   }
 

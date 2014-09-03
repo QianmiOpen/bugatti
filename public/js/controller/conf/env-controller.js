@@ -31,8 +31,8 @@ define(['angular'], function(angular) {
                 templateUrl: 'partials/modal.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function () {
-                        EnvService.remove(id, function(state) {
-                            $modalInstance.close(state);
+                        EnvService.remove(id, function(data) {
+                            $modalInstance.close(data);
                         });
                     };
                     $scope.cancel = function () {
@@ -40,13 +40,11 @@ define(['angular'], function(angular) {
                     };
                 }
             });
-            modalInstance.result.then(function(state) {
-                if (state !== '0') {
-                    $scope.envs.splice(index, 1);
-                    EnvService.count(function(num) {
-                        $scope.totalItems = num;
-                    });
-                }
+            modalInstance.result.then(function(data) {
+                $scope.envs.splice(index, 1);
+                EnvService.count(function(num) {
+                    $scope.totalItems = num;
+                });
             });
         };
 
@@ -64,11 +62,11 @@ define(['angular'], function(angular) {
         $scope.saveOrUpdate = function(env) {
             env.variable = angular.copy($scope.vars);
             EnvService.save(angular.toJson(env), function(data) {
-                if (data.r >= 0) {
-                    $state.go('^');
-                } else if (data.r == 'exist') {
+                if (data.r === 'exist') {
                     $scope.form.name.$invalid = true;
                     $scope.form.name.$error.exists = true;
+                } else {
+                    $state.go('^');
                 }
             });
         };
@@ -83,11 +81,11 @@ define(['angular'], function(angular) {
         $scope.saveOrUpdate = function(env) {
             env.variable = angular.copy($scope.vars);
             EnvService.update($stateParams.id, angular.toJson(env), function(data) {
-                if (data.r >= 0) {
-                    $state.go('^');
-                } else if (data.r == 'exist') {
+                if (data.r === 'exist') {
                     $scope.form.name.$invalid = true;
                     $scope.form.name.$error.exists = true;
+                } else {
+                    $state.go('^');
                 }
             });
         };

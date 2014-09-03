@@ -1,5 +1,8 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import exceptions.UniqueNameException
+
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 
@@ -50,16 +53,36 @@ object AreaHelper {
     qArea.filter(_.id === id).firstOption.map(_Area2AreaInfo)
   }
 
+  @throws[UniqueNameException]
   def create(area: Area): Int = db withSession { implicit session =>
-    qArea.returning(qArea.map(_.id)).insert(area)
+    try {
+      qArea.returning(qArea.map(_.id)).insert(area)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException =>
+        val col_index = x.getMessage match {
+          case msg if msg endsWith ("'idx_name'") => "1"
+          case _ => "2"
+        }
+        throw new UniqueNameException(col_index)
+    }
   }
 
   def delete(id: Int) = db withSession { implicit session =>
     qArea.filter(_.id === id).delete
   }
 
+  @throws[UniqueNameException]
   def update(area: Area) = db withSession { implicit session =>
-    qArea.filter(_.id === area.id).update(area)
+    try {
+      qArea.filter(_.id === area.id).update(area)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException =>
+        val col_index = x.getMessage match {
+          case msg if msg endsWith ("'idx_name'") => "1"
+          case _ => "2"
+        }
+        throw new UniqueNameException(col_index)
+    }
   }
 
   def _Area2AreaInfo(implicit session: Session) = { area: Area =>
@@ -69,4 +92,5 @@ object AreaHelper {
       qRel.filter(c => c.syndicName === syndicName && c.projectId.isNull).length.run)
     AreaInfo(area.id, area.name, area.syndicName, area.syndicIp, counts._1, counts._2, counts._3)
   }
+
 }

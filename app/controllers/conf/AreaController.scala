@@ -4,12 +4,12 @@ import actor.ActorUtils
 import actor.salt.{DeleteArea, UpdateArea, AddArea, RefreshHosts}
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
+import exceptions.UniqueNameException
 import models.conf.{AreaInfo, AreaHelper, Area}
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.Json
-import utils.SaltTools
 
 /**
  * 区域管理
@@ -41,27 +41,32 @@ object AreaController extends BaseController {
 
   def save = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(resultFail(formWithErrors.errorsAsJson)),
-      area =>
-        AreaHelper.findByName(area.name) match {
-          case Some(_) => Ok(resultExists)
-          case None =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增区域", area))
-            val areaId = AreaHelper.create(area)
-            val newArea = area.copy(id = Option(areaId))
-            ActorUtils.areas ! AddArea(newArea)
-            Ok(resultSuccess(Json.toJson(areaId)))
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
+      area => {
+        try {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增区域", area))
+          val areaId = AreaHelper.create(area)
+          val newArea = area.copy(id = Option(areaId))
+          ActorUtils.areas ! AddArea(newArea)
+          Ok(Json.toJson(areaId))
+        } catch {
+          case un: UniqueNameException => Ok(resultUnique(un.getMessage))
         }
+      }
     )
   }
 
   def update = AuthAction(FuncEnum.area) { implicit request =>
     areaForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(resultFail(formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       area => {
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改区域", area))
-        ActorUtils.areas ! UpdateArea(area)
-        Ok(resultSuccess(Json.toJson(AreaHelper.update(area))))
+        try {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改区域", area))
+          ActorUtils.areas ! UpdateArea(area)
+          Ok(Json.toJson(AreaHelper.update(area)))
+        } catch {
+          case un: UniqueNameException => Ok(resultUnique(un.getMessage))
+        }
       }
     )
   }
@@ -71,8 +76,8 @@ object AreaController extends BaseController {
       case Some(area) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除区域", area))
         ActorUtils.areas ! DeleteArea(id)
-        Ok(resultSuccess(Json.toJson(AreaHelper.delete(id))))
-      case None => NotFound(resultNone)
+        Ok(Json.toJson(AreaHelper.delete(id)))
+      case None => NotFound
     }
   }
 
@@ -81,9 +86,9 @@ object AreaController extends BaseController {
       case Some(area) => {
         ActorUtils.areaRefresh ! RefreshHosts(id)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "刷新区域", area))
-        Ok(resultSuccess(Json.toJson(AreaHelper.findInfoById(id))))
+        Ok(Json.toJson(AreaHelper.findInfoById(id)))
       }
-      case None => NotFound(resultNone)
+      case None => NotFound
     }
   }
 

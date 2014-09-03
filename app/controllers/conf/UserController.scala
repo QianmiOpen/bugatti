@@ -2,6 +2,7 @@ package controllers.conf
 
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum, RoleEnum}
+import exceptions.UniqueNameException
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -66,20 +67,19 @@ object UserController extends BaseController {
 
   def save = AuthAction(FuncEnum.user) { implicit request =>
     userForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       userForm => {
-        UserHelper.findByJobNo(userForm.jobNo) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            val toUser = userForm.toUser
-            if (request.user.role == RoleEnum.user) Forbidden
-            else if (toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
-            else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
-            else {
-              ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", toUser))
-              Ok(Json.obj("r" -> UserHelper.create(toUser.copy(jobNo = toUser.jobNo.toLowerCase), userForm.toPermission)))
-            }
+        val toUser = userForm.toUser
+        if (request.user.role == RoleEnum.user) Forbidden
+        else if (toUser.role == RoleEnum.admin && request.user.superAdmin == false) Forbidden
+        else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
+        else {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", toUser))
+          try {
+            Ok(Json.toJson(UserHelper.create(toUser.copy(jobNo = toUser.jobNo.toLowerCase), userForm.toPermission)))
+          } catch {
+            case un: UniqueNameException => Ok(_Exist)
+          }
         }
       }
     )
@@ -87,7 +87,7 @@ object UserController extends BaseController {
 
   def update(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
     userForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       userForm => {
         val toUser = userForm.toUser
         if (request.user.role == RoleEnum.user) Forbidden
@@ -95,7 +95,11 @@ object UserController extends BaseController {
         else if (toUser.role == RoleEnum.user && toUser.superAdmin == true) BadRequest
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", toUser))
-          Ok(Json.obj("r" -> UserHelper.update(jobNo.toLowerCase, toUser, userForm.toPermission)))
+          try {
+            Ok(Json.toJson(UserHelper.update(jobNo.toLowerCase, toUser, userForm.toPermission)))
+          } catch {
+            case un: UniqueNameException => Ok(_Exist)
+          }
         }
       }
     )

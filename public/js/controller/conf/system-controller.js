@@ -9,8 +9,8 @@ define(['angular'], function(angular){
                 templateUrl: "partials/modal.html",
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function() {
-                        SystemService.buildTag(function(state) {
-                            $modalInstance.close(state);
+                        SystemService.buildTag(function(data) {
+                            $modalInstance.close(data);
                         });
                     };
                     $scope.cancel = function() {
@@ -18,7 +18,7 @@ define(['angular'], function(angular){
                     };
                 }
             });
-            modalInstance.result.then(function(state) {
+            modalInstance.result.then(function(data) {
             });
         };
 
@@ -27,8 +27,8 @@ define(['angular'], function(angular){
                 templateUrl: "partials/modal.html",
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function() {
-                        SystemService.refresh(function(state) {
-                            $modalInstance.close(state);
+                        SystemService.refresh(function(data) {
+                            $modalInstance.close(data);
                         });
                     };
                     $scope.cancel = function() {
@@ -36,7 +36,7 @@ define(['angular'], function(angular){
                     };
                 }
             });
-            modalInstance.result.then(function(state) {
+            modalInstance.result.then(function(data) {
             });
         }
     }]);

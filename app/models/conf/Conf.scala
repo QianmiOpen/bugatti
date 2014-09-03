@@ -1,5 +1,7 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import exceptions.UniqueNameException
 import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
@@ -64,16 +66,26 @@ object ConfHelper extends PlayCache {
     qConf.filter(c => c.envId === envId && c.projectId === projectId && c.versionId === versionId).list
   }
 
+  @throws[UniqueNameException]
   def create(confForm: ConfForm) = db withTransaction { implicit session =>
-    val id = qConf.returning(qConf.map(_.id)).insert(confForm.toConf)
-    ConfContentHelper._create(confForm.toContent.copy(Some(id)))
+    try {
+      val id = qConf.returning(qConf.map(_.id)).insert(confForm.toConf)
+      ConfContentHelper._create(confForm.toContent.copy(Some(id)))
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
+  @throws[UniqueNameException]
   def create(conf: Conf, confContent: Option[ConfContent]) = db withTransaction { implicit session =>
-    val id = qConf.returning(qConf.map(_.id)).insert(conf)
-    confContent.map { _confContent =>
-      ConfContentHelper._create(_confContent.copy(Some(id)))
-    }.size
+    try {
+      val id = qConf.returning(qConf.map(_.id)).insert(conf)
+      confContent.map { _confContent =>
+        ConfContentHelper._create(_confContent.copy(Some(id)))
+      }.size
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
   def delete(conf: Conf) = db withTransaction { implicit session =>
@@ -90,28 +102,29 @@ object ConfHelper extends PlayCache {
           case Some(content) =>
             ConfLogContentHelper._create(ConfLogContent(confLogId, content.octet, content.content))
             ConfContentHelper._delete(id)
-          case None =>
-            -2
+          case None => -2
         }
-      case None =>
-        -1
+      case None => -1
     }
   }
 
+  @throws[UniqueNameException]
   def update(id: Int, confForm: ConfForm) = db withSession { implicit session =>
     findById(id) match {
       case Some(conf) =>
         val confLogId = ConfLogHelper._create(ConfLog(None, id, conf.envId, conf.versionId, conf.jobNo, conf.name, conf.path, conf.fileType, conf.remark, conf.updated))
-        qConf.filter(_.id === id).update(confForm.toConf.copy(Some(id)))
-        ConfContentHelper.findById(id) match {
-          case Some(content) =>
-            ConfLogContentHelper._create(ConfLogContent(confLogId, content.octet, content.content))
-            ConfContentHelper._update(id, confForm.toContent)
-          case None =>
-            -2
+        try {
+          qConf.filter(_.id === id).update(confForm.toConf.copy(Some(id)))
+          ConfContentHelper.findById(id) match {
+            case Some(content) =>
+              ConfLogContentHelper._create(ConfLogContent(confLogId, content.octet, content.content))
+              ConfContentHelper._update(id, confForm.toContent)
+            case None => -2
+          }
+        } catch {
+          case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
         }
-      case None =>
-        -1
+      case None => -1
     }
   }
 

@@ -1,10 +1,8 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 
 import play.api.cache._
-import play.api.libs.json._
 
 trait Security { self: Controller =>
   implicit val app: play.api.Application = play.api.Play.current
@@ -20,7 +18,7 @@ trait Security { self: Controller =>
         Cache.getAs[String](token) map { jobNo =>
           f(token)(jobNo)(request)
         }
-      } getOrElse Unauthorized(Json.obj("r" -> "No Token"))
+      } getOrElse Unauthorized("No Token")
     }
 
 }

@@ -1,6 +1,8 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.LevelEnum
+import exceptions.UniqueNameException
 import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
@@ -70,14 +72,19 @@ object VersionHelper extends PlayCache {
     qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).take(top).list
   }
 
+  @throws[UniqueNameException]
   def create(version: Version) = db withTransaction { implicit session =>
-    val versionId = qVersion.returning(qVersion.map(_.id)).insert(version)
-    ProjectHelper.findById(version.projectId) match {
-        case Some(p) =>
-          ProjectHelper._update(version.projectId, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
-        case None =>
+    try {
+      val versionId = qVersion.returning(qVersion.map(_.id)).insert(version)
+      ProjectHelper.findById(version.projectId) match {
+          case Some(p) =>
+            ProjectHelper._update(version.projectId, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
+          case None =>
+      }
+      versionId
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
-    versionId
   }
 
   def delete(version: Version): Int = db withTransaction { implicit session =>
@@ -90,9 +97,14 @@ object VersionHelper extends PlayCache {
     qVersion.filter(_.id is version.id).delete
   }
 
+  @throws[UniqueNameException]
   def update(id: Int, version: Version) = db withSession { implicit session =>
-    val version2update = version.copy(Option(id))
-    qVersion.filter(_.id === id).update(version2update)
+    try {
+      val version2update = version.copy(Option(id))
+      qVersion.filter(_.id === id).update(version2update)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
 }

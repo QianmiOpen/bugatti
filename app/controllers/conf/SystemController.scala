@@ -33,7 +33,7 @@ object SystemController extends BaseController {
     }
 
     Await.result(result, 30 seconds)
-    Ok(Json.obj("r" -> Json.toJson(0)))
+    Ok(Json.toJson(0))
   }
 
   def refresh = AuthAction(FuncEnum.system) { implicit request =>
@@ -49,6 +49,6 @@ object SystemController extends BaseController {
     }
 
     Await.result(result, 30 seconds)
-    Ok(Json.obj("r" -> Json.toJson(0)))
+    Ok(Json.toJson(0))
   }
 }

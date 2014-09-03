@@ -59,7 +59,12 @@ define(['angular'], function(angular) {
             $scope.save = function() {
                 $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 ConfService.save(angular.toJson($scope.conf), function(data) {
-                    $state.go('conf.project.version.conf.list', {eid: $scope.conf.envId})
+                    if (data.r === 'exist') {
+                        $scope.form.path.$invalid = true;
+                        $scope.form.path.$error.exists = true;
+                    } else {
+                        $state.go('conf.project.version.conf.list', {eid: $scope.conf.envId})
+                    }
                 });
             };
 
@@ -109,8 +114,8 @@ define(['angular'], function(angular) {
                     templateUrl: 'partials/modal.html',
                     controller: function ($scope, $modalInstance) {
                         $scope.ok = function () {
-                            ConfService.remove(cid, function(state) {
-                                $modalInstance.close(state);
+                            ConfService.remove(cid, function(data) {
+                                $modalInstance.close(data);
                             });
                         };
                         $scope.cancel = function () {
@@ -118,12 +123,8 @@ define(['angular'], function(angular) {
                         };
                     }
                 });
-                modalInstance.result.then(function(state) {
-                    if (state >= 0) {
-                        $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
-                    } else {
-                        alert('删除失败！')
-                    }
+                modalInstance.result.then(function(data) {
+                    $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
                 });
             };
 
@@ -151,7 +152,12 @@ define(['angular'], function(angular) {
             $scope.update = function() {
                 $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                 ConfService.update($stateParams.cid, angular.toJson($scope.conf), function(data) {
-                    $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+                    if (data.r === 'exist') {
+                        $scope.form.path.$invalid = true;
+                        $scope.form.path.$error.exists = true;
+                    } else {
+                        $state.go('conf.project.version.conf.list', {eid: $scope.env.id})
+                    }
                 });
             };
 
@@ -191,8 +197,8 @@ define(['angular'], function(angular) {
     // ----------------------------------------------------
     // 一键拷贝
     // ----------------------------------------------------
-    app.controller('ConfCopyCtrl', ['$scope', '$state', '$filter', '$stateParams', 'ConfService', 'VersionService',
-        function($scope, $state, $filter, $stateParams, ConfService, VersionService) {
+    app.controller('ConfCopyCtrl', ['$scope', '$state', '$window', '$filter', '$stateParams', 'ConfService', 'VersionService',
+        function($scope, $state, $window, $filter, $stateParams, ConfService, VersionService) {
 
             $scope.copyParam = {projectId: $stateParams.id, target_eid: null, target_vid: null, envId: $stateParams.eid, versionId: $stateParams.vid, ovr: false};
 
@@ -214,6 +220,8 @@ define(['angular'], function(angular) {
                 ConfService.copy(angular.toJson(param), function(data) {
                     if (data.r === 'ok') {
                         $state.go('conf.project.version.conf.list', {eid: param.envId}, {reload: true})
+                    } else if (data.r === 'exist') {
+                        $window.alert('内容已存在')
                     }
                 });
             };

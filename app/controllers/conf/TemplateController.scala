@@ -2,7 +2,7 @@ package controllers.conf
 
 import controllers.BaseController
 import enums.ItemTypeEnum
-import enums.ItemTypeEnum.ItemType
+import exceptions.UniqueNameException
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -49,21 +49,20 @@ object TemplateController extends BaseController {
 
   def delete(id: Int) = Action {
     ProjectHelper.countByTemplateId(id) match {
-      case count if count > 0 => Ok(Json.obj("r" -> "exist")) // 项目中还存在使用情况
+      case count if count > 0 => Ok(_Exist) // 项目中还存在使用情况
       case _ =>
-        Ok(Json.obj("r" -> Json.toJson(TemplateHelper.delete(id))))
+        Ok(Json.toJson(TemplateHelper.delete(id)))
     }
   }
 
   def save = Action { implicit request =>
     templateForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       templateFrom => {
-        TemplateHelper.findByName(templateFrom.name) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            Ok(Json.obj("r" -> TemplateHelper.create(templateFrom.toTemplate, templateFrom.items)))
+        try {
+          Ok(Json.toJson(TemplateHelper.create(templateFrom.toTemplate, templateFrom.items)))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
         }
       }
     )
@@ -71,9 +70,13 @@ object TemplateController extends BaseController {
 
   def update(id: Int) = Action { implicit request =>
     templateForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       templateFrom => {
-        Ok(Json.obj("r" -> TemplateHelper.update(id, templateFrom.toTemplate, templateFrom.items)))
+        try {
+          Ok(Json.toJson(TemplateHelper.update(id, templateFrom.toTemplate, templateFrom.items)))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
+        }
       }
     )
   }

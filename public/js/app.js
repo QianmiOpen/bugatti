@@ -65,7 +65,7 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
             }]);
 
         module.config(["$httpProvider", function($httpProvider) {
-            var interceptor = ["$rootScope", "$q", "$timeout", function($rootScope, $q, $timeout) {
+            var interceptor = ["$rootScope", "$q", "$window", function($rootScope, $q, $window) {
                 return function(promise) {
                     return promise.then(
                         function(response) {
@@ -73,11 +73,15 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
                         },
                         function(response) { // error
                             if (response.status == 400) {
-                                alert('参数错误');
+                                $window.alert('参数错误');
+                            } else if (response.status == 403) {
+                                $window.alert('没有权限');
                             } else if (response.status == 404) {
-                                alert('项目不存在');
+                                $window.alert('内容不存在');
                             } else if (response.status == 409) {
-                                alert('项目已存在');
+                                $window.alert('内容已存在');
+                            } else if (response.status == 500) {
+                                $window.alert('内部错误');
                             }
                             return $q.reject(response);
                         }

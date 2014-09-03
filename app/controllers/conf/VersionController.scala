@@ -2,6 +2,7 @@ package controllers.conf
 
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
+import exceptions.UniqueNameException
 import models.conf._
 import org.joda.time.DateTime
 import utils.ControlUtil._
@@ -75,26 +76,26 @@ object VersionController extends BaseController {
         else ConfHelper.findByVersionId(id).isEmpty match {
           case true =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除版本", version))
-            Ok(Json.obj("r" -> Json.toJson(VersionHelper.delete(version))))
+            Ok(Json.toJson(VersionHelper.delete(version)))
           case false =>
-            Ok(Json.obj("r" -> "exist"))
+            Ok(_Exist)
         }
-      case None =>
-        Ok(Json.obj("r" -> "none"))
+      case None => NotFound
     }
   }
 
   def save = AuthAction(FuncEnum.project) { implicit request =>
     versionForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       versionForm => {
         if (!UserHelper.hasProjectSafe(versionForm.projectId, request.user)) Forbidden
-        else VersionHelper.findByProjectId(versionForm.projectId).find(_.vs == versionForm.vs) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增版本", versionForm))
-            Ok(Json.obj("r" ->Json.toJson(VersionHelper.create(versionForm))))
+        else {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增版本", versionForm))
+          try {
+            Ok(Json.toJson(VersionHelper.create(versionForm)))
+          } catch {
+            case un: UniqueNameException => Ok(_Exist)
+          }
         }
       }
     )
@@ -102,17 +103,16 @@ object VersionController extends BaseController {
 
   def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     versionForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       versionForm => {
         if (!UserHelper.hasProjectSafe(versionForm.projectId, request.user)) Forbidden
-        else VersionHelper.findByProjectId(versionForm.projectId)
-          .filterNot(_.id == versionForm.id) // Some(id)
-          .find(_.vs == versionForm.vs) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改版本", versionForm))
-            Ok(Json.obj("r" -> Json.toJson(VersionHelper.update(id, versionForm))))
+        else {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改版本", versionForm))
+          try {
+            Ok(Json.toJson(VersionHelper.update(id, versionForm)))
+          } catch {
+            case un: UniqueNameException => Ok(_Exist)
+          }
         }
       }
     )

@@ -1,5 +1,7 @@
 package models.conf
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import exceptions.UniqueNameException
 import play.api.Play.current
 import enums.{LevelEnum, FuncEnum, RoleEnum}
 import enums.RoleEnum.Role
@@ -32,6 +34,8 @@ class UserTable(tag: Tag) extends Table[User](tag, "app_user") {
   def lastVisit = column[DateTime]("last_visit", O.Nullable, O.Default(DateTime.now())) // 最近登录时间
 
   override def * = (jobNo, name, role, superAdmin, locked, lastIp.?, lastVisit.?) <> (User.tupled, User.unapply _)
+
+  def idx = index("idx_job_no", jobNo)
 }
 
 object UserHelper extends PlayCache {
@@ -63,8 +67,13 @@ object UserHelper extends PlayCache {
     _create(user) + PermissionHelper._create(permission)
   }
 
+  @throws[UniqueNameException]
   def _create(user: User)(implicit session: JdbcBackend#Session) = {
-    qUser.insert(user)(session)
+    try {
+      qUser.insert(user)(session)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
   def delete(jobNo: String) = db withSession { implicit session =>
@@ -81,16 +90,21 @@ object UserHelper extends PlayCache {
 
   def update(jobNo: String, user: User, permission: Permission) = db withTransaction { implicit session =>
     _update(jobNo, user) + (PermissionHelper.findByJobNo(jobNo) match {
-      case Some(p) =>
+      case Some(_) =>
         PermissionHelper._update(jobNo, permission)
       case None =>
         PermissionHelper._create(permission)
     })
   }
 
+  @throws[UniqueNameException]
   def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
 //    val user2update = user.copy(jobNo) // bug
-    qUser.filter(_.jobNo === jobNo).update(user)(session)
+    try {
+      qUser.filter(_.jobNo === jobNo).update(user)(session)
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
   // ---------------------------------------------------

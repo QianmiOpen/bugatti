@@ -1,5 +1,6 @@
 package controllers.conf
 
+import exceptions.UniqueNameException
 import utils.{TaskTools, FileUtil}
 import utils.ControlUtil._
 import controllers.{BaseController}
@@ -76,12 +77,16 @@ object ConfController extends BaseController {
 
   def save = AuthAction(FuncEnum.project) { implicit request =>
     confForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
         else {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
-          Ok(Json.obj("r" -> Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo)))))
+          try {
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
+            Ok(Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo))))
+          } catch {
+            case un: UniqueNameException => Ok(_Exist)
+          }
         }
       }
     )
@@ -89,12 +94,16 @@ object ConfController extends BaseController {
 
   def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     confForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
         if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
         else {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
-          Ok(Json.obj("r" -> Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo)))))
+          try {
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
+            Ok(Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo))))
+          } catch {
+            case un: UniqueNameException => Ok(_Exist)
+          }
         }
       }
     )
@@ -117,6 +126,7 @@ object ConfController extends BaseController {
       reqConfForm.map { _confForm =>
         if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user)) Forbidden
         else {
+
           val result = body.files.filter(f => f.ref.file.length() < maxSizeExceeded).map { tempFile =>
             val filePath = _confForm.path
             val _path = if (filePath.last != '/') filePath + '/' else filePath
@@ -126,14 +136,16 @@ object ConfController extends BaseController {
             val isOctet = isOctet_?(tempFile.filename, bytes)
             Json.obj("fileName" -> tempFile.filename, "status" -> ConfHelper.create(confFormat.toConf, Some(ConfContent(None, isOctet, bytes))))
           }
-          Ok(Json.obj("r" -> result))
+          Ok(Json.toJson(result))
+
+
         }
       } getOrElse(BadRequest)
     } getOrElse(BadRequest)
   }
 
   def completer(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project) { implicit request =>
-    Ok(Json.obj("r" -> TaskTools.generateCodeCompleter(envId, projectId, versionId)))
+    Ok(Json.toJson(TaskTools.generateCodeCompleter(envId, projectId, versionId)))
   }
 
   // ===========================================================================
@@ -184,10 +196,10 @@ object ConfController extends BaseController {
   )
   def copy = AuthAction(FuncEnum.project) { implicit request =>
     copyForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       copyForm => {
         if (!UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user)) Forbidden
-        else if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(Json.obj("r" -> "exist"))
+        else if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(_Exist)
         else {
           val targetConfs = ConfHelper.findByEnvId_VersionId(copyForm.target_eid, copyForm.target_vid)
           val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.envId, copyForm.versionId)
@@ -206,7 +218,7 @@ object ConfController extends BaseController {
           val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.user.jobNo,
             "ip" -> request.remoteAddress, "msg" -> "一键拷贝", "data" -> Json.toJson(copyForm)).toString
           ALogger.info(_msg)
-          Ok(Json.obj("r" -> "ok"))
+          Ok(_Success)
         }
       }
     )

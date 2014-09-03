@@ -1,8 +1,8 @@
 package controllers.conf
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import controllers.BaseController
 import enums.{FuncEnum, LevelEnum, ModEnum, RoleEnum}
+import exceptions.UniqueNameException
 import models.conf._
 import org.joda.time.DateTime
 import play.api.data.Forms._
@@ -88,49 +88,51 @@ object ProjectController extends BaseController {
             org.apache.commons.io.FileUtils.deleteDirectory(getRepositoryDir(id))
 
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除项目", project))
-            Ok(Json.obj("r" -> Json.toJson(ProjectHelper.delete(id))))
-          case _ => Ok(Json.obj("r" -> "exist"))
+            Ok(Json.toJson(ProjectHelper.delete(id)))
+          case _ => Ok(_Exist)
         }
-        case None => Ok(Json.obj("r" -> "none"))
+        case None => NotFound
     }
   }
 
   def save = AuthAction(FuncEnum.project) { implicit request =>
+    def createRepository(projectId: Int) = {
+      LockUtil.lock(s"${projectId}") {
+        val gitDir = getRepositoryDir(projectId)
+        try {
+          JGitUtil.initRepository(gitDir)
+        } catch {
+          case ie: IllegalStateException => play.api.Logger.warn("Create Repository Error:", ie)
+        }
+      }
+    }
     projectForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       projectForm => {
-        ProjectHelper.findByName(projectForm.name) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            val projectId = ProjectHelper.create(projectForm, request.user.jobNo)
-            LockUtil.lock(s"${projectId}") {
-              // Create the actual repository
-              val gitDir = getRepositoryDir(projectId)
-              try {
-                JGitUtil.initRepository(gitDir)
-              } catch {
-                case ie: IllegalStateException => play.api.Logger.warn("Create Repository Error:", ie)
-              }
-            }
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增项目", projectForm.toProject))
-            Ok(Json.obj("r" -> projectId))
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增项目", projectForm.toProject))
+        try {
+          val projectId = ProjectHelper.create(projectForm, request.user.jobNo)
+          createRepository(projectId) // Create the actual repository
+          Ok(Json.toJson(projectId))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
         }
       }
     )
+
   }
 
   def update(projectId: Int, envId: Int) = AuthAction(FuncEnum.project) { implicit request =>
     projectForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       projectForm => {
         if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改项目", projectForm.toProject))
           try {
-            Ok(Json.obj("r" -> ProjectHelper.update(projectId, envId, projectForm)))
+            Ok(Json.toJson(ProjectHelper.update(projectId, envId, projectForm)))
           } catch {
-            case me: MySQLIntegrityConstraintViolationException => Ok(Json.obj("r" -> "exist"))
+            case un: UniqueNameException => Ok(_Exist)
           }
         }
       }
@@ -180,13 +182,15 @@ object ProjectController extends BaseController {
 
   def saveMember(projectId: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
     if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
-    else UserHelper.findByJobNo(jobNo) match {
-      case Some(_) =>
+    else {
+      try {
         val member = Member(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member))
-        Ok(Json.obj("r" -> Json.toJson(MemberHelper.create(member))))
-      case None =>
-        Ok(Json.obj("r" -> "none"))
+        val mid = MemberHelper.create(member)
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member.copy(Some(mid))))
+        Ok(Json.toJson(mid))
+      } catch {
+        case un: UniqueNameException => Ok(_Exist)
+      }
     }
   }
 
@@ -197,13 +201,13 @@ object ProjectController extends BaseController {
         else op match {
           case "up" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级成员", member))
-            Ok(Json.obj("r" -> MemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
+            Ok(Json.toJson(MemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
           case "down" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级成员", member))
-            Ok(Json.obj("r" -> MemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
+            Ok(Json.toJson(MemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
           case "remove" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "剔除成员", member))
-            Ok(Json.obj("r" -> MemberHelper.delete(memberId)))
+            Ok(Json.toJson(MemberHelper.delete(memberId)))
           case _ => BadRequest
         }
       case None => NotFound
@@ -242,16 +246,16 @@ object ProjectController extends BaseController {
    */
   def addVersion() = Action { implicit request =>
     verForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       verData => verData.authToken match {
         case token if token == authToken =>
           ProjectHelper.findByName(verData.projectName) match {
             case Some(project) =>
               VersionHelper.findByProjectId_Vs(project.id.get, verData.version) match {
-                case Some(_) => Conflict(Json.obj("r" -> "exist"))
+                case Some(_) => Conflict(_Exist)
                 case None =>
                   VersionHelper.create(Version(None, project.id.get, verData.version, DateTime.now()))
-                  Ok(Json.obj("r" -> "ok"))
+                  Ok(_Success)
               }
             case None => NotFound
           }

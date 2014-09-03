@@ -30,11 +30,11 @@ define(['angular'], function(angular) {
                 }
             });
             modalInstance.result.then(function(data) {
-                if (data.r >= 0) {
+                if (data.r === 'exist') {
+                    alert('还有项目在使用该模板，请删除后再操作。。。')
+                } else {
                     $scope.templates.splice(index, 1);
                     $scope.totalItems = $scope.totalItems -1;
-                } else if (data.r == 'exist') {
-                    alert('还有项目在使用该模板，请删除后再操作。。。')
                 }
             });
         };
@@ -60,11 +60,11 @@ define(['angular'], function(angular) {
         // insert
         $scope.saveOrUpdate = function(template) {
             TemplateService.save(angular.toJson(template), function(data) {
-                if (data.r >= 0) {
-                    $state.go('^');
-                } else if (data.r == 'exist') {
+                if (data.r === 'exist') {
                     $scope.form.name.$invalid = true;
                     $scope.form.name.$error.exists = true;
+                } else {
+                    $state.go('^');
                 }
             })
         };
@@ -102,11 +102,11 @@ define(['angular'], function(angular) {
 
         $scope.saveOrUpdate = function(template) {
             TemplateService.update($stateParams.id, angular.toJson(template), function(data) {
-                if (data.r >= 0) {
-                    $state.go('^');
-                } else if (data.r == 'exist') {
+                if (data.r === 'exist') {
                     $scope.form.name.$invalid = true;
                     $scope.form.name.$error.exists = true;
+                } else {
+                    $state.go('^');
                 }
             });
         };

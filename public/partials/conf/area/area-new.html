@@ -21,9 +21,10 @@
         <div class="col-sm-5">
             <input type="text" class="form-control" ng-model="area.syndicName" name="syndicName" id="syndicName" ng-maxlength="30" placeholder="区域代理主机名" required>
         </div>
-        <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
-            <span ng-show="form.name.$error.required" class="control-label">请输入区域代理主机名</span>
-            <span ng-show="form.name.$error.maxLength" class="control-label">超过长度</span>
+        <div ng-show="form.syndicName.$dirty && form.syndicName.$invalid" class="has-error">
+            <span ng-show="form.syndicName.$error.required" class="control-label">请输入区域代理主机名</span>
+            <span ng-show="form.syndicName.$error.maxLength" class="control-label">超过长度</span>
+            <span ng-show="form.syndicName.$error.exists" class="control-label">该主机已经存在，请换一个名称</span>
         </div>
     </div>
     <div class="form-group">
@@ -31,9 +32,9 @@
         <div class="col-sm-5">
             <input type="text" class="form-control" ng-model="area.syndicIp" name="syndicIp" id="syndicIp" ng-maxlength="30" placeholder="区域代理主机IP" required>
         </div>
-        <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
-            <span ng-show="form.name.$error.required" class="control-label">请输入区域代理主机IP</span>
-            <span ng-show="form.name.$error.maxLength" class="control-label">超过长度</span>
+        <div ng-show="form.syndicIp.$dirty && form.syndicIp.$invalid" class="has-error">
+            <span ng-show="form.syndicIp.$error.required" class="control-label">请输入区域代理主机IP</span>
+            <span ng-show="form.syndicIp.$error.maxLength" class="control-label">超过长度</span>
         </div>
     </div>
 

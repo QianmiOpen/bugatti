@@ -38,8 +38,8 @@ define(['angular'], function(angular) {
                     templateUrl: 'partials/modal.html',
                     controller: function ($scope, $modalInstance) {
                         $scope.ok = function () {
-                            UserService.remove(jobNo, function(state) {
-                                $modalInstance.close(state);
+                            UserService.remove(jobNo, function(data) {
+                                $modalInstance.close(data);
                             });
                         };
                         $scope.cancel = function () {
@@ -47,13 +47,11 @@ define(['angular'], function(angular) {
                         };
                     }
                 });
-                modalInstance.result.then(function(state) {
-                    if (state !== '0') {
-                        $scope.users.splice(index, 1);
-                        UserService.count(function(num) {
-                            $scope.totalItems = num;
-                        });
-                    }
+                modalInstance.result.then(function(data) {
+                    $scope.users.splice(index, 1);
+                    UserService.count($scope.s_jobNo, function(num) {
+                        $scope.totalItems = num;
+                    });
                 });
             };
     }]);
@@ -81,11 +79,11 @@ define(['angular'], function(angular) {
                 });
                 $scope.user.functions = func.join(",");
                 UserService.save(angular.toJson(user), function(data) {
-                    if (data.r >= 0) {
-                        $state.go('^');
-                    } else if (data.r == 'exist') {
+                    if (data.r === 'exist') {
                         $scope.form.jobNo.$invalid = true;
                         $scope.form.jobNo.$error.exists = true;
+                    } else {
+                        $state.go('^');
                     }
                 });
             };
@@ -138,11 +136,11 @@ define(['angular'], function(angular) {
                 $scope.user.functions = func.join(",");
                 user.lastVisit = $filter('date')(user.lastVisit, "yyyy-MM-dd HH:mm:ss")
                 UserService.update($stateParams.id, angular.toJson(user), function(data) {
-                    if (data.r >= 0) {
-                        $state.go('^');
-                    } else if (data.r == 'exist') {
+                    if (data.r === 'exist') {
                         $scope.form.jobNo.$invalid = true;
                         $scope.form.jobNo.$error.exists = true;
+                    } else {
+                        $state.go('^');
                     }
                 });
             };

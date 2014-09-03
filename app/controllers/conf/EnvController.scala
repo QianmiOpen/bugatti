@@ -1,6 +1,7 @@
 package controllers.conf
 
 import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
+import exceptions.UniqueNameException
 import models.conf._
 import play.api.mvc._
 import controllers.BaseController
@@ -64,8 +65,7 @@ object EnvController extends BaseController {
       case Some(env) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除环境", env))
         Ok(Json.toJson(EnvironmentHelper.delete(id)))
-      case None =>
-        NotFound
+      case None => NotFound
     }
   }
 
@@ -75,28 +75,26 @@ object EnvController extends BaseController {
 
   def save = AuthAction(FuncEnum.env) { implicit request =>
     envForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
-        EnvironmentHelper.findByName(env.name) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境", env))
-            Ok(Json.obj("r" -> Json.toJson(EnvironmentHelper.create(env))))
+        try {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境", env))
+          Ok(Json.toJson(EnvironmentHelper.create(env)))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
         }
     )
   }
 
   def update(id: Int) = AuthAction(FuncEnum.env) { implicit request =>
     envForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
-        EnvironmentHelper.findByName(env.name).find(_.id != Some(id)) match {
-          case Some(_) =>
-            Ok(Json.obj("r" -> "exist"))
-          case None =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改环境", env))
-            Ok(Json.obj("r" -> Json.toJson(EnvironmentHelper.update(id, env))))
+        try {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改环境", env))
+          Ok(Json.toJson(EnvironmentHelper.update(id, env)))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
         }
     )
   }

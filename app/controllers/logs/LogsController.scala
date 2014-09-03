@@ -1,10 +1,7 @@
 package controllers.logs
 
-
 import controllers.BaseController
 import models.logs.{LogsHelper, Logs}
-import org.joda.time.DateTime
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -32,7 +29,7 @@ object LogsController extends BaseController {
 
   def search(page: Int, pageSize: Int) = Action { implicit request =>
     logsForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       logs => {
         Ok(Json.toJson(LogsHelper.searchLogs(logs, page, pageSize)))
       }
@@ -41,7 +38,7 @@ object LogsController extends BaseController {
 
   def count = Action { implicit request =>
     logsForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.obj("r" -> formWithErrors.errorsAsJson)),
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       logs => {
         Ok(Json.toJson(LogsHelper.searchCount(logs)))
       }

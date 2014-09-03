@@ -3,7 +3,9 @@ package models.conf
 import actor.ActorUtils
 import actor.conf.UpdateProject
 import com.github.tototoshi.slick.MySQLJodaSupport._
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.LevelEnum
+import exceptions.UniqueNameException
 import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
 import play.api.Play.current
@@ -108,19 +110,25 @@ object ProjectHelper extends PlayCache {
     // member
     MemberHelper._create(Member(None, _projectId, LevelEnum.safe, jobNo))
     _projectId
+
   }
 
+  @throws[UniqueNameException]
   def _create(project: Project)(implicit session: JdbcBackend#Session) = {
-    val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
-    //增加项目依赖初始关系
-    TemplateHelper.findById(project.templateId) match {
-      case Some(template) =>
-        ProjectDependencyHelper.insertWithSeq(template.dependentProjectIds.map(x => ProjectDependency(None, pid, x)))
-      case None => // ignore
+    try {
+      val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
+      //增加项目依赖初始关系
+      TemplateHelper.findById(project.templateId) match {
+        case Some(template) =>
+          ProjectDependencyHelper.insertWithSeq(template.dependentProjectIds.map(x => ProjectDependency(None, pid, x)))
+        case None => // ignore
+      }
+      //修改缓存
+      ActorUtils.configuarActor ! UpdateProject(pid, project.name)
+      pid
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
-    //修改缓存
-    ActorUtils.configuarActor ! UpdateProject(pid, project.name)
-    pid
   }
 
   def delete(id: Int) = db withTransaction { implicit session =>
@@ -158,12 +166,17 @@ object ProjectHelper extends PlayCache {
     _update(id, projectForm.toProject)
   }
 
+  @throws[UniqueNameException]
   def _update(id: Int, project: Project)(implicit session: JdbcBackend#Session) = {
-    val project2update = project.copy(Some(id))
-    val result = qProject.filter(_.id === id).update(project2update)(session)
-    //修改缓存
-    ActorUtils.configuarActor ! UpdateProject(id, project.name)
-    result
+    try {
+      val project2update = project.copy(Some(id))
+      val result = qProject.filter(_.id === id).update(project2update)(session)
+      //修改缓存
+      ActorUtils.configuarActor ! UpdateProject(id, project.name)
+      result
+    } catch {
+      case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
   }
 
 //  ====================================================
