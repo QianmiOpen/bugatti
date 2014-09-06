@@ -26,6 +26,7 @@ object EnvController extends BaseController {
     mapping(
       "id" -> optional(number),
       "name" -> nonEmptyText(maxLength = 30),
+      "jobNo" -> optional(text(maxLength = 16)),
       "remark" -> optional(text(maxLength = 250)),
       "nfServer" -> optional(text(maxLength = 30)),
       "ipRange" -> optional(nonEmptyText(maxLength = 300)),
@@ -53,7 +54,7 @@ object EnvController extends BaseController {
   // 任务模块查看
   def showAuth = AuthAction(FuncEnum.task) { implicit request =>
     // 管理员 & 委员长 显示所有环境
-    val countSafe = MemberHelper.count(request.user.jobNo, LevelEnum.safe)
+    val countSafe = ProjectMemberHelper.count(request.user.jobNo, LevelEnum.safe)
     val seq =
       if ((request.user.role == RoleEnum.admin && request.user.superAdmin) || countSafe > 0) EnvironmentHelper.all()
       else EnvironmentHelper.findByUnsafe()
@@ -79,7 +80,7 @@ object EnvController extends BaseController {
       env =>
         try {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境", env))
-          Ok(Json.toJson(EnvironmentHelper.create(env)))
+          Ok(Json.toJson(EnvironmentHelper.create(env.copy(jobNo = Some(request.user.jobNo)))))
         } catch {
           case un: UniqueNameException => Ok(_Exist)
         }
@@ -97,6 +98,42 @@ object EnvController extends BaseController {
           case un: UniqueNameException => Ok(_Exist)
         }
     )
+  }
+
+  // ----------------------------------------------------------
+  // 环境成员
+  // ----------------------------------------------------------
+  implicit val memberWrites = Json.writes[EnvironmentMember]
+
+  def member(envId: Int, jobNo: String) = Action {
+    Ok(Json.toJson(EnvironmentMemberHelper.findEnvId_JobNo(envId, jobNo.toLowerCase)))
+  }
+
+  def members(envId: Int) = AuthAction(FuncEnum.env) {
+    Ok(Json.toJson(EnvironmentMemberHelper.findByEnvId(envId)))
+  }
+
+  def saveMember(envId: Int, jobNo: String) = AuthAction(FuncEnum.env) { implicit request =>
+    EnvironmentHelper.findById(envId) match {
+      case Some(env) if (env.jobNo == Some(request.user.jobNo)) =>
+        try {
+          val member = EnvironmentMember(None, envId, jobNo.toLowerCase)
+          Ok(Json.toJson(EnvironmentMemberHelper.create(member)))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
+        }
+      case Some(env) if (env.jobNo != Some(request.user.jobNo)) => Forbidden
+      case _ => NotFound
+    }
+  }
+
+  def deleteMember(envId: Int, memberId: Int) = AuthAction(FuncEnum.env) { implicit request =>
+    EnvironmentHelper.findById(envId) match {
+      case Some(env) if (env.jobNo == Some(request.user.jobNo)) =>
+        Ok(Json.toJson(EnvironmentMemberHelper.delete(memberId)))
+      case Some(env) if (env.jobNo != Some(request.user.jobNo)) => Forbidden
+      case _ => NotFound
+    }
   }
 
 }

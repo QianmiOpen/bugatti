@@ -146,7 +146,7 @@ object ProjectController extends BaseController {
       Ok(Json.toJson(ProjectHelper.all()))
     }
     else {
-      Ok(Json.toJson(MemberHelper.findProjectsByJobNo(request.user.jobNo)))
+      Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(request.user.jobNo)))
     }
   }
 
@@ -167,25 +167,25 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   // 项目成员
   // ----------------------------------------------------------
-  implicit val memberWrites = Json.writes[Member]
+  implicit val memberWrites = Json.writes[ProjectMember]
 
-  def msg(user: String, ip: String, msg: String, data: Member) =
+  def msg(user: String, ip: String, msg: String, data: ProjectMember) =
     Json.obj("mod" -> ModEnum.member.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   def member(projectId: Int, jobNo: String) = Action {
-    Ok(Json.toJson(MemberHelper.findByProjectId_JobNo(projectId, jobNo)))
+    Ok(Json.toJson(ProjectMemberHelper.findByProjectId_JobNo(projectId, jobNo.toLowerCase)))
   }
 
   def members(projectId: Int) = AuthAction(FuncEnum.project) {
-    Ok(Json.toJson(MemberHelper.findByProjectId(projectId)))
+    Ok(Json.toJson(ProjectMemberHelper.findByProjectId(projectId)))
   }
 
   def saveMember(projectId: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
     if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
     else {
       try {
-        val member = Member(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
-        val mid = MemberHelper.create(member)
+        val member = ProjectMember(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
+        val mid = ProjectMemberHelper.create(member)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member.copy(Some(mid))))
         Ok(Json.toJson(mid))
       } catch {
@@ -195,19 +195,19 @@ object ProjectController extends BaseController {
   }
 
   def updateMember(memberId: Int, op: String) = AuthAction(FuncEnum.project) { implicit request =>
-    MemberHelper.findById(memberId) match {
+    ProjectMemberHelper.findById(memberId) match {
       case Some(member) =>
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
         else op match {
           case "up" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级成员", member))
-            Ok(Json.toJson(MemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
+            Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
           case "down" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级成员", member))
-            Ok(Json.toJson(MemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
+            Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
           case "remove" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "剔除成员", member))
-            Ok(Json.toJson(MemberHelper.delete(memberId)))
+            Ok(Json.toJson(ProjectMemberHelper.delete(memberId)))
           case _ => BadRequest
         }
       case None => NotFound

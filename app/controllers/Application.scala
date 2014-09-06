@@ -126,6 +126,11 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.EnvController.delete,
         conf.routes.javascript.EnvController.showAuth,
         conf.routes.javascript.EnvController.allScriptVersion,
+        // env member
+        conf.routes.javascript.EnvController.member,
+        conf.routes.javascript.EnvController.members,
+        conf.routes.javascript.EnvController.saveMember,
+        conf.routes.javascript.EnvController.deleteMember,
 
         // project
         conf.routes.javascript.ProjectController.show,

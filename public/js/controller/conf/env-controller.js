@@ -50,12 +50,58 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('EnvShowCtrl', ['$scope', '$stateParams', 'EnvService',
-        function($scope, $stateParams, EnvService) {
-            EnvService.get($stateParams.id, function(data) {
-                $scope.env = data;
+    app.controller('EnvShowCtrl', ['$scope', '$stateParams', 'EnvService', function($scope, $stateParams, EnvService) {
+        EnvService.get($stateParams.id, function(data) {
+            $scope.env = data;
+        });
+
+        // ---------------------------------------------
+        // 环境成员管理
+        // ---------------------------------------------
+        EnvService.members($stateParams.id, function(data) {
+            $scope.members = data;
+        })
+
+        $scope.addMember = function(jobNo) {
+            $scope.jobNo$error = '';
+            if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
+                $scope.jobNo$error = '工号格式错误';
+                return;
+            }
+            var exist = false;
+            angular.forEach($scope.members, function(m) {
+                if (m.jobNo === jobNo) {
+                    exist = true;
+                }
             });
-        }]);
+            if (exist) {
+                $scope.jobNo$error = '已存在';
+                return;
+            }
+
+            EnvService.saveMember($stateParams.id, jobNo, function(data) {
+                if (data.r === 'exist') {
+                    $scope.jobNo$error = '已存在用户';
+                } else if (data > 0) {
+                    EnvService.members($stateParams.id, function(data) {
+                        $scope.members = data;
+                        $scope.jobNo$error = '';
+                    });
+                }
+            });
+        }
+
+        $scope.memberRemove = function(mid, msg) {
+            if (confirm(msg)) {
+                EnvService.deleteMember($stateParams.id, mid, function(rd) {
+                    EnvService.members($stateParams.id, function(data) {
+                        $scope.members = data;
+                    });
+                });
+            }
+        };
+
+    }]);
 
     app.controller('EnvCreateCtrl', ['$scope', '$stateParams', '$state', 'EnvService', function($scope, $stateParams, $state, EnvService) {
         $scope.env = {level: "unsafe", scriptVersion: "latest"};

@@ -42,6 +42,11 @@ DELETE        /env/:id                                            controllers.co
 POST          /env                                                controllers.conf.EnvController.save
 PUT           /env/:id                                            controllers.conf.EnvController.update(id: Int)
 POST          /env/auth                                           controllers.conf.EnvController.showAuth
+# Environment member
+GET           /env/:envId/members                                 controllers.conf.EnvController.members(envId: Int)
+GET           /env/:envId/member/:jobNo                           controllers.conf.EnvController.member(envId: Int, jobNo: String)
+POST          /env/:envId/member                                  controllers.conf.EnvController.saveMember(envId: Int, jobNo: String)
+DELETE        /env/member/:memberId                               controllers.conf.EnvController.deleteMember(envId: Int, memberId: Int)
 
 # Project
 GET           /project                                            controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?=                false,        page:        Int                ?=0,        pageSize:        Int         ?=        30)
@@ -56,7 +61,7 @@ POST          /project                                            controllers.co
 PUT           /project/:projectId                                 controllers.conf.ProjectController.update(projectId: Int, envId: Int)
 POST          /project/auth                                       controllers.conf.ProjectController.showAuth
 # Project member
-GET           /project/:projectId/member                          controllers.conf.ProjectController.members(projectId: Int)
+GET           /project/:projectId/members                         controllers.conf.ProjectController.members(projectId: Int)
 GET           /project/:projectId/member/:jobNo                   controllers.conf.ProjectController.member(projectId: Int, jobNo: String)
 POST          /project/:projectId/member                          controllers.conf.ProjectController.saveMember(projectId: Int, jobNo: String)
 PUT           /project/member/:memberId                           controllers.conf.ProjectController.updateMember(memberId: Int, op: String)

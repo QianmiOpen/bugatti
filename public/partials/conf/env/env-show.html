@@ -14,6 +14,10 @@
         <td>{{env.name}}</td>
     </tr>
     <tr>
+        <td class="text-right col-sm-3">创建人：</td>
+        <td>{{env.jobNo}}</td>
+    </tr>
+    <tr>
         <td class="text-right col-sm-3">ip范围：</td>
         <td>{{env.ipRange}}</td>
     </tr>
@@ -32,3 +36,72 @@
     </tbody>
 
 </table>
+
+<br/>
+
+<style>
+    .member-list ul {
+        margin-top: -20px;
+        letter-spacing: -0.31em;
+        *letter-spacing: normal;
+        word-spacing: -0.43em;
+        font-size: 0;
+        padding:0;
+    }
+    .member-list .pic {
+        margin-bottom: 5px;
+    }
+    .member-list li {
+        display: inline-block;
+        *display: inline;
+        zoom: 1;
+        width: 75px;
+        margin-top: 20px;
+        text-align: center;
+        font-size: 12px;
+        vertical-align: top;
+        letter-spacing: normal;
+        word-spacing: normal;
+    }
+    .member-list .name {
+        clear: both;
+    }
+    .u_actions { display:inline-block;*display:inline;zoom:1;vertical-align:middle; }
+    .gact a:visited, a.gact:visited {
+        color: #bbb;
+        font-size: 12px;
+        text-decoration: none;
+        text-align: center;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        成员
+        &nbsp;&nbsp;
+        <form ng-submit="addMember(searchMember.jobNo)" >
+            <input type="text" ng-model="searchMember.jobNo"/>
+            <button type="submit" class="btn btn-link">+</button>
+            <span class="has-error">
+                <span ng-show="jobNo$error" class="control-label">{{jobNo$error}}</span>
+            </span>
+        </form>
+    </div>
+
+    <div class="panel-body member-list">
+        <ul>
+            <li ng-repeat="m in members" >
+                <div class="pic">
+                    <img src="/img/user_normal.jpg" alt="test"/>
+                    <div class="u_actions" >
+                        <span class="gact" title="移出">
+                            <a href="" ng-click="memberRemove(m.id, '真的要把' + m.jobNo + '移出环境？')" title="把{{m.jobNo}}移出环境">k</a>
+                        </span><br/><br/>
+                    </div>
+                </div>
+                <div class="name">{{m.jobNo}}</div>
+            </li>
+
+        </ul>
+    </div>
+</div></div>

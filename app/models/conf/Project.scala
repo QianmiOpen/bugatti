@@ -38,7 +38,7 @@ object ProjectHelper extends PlayCache {
   import models.AppDB._
 
   val qProject = TableQuery[ProjectTable]
-  val qMember = TableQuery[MemberTable]
+  val qMember = TableQuery[ProjectMemberTable]
   val qpd = TableQuery[ProjectDependencyTable]
 
   def findById(id: Int): Option[Project] = db withSession { implicit session =>
@@ -108,7 +108,7 @@ object ProjectHelper extends PlayCache {
     val attrs = projectForm.items.map(item => item.copy(None, Some(_projectId)))
     AttributeHelper._create(attrs)
     // member
-    MemberHelper._create(Member(None, _projectId, LevelEnum.safe, jobNo))
+    ProjectMemberHelper._create(ProjectMember(None, _projectId, LevelEnum.safe, jobNo))
     _projectId
 
   }
@@ -137,7 +137,7 @@ object ProjectHelper extends PlayCache {
     // attribute
     AttributeHelper._deleteByProjectId(id)
     // member
-    MemberHelper._deleteByProjectId(id)
+    ProjectMemberHelper._deleteByProjectId(id)
     // variable
     VariableHelper._deleteByProjectId(id)
     val result = qProject.filter(_.id === id).delete

@@ -32,6 +32,21 @@ define(['angular'], function(angular) {
             },
             allScriptVersion: function(callback) {
                 $http(PlayRoutes.controllers.conf.EnvController.allScriptVersion()).success(callback);
+            },
+            // ------------------------------------------------
+            // 环境成员
+            // ------------------------------------------------
+            member: function(envId, jobNo, callback) {
+                $http(PlayRoutes.controllers.conf.EnvController.member(envId, jobNo)).success(callback);
+            },
+            members: function(envId, callback) {
+                $http(PlayRoutes.controllers.conf.EnvController.members(envId)).success(callback);
+            },
+            saveMember: function(envId, jobNo, callback) {
+                $http.post(PlayRoutes.controllers.conf.EnvController.saveMember(envId, jobNo).url).success(callback);
+            },
+            deleteMember: function(envId, memberId, callback) {
+                $http(PlayRoutes.controllers.conf.EnvController.deleteMember(envId, memberId)).success(callback);
             }
         }
     });
