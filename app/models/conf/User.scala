@@ -108,7 +108,7 @@ object UserHelper extends PlayCache {
   }
 
   // ---------------------------------------------------
-  // 项目和环境资源权限
+  // 项目和环境资源权限, todo add cache
   // ---------------------------------------------------
 
   /* 项目委员 */
@@ -137,6 +137,20 @@ object UserHelper extends PlayCache {
         EnvironmentHelper.findById(envId) match {
           case Some(env) if env.level == LevelEnum.safe => if (member.level == env.level) true else false
           case Some(env) if env.level == LevelEnum.unsafe => true
+          case _ => false
+        }
+      case _ => false
+    }
+  }
+
+  /* 环境成员 */
+  def hasEnv(envId: Int, user: User): Boolean = {
+    if (user.role == RoleEnum.admin && user.superAdmin) true
+    else EnvironmentHelper.findById(envId) match {
+      case Some(env) if env.jobNo == Some(user.jobNo) => true
+      case Some(env) if env.jobNo != Some(user.jobNo) =>
+        EnvironmentMemberHelper.findEnvId_JobNo(envId, user.jobNo) match {
+          case Some(_) => true
           case _ => false
         }
       case _ => false
