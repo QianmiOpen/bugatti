@@ -145,7 +145,7 @@ object ConfController extends BaseController {
   }
 
   def completer(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project) { implicit request =>
-    Ok(Json.toJson(TaskTools.generateCodeCompleter(envId, projectId, versionId)))
+    Ok(Json.toJson(Json.obj("r" -> TaskTools.generateCodeCompleter(envId, projectId, versionId))))
   }
 
   // ===========================================================================

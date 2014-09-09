@@ -1,6 +1,7 @@
 package actor.task
 
 import java.io.File
+import java.util.regex.Pattern
 
 import akka.actor._
 import com.qianmi.bugatti.actors.TimeOut
@@ -51,12 +52,11 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
       replaceCommand.templateStep.foreach { templateStep =>
         var command = templateStep.sls
-        _reg.findAllIn(command).foreach { key =>
+        getContentKeys(command).foreach { key =>
           _lastReplaceKey = key
-          val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          val (ret, value) = engine.eval(realkey)
+          val (ret, value) = engine.eval(key)
           if (ret) {
-            command = command.replaceAll(s"\\{\\{${realkey}\\}\\}", value)
+            command = command.replaceAll(Pattern.quote(s"{{${key}}}"), value)
           } else {
             errors += s"${key}: ${value}"
             log.error(value)
@@ -155,13 +155,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     var errors = Set.empty[String]
     if (!conf.octet) {
       var content = new String(conf.content, "UTF8")
-      _reg.findAllIn(content).foreach {
+      getContentKeys(content).foreach {
         key =>
           _lastReplaceKey = key
-          val realkey = key.replaceAll("\\{\\{", "").replaceAll("\\}\\}", "")
-          val (ret, value) = engine.eval(realkey)
+          val (ret, value) = engine.eval(key)
           if (ret) {
-            content = content.replaceAll(s"\\{\\{${realkey}\\}\\}", value)
+            content = content.replaceAll(Pattern.quote(s"{{${key}}}"), value)
           } else {
             errors += s"${key}: ${value}"
             log.info(value)
@@ -175,6 +174,41 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     } else {
       return (true, "")
     }
+  }
+
+  def getContentKeys(content: String): Seq[String] = {
+    var retSeq = Seq.empty[String]
+    var num = 0
+    var key = ""
+    var bAppend = false
+    var lastLeft= false
+    var stopNum = 0
+    content.foreach { c =>
+      if (c == '{') {
+        num += 1
+        if (lastLeft) {
+          bAppend = true
+          stopNum = num
+        }
+        lastLeft = true
+      } else {
+        lastLeft = false
+      }
+
+      if (c == '}' && num > 0) {
+        num -= 1
+        if (num == stopNum - 1) {
+          bAppend = false
+          retSeq = retSeq :+ key.drop(1)
+          key = ""
+        }
+      }
+
+      if (bAppend) {
+        key = s"$key$c"
+      }
+    }
+    retSeq.toSet.toSeq
   }
 }
 
