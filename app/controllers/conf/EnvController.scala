@@ -115,7 +115,7 @@ object EnvController extends BaseController {
 
   def saveMember(envId: Int, jobNo: String) = AuthAction(FuncEnum.env) { implicit request =>
     EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(request.user.jobNo) =>
+      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.superAdmin_?(request.user) =>
         try {
           val member = EnvironmentMember(None, envId, jobNo.toLowerCase)
           Ok(Json.toJson(EnvironmentMemberHelper.create(member)))
@@ -129,7 +129,7 @@ object EnvController extends BaseController {
 
   def deleteMember(envId: Int, memberId: Int) = AuthAction(FuncEnum.env) { implicit request =>
     EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(request.user.jobNo) =>
+      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.superAdmin_?(request.user) =>
         Ok(Json.toJson(EnvironmentMemberHelper.delete(memberId)))
       case Some(env) if env.jobNo != Some(request.user.jobNo) => Forbidden
       case _ => NotFound

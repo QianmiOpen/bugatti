@@ -25,7 +25,7 @@ trait BaseController extends Controller with Security {
     maybeToken flatMap { token =>
       Cache.getAs[String](token) map { jobNo =>
         UserHelper.findByJobNo(jobNo) match {
-          case Some(user) if user.role == RoleEnum.admin => block(new RequestWithUser[A](user, request))
+          case Some(user) if UserHelper.superAdmin_?(user) => block(new RequestWithUser[A](user, request))
           case Some(user) if user.role == RoleEnum.user =>
             findPermission(jobNo, func) match {
               case Some(true) => block(new RequestWithUser[A](user, request))

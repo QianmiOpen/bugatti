@@ -113,7 +113,7 @@ object UserHelper extends PlayCache {
 
   /* 项目委员 */
   def hasProject(projectId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin && user.superAdmin) true
+    if (superAdmin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId => true
       case _ => false
@@ -122,7 +122,7 @@ object UserHelper extends PlayCache {
 
   /* 项目委员长 */
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin && user.superAdmin) true
+    if (superAdmin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId && member.level == LevelEnum.safe => true
       case _ => false
@@ -131,7 +131,7 @@ object UserHelper extends PlayCache {
 
   /* 指定环境下，根据安全级别选择委员长或成员访问 */
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin && user.superAdmin) true
+    if (superAdmin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId =>
         EnvironmentHelper.findById(envId) match {
@@ -145,7 +145,7 @@ object UserHelper extends PlayCache {
 
   /* 环境成员 */
   def hasEnv(envId: Int, user: User): Boolean = {
-    if (user.role == RoleEnum.admin && user.superAdmin) true
+    if (superAdmin_?(user)) true
     else EnvironmentHelper.findById(envId) match {
       case Some(env) if env.jobNo == Some(user.jobNo) => true
       case Some(env) if env.jobNo != Some(user.jobNo) =>
@@ -156,5 +156,7 @@ object UserHelper extends PlayCache {
       case _ => false
     }
   }
+
+  def superAdmin_?(user: User): Boolean = if (user.role == RoleEnum.admin && user.superAdmin) true else false
 
 }

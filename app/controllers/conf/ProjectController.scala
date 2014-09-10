@@ -144,8 +144,7 @@ object ProjectController extends BaseController {
     val user = request.user
     if(user.role == RoleEnum.admin && user.superAdmin){
       Ok(Json.toJson(ProjectHelper.all()))
-    }
-    else {
+    } else {
       Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(request.user.jobNo)))
     }
   }
