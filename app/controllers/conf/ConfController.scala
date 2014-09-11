@@ -221,7 +221,7 @@ object ConfController extends BaseController {
             val content = ConfContentHelper.findById(c.id.get)
             ConfHelper.create(c.copy(id = None, envId = copyForm.envId, versionId = copyForm.versionId), content)
           }
-          val opMsg = if (copyForm.target_eid == 0) "生成模板" else "一键拷贝"
+          val opMsg = if (copyForm.copy) "一键拷贝" else "生成模板"
           val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.user.jobNo,
             "ip" -> request.remoteAddress, "msg" -> opMsg, "data" -> Json.toJson(copyForm)).toString
           ALogger.info(_msg)
