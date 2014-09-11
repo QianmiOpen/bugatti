@@ -70,7 +70,7 @@ define(['angular'], function(angular) {
 
             $scope.wordList = [];
             $scope.completers = ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
-                var obj = eval('(' + data + ')');
+                var obj = eval(data);
                 for (var prop in obj) {
                     $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                 }
@@ -167,7 +167,7 @@ define(['angular'], function(angular) {
 
             $scope.wordList = [];
             $scope.completers = ConfService.completer($stateParams.eid, $stateParams.id, $stateParams.vid, function(data) {
-                var obj = eval('(' + data + ')');
+                var obj = eval(data);
                 for (var prop in obj) {
                     $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                 }

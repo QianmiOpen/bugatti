@@ -138,7 +138,7 @@ object TaskTools {
         s"""{"$result", "error"}"""
       }
     } else {
-      "{'没有关联机器!':'error'}"
+      s"""{"没有关联机器!":"error"}"""
     }
   }
 }
