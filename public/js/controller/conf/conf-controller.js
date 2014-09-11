@@ -4,9 +4,9 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.confModule', ['angularFileUpload']);
 
-    app.controller('ConfCtrl', ['$scope', '$state', '$stateParams', '$modal',
+    app.controller('ConfCtrl', ['$scope', '$state', '$stateParams', '$modal', '$window',
         'ConfService', 'EnvService', 'ProjectService', 'VersionService',
-        function($scope, $state, $stateParams, $modal, ConfService, EnvService, ProjectService, VersionService) {
+        function($scope, $state, $stateParams, $modal, $window, ConfService, EnvService, ProjectService, VersionService) {
             // load project
             ProjectService.get($stateParams.id, function(data) {
                 $scope.project = data;
@@ -18,16 +18,18 @@ define(['angular'], function(angular) {
             // load env all
             EnvService.getAll(function(data) {
                 if (data == null || data.length == 0) {
-                    return;
+                    $scope.envs = [];
+                } else {
+                    $scope.envs = data;
                 }
-                $scope.envs = data;
+                $scope.envs.unshift({"id": 0, "name": '模板配置', "nfServer": '', "ipRange": '', "level": 'safe', "scriptVersion": '', "jobNo": '', "remark": ''})
 
-                if ($stateParams.eid) {
+                if ($stateParams.eid && $stateParams.eid != 0) {
                     EnvService.get($stateParams.eid, function(e) {
                         $scope.envChange(e)
                     });
                 } else { // default select first
-                    $scope.envChange(data[0])
+                    $scope.envChange($scope.envs[0])
                 }
             });
 
@@ -36,6 +38,19 @@ define(['angular'], function(angular) {
                 $scope.env = e;
             };
 
+            // 生成模板
+            $scope.gen = function() {
+                $scope.copyParam = {projectId: $stateParams.id, target_eid: $stateParams.eid, target_vid: $stateParams.vid, envId: 0, versionId: $stateParams.vid, ovr: true, copy: false};
+                if (confirm('把当前环境所有配置文件生成模板？')) {
+                    ConfService.copy(angular.toJson($scope.copyParam), function(data) {
+                        if (data.r === 'ok') {
+                            $window.alert('成功')
+                        } else if (data.r === 'exist') {
+                            $window.alert('内容已存在')
+                        }
+                    });
+                }
+            }
     }]);
 
     app.controller('ConfListCtrl', ['$scope', '$state', '$stateParams', '$modal',
