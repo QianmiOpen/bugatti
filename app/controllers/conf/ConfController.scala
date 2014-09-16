@@ -180,9 +180,10 @@ object ConfController extends BaseController {
 
   // ===========================================================================
   // 一键拷贝, todo 无事务，后期改造为队列
+  // 从目标拷贝
   // ===========================================================================
   implicit val conFormWrites = Json.writes[CopyForm]
-  case class CopyForm(target_eid: Int, target_vid: Int, envId: Int, versionId: Int, projectId: Int, ovr: Boolean)
+  case class CopyForm(target_eid: Int, target_vid: Int, envId: Int, versionId: Int, projectId: Int, ovr: Boolean, copy: Boolean)
   val copyForm = Form(
     mapping(
       "target_eid" -> number,
@@ -190,7 +191,8 @@ object ConfController extends BaseController {
       "envId" -> number, // 原环境编号
       "versionId" -> number, // 原版本编号
       "projectId" -> number, // 原项目编号
-      "ovr" -> default(boolean, false)
+      "ovr" -> default(boolean, false),
+      "copy" -> default(boolean, true)
     )(CopyForm.apply)(CopyForm.unapply)
   )
   def copy = AuthAction(FuncEnum.project) { implicit request =>
@@ -202,20 +204,26 @@ object ConfController extends BaseController {
         else {
           val targetConfs = ConfHelper.findByEnvId_VersionId(copyForm.target_eid, copyForm.target_vid)
           val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.envId, copyForm.versionId)
-          val confs = copyForm.ovr match {
-            case true =>
+          val confs = (copyForm.ovr, copyForm.copy) match {
+            case (true, true) =>
               targetConfs.filter(t => currConfs.map(_.path).contains(t.path)).foreach( c => ConfHelper.delete(c)) // delete exist
               targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path)) // return targets
-            case false =>
+            case (false, true) =>
               targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path))
+            case (true, false) =>
+              currConfs.filter(t => targetConfs.map(_.path).contains(t.path)).foreach( c => ConfHelper.delete(c)) // delete exist
+              targetConfs
+            case (false, false) =>
+              currConfs.filterNot(t => targetConfs.map(_.path).contains(t.path))
           }
           // insert all
           confs.foreach { c =>
             val content = ConfContentHelper.findById(c.id.get)
             ConfHelper.create(c.copy(id = None, envId = copyForm.envId, versionId = copyForm.versionId), content)
           }
+          val opMsg = if (copyForm.copy) "一键拷贝" else "生成模板"
           val _msg = Json.obj("mod" -> ModEnum.conf.toString, "user" -> request.user.jobNo,
-            "ip" -> request.remoteAddress, "msg" -> "一键拷贝", "data" -> Json.toJson(copyForm)).toString
+            "ip" -> request.remoteAddress, "msg" -> opMsg, "data" -> Json.toJson(copyForm)).toString
           ALogger.info(_msg)
           Ok(_Success)
         }

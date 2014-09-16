@@ -12,8 +12,7 @@
     </li>
 </ul>
 
-<div class="btn-group mtb15" ng-if="project.id" has-project="{{project.id}}">
-
+<div class="btn-group mtb15" ng-if="project.id && $stateParams.eid > 0" has-project="{{project.id}}">
     <button ng-if="hasProject_" ui-sref="conf.project.version.conf.upload({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default" ng-disabled='$state.current.url == "/upload"'>
         <i class="glyphicon glyphicon-upload"></i>上传
     </button>
@@ -22,6 +21,7 @@
         新建
     </button>
     <button ng-if="hasProject_" ui-sref="conf.project.version.conf.copy({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default" ng-disabled='$state.current.url == "/copy"'>一键拷贝</button>
+    <button ng-if="hasProject_" ng-click="gen()" type="button" class="btn btn-default">生成模板</button>
     <a ng-if="!$state.includes('conf.project.version.conf.list')" ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
 </div>
 

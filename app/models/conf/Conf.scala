@@ -27,7 +27,7 @@ case class ConfForm(id: Option[Int], envId: Int, projectId: Int, versionId: Int,
 }
 class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def envId = column[Int]("env_id")     // 环境编号
+  def envId = column[Int]("env_id")     // 环境编号, 0: 默认模板
   def projectId = column[Int]("project_id") // 项目编号
   def versionId = column[Int]("version_id") // 项目版本编号
   def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
