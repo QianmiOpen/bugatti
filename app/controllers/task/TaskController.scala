@@ -26,7 +26,7 @@ import models.conf.Environment
 import models.conf.Project
 import play.api.libs.json.JsObject
 
-//import scala.Seq
+import play.api.mvc.{JavascriptLitteral, QueryStringBindable}
 
 /**
  * 任务管理
@@ -58,8 +58,8 @@ object TaskController extends BaseController {
     }
   }
 
-  def findLastStatus(envId: Int, projectId: Int) = Action{
-    val list = TaskHelper.findLastStatusByProject(envId, projectId).map{
+  def findLastStatus(envId: Int, projectId: Int, clusters: String) = Action{
+    val list = TaskHelper.findLastStatusByClusters(envId, projectId, clusters.split(",")).map{
       t => {
         var tJson = Json.toJson(t).as[JsObject]
         VersionHelper.findById(t.versionId.getOrElse(0)) match {
@@ -125,12 +125,13 @@ object TaskController extends BaseController {
     val tq = fieldsJson \ "taskQueue"
     val envId = (tq \ "envId").as[Int]
     val projectId = (tq \ "projectId").as[Int]
+    val clusterName = (tq \ "clusterName").asOpt[String]
     val versionId = (tq \ "versionId").asOpt[Int]
     Logger.info(s"version ==> ${versionId}")
     val templateId = (tq \ "templateId").as[Int]
-    val taskQueue = TaskQueue(None, envId, projectId, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
+    val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
     val taskQueueId = TaskQueueHelper.create(taskQueue)
-    MyActor.createNewTask(envId, projectId)
+    MyActor.createNewTask(envId, projectId, clusterName)
     //test
 //    var seq = Seq.empty[TaskQueue]
 //    val doEnv = 2
@@ -226,9 +227,14 @@ object TaskController extends BaseController {
     Ok
   }
 
-  def forceTerminate(envId: Int, projectId: Int) = Action {
-    MyActor.forceTerminate(envId, projectId)
+  def forceTerminate(envId: Int, projectId: Int, clusterName: Option[String]) = Action {
+    MyActor.forceTerminate(envId, projectId, clusterName)
     Ok
+  }
+
+  //=======================任务界面重构===========================================
+  def findClusterByEnv_Project(envId: Int, projectId: Int) = Action {
+    Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)))
   }
 
   implicit val varWrites = Json.writes[Variable]
@@ -236,5 +242,6 @@ object TaskController extends BaseController {
   implicit val taskWrites = Json.writes[Task]
   implicit val versionWrites = Json.writes[Version]
   implicit val taskTemplateWrites = Json.writes[TaskTemplate]
+  implicit val envProRelWrites = Json.writes[EnvironmentProjectRel]
 
 }

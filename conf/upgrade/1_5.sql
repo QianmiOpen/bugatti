@@ -12,3 +12,6 @@ CREATE TABLE `environment_member` (
   KEY `idx_eid` (`env_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE `task_queue` ADD COLUMN `cluster_name` VARCHAR(254) NULL COMMENT '负载机器名称' AFTER `project_id`;
+
+ALTER TABLE `task` ADD COLUMN `cluster_name` VARCHAR(254) NULL COMMENT '负载机器名称' AFTER `project_id`;

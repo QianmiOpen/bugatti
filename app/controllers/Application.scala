@@ -216,6 +216,7 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.taskLogFirst,
         task.routes.javascript.TaskController.removeTaskQueue,
         task.routes.javascript.TaskController.forceTerminate,
+        task.routes.javascript.TaskController.findClusterByEnv_Project,
 
         // logs
         logs.routes.javascript.LogsController.search,

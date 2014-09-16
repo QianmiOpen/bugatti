@@ -136,7 +136,7 @@ object Global extends GlobalSettings {
     val set = TaskQueueHelper.findEnvId_ProjectId()
     set.foreach {
       s =>
-        MyActor.createNewTask(s._1, s._2)
+        MyActor.createNewTask(s._1, s._2, s._3)
     }
 
     //初始化ConfigureActor中的projectMap

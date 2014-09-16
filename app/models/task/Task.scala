@@ -18,12 +18,13 @@ import play.api.libs.json.JsSuccess
  * @author of729
  * @author of546
  */
-case class Task(id: Option[Int], envId: Int, projectId: Int, versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
+case class Task(id: Option[Int], envId: Int, projectId: Int, clusterName: Option[String], versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
 
 case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id")
   def projectId = column[Int]("project_id")
+  def clusterName = column[String]("cluster_name", O.Nullable)
   def versionId = column[Int]("version_id", O.Nullable)
   def taskTemplateId = column[Int]("task_template_id")
   def status = column[TaskStatus]("status")
@@ -31,7 +32,7 @@ case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def endTime = column[DateTime]("end_time", O.Nullable, O.DBType("DATETIME"))
   def operatorId = column[Int]("operator_id")
 
-  override def * = (id.?, envId, projectId, versionId.?, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
+  override def * = (id.?, envId, projectId, clusterName.?, versionId.?, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
 }
 
 object TaskHelper {
@@ -40,6 +41,7 @@ object TaskHelper {
     (JsPath \ "id").readNullable[Int] and
     (JsPath \ "envId").read[Int] and
     (JsPath \ "projectId").read[Int] and
+    (JsPath \ "clusterName").readNullable[String] and
     (JsPath \ "versionId").readNullable[Int] and
     (JsPath \ "taskTemplateId").read[Int] and
     (JsPath \ "status").read[TaskStatus] and
@@ -128,13 +130,23 @@ object TaskHelper {
     taskQuery.list
   }
 
-  def findLastStatusByProject(envId: Int, projectId: Int): List[Task] = {
-    val projects = Json.obj("id" -> projectId)
-    findLastStatus(envId, projects)
+  def findLastStatusByClusters(envId: Int, projectId: Int, clusters: Seq[String]): Seq[Task] = db withSession { implicit session =>
+//    val projects = Json.obj("id" -> projectId)
+//    findLastStatus(envId, projects)
+    val maxEndTime = qTask.filter(t => t.envId === envId && t.projectId === projectId && (t.clusterName inSet clusters) ).groupBy(_.clusterName)
+      .map {
+      case (clusterName, row) => clusterName -> row.map(_.startTime).max
+    }
+    val taskQuery = for{
+      task <- qTask
+      max <- maxEndTime
+      if (task.clusterName === max._1 && task.startTime === max._2)
+    } yield task
+    taskQuery.list
   }
 
   implicit def taskQueue2Task(tq: TaskQueue): Task ={
-    Task(None, tq.envId, tq.projectId, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
+    Task(None, tq.envId, tq.projectId, tq.clusterName, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
   }
 
   def addByTaskQueue(tq: TaskQueue): Int = db withSession { implicit session =>

@@ -12,8 +12,8 @@ define(['angular'], function(angular) {
             getLastTaskStatus: function(envId, projects, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.findLastTaskStatus().url, {'envId': envId, 'projects': projects}).success(callback)
             },
-            findLastStatus: function(envId, projectId, callback){
-                $http(PlayRoutes.controllers.task.TaskController.findLastStatus(envId, projectId)).success(callback)
+            findLastStatus: function(envId, projectId, clusters, callback){
+                $http(PlayRoutes.controllers.task.TaskController.findLastStatus(envId, projectId, clusters)).success(callback)
             },
             createNewTaskQueue: function(taskQueue, callback){
                 $http.post(PlayRoutes.controllers.task.TaskController.createNewTaskQueue().url, {'taskQueue': taskQueue}).success(callback)
@@ -27,8 +27,11 @@ define(['angular'], function(angular) {
             readHeader: function(taskId, byteSize, callback){
                 $http(PlayRoutes.controllers.task.TaskController.taskLogFirst(taskId, byteSize)).success(callback)
             },
-            forceTerminate: function(envId, projectId, callback){
-                $http(PlayRoutes.controllers.task.TaskController.forceTerminate(envId, projectId)).success(callback)
+            forceTerminate: function(envId, projectId, clusterName, callback){
+                $http(PlayRoutes.controllers.task.TaskController.forceTerminate(envId, projectId, clusterName)).success(callback)
+            },
+            findClusters: function(envId, projectId, callback){
+                $http(PlayRoutes.controllers.task.TaskController.findClusterByEnv_Project(envId, projectId)).success(callback)
             }
         }
     });

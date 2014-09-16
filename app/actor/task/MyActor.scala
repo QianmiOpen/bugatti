@@ -26,6 +26,8 @@ object MyActor {
 
   implicit val timeout = Timeout(2 seconds)
 
+  final val projectKey = "ALL"
+
   val system = ActorUtils.system
   //管理taskQueue中，在同一时间只有一个eid_pid的任务在执行
   val superviseTaskActor = system.actorOf(Props[MyActor], "superviseActor")
@@ -33,7 +35,7 @@ object MyActor {
   val socketActor = system.actorOf(Props[SocketActor], "socketActor")
 
   //容器：管理eid_pid状态
-  var envId_projectIdStatus = Map.empty[String, TaskStatus]
+  var envId_projectIdStatus = Map.empty[String, Seq[String]]
 
   var statusMap = Json.obj()
 
@@ -48,8 +50,8 @@ object MyActor {
   /**
    * 新建一个任务需要到actor的队列中处理
    */
-  def createNewTask(envId: Int, projectId: Int) = {
-    superviseTaskActor ! CreateNewTaskActor(envId, projectId)
+  def createNewTask(envId: Int, projectId: Int, clusterName: Option[String]) = {
+    superviseTaskActor ! CreateNewTaskActor(envId, projectId, clusterName)
   }
 
   def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
@@ -75,8 +77,8 @@ object MyActor {
     }
   }
 
-  def forceTerminate(envId: Int, projectId: Int): Unit ={
-    superviseTaskActor ! ForceTerminate(envId, projectId)
+  def forceTerminate(envId: Int, projectId: Int, clusterName: Option[String]): Unit ={
+    superviseTaskActor ! ForceTerminate(envId, projectId, clusterName)
   }
 
   //在global被初始化
@@ -100,25 +102,26 @@ object MyActor {
 class MyActor extends Actor with ActorLogging {
   import context._
   def receive = {
-    case CreateNewTaskActor(envId, projectId) => {
+    case CreateNewTaskActor(envId, projectId, cluster) => {
       // 增加任务队列数量
-      val key = s"${envId}_${projectId}"
+      val key = taskKey(envId, projectId, cluster)
       incQueueNum(key, 1)
-      self ! NextTaskQueue(envId, projectId)
+      self ! NextTaskQueue(envId, projectId, cluster)
     }
-    case NextTaskQueue(envId, projectId) => {
+    case NextTaskQueue(envId, projectId, cluster) => {
       val key = s"${envId}_${projectId}"
-      log.info(s"envId_projectIdStatus before ==> ${MyActor.envId_projectIdStatus}")
-      if(!MyActor.envId_projectIdStatus.keySet.contains(key)){
-        MyActor.envId_projectIdStatus += key -> TaskEnum.TaskProcess
-        log.info(s"envId_projectIdStatus after ==> ${MyActor.envId_projectIdStatus}")
-        context.child(s"taskExecute_${key}").getOrElse(
-          actorOf(Props[TaskExecute], s"taskExecute_${key}")
-        ) ! NextTaskQueue(envId, projectId)
+      val tKey = taskKey(envId, projectId, cluster)
+      val clusterName = genClusterName(cluster)
+      if(isTaskAvailable(key, clusterName)){
+        addKeyStatus(key, clusterName)
+        context.child(s"taskExecute_${tKey}").getOrElse(
+          actorOf(Props[TaskExecute], s"taskExecute_${tKey}")
+        ) ! NextTaskQueue(envId, projectId, cluster)
       }
     }
-    case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum) => {
-      val key = s"${tq.envId}_${tq.projectId}"
+    case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum, cluster) => {
+//      val key = s"${tq.envId}_${tq.projectId}"
+      val key = taskKey(tq.envId, tq.projectId, cluster)
       //1、修改queueNum
       incQueueNum(key, -1)
       //2、更新queueList
@@ -132,8 +135,9 @@ class MyActor extends Actor with ActorLogging {
       //6、taskName
       changeStatus(mergerStatus(key, Json.obj("taskName" -> taskName)))
     }
-    case ChangeCommandStatus(envId, projectId, order, sls, machine) => {
-      val key = s"${envId}_${projectId}"
+    case ChangeCommandStatus(envId, projectId, order, sls, machine, cluster) => {
+//      val key = s"${envId}_${projectId}"
+      val key = taskKey(envId, projectId, cluster)
       //1、currentNum
       changeStatus(mergerStatus(key, Json.obj("currentNum" -> order)))
       //2、command.commandName
@@ -141,8 +145,9 @@ class MyActor extends Actor with ActorLogging {
       val json = Json.obj("command" -> Json.obj("sls" -> sls, "machine" -> machine))
       changeStatus(mergerStatus(key, json))
     }
-    case ChangeOverStatus(envId, projectId, status, endTime, version) => {
-      val key = s"${envId}_${projectId}"
+    case ChangeOverStatus(envId, projectId, status, endTime, version, cluster) => {
+//      val key = s"${envId}_${projectId}"
+      val key = taskKey(envId, projectId, cluster)
       //1、taskStatus
       changeStatus(mergerStatus(key, Json.obj("taskStatus" -> Json.toJson(status))))
       //2、endTime
@@ -162,15 +167,16 @@ class MyActor extends Actor with ActorLogging {
 
     }
 
-    case ForceTerminate(envId, projectId) => {
-      val key = s"${envId}_${projectId}"
+    case ForceTerminate(envId, projectId, clusterName) => {
+//      val key = s"${envId}_${projectId}"
+      val key = taskKey(envId, projectId, clusterName)
       context.child(s"taskExecute_${key}").getOrElse(
         actorOf(Props[TaskExecute], s"taskExecute_${key}")
       ) ! TerminateCommands(TaskEnum.TaskFailed)
     }
 
-    case RemoveStatus(envId, projectId) => {
-      removeStatus(envId, projectId)
+    case RemoveStatus(envId, projectId, cluster) => {
+      removeStatus(envId, projectId, cluster)
     }
 
     case RefreshSyndic() => {
@@ -214,42 +220,121 @@ class MyActor extends Actor with ActorLogging {
     MyActor.statusMap
   }
 
-  def removeStatus(envId: Int, projectId: Int) = {
+  def removeStatus(envId: Int, projectId: Int, clusterName: Option[String]) = {
     val key = s"${envId}_${projectId}"
-    val queueNum = (MyActor.statusMap \ key \ "queueNum").asOpt[Int]
+    val tKey = taskKey(envId, projectId, clusterName)
+    val cName = genClusterName(clusterName)
+    val queueNum = (MyActor.statusMap \ tKey \ "queueNum").asOpt[Int]
     queueNum match {
       case Some(qm) => {
         if(qm == 0){
-          MyActor.statusMap = MyActor.statusMap - key
-          MyActor.socketActor ! FindLastStatus(key)
+          MyActor.statusMap = MyActor.statusMap - tKey
+          MyActor.socketActor ! FindLastStatus(tKey)
         }
         else {
-          MyActor.statusMap = MyActor.statusMap - key
-          changeStatus(Json.obj(key -> Json.obj("queueNum" -> queueNum)))
+          MyActor.statusMap = MyActor.statusMap - tKey
+          changeStatus(Json.obj(tKey -> Json.obj("queueNum" -> queueNum)))
         }
-        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
-        self ! NextTaskQueue(envId, projectId)
+//        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+        removeKeyStatus(key, cName)
+        self ! NextTaskQueue(envId, projectId, clusterName)
       }
       case _ => {
-        MyActor.statusMap = MyActor.statusMap - key
-        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+        MyActor.statusMap = MyActor.statusMap - tKey
+//        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
+        removeKeyStatus(key, cName)
       }
     }
   }
 
+  /**
+   * 判断同一个项目下的任务是否可以触发执行
+   * @param key
+   * @param name
+   * @return
+   */
+  def isTaskAvailable(key: String, name: String): Boolean ={
+    MyActor.envId_projectIdStatus.get(key) match {
+      case Some(seq) =>
+        if(seq.contains(MyActor.projectKey) || name == MyActor.projectKey){
+          false
+        }else {
+          !seq.contains(name)
+        }
+      case _ =>
+        true
+    }
+  }
+
+  /**
+   * 记录该项目中正在执行的任务key
+   * @param key
+   * @param name
+   */
+  def addKeyStatus(key: String, name: String): Unit ={
+    MyActor.envId_projectIdStatus.get(key) match {
+      case Some(seq) =>
+        MyActor.envId_projectIdStatus += key -> (seq :+ name)
+      case _ =>
+        MyActor.envId_projectIdStatus += key -> Seq(name)
+    }
+  }
+
+  /**
+   * 删除该项目中已经执行完成的key
+   * @param key
+   * @param name
+   */
+  def removeKeyStatus(key: String, name: String): Unit ={
+    MyActor.envId_projectIdStatus.get(key) match {
+      case Some(seq) =>
+        MyActor.envId_projectIdStatus += key -> (seq.filterNot(_ == name))
+      case _ =>
+    }
+  }
+
+  /**
+   * 生成正确的taskKey（区分项目和机器级别的key）
+   * @param envId
+   * @param projectId
+   * @param cluster
+   * @return
+   */
+  def taskKey(envId: Int, projectId: Int, cluster: Option[String]): String ={
+    cluster match{
+      case Some(c) =>
+        s"${envId}_${projectId}_${c}"
+      case _ =>
+        s"${envId}_${projectId}"
+    }
+  }
+
+  /**
+   * 转换机器负载的名称，如果是项目级别，则返回projectKey
+   * @param cluster
+   * @return
+   */
+  def genClusterName(cluster: Option[String]): String ={
+    cluster match {
+      case Some(s) => s
+      case _ => MyActor.projectKey
+    }
+  }
+
+
 }
 
-case class CreateNewTaskActor(envId: Int, projectId: Int)
-case class NextTaskQueue(envId: Int, projectId: Int)
+case class CreateNewTaskActor(envId: Int, projectId: Int, clusterName: Option[String])
+case class NextTaskQueue(envId: Int, projectId: Int, clusterName: Option[String])
 
-case class ChangeTaskStatus(taskQueue: TaskQueue, taskName: String, queues: Seq[JsObject], currentNum: Int, totalNum: Int)
-case class ChangeCommandStatus(envId: Int, projectId: Int, currentNum: Int, commandName: String, machine: String)
-case class ChangeOverStatus(envId: Int, projectId: Int, taskStatus: TaskStatus, endTime: DateTime, version: String)
-case class RemoveStatus(envId: Int, projectId: Int)
+case class ChangeTaskStatus(taskQueue: TaskQueue, taskName: String, queues: Seq[JsObject], currentNum: Int, totalNum: Int, cluster: Option[String])
+case class ChangeCommandStatus(envId: Int, projectId: Int, currentNum: Int, commandName: String, machine: String, cluster: Option[String])
+case class ChangeOverStatus(envId: Int, projectId: Int, taskStatus: TaskStatus, endTime: DateTime, version: String, cluster: Option[String])
+case class RemoveStatus(envId: Int, projectId: Int, clusterName: Option[String])
 case class FindLastStatus(key: String)
 case class RefreshSyndic()
 
-case class ForceTerminate(envId: Int, projectId: Int)
+case class ForceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
 
 class WSSchedule{
   def start(socketActor: ActorRef, notify: String): Cancellable = {

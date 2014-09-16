@@ -39,6 +39,8 @@ class CommandActor extends Actor with ActorLogging {
 
   var _taskObj: ProjectTask_v = null
 
+  var _clusterName = Option.empty[String]
+
   def receive = {
     case insertCommands: InsertCommands => {
       _taskId = insertCommands.taskId
@@ -47,6 +49,7 @@ class CommandActor extends Actor with ActorLogging {
       _versionId = insertCommands.versionId
       _returnJson = insertCommands.json
       _taskObj = insertCommands.taskObj
+      _clusterName = insertCommands.cluster
 
       if (insertCommands.commandList.length == 0) {
         noCommands(_taskId, _envId, _projectId, insertCommands.json)
@@ -61,7 +64,7 @@ class CommandActor extends Actor with ActorLogging {
       if (_order <= _commands.length) {
         val command = _commands(_order - 1)
         //TODO 推送状态
-        MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine)
+        MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine, _clusterName)
         //TODO 修改数据库状态 （暂时取消这个步骤，因为和日志有重合功能）
 
         executeSalt(_taskId, command, _envId, _projectId, _versionId, _order)
@@ -157,7 +160,7 @@ class CommandActor extends Actor with ActorLogging {
   def terminateCommand(status: TaskStatus) = {
     TaskHelper.changeStatus(_taskId, status)
     val (task, version) = getTask_VS(_taskId)
-    MyActor.superviseTaskActor ! ChangeOverStatus(_envId, _projectId, status, task.endTime.get, version)
+    MyActor.superviseTaskActor ! ChangeOverStatus(_envId, _projectId, status, task.endTime.get, version, _clusterName)
 
     closeLookup
 //    closeSelf
@@ -177,7 +180,7 @@ class CommandActor extends Actor with ActorLogging {
     insertResultLog(taskId, s"[error] ${json \ "error"}")
     TaskHelper.changeStatus(taskId, TaskEnum.TaskFailed)
     val (task, version) = getTask_VS(taskId)
-    MyActor.superviseTaskActor ! ChangeOverStatus(envId, projectId, TaskEnum.TaskFailed, task.endTime.get, version)
+    MyActor.superviseTaskActor ! ChangeOverStatus(envId, projectId, TaskEnum.TaskFailed, task.endTime.get, version, _clusterName)
   }
 
   def getTask_VS(taskId: Int): (Task, String) = {
@@ -265,7 +268,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 }
 
-case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v)
+case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v, cluster: Option[String])
 
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 

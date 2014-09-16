@@ -74,7 +74,6 @@ define(['angular'], function(angular) {
                 TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
                     $scope.lastTasks = data
                     $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
-                    console.log($scope.projectStatus)
                     $scope.mergeTemplates()
 
                 })
@@ -86,7 +85,6 @@ define(['angular'], function(angular) {
             $scope.projectStatus.map($scope.getProjectTemplates)
         }
         $scope.getTemplates = function(){
-            console.log($scope.scriptVersion)
             //查询项目模板（操作按钮）
             TaskService.getTemplates($scope.scriptVersion, function(data){
                 $scope.templates = data
@@ -98,6 +96,10 @@ define(['angular'], function(angular) {
         $scope.getProjectTemplates = function(data){
             data.templates = $scope.templates[data.templateId]
             data
+        }
+
+        $scope.getClusterTemplates = function(data){
+//            data.
         }
 
         $scope.randomKey = function(min, max) {
@@ -122,15 +124,17 @@ define(['angular'], function(angular) {
                     var tsData = $scope.tsData
                     for(var pIndex in $scope.projectStatus){
                         var p = $scope.projectStatus[pIndex]
-                        //envId + projectId
-                        var key = $scope.activeEnv + "_" + p.id
-                        var key_last = key + "_last"
-                        var projectObj = tsData[key]
-                        var projectObj_last = tsData[key_last]
+                        for(var vmIndex in $scope.vms){
+                            var vmName = $scope.vms[vmIndex].name
+                            //envId + projectId
+                            var key = $scope.activeEnv + "_" + p.id + "_" + vmName
+                            var key_last = key + "_last"
+                            var projectObj = tsData[key]
+                            var projectObj_last = tsData[key_last]
 
-                        if(projectObj != undefined){
-                            /**
-                             * {"4_1":
+                            if(projectObj != undefined){
+                                /**
+                                 * {"4_1":
                              *      {"queueNum":0,
                              *       "queues":[
                              *          {"id":1,"envId":4,"projectId":1,"versionId":2,"taskTemplateId":7,"status":3,"importTime":1406172301000,"taskId":1,"operatorId":1,"taskTemplateName":"安装应用"}
@@ -142,8 +146,12 @@ define(['angular'], function(angular) {
                              *       "command":{"sls":"加固os","machine":"d6a597315b01"}
                              *      }
                              *  }
-                             **/
-                            p.task = projectObj
+                                 **/
+//                                p.task = projectObj
+                                var pcIndex = $scope.findVmIndex(vmName, p)
+                                if(p.clusters.length > 0){
+                                    p.clusters[pcIndex].task = projectObj
+                                }
 //                            p.status.currentNum = projectObj.currentNum
 //                            p.status.totalNum = projectObj.totalNum
 //                            p.status.queueNum = projectObj.queueNum
@@ -154,25 +162,41 @@ define(['angular'], function(angular) {
 //                            if(p.task != undefined){
 //                                p.task.taskName = projectObj.taskName
 //                            }
-                        }
-                        if(projectObj_last != undefined){
-                            $scope.findLastStatus(projectObj_last)
+                            }
+                            if(projectObj_last != undefined){
+                                $scope.findLastStatus(projectObj_last)
+                            }
                         }
                     }
                     $scope.projectStatus = $scope.projectStatus.map($scope.addStatusTip)
                 })
             }
         }
+
+        $scope.findVmIndex = function(name, project){
+            var index = -1
+            for(var pcIndex in project.clusters){
+                if(project.clusters[pcIndex].name == name){
+                    index = pcIndex
+                }
+            }
+            return index
+        }
         //获取envId_projectId最后一个任务状态
         $scope.findLastStatus = function(data){
-            console.log(data)
             var tmp = data.split("_")
-            console.log(tmp[0] + "," + tmp[1])
-            TaskService.findLastStatus(tmp[0], tmp[1], function(data){
+            var clusterName = null
+            if(tmp.length > 2){
+                clusterName = tmp[2]
+            }
+            TaskService.findLastStatus(tmp[0], tmp[1], clusterName, function(data){
                 $scope.lastTasks = data
-                $scope.projectStatus = $scope.projectStatus.map($scope.changeLastData).map($scope.addStatusTip)
-                console.log($scope.projectStatus)
-                $scope.mergeTemplates()
+                if(clusterName == null){
+                    $scope.projectStatus = $scope.projectStatus.map($scope.changeLastData).map($scope.addStatusTip)
+                }else {
+                    $scope.projectStatus = $scope.projectStatus.map($scope.changeLastDataCluster)
+                }
+//                $scope.mergeTemplates()
             })
         }
 
@@ -189,10 +213,25 @@ define(['angular'], function(angular) {
         $scope.changeLastData = function(data){
             for(var index in $scope.lastTasks){
                 var p = $scope.lastTasks[index]
-                console.log(p)
                 if(p.projectId === data.id){
                     data.task = p
                     data.task.queueNum = 0
+                }
+            }
+            return data
+        }
+        $scope.changeLastDataCluster = function(data){
+            if($scope.lastTasks.length > 0){
+                for(var cIndex in $scope.lastTasks){
+                    var c = $scope.lastTasks[cIndex]
+                    for(var cIndex in data.clusters){
+                        var cluster = data.clusters[cIndex]
+                        if(c.clusterName == cluster.name){
+                            data.clusters[cIndex].task = c
+                            data.clusters[cIndex].task.queueNum = 0
+                            data.clusters[cIndex].task.statusTip = $scope.explainTaskStatus(data.clusters[cIndex].task.status)
+                        }
+                    }
                 }
             }
             return data
@@ -204,7 +243,6 @@ define(['angular'], function(angular) {
             data.task.status = 0
             for(var index in $scope.lastTasks){
                 var p = $scope.lastTasks[index]
-                console.log(p)
                 if(p.projectId === data.id){
                     data.task = p
                     data.task.queueNum = 0
@@ -221,6 +259,7 @@ define(['angular'], function(angular) {
             }
             return data
         }
+
         //解析task status
         $scope.explainTaskStatus = function(status){
             switch(status){
@@ -299,11 +338,12 @@ define(['angular'], function(angular) {
             })
         }
 
-        $scope.deploy = function(projectId, versionId){
+        $scope.deploy = function(projectId, versionId, clusterName){
             $scope.taskQueue = {}
             $scope.taskQueue.envId = $scope.activeEnv
             $scope.taskQueue.projectId = projectId
             $scope.taskQueue.versionId = versionId
+            $scope.taskQueue.clusterName = clusterName
             $scope.taskQueue.templateId = $scope.choosedTemplateId
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
 
@@ -322,12 +362,12 @@ define(['angular'], function(angular) {
 
         }
 
-        $scope.showClick = function(versionMenu, projectId, templateId){
+        $scope.showClick = function(versionMenu, projectId, templateId, clusterName){
             if(!versionMenu){
                 $scope.taskQueue = {}
                 $scope.taskQueue.envId = $scope.activeEnv
                 $scope.taskQueue.projectId = projectId
-//                $scope.taskQueue.versionId = versionId
+                $scope.taskQueue.clusterName = clusterName
                 $scope.taskQueue.templateId = templateId
                 TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
                 $scope.versionShow = false
@@ -348,14 +388,41 @@ define(['angular'], function(angular) {
         }
 
         $scope.goTaskLog = function(taskId){
-            console.log(taskId)
             $state.go('.log', {taskId: taskId})
         }
 
 //=====================================终止任务========================================
-        $scope.forceTerminate = function(pid){
-            console.log(pid)
-            TaskService.forceTerminate($scope.activeEnv, pid, function(data){})
+        $scope.forceTerminate = function(pid, clusterName){
+            TaskService.forceTerminate($scope.activeEnv, pid, clusterName, function(data){})
+        }
+
+    //=============================== new vm task =====================================
+        $scope.isQueueShow = []
+        $scope.vms = []
+        $scope.showVm = function(proId){
+            //根据项目proId & envId 获取关联机器
+            TaskService.findClusters($scope.activeEnv, proId, function(data){
+                data.map(function(t){
+                    $scope.isQueueShow.push(false)
+                })
+                $scope.projectStatus.map(function(t){
+                    if(t.id == data[0].projectId){
+                        t.clusters = data
+                        $scope.vms = data
+                    }
+                    return t
+                })
+                var clusterNames = $scope.vms.map(function(c){return c.name}).join(',')
+                TaskService.findLastStatus($scope.activeEnv, proId, clusterNames, function(data){
+                    $scope.lastTasks = data
+                    $scope.projectStatus = $scope.projectStatus.map($scope.changeLastDataCluster)
+//                $scope.mergeTemplates()
+                })
+            })
+        }
+
+        $scope.showQueues = function(index){
+            $scope.isQueueShow[index] = !$scope.isQueueShow[index]
         }
     }]);
 
@@ -371,7 +438,6 @@ define(['angular'], function(angular) {
 
         var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
         var path = PlayRoutes.controllers.task.TaskController.taskLog(taskId).webSocketURL()
-        console.log(path)
         var logSocket = new WS(path)
 //        var logSocket = new WS("ws://bugatti.dev.ofpay.com/#/task/joinProcess")
 
