@@ -48,6 +48,7 @@
     <logger name="akka" level="INFO" />
     <logger name="com.jolbox.bonecp" level="DEBUG"/>
     <logger name="scala.slick" level="INFO"/>
+    <logger name="org.jboss.netty" level="INFO"/>
     <logger name="actor" level="INFO"/>
 
     <root level="INFO">

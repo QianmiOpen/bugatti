@@ -47,7 +47,7 @@ object ProjectMemberHelper extends PlayCache {
 
   def findProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
     val q = for{
-      (m, p) <- qMember leftJoin qProject on (_.projectId === _.id)
+      (m, p) <- qMember innerJoin qProject on (_.projectId === _.id)
       if m.jobNo === jobNo
     } yield p
     q.list
