@@ -1,10 +1,15 @@
 <div class="col-sm-8 p0" style="color:#666; font-weight: bold;"><span style="color: #999">~/</span>{{conf.path}}</div>
-<div class="navbar-right btn-group btn-group-xs" has-project="{{$stateParams.id}}">
 
+<div ng-if="!action" class="navbar-right btn-group btn-group-xs" has-project="{{$stateParams.id}}">
     <button ng-if="confContent.octet == false && hasProject_" ui-sref="conf.project.version.conf.edit({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">编辑</button>
     <button ng-if="confContent.octet == false" ui-sref="conf.project.version.conf.log({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">历史</button>
-
     <button ng-if="hasProject_" ng-click="delete(conf.id)" type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
+</div>
+
+<!-- directive -->
+<div ng-if="action" class="navbar-right btn-group btn-group-xs" >
+    <button ng-click="setAction('edit', conf)" type="button" class="btn btn-default">编辑</button>
+    <button ng-click="delete(conf.id)" type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
 </div>
 
 <div class="clearfix"></div>

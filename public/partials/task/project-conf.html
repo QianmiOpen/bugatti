@@ -1,0 +1,21 @@
+
+<select ng-change="changeVersion(versionId)" class="form-control mt15" ng-model="versionId" ng-options="v.id as v.vs for v in versions">
+    <option value="">-- 选择项目版本 --</option>
+</select>
+
+<div class="btn-group mtb15" ng-show="versionId" >
+    <button ng-disabled="isAction('upload')" ng-click="setAction('upload')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-upload"></i>上传</button>
+    <button ng-disabled="isAction('create')" ng-click="setAction('create')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i>新建</button>
+    <button ng-disabled="isAction('copy')" ng-click="setAction('copy')" type="button" class="btn btn-default">一键拷贝</button>
+    <a ng-click="setAction('list')" class="btn">返回列表</a>
+</div>
+
+<div class="clearfix"></div>
+
+<project-list ng-show="versionId && isAction('list')"></project-list>
+<project-detail ng-show="versionId && isAction('detail')"></project-detail>
+<project-edit ng-show="versionId && isAction('edit')"></project-edit>
+<project-create ng-show="versionId && isAction('create')"></project-create>
+<project-copy ng-show="versionId && isAction('copy')"></project-copy>
+<project-upload ng-show="versionId && isAction('upload')"></project-upload>
+

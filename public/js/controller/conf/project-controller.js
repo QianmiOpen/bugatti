@@ -405,7 +405,7 @@ define(['angular'], function(angular) {
                         else {
                             angular.forEach(project_vars, function(pv) {
                                 if (findInVars(_vars, pv) === -1) {
-                                    _vars.push({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                    _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
                                 }
                             });
                         }
