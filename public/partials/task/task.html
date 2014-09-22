@@ -4,11 +4,7 @@
             <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env.id)" ng-repeat="env in envs"><a href="">{{env.name}}</a></li>
         </ul>
     </div>
-    <style>
-        /*.collapse.in {display: table-row} todo body width
-        */
-    </style>
-    <br>
+    <br/>
     <accordion close-others="true">
         <accordion-group ng-repeat="pro in projectStatus">
             <accordion-heading>
