@@ -31,23 +31,19 @@ object ScriptGitActor {
 
 class ScriptGitActor extends Actor with ActorLogging {
   val TemplateSuffix = ".yaml"
-  val TemplatePath = "/templates"
+  val TemplatePath = "/templates" 
   val Ok = "Ok"
 
   val app = Play.current
   lazy val gitFormulasDir: File = new File(app.configuration.getString("git.formulas.dir").getOrElse("target/formulas"))
   lazy val gitFormulasUrl = app.configuration.getString("git.formulas.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-formulas.git")
-  lazy val gitPkgsDir: File = new File(app.configuration.getString("git.pkgs.dir").getOrElse("target/pkgs"))
-  lazy val gitPkgsUrl = app.configuration.getString("git.pkgs.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-pkgs.git")
 
   var gitFormulas: Git = null
-  var gitPkgs: Git = null
 
   override def preStart(): Unit = {
     // 启动时初始化git目录
     if (app.configuration.getBoolean("git.init").getOrElse(true)) {
       gitFormulas = _initGitDir(gitFormulasDir, gitFormulasUrl)
-      gitPkgs = _initGitDir(gitPkgsDir, gitPkgsUrl)
     }
   }
 
@@ -81,19 +77,15 @@ class ScriptGitActor extends Actor with ActorLogging {
   }
 
   def _tagScript(tagName: String) = {
-    if (gitFormulas != null && gitPkgs != null) {
+    if (gitFormulas != null) {
       // checkout到master上
       gitFormulas.checkout().setName(ScriptVersionHelper.Master).call()
-      gitPkgs.checkout().setName(ScriptVersionHelper.Master).call()
 
       gitFormulas.pull().call()
-      gitPkgs.pull().call()
 
       gitFormulas.tag().setName(tagName).call()
-      gitPkgs.tag().setName(tagName).call()
 
       gitFormulas.push().setPushTags().call()
-      gitPkgs.push().setPushTags().call()
 
       ScriptVersionHelper.create(ScriptVersion(None, tagName, message = Some("")))
       _loadTemplateFromDir(tagName)

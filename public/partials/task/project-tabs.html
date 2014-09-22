@@ -1,0 +1,20 @@
+<div>
+    <div class="tabs">
+        <ul class="nav nav-tabs">
+            <li ng-class="{ active:isSet(1) }"><a href ng-click="setTab(1)">负载</a></li>
+            <li ng-class="{ active:isSet(2) }"><a href ng-click="setTab(2)">属性</a></li>
+            <li ng-class="{ active:isSet(3) }"><a href ng-click="setTab(3)">配置</a></li>
+        </ul>
+    </div>
+
+    <div class="table-responsive">
+        <!-- Project Balance -->
+        <project-balance ng-show="isSet(1)"></project-balance>
+
+        <!-- Project Item -->
+        <project-item ng-show="isSet(2)"></project-item>
+
+        <!-- Project Conf -->
+        <project-conf ng-show="isSet(3)"></project-conf>
+    </div>
+</div>

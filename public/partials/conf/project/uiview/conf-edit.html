@@ -45,7 +45,7 @@
         <tr>
             <td>
                 <div class="text-right">
-                    <button type="button" class="btn btn-link" back-button>取消</button>
+                    <button ng-if="!action" type="button" class="btn btn-link" back-button>取消</button>
                     &nbsp;&nbsp;
                     <button class="btn btn-success col-sm-2 navbar-right" ng-click="update()" ng-disabled="form.$invalid"> 修改文件 </button>
                 </div>

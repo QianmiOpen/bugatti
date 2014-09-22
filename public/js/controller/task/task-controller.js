@@ -53,7 +53,7 @@ define(['angular'], function(angular) {
                     $scope.scriptVersion = envObj.scriptVersion
                 }
             }
-            console.table($scope.envs)
+//            console.table($scope.envs)
             $scope.getTemplates()
         }
 
@@ -406,7 +406,7 @@ define(['angular'], function(angular) {
                     $scope.isQueueShow.push(false)
                 })
                 $scope.projectStatus.map(function(t){
-                    if(t.id == data[0].projectId){
+                    if(!angular.isUndefined(data[0]) && t.id == data[0].projectId){
                         t.clusters = data
                         $scope.vms = data
                     }
