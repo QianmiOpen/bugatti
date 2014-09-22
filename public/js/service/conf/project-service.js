@@ -54,6 +54,9 @@ define(['angular'], function(angular) {
             },
             updateMember: function(memberId, op, callback) {
                 $http.put(PlayRoutes.controllers.conf.ProjectController.updateMember(memberId, op).url).success(callback);
+            },
+            addCluster: function(eid, pid, callback){
+                $http.put(PlayRoutes.controllers.conf.ProjectController.addCluster(eid, pid).url).success(callback)
             }
         }
     });

@@ -58,6 +58,7 @@ define(['angular'], function(angular) {
         }
 
 //=====================================项目========================================
+
         $scope.showProjects = function(){
             ProjectService.getAuth(function(data){
                 $scope.pros = []
@@ -397,8 +398,19 @@ define(['angular'], function(angular) {
         }
 
     //=============================== new vm task =====================================
+        $scope.addCluster = function(pid){
+            console.log(pid)
+            ProjectService.addCluster($scope.activeEnv, pid, function(data){
+                console.log(data)
+                if(data.r == 1){
+                    $scope.showVm(pid)
+                }
+            })
+        }
+
         $scope.isQueueShow = []
         $scope.vms = []
+
         $scope.showVm = function(proId){
             //根据项目proId & envId 获取关联机器
             TaskService.findClusters($scope.activeEnv, proId, function(data){

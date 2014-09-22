@@ -61,6 +61,11 @@ object EnvironmentProjectRelHelper {
     qRelation.filter(r => r.envId === envId && r.projectId.isNull).list
   }
 
+  def updateByEnvId_projectId(envId: Int, pId: Int) = db withSession { implicit session =>
+    val seq = findIpsByEnvId(envId)
+    qRelation.filter( t => t.id === seq(0).id && t.projectId.isNull).update(seq(0).copy(projectId = Option(pId)))
+  }
+
   def allNotEmpty: Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     qRelation.filter(r => r.envId.isNotNull && r.projectId.isNotNull).list
   }

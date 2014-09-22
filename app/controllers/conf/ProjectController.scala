@@ -264,4 +264,8 @@ object ProjectController extends BaseController {
     )
   }
 
+  def addCluster(envId: Int, projectId: Int)= Action { implicit request =>
+    Ok(Json.obj("r" -> EnvironmentProjectRelHelper.updateByEnvId_projectId(envId, projectId)))
+  }
+
 }

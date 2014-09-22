@@ -60,6 +60,7 @@ DELETE        /project/:id                                        controllers.co
 POST          /project                                            controllers.conf.ProjectController.save
 PUT           /project/:projectId                                 controllers.conf.ProjectController.update(projectId: Int, envId: Int)
 POST          /project/auth                                       controllers.conf.ProjectController.showAuth(all: Boolean)
+PUT           /project/addCluster/:envId/:projectId               controllers.conf.ProjectController.addCluster(envId: Int, projectId: Int)
 # Project member
 GET           /project/:projectId/members                         controllers.conf.ProjectController.members(projectId: Int)
 GET           /project/:projectId/member/:jobNo                   controllers.conf.ProjectController.member(projectId: Int, jobNo: String)
