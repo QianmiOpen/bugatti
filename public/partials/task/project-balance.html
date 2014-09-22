@@ -11,7 +11,7 @@
     </thead>
     <tbody ng-repeat="c in pro.clusters">
     <tr >
-        <td><a class="glyphicon glyphicon-minus-sign" href="" ng-click="removeCluster(c.id)"></a></td>
+        <td><a class="glyphicon glyphicon-minus-sign" href="" ng-click="removeCluster(pro.id, c.id)"></a></td>
         <td>{{c.name}}</td>
         <td>
             <a href="" ng-click="showQueues($index)">

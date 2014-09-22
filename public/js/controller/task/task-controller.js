@@ -404,8 +404,22 @@ define(['angular'], function(angular) {
                 console.log(data)
                 if(data.r == 1){
                     $scope.showVm(pid)
+                }else {
+                    console.log("添加失败")
                 }
             })
+        }
+
+        $scope.removeCluster = function(pid, cid){
+            console.log(cid)
+            ProjectService.removeCluster(cid, function(data){
+                if(data.r == 1){
+                    $scope.showVm(pid)
+                }else {
+                    console.log("解绑失败")
+                }
+            })
+
         }
 
         $scope.isQueueShow = []

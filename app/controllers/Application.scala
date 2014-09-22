@@ -154,6 +154,7 @@ object Application extends ScalaController with Security {
 
         //project cluster
         conf.routes.javascript.ProjectController.addCluster,
+        conf.routes.javascript.ProjectController.removeCluster,
 
         // template
         conf.routes.javascript.TemplateController.all,
