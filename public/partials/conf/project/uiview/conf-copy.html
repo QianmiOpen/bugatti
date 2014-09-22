@@ -1,5 +1,5 @@
 
-<form name="form" class="form-horizontal" novalidate>
+<form name="copyForm" class="form-horizontal" novalidate>
     <div class="form-group">
         <label for="selectVersion" class="col-sm-2 control-label">版本选择：</label>
         <div class="col-sm-5">
@@ -10,7 +10,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">环境选择：</label>
         <div class="col-sm-5">
-            <label class="radio-inline" ng-repeat="e in envs">
+            <label class="radio-inline" ng-repeat="e in copyEnvs">
                 <input type="radio" name="env" ng-model="copyParam.target_eid" value="{{e.id}}" required>
                 {{e.name}}
             </label>
@@ -38,7 +38,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-5">
-            <button class="btn btn-success" ng-click="ok(copyParam)" ng-disabled="form.$invalid">确认</button>
+            <button class="btn btn-success" ng-click="ok(copyParam)" ng-disabled="copyForm.$invalid">确认</button>
         </div>
     </div>
 

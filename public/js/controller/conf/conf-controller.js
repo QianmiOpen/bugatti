@@ -214,7 +214,7 @@ define(['angular'], function(angular) {
     // ----------------------------------------------------
     app.controller('ConfCopyCtrl', ['$scope', '$state', '$window', '$filter', '$stateParams', 'ConfService', 'VersionService',
         function($scope, $state, $window, $filter, $stateParams, ConfService, VersionService) {
-
+            $scope.copyEnvs = angular.copy($scope.envs);
             $scope.copyParam = {projectId: $stateParams.id, target_eid: null, target_vid: null, envId: $stateParams.eid, versionId: $stateParams.vid, ovr: false};
 
             VersionService.top($stateParams.id, function(data) {

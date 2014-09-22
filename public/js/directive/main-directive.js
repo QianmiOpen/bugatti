@@ -642,6 +642,9 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/conf/project/uiview/conf-copy.html',
             controller: ['$scope', '$window', 'VersionService', 'ConfService', function($scope, $window, VersionService, ConfService) {
                 $scope.initCopyConf = function() {
+                    $scope.copyEnvs = angular.copy($scope.envs);
+                    $scope.copyEnvs.unshift({"id": 0, "name": '模板配置', "nfServer": '', "ipRange": '', "level": 'safe', "scriptVersion": '', "jobNo": '', "remark": ''})
+
                     $scope.copyParam = {projectId: $scope.pro.id, target_eid: null, target_vid: null, envId: $scope.activeEnv, versionId: $scope.versionId, ovr: false};
 
                     VersionService.top($scope.pro.id, function(data) {
