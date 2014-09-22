@@ -432,7 +432,7 @@ define(['angular'], function(angular) {
         }
     });
 
-    app.directive('projectList', function() {
+    app.directive('confList', function() {
         return {
             restrict: 'E',
             require: '^projectConf',
@@ -450,7 +450,7 @@ define(['angular'], function(angular) {
         }
     });
 
-    app.directive('projectDetail', function() {
+    app.directive('confDetail', function() {
         return {
             restrict: 'E',
             require: '^projectConf',
@@ -509,7 +509,7 @@ define(['angular'], function(angular) {
     });
 
 
-    app.directive('projectEdit', function() {
+    app.directive('confEdit', function() {
         return {
             restrict: 'E',
             require: '^projectConf',
@@ -547,7 +547,7 @@ define(['angular'], function(angular) {
     });
 
 
-    app.directive('projectCreate', function() {
+    app.directive('confCreate', function() {
         return {
             restrict: 'E',
             require: '^projectConf',
@@ -579,7 +579,7 @@ define(['angular'], function(angular) {
         }
     });
 
-    app.directive('projectCopy', function() {
+    app.directive('confCopy', function() {
         return {
             restrict: 'E',
             require: '^projectConf',
@@ -623,7 +623,7 @@ define(['angular'], function(angular) {
         }
     });
 
-    app.directive('projectUpload', function() {
+    app.directive('confUpload', function() {
         return {
             restrict: 'E',
             require: '^projectConf',
