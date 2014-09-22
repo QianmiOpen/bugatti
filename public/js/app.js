@@ -76,15 +76,15 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
                         },
                         function(response) { // error
                             if (response.status == 400) {
-                                $window.alert('参数错误');
+                                console.log('参数错误');
                             } else if (response.status == 403) {
-                                $window.alert('没有权限');
+                                console.log('没有权限');
                             } else if (response.status == 404) {
-                                $window.alert('内容不存在');
+                                console.log('内容不存在');
                             } else if (response.status == 409) {
-                                $window.alert('内容已存在');
+                                console.log('内容已存在');
                             } else if (response.status == 500) {
-                                $window.alert('内部错误');
+                                console.log('内部错误');
                             }
                             return $q.reject(response);
                         }
