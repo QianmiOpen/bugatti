@@ -1,5 +1,8 @@
 <div class="col-md-offset-0 main">
     <div class="page-header clearfix">
+        <div class="form-group pull-left col-xs-6 p0">
+            <input type="text" ng-model="searchText.name" class="form-control" placeholder="在这里输入项目名称，可快速检索">
+        </div>
         <button class="btn btn-primary pull-right" ng-click="changeProjects()">{{projectListName}}</button>
     </div>
 
@@ -10,7 +13,7 @@
     </div>
     <br/>
     <accordion close-others="true">
-        <accordion-group ng-repeat="pro in projectStatus">
+        <accordion-group ng-repeat="pro in projectStatus|filter:searchText">
             <accordion-heading>
                 <span class="hand" ng-click="showVm(pro.id)">{{pro.name}}</span>
             </accordion-heading>

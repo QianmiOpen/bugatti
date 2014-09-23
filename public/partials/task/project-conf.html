@@ -11,11 +11,12 @@
 </div>
 
 <div class="clearfix"></div>
-
-<conf-list ng-show="versionId && isAction('list')"></conf-list>
-<conf-detail ng-show="versionId && isAction('detail')"></conf-detail>
-<conf-edit ng-show="versionId && isAction('edit')"></conf-edit>
-<conf-create ng-show="versionId && isAction('create')"></conf-create>
-<conf-copy ng-show="versionId && isAction('copy')"></conf-copy>
-<conf-upload ng-show="versionId && isAction('upload')"></conf-upload>
+<div ng-if="versionId">
+    <conf-list ng-show="isAction('list')"></conf-list>
+    <conf-detail ng-show="isAction('detail')"></conf-detail>
+    <conf-edit ng-show="isAction('edit')"></conf-edit>
+    <conf-create ng-show="isAction('create')"></conf-create>
+    <conf-copy ng-show="isAction('copy')"></conf-copy>
+    <conf-upload ng-show="isAction('upload')"></conf-upload>
+</div>
 
