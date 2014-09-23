@@ -533,11 +533,11 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    this.wordList = [];
+                    $scope.wordList = [];
                     ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                         var obj = eval(data);
                         for (var prop in obj) {
-                            this.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                            $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                         }
                     });
                     var langTools = ace.require("ace/ext/language_tools");
