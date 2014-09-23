@@ -147,7 +147,7 @@ object ConfController extends BaseController {
     } getOrElse(BadRequest)
   }
 
-  def completer(envId: Int, projectId: Int, versionId: Int) = Action {
+  def completer(envId: Int, projectId: Int, versionId: Int) = Action { implicit request =>
     Ok(Json.parse(TaskTools.generateCodeCompleter(envId, projectId, versionId)))
   }
 
