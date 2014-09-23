@@ -67,7 +67,7 @@ object ConfController extends BaseController {
   def delete(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     ConfHelper.findById(id) match {
       case Some(conf) =>
-        if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) ||
+        if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) &&
             !UserHelper.hasEnv(conf.envId, request.user)
         ) { Forbidden } else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除配置文件", conf))
@@ -81,7 +81,7 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
+        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) &&
             !UserHelper.hasEnv(confForm.envId, request.user)
         ) { Forbidden } else {
           try {
@@ -99,7 +99,7 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
+        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) &&
             !UserHelper.hasEnv(confForm.envId, request.user)
         ) { Forbidden } else {
           try {
@@ -128,7 +128,7 @@ object ConfController extends BaseController {
     )
     request.body.asMultipartFormData.map { body =>
       reqConfForm.map { _confForm =>
-        if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user) ||
+        if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user) &&
             !UserHelper.hasEnv(_confForm.envId, request.user)
         ) { Forbidden } else {
           val result = body.files.filter(f => f.ref.file.length() < maxSizeExceeded).map { tempFile =>
@@ -203,7 +203,7 @@ object ConfController extends BaseController {
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       copyForm => {
-        if (!UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) ||
+        if (!UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) &&
             !UserHelper.hasEnv(copyForm.envId, request.user)
         ) Forbidden
         else if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(_Exist)

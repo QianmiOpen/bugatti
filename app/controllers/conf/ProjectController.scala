@@ -127,7 +127,7 @@ object ProjectController extends BaseController {
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       projectForm => {
-        if (!UserHelper.hasProjectSafe(projectId, request.user) ||
+        if (!UserHelper.hasProjectSafe(projectId, request.user) &&
             !UserHelper.hasEnv(envId, request.user)
         ) { Forbidden } else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改项目", projectForm.toProject))
