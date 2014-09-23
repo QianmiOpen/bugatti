@@ -58,9 +58,16 @@ define(['angular'], function(angular) {
         }
 
 //=====================================项目========================================
+        $scope.projectAllFlag = false
+        $scope.projectListName = $scope.projectAllFlag ? "只显示我的项目": "显示所有项目"
 
+        $scope.changeProjects = function(){
+            $scope.projectAllFlag = ! $scope.projectAllFlag
+            $scope.projectListName = $scope.projectAllFlag ? "只显示我的项目": "显示所有项目"
+            $scope.showProjects()
+        }
         $scope.showProjects = function(){
-            ProjectService.getAuth(function(data){
+            ProjectService.getAuth($scope.projectAllFlag, function(data){
                 $scope.pros = []
                 for(var p in data){
                     $scope.pros.push(data[p])
