@@ -23,7 +23,7 @@ class RefreshAreasActor extends Actor with ActorLogging {
   var refreshSchedule: Cancellable = _
 
   override def preStart(): Unit = {
-    refreshSchedule = context.system.scheduler.schedule(10 seconds, 600 seconds, self, RefreshAreasHosts)
+    refreshSchedule = context.system.scheduler.schedule(10 seconds, 3600 * 24 seconds, self, RefreshAreasHosts)
   }
 
   override def postStop(): Unit = {

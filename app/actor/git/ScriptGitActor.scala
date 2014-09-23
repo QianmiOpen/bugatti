@@ -31,7 +31,7 @@ object ScriptGitActor {
 
 class ScriptGitActor extends Actor with ActorLogging {
   val TemplateSuffix = ".yaml"
-  val TemplatePath = "/templates" 
+  val TemplatePath = "/templates"
   val Ok = "Ok"
 
   val app = Play.current
