@@ -30,7 +30,9 @@ define(['angular'], function(angular) {
                 $scope.envs.push(data[d])
             }
             $scope.activeEnv = $scope.envs.length == 0 ? 1 : $scope.envs[0].id
-            $scope.chooseEnv($scope.activeEnv)
+            if($scope.envs.length > 0){
+                $scope.chooseEnv($scope.activeEnv)
+            }
         });
 
         //选择默认选中的环境
@@ -58,16 +60,16 @@ define(['angular'], function(angular) {
         }
 
 //=====================================项目========================================
-        $scope.projectAllFlag = false
-        $scope.projectListName = $scope.projectAllFlag ? "只显示我的项目": "显示所有项目"
+//        $scope.projectAllFlag = false
+//        $scope.projectListName = $scope.projectAllFlag ? "只显示我的项目": "显示所有项目"
 
-        $scope.changeProjects = function(){
-            $scope.projectAllFlag = ! $scope.projectAllFlag
-            $scope.projectListName = $scope.projectAllFlag ? "只显示我的项目": "显示所有项目"
-            $scope.showProjects()
-        }
+//        $scope.changeProjects = function(){
+//            $scope.projectAllFlag = ! $scope.projectAllFlag
+//            $scope.projectListName = $scope.projectAllFlag ? "只显示我的项目": "显示所有项目"
+//            $scope.showProjects()
+//        }
         $scope.showProjects = function(){
-            ProjectService.getAuth($scope.projectAllFlag, function(data){
+            ProjectService.getAuth($scope.activeEnv, function(data){
                 $scope.pros = []
                 for(var p in data){
                     $scope.pros.push(data[p])

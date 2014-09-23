@@ -142,10 +142,10 @@ object ProjectController extends BaseController {
   }
 
   // 任务模块查看
-  def showAuth(all: Boolean) = AuthAction(FuncEnum.task) { implicit request =>
+  def showAuth(envId: Int) = AuthAction(FuncEnum.task) { implicit request =>
     val user = request.user
     //超级管理员才可以看到所有项目
-    if(user.role == user.superAdmin || all){
+    if(user.superAdmin || UserHelper.hasEnv(envId, user)){
       Ok(Json.toJson(ProjectHelper.all()))
     } else {
       Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(request.user.jobNo)))

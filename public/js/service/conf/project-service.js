@@ -15,8 +15,8 @@ define(['angular'], function(angular) {
             getExceptSelf: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.allExceptSelf(id)).success(callback);
             },
-            getAuth: function(flag, callback) {
-                $http(PlayRoutes.controllers.conf.ProjectController.showAuth(flag)).success(callback);
+            getAuth: function(envId, callback) {
+                $http(PlayRoutes.controllers.conf.ProjectController.showAuth(envId)).success(callback);
             },
             getPage: function(projectName, my, page, pageSize, callback) {
                 $http(PlayRoutes.controllers.conf.ProjectController.index(projectName, my, page, pageSize)).success(callback);

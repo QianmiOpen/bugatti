@@ -26,6 +26,7 @@ object EnvironmentMemberHelper extends PlayCache {
   import models.AppDB._
 
   val qMember = TableQuery[EnvironmentMemberTable]
+  val qEnv = TableQuery[EnvironmentTable]
 
   def findById(id: Int) = db withSession { implicit session =>
     qMember.filter(_.id === id).firstOption
@@ -41,6 +42,15 @@ object EnvironmentMemberHelper extends PlayCache {
 
   def findByJobNo(jobNo: String): Seq[EnvironmentMember] = db withSession{implicit session =>
     qMember.filter(m => m.jobNo === jobNo).list
+  }
+
+  def findEnvsByJobNo(jobNo: String): Seq[Environment] = db withSession{implicit session =>
+    val envList = for{
+      e <- qEnv
+      m <- qMember
+      if(e.id === m.envId && m.jobNo === jobNo)
+    } yield e
+    envList.list
   }
 
   def create(member: EnvironmentMember) = db withSession { implicit session =>

@@ -59,7 +59,7 @@ GET           /project/:id                                        controllers.co
 DELETE        /project/:id                                        controllers.conf.ProjectController.delete(id: Int)
 POST          /project                                            controllers.conf.ProjectController.save
 PUT           /project/:projectId                                 controllers.conf.ProjectController.update(projectId: Int, envId: Int)
-POST          /project/auth                                       controllers.conf.ProjectController.showAuth(all: Boolean)
+POST          /project/auth                                       controllers.conf.ProjectController.showAuth(envId: Int)
 PUT           /project/addCluster/:envId/:projectId               controllers.conf.ProjectController.addCluster(envId: Int, projectId: Int)
 DELETE        /project/removeCluster/:clusterId                   controllers.conf.ProjectController.removeCluster(clusterId: Int)
 # Project member
