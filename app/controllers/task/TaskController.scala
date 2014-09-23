@@ -129,7 +129,8 @@ object TaskController extends BaseController {
     val versionId = (tq \ "versionId").asOpt[Int]
     Logger.info(s"version ==> ${versionId}")
     val templateId = (tq \ "templateId").as[Int]
-    val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, 1)
+    val jobNo = (tq \ "operatorId").as[String]
+    val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, jobNo)
     val taskQueueId = TaskQueueHelper.create(taskQueue)
     MyActor.createNewTask(envId, projectId, clusterName)
     //test

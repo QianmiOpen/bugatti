@@ -13,7 +13,7 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 /**
  * Created by jinwei on 18/6/14.
  */
-case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, clusterName: Option[String], versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, importTime: DateTime, taskId: Option[Int], schemeId: Option[Int], operatorId: Int)
+case class TaskQueue(id: Option[Int], envId: Int, projectId: Int, clusterName: Option[String], versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, importTime: DateTime, taskId: Option[Int], schemeId: Option[Int], operatorId: String)
 
 case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -26,7 +26,7 @@ case class TaskQueueTable(tag: Tag) extends Table[TaskQueue](tag, "task_queue") 
   def importTime = column[DateTime]("import_time", O.DBType("DATETIME"))
   def taskId = column[Int]("task_id", O.Nullable)
   def schemeId = column[Int]("scheme_id", O.Nullable)
-  def operatorId = column[Int]("operator_id")
+  def operatorId = column[String]("operator_id")
 
   override def * = (id.?, envId, projectId, clusterName.?, versionId.?, taskTemplateId, status, importTime, taskId.?, schemeId.?, operatorId) <> (TaskQueue.tupled, TaskQueue.unapply _)
 }
@@ -47,7 +47,7 @@ object TaskQueueHelper{
     (JsPath \ "importTime").read[DateTime] and
     (JsPath \ "taskId").readNullable[Int] and
     (JsPath \ "schemeId").readNullable[Int] and
-    (JsPath \ "operatorId").read[Int]
+    (JsPath \ "operatorId").read[String]
   )(TaskQueue.apply _)
 
   /**

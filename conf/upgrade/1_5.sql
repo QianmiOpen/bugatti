@@ -15,3 +15,7 @@ CREATE TABLE `environment_member` (
 ALTER TABLE `task_queue` ADD COLUMN `cluster_name` VARCHAR(254) NULL COMMENT '负载机器名称' AFTER `project_id`;
 
 ALTER TABLE `task` ADD COLUMN `cluster_name` VARCHAR(254) NULL COMMENT '负载机器名称' AFTER `project_id`;
+
+ALTER TABLE `task_queue` MODIFY `operator_id` VARCHAR(16) NOT NULL ;
+
+ALTER TABLE `task` MODIFY `operator_id` VARCHAR(16) NOT NULL ;

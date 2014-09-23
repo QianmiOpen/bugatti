@@ -353,6 +353,7 @@ define(['angular'], function(angular) {
             $scope.taskQueue.versionId = versionId
             $scope.taskQueue.clusterName = clusterName
             $scope.taskQueue.templateId = $scope.choosedTemplateId
+            $scope.taskQueue.operatorId = Auth.user.username
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
 
             })
@@ -377,6 +378,7 @@ define(['angular'], function(angular) {
                 $scope.taskQueue.projectId = projectId
                 $scope.taskQueue.clusterName = clusterName
                 $scope.taskQueue.templateId = templateId
+                $scope.taskQueue.operatorId = Auth.user.username
                 TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
                 $scope.versionShow = false
             } else {//部署

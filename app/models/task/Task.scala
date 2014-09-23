@@ -18,7 +18,7 @@ import play.api.libs.json.JsSuccess
  * @author of729
  * @author of546
  */
-case class Task(id: Option[Int], envId: Int, projectId: Int, clusterName: Option[String], versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: Int)
+case class Task(id: Option[Int], envId: Int, projectId: Int, clusterName: Option[String], versionId: Option[Int], taskTemplateId:Int, status: TaskStatus, startTime: Option[DateTime], endTime: Option[DateTime], operatorId: String)
 
 case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -30,7 +30,7 @@ case class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
   def status = column[TaskStatus]("status")
   def startTime = column[DateTime]("start_time", O.Nullable, O.DBType("DATETIME"))
   def endTime = column[DateTime]("end_time", O.Nullable, O.DBType("DATETIME"))
-  def operatorId = column[Int]("operator_id")
+  def operatorId = column[String]("operator_id")
 
   override def * = (id.?, envId, projectId, clusterName.?, versionId.?, taskTemplateId, status, startTime.? ,endTime.?, operatorId) <> (Task.tupled, Task.unapply _)
 }
@@ -47,7 +47,7 @@ object TaskHelper {
     (JsPath \ "status").read[TaskStatus] and
     (JsPath \ "startTime").readNullable[DateTime] and
     (JsPath \ "endTime").readNullable[DateTime] and
-    (JsPath \ "operatorId").read[Int]
+    (JsPath \ "operatorId").read[String]
   )(Task.apply _)
 
   import models.AppDB._
@@ -146,7 +146,7 @@ object TaskHelper {
   }
 
   implicit def taskQueue2Task(tq: TaskQueue): Task ={
-    Task(None, tq.envId, tq.projectId, tq.clusterName, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, 1)
+    Task(None, tq.envId, tq.projectId, tq.clusterName, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, tq.operatorId)
   }
 
   def addByTaskQueue(tq: TaskQueue): Int = db withSession { implicit session =>
