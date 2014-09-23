@@ -1,14 +1,14 @@
-<form name="form" class="form-horizontal" novalidate>
+<form name="editForm" class="form-horizontal" novalidate>
     <table class="table table-striped border-less">
         <tr>
             <td class="col-sm-9" style="vertical-align: middle">
                 <span style="color: #999">~/</span>
                 <input ng-model="conf.path" class="form-control" style="width:70%; display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
-                <span class="has-error" ng-show="form.path.$dirty && form.path.$invalid">
-                    <span ng-show="form.path.$error.required" class="control-label">请输入文件（路径）名称</span>
-                    <span ng-show="form.path.$error.maxlength" class="control-label">（路径）名称超过长度</span>
-                    <span ng-show="form.path.$error.pattern" class="control-label">无效的（路径）名称</span>
-                    <span ng-show="form.path.$error.exists" class="control-label">文件冲突</span>
+                <span class="has-error" ng-show="editForm.path.$dirty && editForm.path.$invalid">
+                    <span ng-show="editForm.path.$error.required" class="control-label">请输入文件（路径）名称</span>
+                    <span ng-show="editForm.path.$error.maxlength" class="control-label">（路径）名称超过长度</span>
+                    <span ng-show="editForm.path.$error.pattern" class="control-label">无效的（路径）名称</span>
+                    <span ng-show="editForm.path.$error.exists" class="control-label">文件冲突</span>
                 </span>
             </td>
             <td rowspan="4">
@@ -47,7 +47,7 @@
                 <div class="text-right">
                     <button ng-if="!action" type="button" class="btn btn-link" back-button>取消</button>
                     &nbsp;&nbsp;
-                    <button class="btn btn-success col-sm-2 navbar-right" ng-click="update()" ng-disabled="form.$invalid"> 修改文件 </button>
+                    <button class="btn btn-success col-sm-2 navbar-right" ng-click="update()" ng-disabled="editForm.$invalid"> 修改文件 </button>
                 </div>
             </td>
         </tr>

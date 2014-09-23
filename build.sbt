@@ -39,6 +39,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jsdifflib" % "0fcca118e",
   "org.webjars" % "datatables" % "1.10.0-beta-2",
   "org.webjars" % "angular-loading-bar" % "0.5.1",
+  "org.webjars" % "angular-growl" % "0.4.0",
+  "org.webjars" % "bindonce" % "0.3.1",
   "org.eclipse.jgit" % "org.eclipse.jgit" % "3.4.1.201406201815-r",
   "org.yaml" % "snakeyaml" % "1.13"
 )
