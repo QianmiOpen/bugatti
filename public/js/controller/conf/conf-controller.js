@@ -120,7 +120,6 @@ define(['angular'], function(angular) {
             ConfService.get($stateParams.cid, function(data) {
                 $scope.conf = data.conf;
                 $scope.confContent = data.confContent;
-                $scope.conf.content = data.confContent.content;
             });
 
             // remove

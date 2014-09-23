@@ -461,7 +461,6 @@ define(['angular'], function(angular) {
                     ConfService.get($scope.conf.id, function(data) {
                         $scope.conf = data.conf;
                         $scope.confContent = data.confContent;
-                        $scope.conf.content = data.confContent.content;
                     });
 
                     // remove
