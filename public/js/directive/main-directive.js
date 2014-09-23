@@ -553,7 +553,7 @@ define(['angular'], function(angular) {
                         var codeCompleter = {
                             getCompletions: function(editor, session, pos, prefix, callback) {
                                 if (prefix.length === 0) { callback(null, []); return }
-                                callback(null, this.wordList.map(function(ea) {
+                                callback(null, $scope.wordList.map(function(ea) {
                                     return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                                 }));
                             }
@@ -614,7 +614,7 @@ define(['angular'], function(angular) {
                         var codeCompleter = {
                             getCompletions: function(editor, session, pos, prefix, callback) {
                                 if (prefix.length === 0) { callback(null, []); return }
-                                callback(null, this.wordList.map(function(ea) {
+                                callback(null, $scope.wordList.map(function(ea) {
                                     return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                                 }));
                             }
