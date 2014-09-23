@@ -8,7 +8,7 @@
                 <a ng-if="!action" tooltip="{{conf.name}}" ui-sref="conf.project.version.conf.detail({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})">{{conf.name}}</a>
 
                 <!-- directive -->
-                <a ng-if="action" tooltip="{{conf.name}}" ng-click="setAction('detail', conf)" href="">{{conf.name}}</a>
+                <a ng-if="action" tooltip="{{conf.name}}" ng-click="setAction('detail', conf.id)" href="">{{conf.name}}</a>
             </td>
             <td class="text-muted"><span tooltip="{{conf.path}}">~/{{conf.path}}</span></td>
             <td class="text-muted" width="15%"><span tooltip="{{conf.updated | date:'yyyy-MM-dd HH:mm:ss'}}">{{conf.updated | timeago }}</span></td>

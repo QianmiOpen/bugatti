@@ -416,9 +416,9 @@ define(['angular'], function(angular) {
                 $scope.isAction = function(checkTab) {
                     return $scope.action === checkTab;
                 };
-                $scope.setAction = function(activeTab, conf) {
+                $scope.setAction = function(activeTab, conf_id) {
                     $scope.action = activeTab;
-                    $scope.conf = conf;
+                    $scope.conf_id = conf_id;
                 };
 
             }],
@@ -458,7 +458,7 @@ define(['angular'], function(angular) {
             controller: ['$scope', '$modal', 'ConfService', function($scope, $modal, ConfService) {
                 $scope.initConfData = function() {
 
-                    ConfService.get($scope.conf.id, function(data) {
+                    ConfService.get($scope.conf_id, function(data) {
                         $scope.conf = data.conf;
                         $scope.confContent = data.confContent;
                     });
@@ -516,7 +516,7 @@ define(['angular'], function(angular) {
             controller: ['$scope', '$filter', 'ConfService', function($scope, $filter, ConfService) {
                 $scope.initEditConf = function() {
 
-                    ConfService.get($scope.conf.id, function(data) {
+                    ConfService.get($scope.conf_id, function(data) {
                         $scope.conf = data.conf;
                         $scope.conf.content = data.confContent.content;
                     });
@@ -542,7 +542,6 @@ define(['angular'], function(angular) {
                     });
                     var langTools = ace.require("ace/ext/language_tools");
                     this.aceLoaded = function(_editor) {
-                        console.log('ace...')
                         _editor.setOptions({
                             enableBasicAutocompletion: true
                         });
