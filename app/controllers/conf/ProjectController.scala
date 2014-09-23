@@ -123,12 +123,13 @@ object ProjectController extends BaseController {
 
   }
 
-  def update(projectId: Int, envId: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def update(projectId: Int, envId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       projectForm => {
-        if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
-        else {
+        if (!UserHelper.hasProjectSafe(projectId, request.user) ||
+            !UserHelper.hasEnv(envId, request.user)
+        ) { Forbidden } else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改项目", projectForm.toProject))
           try {
             Ok(Json.toJson(ProjectHelper.update(projectId, envId, projectForm)))

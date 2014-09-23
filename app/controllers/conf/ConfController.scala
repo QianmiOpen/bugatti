@@ -1,6 +1,7 @@
 package controllers.conf
 
 import exceptions.UniqueNameException
+import play.api.mvc.Action
 import utils.{TaskTools, FileUtil}
 import utils.ControlUtil._
 import controllers.{BaseController}
@@ -51,7 +52,7 @@ object ConfController extends BaseController {
     )(ConfForm.apply)(ConfForm.unapply)
   )
 
-  def show(id: Int) = AuthAction(FuncEnum.project) {
+  def show(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
     ConfHelper.findById(id) match {
       case Some(conf) =>
         Ok(Json.obj("conf" -> Json.toJson(conf), "confContent" -> ConfContentHelper.findById(id)))
@@ -59,15 +60,16 @@ object ConfController extends BaseController {
     }
   }
 
-  def all(envId: Int, versionId: Int) = AuthAction(FuncEnum.project) {
+  def all(envId: Int, versionId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
     Ok(Json.toJson(ConfHelper.findByEnvId_VersionId(envId, versionId)))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def delete(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     ConfHelper.findById(id) match {
       case Some(conf) =>
-        if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user)) Forbidden
-        else {
+        if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) ||
+            !UserHelper.hasEnv(conf.envId, request.user)
+        ) { Forbidden } else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除配置文件", conf))
           Ok(Json.toJson(ConfHelper.delete(id)))
         }
@@ -75,12 +77,13 @@ object ConfController extends BaseController {
     }
   }
 
-  def save = AuthAction(FuncEnum.project) { implicit request =>
+  def save = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
-        else {
+        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
+            !UserHelper.hasEnv(confForm.envId, request.user)
+        ) { Forbidden } else {
           try {
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
             Ok(Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo))))
@@ -92,12 +95,13 @@ object ConfController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def update(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)) Forbidden
-        else {
+        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
+            !UserHelper.hasEnv(confForm.envId, request.user)
+        ) { Forbidden } else {
           try {
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
             Ok(Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo))))
@@ -117,16 +121,16 @@ object ConfController extends BaseController {
     else octetFileType.exists(_ == FileUtil.getExtension(filename))
   }
 
-  def upload = AuthAction[TemporaryFile](FuncEnum.project) { implicit request =>
+  def upload = AuthAction[TemporaryFile](FuncEnum.project, FuncEnum.task) { implicit request =>
     val reqConfForm: Option[ConfForm] = confForm.bindFromRequest().fold(
       formWithErrors => None,
       _confForm => Some(_confForm)
     )
     request.body.asMultipartFormData.map { body =>
       reqConfForm.map { _confForm =>
-        if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user)) Forbidden
-        else {
-
+        if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user) ||
+            !UserHelper.hasEnv(_confForm.envId, request.user)
+        ) { Forbidden } else {
           val result = body.files.filter(f => f.ref.file.length() < maxSizeExceeded).map { tempFile =>
             val filePath = _confForm.path
             val _path = if (filePath.last != '/') filePath + '/' else filePath
@@ -143,7 +147,7 @@ object ConfController extends BaseController {
     } getOrElse(BadRequest)
   }
 
-  def completer(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def completer(envId: Int, projectId: Int, versionId: Int) = Action {
     Ok(Json.parse(TaskTools.generateCodeCompleter(envId, projectId, versionId)))
   }
 
@@ -195,11 +199,13 @@ object ConfController extends BaseController {
       "copy" -> default(boolean, true)
     )(CopyForm.apply)(CopyForm.unapply)
   )
-  def copy = AuthAction(FuncEnum.project) { implicit request =>
+  def copy = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       copyForm => {
-        if (!UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user)) Forbidden
+        if (!UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) ||
+            !UserHelper.hasEnv(copyForm.envId, request.user)
+        ) Forbidden
         else if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(_Exist)
         else {
           val targetConfs = ConfHelper.findByEnvId_VersionId(copyForm.target_eid, copyForm.target_vid)

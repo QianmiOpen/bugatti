@@ -13,14 +13,14 @@ trait BaseController extends Controller with Security {
 
   val ALogger = play.Logger.of("ActionLog")
 
-  def AuthAction[A](implicit func: Func) = new ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
+  def AuthAction[A](implicit func: Func*) = new ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
 
     def invokeBlock[A](request: Request[A], block: (RequestWithUser[A]) => Future[SimpleResult]) = {
       authenticate(request, block)
     }
   }
 
-  private def authenticate[A](request: Request[A], block: (RequestWithUser[A]) => Future[SimpleResult])(implicit func: Func) = {
+  private def authenticate[A](request: Request[A], block: (RequestWithUser[A]) => Future[SimpleResult])(implicit func: Seq[Func]) = {
     val maybeToken = request.headers.get(AuthTokenHeader).orElse(request.getQueryString(AuthTokenUrlKey))
     maybeToken flatMap { token =>
       Cache.getAs[String](token) map { jobNo =>
@@ -37,8 +37,10 @@ trait BaseController extends Controller with Security {
     } getOrElse Future.successful(Unauthorized)
   }
 
-  private def findPermission(jobNo: String, func: Func): Option[Boolean] = {
-    PermissionHelper.findByJobNo(jobNo) map { p => p.functions.exists(_ == func) }
+  private def findPermission(jobNo: String, func: Seq[Func]): Option[Boolean] = {
+    PermissionHelper.findByJobNo(jobNo).map{ p =>
+      p.functions.exists(func.contains(_))
+    }
   }
 
   // 页面返回
