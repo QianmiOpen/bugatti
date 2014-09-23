@@ -1,6 +1,6 @@
 
 <div class="upload-div">
-<form name="form" novalidate>
+<form name="uploadForm" novalidate>
     <table>
         <tr class="form-group">
             <td>设置上传文件路径：
@@ -8,7 +8,7 @@
             <td colspan="2">
                 <input type="text" style="width:300px;" class="form-control" name="filePath" ng-model="filePath" placeholder="必填，例如：conf/abc" required></td>
 
-            <td><div class="has-error"> <span ng-show="form.filePath.$error.required"  class="control-label">&nbsp;请填写文件路径</span></div></td>
+            <td><div class="has-error"> <span ng-show="uploadForm.filePath.$error.required"  class="control-label">&nbsp;请填写文件路径</span></div></td>
         </tr>
         <tbody ng-if="filePath.length > 0">
         <tr><td>&nbsp;</td></tr>
