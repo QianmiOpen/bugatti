@@ -154,14 +154,14 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   // 项目属性
   // ----------------------------------------------------------
-  def atts(projectId: Int) = AuthAction(FuncEnum.project) {
+  def atts(projectId: Int) = Action {
     Ok(Json.toJson(AttributeHelper.findByProjectId(projectId)))
   }
 
   // ----------------------------------------------------------
   // 项目环境变量
   // ----------------------------------------------------------
-  def vars(projectId: Int, envId: Int) = AuthAction(FuncEnum.project) {
+  def vars(projectId: Int, envId: Int) = Action {
     Ok(Json.toJson(VariableHelper.findByEnvId_ProjectId(envId, projectId)))
   }
 
