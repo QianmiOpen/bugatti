@@ -57,6 +57,9 @@ define(['angular'], function(angular) {
             },
             addCluster: function(eid, pid, callback){
                 $http.put(PlayRoutes.controllers.conf.ProjectController.addCluster(eid, pid).url).success(callback)
+            },
+            removeCluster: function(cid, callback){
+                $http.delete(PlayRoutes.controllers.conf.ProjectController.removeCluster(cid).url).success(callback)
             }
         }
     });

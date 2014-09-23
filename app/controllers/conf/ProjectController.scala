@@ -268,4 +268,11 @@ object ProjectController extends BaseController {
     Ok(Json.obj("r" -> EnvironmentProjectRelHelper.updateByEnvId_projectId(envId, projectId)))
   }
 
+  def removeCluster(clusterId: Int)= Action { implicit request =>
+    EnvironmentProjectRelHelper.findById(clusterId) match {
+      case Some(rel) => Ok(Json.obj("r" -> EnvironmentProjectRelHelper.unbind(rel)))
+      case _ => Ok(Json.obj("r" -> 0))
+    }
+  }
+
 }
