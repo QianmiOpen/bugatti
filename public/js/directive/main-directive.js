@@ -483,7 +483,7 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    this.aceLoaded = function(_editor) {
+                    $scope.aceLoaded = function(_editor) {
                         // Editor part
                         var _session = _editor.getSession();
                         var fileName = $scope.conf ? $scope.conf.name : undefined;
@@ -541,7 +541,8 @@ define(['angular'], function(angular) {
                         }
                     });
                     var langTools = ace.require("ace/ext/language_tools");
-                    this.aceLoaded = function(_editor) {
+                    $scope.aceLoaded = function(_editor) {
+
                         _editor.setOptions({
                             enableBasicAutocompletion: true
                         });
@@ -593,16 +594,16 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    this.wordList = [];
+                    $scope.wordList = [];
                     ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                         var obj = eval(data);
                         for (var prop in obj) {
-                            this.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                            $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                         }
                     });
 
                     var langTools = ace.require("ace/ext/language_tools");
-                    this.aceLoaded = function(_editor) {
+                    $scope.aceLoaded = function(_editor) {
                         _editor.setOptions({
                             enableBasicAutocompletion: true
                         });
