@@ -1,5 +1,6 @@
 package controllers.conf
 
+import actor.task.{RefreshSyndic, MyActor}
 import controllers.BaseController
 import enums.{FuncEnum, LevelEnum, ModEnum, RoleEnum}
 import exceptions.UniqueNameException
@@ -265,12 +266,24 @@ object ProjectController extends BaseController {
   }
 
   def addCluster(envId: Int, projectId: Int)= Action { implicit request =>
-    Ok(Json.obj("r" -> EnvironmentProjectRelHelper.updateByEnvId_projectId(envId, projectId)))
+    val result = EnvironmentProjectRelHelper.updateByEnvId_projectId(envId, projectId)
+    if(result == 1){
+      //刷新缓存
+      MyActor.superviseTaskActor ! RefreshSyndic()
+    }
+    Ok(Json.obj("r" -> result))
   }
 
   def removeCluster(clusterId: Int)= Action { implicit request =>
     EnvironmentProjectRelHelper.findById(clusterId) match {
-      case Some(rel) => Ok(Json.obj("r" -> EnvironmentProjectRelHelper.unbind(rel)))
+      case Some(rel) => {
+        val result = EnvironmentProjectRelHelper.unbind(rel)
+        if(result == 1){
+          //刷新缓存
+          MyActor.superviseTaskActor ! RefreshSyndic()
+        }
+        Ok(Json.obj("r" -> result))
+      }
       case _ => Ok(Json.obj("r" -> 0))
     }
   }
