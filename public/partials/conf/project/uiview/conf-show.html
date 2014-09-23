@@ -8,7 +8,7 @@
 
 <!-- directive -->
 <div ng-if="action" class="navbar-right btn-group btn-group-xs" >
-    <button ng-if="confContent.octet == false" ng-click="setAction('edit', conf)" type="button" class="btn btn-default">编辑</button>
+    <button ng-if="confContent.octet == false" ng-click="setAction('edit', conf.id)" type="button" class="btn btn-default">编辑</button>
     <button ng-click="delete(conf.id)" type="button" class="btn btn-danger" style="margin-left:15px;">删除</button>
 </div>
 
