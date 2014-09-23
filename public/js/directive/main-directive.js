@@ -516,6 +516,7 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/conf/project/uiview/conf-edit.html',
             controller: ['$scope', '$filter', 'ConfService', function($scope, $filter, ConfService) {
                 $scope.initEditConf = function() {
+
                     ConfService.get($scope.conf.id, function(data) {
                         $scope.conf = data.conf;
                         $scope.conf.content = data.confContent.content;
@@ -533,15 +534,16 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    $scope.wordList = [];
-                    $scope.completers = ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
+                    this.wordList = [];
+                    ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                         var obj = eval(data);
                         for (var prop in obj) {
-                            $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                            this.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                         }
                     });
                     var langTools = ace.require("ace/ext/language_tools");
-                    $scope.aceLoaded = function(_editor) {
+                    this.aceLoaded = function(_editor) {
+                        console.log('ace...')
                         _editor.setOptions({
                             enableBasicAutocompletion: true
                         });
@@ -552,16 +554,14 @@ define(['angular'], function(angular) {
                         var codeCompleter = {
                             getCompletions: function(editor, session, pos, prefix, callback) {
                                 if (prefix.length === 0) { callback(null, []); return }
-                                callback(null, $scope.wordList.map(function(ea) {
+                                callback(null, this.wordList.map(function(ea) {
                                     return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                                 }));
                             }
                         };
                         langTools.addCompleter(codeCompleter);
                     };
-
                 }
-
             }],
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('action', function () {
@@ -595,16 +595,16 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    $scope.wordList = [];
-                    $scope.completers = ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
+                    this.wordList = [];
+                    ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                         var obj = eval(data);
                         for (var prop in obj) {
-                            $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                            this.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                         }
                     });
 
                     var langTools = ace.require("ace/ext/language_tools");
-                    $scope.aceLoaded = function(_editor) {
+                    this.aceLoaded = function(_editor) {
                         _editor.setOptions({
                             enableBasicAutocompletion: true
                         });
@@ -615,7 +615,7 @@ define(['angular'], function(angular) {
                         var codeCompleter = {
                             getCompletions: function(editor, session, pos, prefix, callback) {
                                 if (prefix.length === 0) { callback(null, []); return }
-                                callback(null, $scope.wordList.map(function(ea) {
+                                callback(null, this.wordList.map(function(ea) {
                                     return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
                                 }));
                             }

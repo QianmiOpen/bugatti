@@ -181,7 +181,7 @@ define(['angular'], function(angular) {
             };
 
             $scope.wordList = [];
-            $scope.completers = ConfService.completer($stateParams.eid, $stateParams.id, $stateParams.vid, function(data) {
+            ConfService.completer($stateParams.eid, $stateParams.id, $stateParams.vid, function(data) {
                 var obj = eval(data);
                 for (var prop in obj) {
                     $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
