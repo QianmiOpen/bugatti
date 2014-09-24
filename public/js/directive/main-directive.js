@@ -99,6 +99,21 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    // 用户名称显示
+    app.directive('unameShow', ['UserService', function(UserService) {
+        return {
+            restrict: 'E',
+            scope: {
+                jobNo: '@'
+            },
+            template: '<span>{{user.name}}</span>',
+            link: function($scope, element, attrs) {
+                UserService.get($scope.jobNo, function(data) {
+                    $scope.user = data;
+                });
+            }
+        }
+    }]);
 
     // 页面权限
     app.directive('accessPermission', ['Auth', function(Auth) {
