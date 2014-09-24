@@ -40,6 +40,7 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
             'angular-loading-bar',
             'ngAnimate',
             'ngCookies',
+            'angular-growl',
             'pasvaz.bindonce',
             'bugattiApp.routes',
             'bugattiApp.filters',
@@ -73,8 +74,10 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
 
             }]);
 
-        module.config(["$httpProvider", function($httpProvider) {
-            var interceptor = ["$rootScope", "$q", "$window", function($rootScope, $q, $window) {
+        module.config(["growlProvider", "$httpProvider", function(growlProvider, $httpProvider) {
+            growlProvider.globalTimeToLive(3000);
+
+            var interceptor = ["$rootScope", "$q", "growl", function($rootScope, $q, growl) {
                 return function(promise) {
                     return promise.then(
                         function(response) {
@@ -82,15 +85,15 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
                         },
                         function(response) { // error
                             if (response.status == 400) {
-                                console.log('参数错误');
+                                growl.addWarnMessage("参数错误");
                             } else if (response.status == 403) {
-                                console.log('没有权限');
+                                growl.addWarnMessage("没有权限");
                             } else if (response.status == 404) {
-                                console.log('内容不存在');
+                                growl.addWarnMessage("内容不存在");
                             } else if (response.status == 409) {
-                                console.log('内容已存在');
+                                growl.addWarnMessage("内容已存在");
                             } else if (response.status == 500) {
-                                console.log('内部错误');
+                                growl.addErrorMessage("内部错误");
                             }
                             return $q.reject(response);
                         }

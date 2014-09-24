@@ -264,8 +264,8 @@ define(['angular'], function(angular) {
             restrict: 'E',
             require: '^projectTabs',
             templateUrl: 'partials/task/project-item.html',
-            controller: ['$scope', '$filter', 'ProjectService', 'TemplateService',
-                function($scope, $filter, ProjectService, TemplateService) {
+            controller: ['$scope', '$filter', 'growl', 'ProjectService', 'TemplateService',
+                function($scope, $filter, growl, ProjectService, TemplateService) {
                 // project variable
                 $scope.vars = [];
                 $scope.addVar = function(v) {
@@ -386,7 +386,7 @@ define(['angular'], function(angular) {
                                 $scope.form.name.$invalid = true;
                                 $scope.form.name.$error.exists = true;
                             } else {
-                                alert('成功');
+                                growl.addSuccessMessage("成功");
                             }
                         });
 
