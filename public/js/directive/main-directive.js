@@ -430,6 +430,17 @@ define(['angular'], function(angular) {
                         enableBasicAutocompletion: true
                     });
 
+                    // Editor part
+                    var fileName = $scope.conf ? $scope.conf.name : '.properties';
+                    if (fileName) {
+                        var suffix = fileName.substring(fileName.lastIndexOf('.') + 1);
+                        if (suffix == 'conf') {
+                            suffix = 'properties'
+                        }
+                        suffix = "ace/mode/" + suffix;
+                        _editor.getSession().setMode(suffix);
+                    }
+
                     _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
                     _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
 
