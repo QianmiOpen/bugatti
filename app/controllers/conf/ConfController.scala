@@ -67,12 +67,12 @@ object ConfController extends BaseController {
   def delete(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     ConfHelper.findById(id) match {
       case Some(conf) =>
-        if (!UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) &&
-            !UserHelper.hasEnv(conf.envId, request.user)
-        ) { Forbidden } else {
+        if (UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) ||
+            UserHelper.hasEnv(conf.envId, request.user)
+        ) {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除配置文件", conf))
           Ok(Json.toJson(ConfHelper.delete(id)))
-        }
+        } else Forbidden
       case None => NotFound
     }
   }
@@ -81,16 +81,16 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) &&
-            !UserHelper.hasEnv(confForm.envId, request.user)
-        ) { Forbidden } else {
+        if (UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
+            UserHelper.hasEnv(confForm.envId, request.user)
+        ) {
           try {
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
             Ok(Json.toJson(ConfHelper.create(confForm.copy(jobNo = request.user.jobNo))))
           } catch {
             case un: UniqueNameException => Ok(_Exist)
           }
-        }
+        } else Forbidden
       }
     )
   }
@@ -99,16 +99,16 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (!UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) &&
-            !UserHelper.hasEnv(confForm.envId, request.user)
-        ) { Forbidden } else {
+        if (UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
+            UserHelper.hasEnv(confForm.envId, request.user)
+        ) {
           try {
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
             Ok(Json.toJson(ConfHelper.update(id, confForm.copy(jobNo = request.user.jobNo))))
           } catch {
             case un: UniqueNameException => Ok(_Exist)
           }
-        }
+        } else Forbidden
       }
     )
   }
@@ -128,9 +128,9 @@ object ConfController extends BaseController {
     )
     request.body.asMultipartFormData.map { body =>
       reqConfForm.map { _confForm =>
-        if (!UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user) &&
-            !UserHelper.hasEnv(_confForm.envId, request.user)
-        ) { Forbidden } else {
+        if (UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user) ||
+            UserHelper.hasEnv(_confForm.envId, request.user)
+        ) {
           val result = body.files.filter(f => f.ref.file.length() < maxSizeExceeded).map { tempFile =>
             val filePath = _confForm.path
             val _path = if (filePath.last != '/') filePath + '/' else filePath
@@ -141,8 +141,7 @@ object ConfController extends BaseController {
             Json.obj("fileName" -> tempFile.filename, "status" -> ConfHelper.create(confFormat.toConf, Some(ConfContent(None, isOctet, bytes))))
           }
           Ok(Json.toJson(result))
-
-        }
+        } else Forbidden
       } getOrElse(BadRequest)
     } getOrElse(BadRequest)
   }
@@ -203,11 +202,13 @@ object ConfController extends BaseController {
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       copyForm => {
-        if (!UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) &&
-            !UserHelper.hasEnv(copyForm.envId, request.user)
-        ) Forbidden
-        else if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(_Exist)
-        else {
+        if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(_Exist)
+        else if (
+          UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) ||
+          UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.target_eid, request.user) ||
+          UserHelper.hasEnv(copyForm.envId, request.user) ||
+          UserHelper.hasEnv(copyForm.target_eid, request.user)
+        ) {
           val targetConfs = ConfHelper.findByEnvId_VersionId(copyForm.target_eid, copyForm.target_vid)
           val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.envId, copyForm.versionId)
           val confs = (copyForm.ovr, copyForm.copy) match {
@@ -232,7 +233,7 @@ object ConfController extends BaseController {
             "ip" -> request.remoteAddress, "msg" -> opMsg, "data" -> Json.toJson(copyForm)).toString
           ALogger.info(_msg)
           Ok(_Success)
-        }
+        } else Forbidden
       }
     )
 

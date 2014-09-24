@@ -1,1 +1,33 @@
-help
+<h3>自动同步项目打包版本信息的pom配置。需要配置在war工程中，不要配置在项目顶层pom中：</h3>
+<pre>
+&lt;plugin&gt;
+    &lt;groupId&gt;com.ofpay&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-ofpaybuild-plugins&lt;/artifactId&gt;
+    &lt;version&gt;1.2.6-RELEASE&lt;/version&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;id&gt;notify-bugatti&lt;/id&gt;
+            &lt;phase&gt;package&lt;/phase&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;notify-bugatti&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+                &lt;projectName&gt;对应bugatti的项目名称&lt;/projectName&gt;
+            &lt;/configuration&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;
+</pre>
+
+<h3>一、线上服务器情况：</h3>
+1、使用tomcat用户和tomcat组运行web项目
+2、tomcat用户目录在/home/tomcat下
+3、/home/tomcat目录下有一个tomcat的链接，指向安装的tomcat版本，后续tomcat升级会修改该超链接。
+4、CATALINA_HOME指向/home/tomcat/tomcat
+5、web项目统一安装在/home/tomcat/tomcat/webapps下，通过server.war超链接连上最新的war包或目录。
+6、web项目可以选择解压或不解压。不解压则/home/tomcat/tomcat/webapps/server.war链接指向最新的web文件，否则指向解压后的目录。
+
+<h3>二、项目名称已经约束，不支持中划线：</h3>
+遵守两条简单的规则：
+第一个字符必须是字母、下划线（_）或美元符号（$）
+余下的字符可以是下划线、美元符号或任何字母或数字字符

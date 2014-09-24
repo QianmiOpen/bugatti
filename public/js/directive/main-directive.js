@@ -421,6 +421,29 @@ define(['angular'], function(angular) {
                     $scope.conf_id = conf_id;
                 };
 
+                // ace editor
+                $scope.wordList = [];
+                var langTools = ace.require("ace/ext/language_tools");
+                $scope.aceLoaded = function(_editor) {
+
+                    _editor.setOptions({
+                        enableBasicAutocompletion: true
+                    });
+
+                    _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
+                    _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
+
+                    var codeCompleter = {
+                        getCompletions: function(editor, session, pos, prefix, callback) {
+                            if (prefix.length === 0) { callback(null, []); return }
+                            callback(null, $scope.wordList.map(function(ea) {
+                                return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
+                            }));
+                        }
+                    };
+                    langTools.addCompleter(codeCompleter);
+                };
+
             }],
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('tab', function () {
@@ -533,33 +556,12 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    $scope.wordList = [];
                     ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                         var obj = eval(data);
                         for (var prop in obj) {
                             $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                         }
                     });
-                    var langTools = ace.require("ace/ext/language_tools");
-                    $scope.aceLoaded = function(_editor) {
-
-                        _editor.setOptions({
-                            enableBasicAutocompletion: true
-                        });
-
-                        _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
-                        _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
-
-                        var codeCompleter = {
-                            getCompletions: function(editor, session, pos, prefix, callback) {
-                                if (prefix.length === 0) { callback(null, []); return }
-                                callback(null, $scope.wordList.map(function(ea) {
-                                    return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
-                                }));
-                            }
-                        };
-                        langTools.addCompleter(codeCompleter);
-                    };
                 }
             }],
             link: function postLink(scope, iElement, iAttrs) {
@@ -594,33 +596,12 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    $scope.wordList = [];
                     ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
                         var obj = eval(data);
                         for (var prop in obj) {
                             $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
                         }
                     });
-
-                    var langTools = ace.require("ace/ext/language_tools");
-                    $scope.aceLoaded = function(_editor) {
-                        _editor.setOptions({
-                            enableBasicAutocompletion: true
-                        });
-
-                        _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
-                        _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
-
-                        var codeCompleter = {
-                            getCompletions: function(editor, session, pos, prefix, callback) {
-                                if (prefix.length === 0) { callback(null, []); return }
-                                callback(null, $scope.wordList.map(function(ea) {
-                                    return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
-                                }));
-                            }
-                        };
-                        langTools.addCompleter(codeCompleter);
-                    };
 
                 }
             }],
