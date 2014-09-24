@@ -4,7 +4,7 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.templateModule', []);
 
-    app.controller('TemplateCtrl', ['$scope', '$modal', 'TemplateService', function($scope, $modal, TemplateService) {
+    app.controller('TemplateCtrl', ['$scope', '$modal', 'growl', 'TemplateService', function($scope, $modal, growl, TemplateService) {
         $scope.currentPage = 1;
         $scope.pageSize = 1000;
 
@@ -31,7 +31,7 @@ define(['angular'], function(angular) {
             });
             modalInstance.result.then(function(data) {
                 if (data.r === 'exist') {
-                    alert('还有项目在使用该模板，请删除后再操作。。。')
+                    growl.addWarnMessage('还有项目在使用该模板，请删除后再操作。。。');
                 } else {
                     $scope.templates.splice(index, 1);
                     $scope.totalItems = $scope.totalItems -1;

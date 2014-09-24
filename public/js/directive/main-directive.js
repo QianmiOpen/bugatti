@@ -635,7 +635,7 @@ define(['angular'], function(angular) {
             restrict: 'E',
             require: '^projectConf',
             templateUrl: 'partials/conf/project/uiview/conf-copy.html',
-            controller: ['$scope', '$window', 'VersionService', 'ConfService', function($scope, $window, VersionService, ConfService) {
+            controller: ['$scope', 'growl', 'VersionService', 'ConfService', function($scope, growl, VersionService, ConfService) {
                 $scope.initCopyConf = function() {
                     $scope.copyEnvs = angular.copy($scope.envs);
                     $scope.copyEnvs.unshift({"id": 0, "name": '模板配置', "nfServer": '', "ipRange": '', "level": 'safe', "scriptVersion": '', "jobNo": '', "remark": ''})
@@ -661,7 +661,7 @@ define(['angular'], function(angular) {
                             if (data.r === 'ok') {
                                 $scope.setAction('list');
                             } else if (data.r === 'exist') {
-                                $window.alert('内容已存在')
+                                growl.addWarnMessage("内容已存在");
                             }
                         });
                     };

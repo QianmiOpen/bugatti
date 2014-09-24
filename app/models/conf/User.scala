@@ -139,7 +139,8 @@ object UserHelper extends PlayCache {
     if (superAdmin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId =>
-        EnvironmentHelper.findById(envId) match {
+        if (member.level == LevelEnum.safe) true
+        else EnvironmentHelper.findById(envId) match {
           case Some(env) if env.level == LevelEnum.safe => if (member.level == env.level) true else false
           case Some(env) if env.level == LevelEnum.unsafe => true
           case _ => false

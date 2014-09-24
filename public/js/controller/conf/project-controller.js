@@ -4,8 +4,8 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.projectModule', []);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'ProjectService', 'VersionService', 'EnvService',
-        function($scope, $state, $stateParams, $modal, ProjectService, VersionService, EnvService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
+        function($scope, $state, $stateParams, $modal, growl, ProjectService, VersionService, EnvService) {
         $scope.currentPage = 1;
         $scope.pageSize = 20;
         $scope.my = false;
@@ -66,7 +66,7 @@ define(['angular'], function(angular) {
             });
             modalInstance.result.then(function(data) {
                 if (data.r == 'exist') {
-                    alert('还有版本存在该项目，请删除后再操作。。。')
+                    growl.addWarnMessage('还有版本存在该项目，请删除后再操作。。。');
                 } else {
                     $scope.projects.splice(index, 1);
                     ProjectService.count($scope.s_projectName, $scope.my, function(num) {
@@ -485,8 +485,8 @@ define(['angular'], function(angular) {
     // ===================================================================
     // ------------------------------项目版本-----------------------------—
     // ===================================================================
-    app.controller('VersionCtrl', ['$scope', '$stateParams', '$modal', 'VersionService',
-        function($scope, $stateParams, $modal, VersionService) {
+    app.controller('VersionCtrl', ['$scope', '$stateParams', '$modal', 'growl', 'VersionService',
+        function($scope, $stateParams, $modal, growl, VersionService) {
 
             $scope.currentPage = 1;
             $scope.pageSize = 10;
@@ -525,7 +525,7 @@ define(['angular'], function(angular) {
                 });
                 modalInstance.result.then(function(data) {
                     if (data.r === 'exist') {
-                        alert('还有配置在使用该版本，请删除后再操作。。。')
+                        growl.addWarnMessage('还有配置在使用该版本，请删除后再操作。。。');
                     } else {
                         $scope.versions.splice(index, 1);
                         VersionService.count($stateParams.id, function(num) {

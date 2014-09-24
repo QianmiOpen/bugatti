@@ -3,7 +3,7 @@
 define(['angular'], function(angular){
     var app = angular.module('bugattiApp.controller.conf.areaModule', []);
 
-    app.controller('AreaCtrl', ['$scope', '$modal', '$window', 'AreaService', function($scope, $modal, $window, AreaService){
+    app.controller('AreaCtrl', ['$scope', '$modal', 'AreaService', function($scope, $modal, AreaService){
         AreaService.getAll(function(data){
            $scope.areas = data;
         });

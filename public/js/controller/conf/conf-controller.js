@@ -4,9 +4,9 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.conf.confModule', ['angularFileUpload']);
 
-    app.controller('ConfCtrl', ['$scope', '$state', '$stateParams', '$modal', '$window',
+    app.controller('ConfCtrl', ['$scope', '$state', '$stateParams', '$modal', 'growl',
         'ConfService', 'EnvService', 'ProjectService', 'VersionService',
-        function($scope, $state, $stateParams, $modal, $window, ConfService, EnvService, ProjectService, VersionService) {
+        function($scope, $state, $stateParams, $modal, growl, ConfService, EnvService, ProjectService, VersionService) {
             // load project
             ProjectService.get($stateParams.id, function(data) {
                 $scope.project = data;
@@ -44,9 +44,9 @@ define(['angular'], function(angular) {
                 if (confirm('把当前环境所有配置文件生成模板？')) {
                     ConfService.copy(angular.toJson($scope.copyParam), function(data) {
                         if (data.r === 'ok') {
-                            $window.alert('成功')
+                            growl.addSuccessMessage("成功");
                         } else if (data.r === 'exist') {
-                            $window.alert('内容已存在')
+                            growl.addWarnMessage("内容已存在");
                         }
                     });
                 }
@@ -222,8 +222,8 @@ define(['angular'], function(angular) {
     // ----------------------------------------------------
     // 一键拷贝
     // ----------------------------------------------------
-    app.controller('ConfCopyCtrl', ['$scope', '$state', '$window', '$filter', '$stateParams', 'ConfService', 'VersionService',
-        function($scope, $state, $window, $filter, $stateParams, ConfService, VersionService) {
+    app.controller('ConfCopyCtrl', ['$scope', '$state', 'growl', '$filter', '$stateParams', 'ConfService', 'VersionService',
+        function($scope, $state, growl, $filter, $stateParams, ConfService, VersionService) {
             $scope.copyEnvs = angular.copy($scope.envs);
             $scope.copyParam = {projectId: $stateParams.id, target_eid: null, target_vid: null, envId: $stateParams.eid, versionId: $stateParams.vid, ovr: false};
 
@@ -246,7 +246,7 @@ define(['angular'], function(angular) {
                     if (data.r === 'ok') {
                         $state.go('conf.project.version.conf.list', {eid: param.envId}, {reload: true})
                     } else if (data.r === 'exist') {
-                        $window.alert('内容已存在')
+                        growl.addWarnMessage("内容已存在");
                     }
                 });
             };
