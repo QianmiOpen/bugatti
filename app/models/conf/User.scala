@@ -3,6 +3,7 @@ package models.conf
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import exceptions.UniqueNameException
 import play.api.Play.current
+import play.api.cache.Cache
 import enums.{LevelEnum, FuncEnum, RoleEnum}
 import enums.RoleEnum.Role
 import models.{MaybeFilter, PlayCache}
@@ -43,9 +44,12 @@ object UserHelper extends PlayCache {
   import models.AppDB._
 
   val qUser = TableQuery[UserTable]
+  def _cacheNoKey(jobNo: String) = s"user.$jobNo"
 
-  def findByJobNo(jobNo: String) = db withSession { implicit session =>
-    qUser.filter(_.jobNo === jobNo).firstOption
+  def findByJobNo(jobNo: String) = Cache.getOrElse[Option[User]](_cacheNoKey(jobNo)) {
+    db withSession { implicit session =>
+      qUser.filter(_.jobNo === jobNo).firstOption
+    }
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
@@ -81,6 +85,7 @@ object UserHelper extends PlayCache {
   }
 
   def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
+    Cache.remove(_cacheNoKey(jobNo)) // clean cache
     qUser.filter(_.jobNo === jobNo).delete(session)
   }
 
@@ -99,7 +104,7 @@ object UserHelper extends PlayCache {
 
   @throws[UniqueNameException]
   def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
-//    val user2update = user.copy(jobNo) // bug
+    Cache.remove(_cacheNoKey(jobNo)) // clean cache
     try {
       qUser.filter(_.jobNo === jobNo).update(user)(session)
     } catch {

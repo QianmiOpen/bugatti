@@ -99,6 +99,21 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    // 用户名称显示
+    app.directive('unameShow', ['UserService', function(UserService) {
+        return {
+            restrict: 'E',
+            scope: {
+                jobNo: '@'
+            },
+            template: '<span>{{user.name}}</span>',
+            link: function($scope, element, attrs) {
+                UserService.get($scope.jobNo, function(data) {
+                    $scope.user = data;
+                });
+            }
+        }
+    }]);
 
     // 页面权限
     app.directive('accessPermission', ['Auth', function(Auth) {
@@ -429,7 +444,7 @@ define(['angular'], function(angular) {
                     _editor.setOptions({
                         enableBasicAutocompletion: true
                     });
-
+                    _editor.getSession().setMode("ace/mode/properties");
                     _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
                     _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
 

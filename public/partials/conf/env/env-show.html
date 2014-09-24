@@ -81,7 +81,7 @@
         &nbsp;&nbsp;
         <form ng-submit="addMember(searchMember.jobNo)" >
             <input type="text" ng-model="searchMember.jobNo"/>
-            <button type="submit" class="btn btn-link">+</button>
+            <button type="submit" class="btn btn-link">+(工号)</button>
             <span class="has-error">
                 <span ng-show="jobNo$error" class="control-label">{{jobNo$error}}</span>
             </span>
@@ -99,7 +99,7 @@
                         </span><br/><br/>
                     </div>
                 </div>
-                <div class="name">{{m.jobNo}}</div>
+                <div class="name"><uname-show job-no="{{m.jobNo}}"></uname-show></div>
             </li>
 
         </ul>
