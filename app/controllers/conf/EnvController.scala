@@ -124,7 +124,8 @@ object EnvController extends BaseController {
   }
 
   def saveMember(envId: Int, jobNo: String) = AuthAction(FuncEnum.env) { implicit request =>
-    EnvironmentHelper.findById(envId) match {
+    if (UserHelper.findByJobNo(jobNo) == None) Ok(_None)
+    else EnvironmentHelper.findById(envId) match {
       case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.superAdmin_?(request.user) =>
         try {
           val member = EnvironmentMember(None, envId, jobNo.toLowerCase)

@@ -182,7 +182,8 @@ object ProjectController extends BaseController {
   }
 
   def saveMember(projectId: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
-    if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
+    if (UserHelper.findByJobNo(jobNo) == None) Ok(_None)
+    else if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
     else {
       try {
         val member = ProjectMember(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)

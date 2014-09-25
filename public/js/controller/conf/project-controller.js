@@ -132,7 +132,10 @@ define(['angular'], function(angular) {
                 }
 
                 ProjectService.saveMember($stateParams.id, jobNo, function(data) {
-                    if (data.r === 'exist') {
+                    if (data.r === 'none') {
+                        $scope.jobNo$error = '用户不存在';
+                    }
+                    else if (data.r === 'exist') {
                         $scope.jobNo$error = '已存在用户';
                     } else if (data > 0) {
                         ProjectService.members($stateParams.id, function(data) {
