@@ -74,7 +74,8 @@ object TaskTools {
       pid =>
         val project = ProjectHelper.findById(pid).get
         val hosts = findHosts(envId, project.id.get).map(c => Host_v(c.name, c.ip, None))
-        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion).filter { t => t._1.startsWith("t_")}
+//        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion).filter { t => t._1.startsWith("t_")}
+        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion)
         project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs))
     }.toMap
   }
