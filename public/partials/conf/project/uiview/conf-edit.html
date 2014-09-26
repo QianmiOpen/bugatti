@@ -3,10 +3,9 @@
         <tr>
             <td class="col-sm-9" style="vertical-align: middle">
                 <span style="color: #999">~/</span>
-                <input ng-model="conf.path" class="form-control" style="width:70%; display:inline;" name="path" id="path" required maxlength="200" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
+                <input ng-model="conf.path" class="form-control" style="width:70%; display:inline;" name="path" id="path" required maxlength="200" ng-pattern="/^.+[^\/]$/" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
                 <span class="has-error" ng-show="editForm.path.$dirty && editForm.path.$invalid">
                     <span ng-show="editForm.path.$error.required" class="control-label">请输入文件（路径）名称</span>
-                    <span ng-show="editForm.path.$error.maxlength" class="control-label">（路径）名称超过长度</span>
                     <span ng-show="editForm.path.$error.pattern" class="control-label">无效的（路径）名称</span>
                     <span ng-show="editForm.path.$error.exists" class="control-label">文件冲突</span>
                 </span>

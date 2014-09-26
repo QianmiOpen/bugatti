@@ -73,6 +73,7 @@ object UserHelper extends PlayCache {
 
   @throws[UniqueNameException]
   def _create(user: User)(implicit session: JdbcBackend#Session) = {
+    Cache.remove(_cacheNoKey(user.jobNo)) // clean cache
     try {
       qUser.insert(user)(session)
     } catch {
