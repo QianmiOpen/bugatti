@@ -603,8 +603,8 @@ define(['angular'], function(angular) {
                         $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
                         ConfService.save(angular.toJson($scope.conf), function(data) {
                             if (data.r === 'exist') {
-                                $scope.form.path.$invalid = true;
-                                $scope.form.path.$error.exists = true;
+                                $scope.newForm.path.$invalid = true;
+                                $scope.newForm.path.$error.exists = true;
                             } else {
                                 $scope.setAction('list');
                             }
