@@ -443,7 +443,7 @@ define(['angular'], function(angular) {
                     $scope.isQueueShow.push(false)
                 })
                 $scope.projectStatus.map(function(t){
-                    if(!angular.isUndefined(data[0]) && t.id == data[0].projectId){
+                    if($scope.isObjEmpty(data)||(!angular.isUndefined(data[0]) && t.id == data[0].projectId)){
                         t.clusters = data
                         $scope.vms = data
                     }
