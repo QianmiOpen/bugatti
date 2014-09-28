@@ -40,16 +40,20 @@ object DependencyController extends BaseController{
   def addDependency = Action(parse.json){implicit request =>
     request.body match {
       case JsObject(fields) => {
-        Ok(Json.toJson(add(fields)))
+        Ok(Json.obj("r" -> add(fields)))
       }
-      case _ => Ok(Json.toJson(0))
+      case _ => Ok(Json.obj("r" -> 0))
     }
   }
   def add(fields: Seq[(String, JsValue)]): Int = {
     val fieldsJson = Json.toJson(fields.toMap)
     val p = (fieldsJson \ "parent").as[DependencyNest]
     val c = (fieldsJson \ "child").as[Project]
-    ProjectDependencyHelper.addByP_C(p, c)
+    try{
+      ProjectDependencyHelper.addByP_C(p, c)
+    } catch {
+      case e: Exception => 0
+    }
   }
 
   implicit val dnWrites = Json.writes[DependencyNest]

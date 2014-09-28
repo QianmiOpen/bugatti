@@ -470,6 +470,43 @@ define(['angular'], function(angular) {
         }
     });
 
+    app.directive('projectDependency', function(){
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            templateUrl: 'partials/task/project-dependency.html',
+            controller: ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
+                function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
+                    $scope.showDependencies = function(){
+                        DependencyService.get($scope.pro.id, function(data){
+                            $scope.groups = data
+                        })
+                    }
+                    $scope.showDependencies()
+
+                    ProjectService.getExceptSelf($scope.pro.id, function(data){
+                        $scope.projects = data
+                    })
+
+                    $scope.removeDependency = function(parent,child){
+                        DependencyService.removeDependency(parent.id, child.id, function(data){
+                            $scope.showDependencies()
+                        })
+                    }
+
+                    $scope.addDependency = function(parent,child){
+                        DependencyService.addDependency(parent, child, function(data){
+                            if(data.r == 0){
+                                growl.addWarnMessage("添加失败");
+                            }
+                            $scope.showDependencies()
+                        })
+                    }
+                }
+            ]
+        }
+    });
+
     app.directive('confList', function() {
         return {
             restrict: 'E',
