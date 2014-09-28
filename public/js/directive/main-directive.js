@@ -482,11 +482,13 @@ define(['angular'], function(angular) {
                             $scope.groups = data
                         })
                     }
-                    $scope.showDependencies()
+                    $scope.delayLoad = function(){
+                        $scope.showDependencies()
 
-                    ProjectService.getExceptSelf($scope.pro.id, function(data){
-                        $scope.projects = data
-                    })
+                        ProjectService.getExceptSelf($scope.pro.id, function(data){
+                            $scope.projects = data
+                        })
+                    }
 
                     $scope.removeDependency = function(parent,child){
                         DependencyService.removeDependency(parent.id, child.id, function(data){
@@ -503,7 +505,14 @@ define(['angular'], function(angular) {
                         })
                     }
                 }
-            ]
+            ],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('tab', function () {
+                    if (scope.tab === 4) {
+                        scope.delayLoad();
+                    }
+                });
+            }
         }
     });
 

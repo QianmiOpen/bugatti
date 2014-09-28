@@ -11,7 +11,7 @@
                 &nbsp;&nbsp;&nbsp;
                 <div class="form-group">
                     <input class="form-control" ng-model="projectFilter" />
-                    <select class="form-control" ng-model="project" ng-options="p.name + ' -- ' + p.name for p in projects|filter:projectFilter">
+                    <select class="form-control" ng-model="project" ng-options="p.name + ' -- ' + p.description for p in projects|filter:projectFilter">
                         <option value="">-- 选择项目 --</option>
                     </select>
                 </div>
@@ -30,7 +30,7 @@
             <span>{{d.name}}</span>
         </td>
         <td>
-            <span>{{d.name}}</span>
+            <span>{{d.description}}</span>
         </td>
     </tr>
     </tbody>
