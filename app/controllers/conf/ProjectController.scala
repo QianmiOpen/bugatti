@@ -32,6 +32,7 @@ object ProjectController extends BaseController {
     mapping(
       "id" -> optional(number),
       "name" -> nonEmptyText,
+      "description" -> optional(text),
       "templateId" -> number,
       "subTotal" -> default(number, 0),
       "lastVid" -> optional(number),

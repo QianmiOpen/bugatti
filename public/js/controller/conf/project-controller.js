@@ -347,7 +347,6 @@ define(['angular'], function(angular) {
                 };
                 $scope.reset();
 
-
                 // load env all
                 EnvService.getAll(function(data) {
                     if (data == null || data.length == 0) {

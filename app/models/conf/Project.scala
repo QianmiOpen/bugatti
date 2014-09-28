@@ -13,21 +13,22 @@ import play.api.Play.current
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend
 
-case class Project(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime])
-case class ProjectForm(id: Option[Int], name: String, templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], items: Seq[Attribute], variables: Seq[Variable]) {
-  def toProject = Project(id, name, templateId, subTotal, lastVid, lastVersion, lastUpdated)
+case class Project(id: Option[Int], name: String, description: Option[String], templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime])
+case class ProjectForm(id: Option[Int], name: String, description: Option[String], templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], items: Seq[Attribute], variables: Seq[Variable]) {
+  def toProject = Project(id, name, description, templateId, subTotal, lastVid, lastVersion, lastUpdated)
 }
 
 class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name")
+  def description = column[String]("description", O.Nullable, O.DBType("VARCHAR(500)"))
   def templateId = column[Int]("template_id")           // 项目模板编号
   def subTotal = column[Int]("sub_total", O.Default(0)) // 版本数量
   def lastVid = column[Int]("last_version_id", O.Nullable)         // 最近版本id
   def lastVersion = column[String]("last_version", O.Nullable)     // 最近版本号
   def lastUpdated= column[DateTime]("last_updated", O.Nullable, O.Default(DateTime.now()))
 
-  override def * = (id.?, name, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?) <> (Project.tupled, Project.unapply _)
+  override def * = (id.?, name, description.?, templateId, subTotal, lastVid.?, lastVersion.?, lastUpdated.?) <> (Project.tupled, Project.unapply _)
   def idx = index("idx_name", name, unique = true)
   def idx_template = index("idx_template", templateId)
 

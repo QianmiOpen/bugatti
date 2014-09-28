@@ -10,6 +10,7 @@
         <div class="col-sm-5">
             <input type="text" class="form-control" ng-model="project.name" name="name" id="name" ng-maxlength="200" placeholder="首字母，余下为字母、数字或下划线美元符号" ng-pattern="/^[a-z_$][a-z_$0-9]*$/i" required>
         </div>
+
         <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
             <span ng-show="form.name.$error.required" class="control-label">请输入项目名称</span>
             <span ng-show="form.name.$error.maxlength" class="control-label">超过长度</span>
@@ -18,6 +19,13 @@
                 1.第一个字符必须是字母、下划线（_）或美元符号（$）<br/>
                 2.余下的字符可以是下划线、美元符号或任何字母或数字字符
             </span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="description" class="col-sm-3 control-label">项目描述：</label>
+        <div class="col-sm-5">
+            <textarea ng-model="project.description" class="form-control" id="description" name="description" rows="3" placeholder="项目的备注内容，选填。" maxlength="500"></textarea>
         </div>
     </div>
 

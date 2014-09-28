@@ -15,9 +15,15 @@
     <accordion close-others="true">
         <accordion-group ng-repeat="pro in projectStatus|filter:searchText">
             <accordion-heading>
-                <span class="hand" ng-click="showVm(pro.id)">{{pro.name}}</span>
+                    <table class="table table-hover table-fixed" style="margin-bottom: 0px;">
+                        <tbody style="border-top: 0px;">
+                            <tr class="hand" ng-click="showVm(pro.id)">
+                                <td style="border-top: 0px; padding-top: 0px; padding-bottom: 0px;" width="20%">{{pro.name}}</td>
+                                <td style="border-top: 0px; padding-top: 0px; padding-bottom: 0px;" width="80%">{{pro.description}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
             </accordion-heading>
-
             <!-- Project Tabs -->
             <project-tabs></project-tabs>
         </accordion-group>

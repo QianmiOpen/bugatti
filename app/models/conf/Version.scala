@@ -78,7 +78,7 @@ object VersionHelper extends PlayCache {
       val versionId = qVersion.returning(qVersion.map(_.id)).insert(version)
       ProjectHelper.findById(version.projectId) match {
           case Some(p) =>
-            ProjectHelper._update(version.projectId, Project(p.id, p.name, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
+            ProjectHelper._update(version.projectId, Project(p.id, p.name, p.description, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
           case None =>
       }
       versionId
