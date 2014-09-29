@@ -516,6 +516,83 @@ define(['angular'], function(angular) {
         }
     });
 
+    app.directive('projectMember', function(){
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            templateUrl: 'partials/task/project-member.html',
+            controller: ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
+                function($scope, $stateParams, $modal, ProjectService, EnvService) {
+                    // ---------------------------------------------
+                    // 项目成员管理
+                    // ---------------------------------------------
+                    ProjectService.members($scope.pro.id, function(data) {
+                        $scope.members = data;
+                    });
+
+                    $scope.addMember = function(jobNo) {
+                        $scope.jobNo$error = '';
+                        if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
+                            $scope.jobNo$error = '工号格式错误';
+                            return;
+                        }
+                        var exist = false;
+                        angular.forEach($scope.members, function(m) {
+                            if (m.jobNo === jobNo) {
+                                exist = true;
+                            }
+                        });
+                        if (exist) {
+                            $scope.jobNo$error = '已存在';
+                            return;
+                        }
+
+                        ProjectService.saveMember($scope.pro.id, jobNo, function(data) {
+                            if (data.r === 'none') {
+                                $scope.jobNo$error = '用户不存在';
+                            }
+                            else if (data.r === 'exist') {
+                                $scope.jobNo$error = '已存在用户';
+                            } else if (data > 0) {
+                                ProjectService.members($scope.pro.id, function(data) {
+                                    $scope.members = data;
+                                    $scope.jobNo$error = '';
+                                });
+                            }
+                        });
+                    }
+
+                    $scope.memberUp = function(mid, msg) {
+                        if (confirm(msg)) {
+                            ProjectService.updateMember(mid, "up", function(data) {
+                                ProjectService.members($scope.pro.id, function(data) {
+                                    $scope.members = data;
+                                });
+                            });
+                        }
+                    };
+                    $scope.memberDown = function(mid, msg) {
+                        if (confirm(msg)) {
+                            ProjectService.updateMember(mid, "down", function(data) {
+                                ProjectService.members($scope.pro.id, function(data) {
+                                    $scope.members = data;
+                                });
+                            });
+                        }
+                    };
+                    $scope.memberRemove = function(mid, msg) {
+                        if (confirm(msg)) {
+                            ProjectService.updateMember(mid, "remove", function(data) {
+                                ProjectService.members($scope.pro.id, function(data) {
+                                    $scope.members = data;
+                                });
+                            });
+                        }
+                    };
+                }]
+        }
+    })
+
     app.directive('confList', function() {
         return {
             restrict: 'E',
