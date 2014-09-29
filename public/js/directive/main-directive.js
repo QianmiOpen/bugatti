@@ -362,9 +362,16 @@ define(['angular'], function(angular) {
                                 });
                             }
                             else {
-                                angular.forEach(project_vars, function(pv) {
-                                    if (findInVars(_vars, pv) === -1) {
-                                        _vars.unshift({name: pv.name, value: pv.value, envId: $scope.activeEnv});  // first add
+                                angular.forEach(item_vars, function(iv) {
+                                    var replaceFlag = false;
+                                    project_vars.map(function(pv){
+                                        if(pv.name == iv.itemName && pv.envId == $scope.activeEnv){
+                                            replaceFlag = true;
+                                            _vars.unshift({name: pv.name, value: pv.value, envId: $scope.activeEnv});
+                                        }
+                                    })
+                                    if(!replaceFlag){
+                                        _vars.push({name: iv.itemName, value: '', envId: $scope.activeEnv});
                                     }
                                 });
                             }
