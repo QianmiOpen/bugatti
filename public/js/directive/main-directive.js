@@ -530,73 +530,82 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/task/project-member.html',
             controller: ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
                 function($scope, $stateParams, $modal, ProjectService, EnvService) {
-                    // ---------------------------------------------
-                    // 项目成员管理
-                    // ---------------------------------------------
+                // ---------------------------------------------
+                // 项目成员管理
+                // ---------------------------------------------
+                $scope.delayLoad = function(){
                     ProjectService.members($scope.pro.id, function(data) {
                         $scope.members = data;
                     });
+                }
 
-                    $scope.addMember = function(jobNo) {
-                        $scope.jobNo$error = '';
-                        if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
-                            $scope.jobNo$error = '工号格式错误';
-                            return;
+                $scope.addMember = function(jobNo) {
+                    $scope.jobNo$error = '';
+                    if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
+                        $scope.jobNo$error = '工号格式错误';
+                        return;
+                    }
+                    var exist = false;
+                    angular.forEach($scope.members, function(m) {
+                        if (m.jobNo === jobNo) {
+                            exist = true;
                         }
-                        var exist = false;
-                        angular.forEach($scope.members, function(m) {
-                            if (m.jobNo === jobNo) {
-                                exist = true;
-                            }
-                        });
-                        if (exist) {
-                            $scope.jobNo$error = '已存在';
-                            return;
-                        }
-
-                        ProjectService.saveMember($scope.pro.id, jobNo, function(data) {
-                            if (data.r === 'none') {
-                                $scope.jobNo$error = '用户不存在';
-                            }
-                            else if (data.r === 'exist') {
-                                $scope.jobNo$error = '已存在用户';
-                            } else if (data > 0) {
-                                ProjectService.members($scope.pro.id, function(data) {
-                                    $scope.members = data;
-                                    $scope.jobNo$error = '';
-                                });
-                            }
-                        });
+                    });
+                    if (exist) {
+                        $scope.jobNo$error = '已存在';
+                        return;
                     }
 
-                    $scope.memberUp = function(mid, msg) {
-                        if (confirm(msg)) {
-                            ProjectService.updateMember(mid, "up", function(data) {
-                                ProjectService.members($scope.pro.id, function(data) {
-                                    $scope.members = data;
-                                });
+                    ProjectService.saveMember($scope.pro.id, jobNo, function(data) {
+                        if (data.r === 'none') {
+                            $scope.jobNo$error = '用户不存在';
+                        }
+                        else if (data.r === 'exist') {
+                            $scope.jobNo$error = '已存在用户';
+                        } else if (data > 0) {
+                            ProjectService.members($scope.pro.id, function(data) {
+                                $scope.members = data;
+                                $scope.jobNo$error = '';
                             });
                         }
-                    };
-                    $scope.memberDown = function(mid, msg) {
-                        if (confirm(msg)) {
-                            ProjectService.updateMember(mid, "down", function(data) {
-                                ProjectService.members($scope.pro.id, function(data) {
-                                    $scope.members = data;
-                                });
+                    });
+                }
+
+                $scope.memberUp = function(mid, msg) {
+                    if (confirm(msg)) {
+                        ProjectService.updateMember(mid, "up", function(data) {
+                            ProjectService.members($scope.pro.id, function(data) {
+                                $scope.members = data;
                             });
-                        }
-                    };
-                    $scope.memberRemove = function(mid, msg) {
-                        if (confirm(msg)) {
-                            ProjectService.updateMember(mid, "remove", function(data) {
-                                ProjectService.members($scope.pro.id, function(data) {
-                                    $scope.members = data;
-                                });
+                        });
+                    }
+                };
+                $scope.memberDown = function(mid, msg) {
+                    if (confirm(msg)) {
+                        ProjectService.updateMember(mid, "down", function(data) {
+                            ProjectService.members($scope.pro.id, function(data) {
+                                $scope.members = data;
                             });
-                        }
-                    };
-                }]
+                        });
+                    }
+                };
+                $scope.memberRemove = function(mid, msg) {
+                    if (confirm(msg)) {
+                        ProjectService.updateMember(mid, "remove", function(data) {
+                            ProjectService.members($scope.pro.id, function(data) {
+                                $scope.members = data;
+                            });
+                        });
+                    }
+                };
+            }],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('tab', function () {
+                    if (scope.tab === 5) {
+                        scope.delayLoad();
+                    }
+                });
+            }
         }
     })
 
