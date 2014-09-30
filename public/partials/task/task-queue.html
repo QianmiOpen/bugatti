@@ -1,39 +1,32 @@
-<div class="col-md-offset-0 main">
-    <div class="page-header clearfix">
-        <h1 class="pull-left" style="margin: 0;">任务管理 - 任务队列</h1>
-        <button class="btn btn-primary pull-right" ng-click="returnList()">返回</button></td>
-    </div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-fixed">
+        <thead>
+        <tr>
+            <th width="15%">Id</th>
+            <th width="60%">任务说明</th>
+            <th width="10%">状态</th>
+            <th width="15%">操作</th>
+        </tr>
+        </thead>
+        <tbody>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover table-fixed">
-            <thead>
-            <tr>
-                <th width="15%">Id</th>
-                <th width="60%">任务说明</th>
-                <th width="10%">状态</th>
-                <th width="15%">操作</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <tr ng-repeat="tq in taskQueues">
-                <td>
-                    {{tq.id}}
-                </td>
-                <td>
-                    {{tq.taskTemplateName}}
-                </td>
-                <td style="padding:10px 0px 0px 0px;">
-                    {{tq.statusName}}
-                </td>
-                <!-- ========================================操作======================================== -->
-                <td class="show">
-                    <a href="" ng-click="removeQueue(tq.id)">
-                        <span class="glyphicon glyphicon-remove"></span>
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+        <tr ng-repeat="tq in c.taskQueues">
+            <td>
+                {{tq.id}}
+            </td>
+            <td>
+                {{tq.taskTemplateName}}
+            </td>
+            <td style="padding:10px 0px 0px 0px;">
+                {{tq.statusName}}
+            </td>
+            <!-- ========================================操作======================================== -->
+            <td class="show">
+                <a href="" ng-click="removeQueue(tq.id)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>

@@ -14,7 +14,7 @@
         <td><a class="glyphicon glyphicon-minus-sign" href="" ng-click="removeCluster(pro.id, c.id)"></a></td>
         <td><span tooltip="{{c.ip}}">{{c.name}}</span></td>
         <td>
-            <a href="" ng-click="showQueues($index)">
+            <a href="" ng-click="showQueues($index, 2)">
                 Queue
                 <span class="badge">{{c.task.queueNum}}</span>
             </a>
@@ -48,8 +48,8 @@
     </tr>
 
     <tr ng-class="isQueueShow[$index]? 'disp-row' : 'disp-hid'">
-        <td colspan="5">
-
+        <td colspan="6">
+            <cluster-tabs></cluster-tabs>
         </td>
     </tr>
     </tbody>

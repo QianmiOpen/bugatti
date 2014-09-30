@@ -607,7 +607,39 @@ define(['angular'], function(angular) {
                 });
             }
         }
-    })
+    });
+
+
+    app.directive('clusterTabs', function(){
+        return {
+            restrict: 'E',
+            templateUrl: 'partials/task/cluster-tabs.html',
+            controller: function($scope){
+
+                $scope.isClusterShow = function(ctab){
+                    return $scope.ctab == ctab ;
+                }
+
+            }
+        }
+    });
+
+    app.directive('taskQueue', function(){
+        return {
+            restrict: 'E',
+            require: '^clusterTabs',
+            templateUrl: 'partials/task/task-queue.html',
+            controller: ['$scope', 'TaskService',
+            function($scope, TaskService){
+                $scope.removeQueue = function(qid){
+                    TaskService.removeTaskQueue(qid, function(data){
+                        //如果删除的任务在一瞬间刚好变为正在执行，应告知
+                    })
+                }
+            }]
+        }
+
+    });
 
     app.directive('confList', function() {
         return {

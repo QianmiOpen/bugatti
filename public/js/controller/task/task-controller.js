@@ -161,6 +161,10 @@ define(['angular'], function(angular) {
                                 var pcIndex = $scope.findVmIndex(vmName, p)
                                 if(p.clusters.length > 0){
                                     p.clusters[pcIndex].task = projectObj
+                                    //队列
+                                    if(projectObj.queues != undefined){
+                                        p.clusters[pcIndex].taskQueues = projectObj.queues.filter($scope.addQueueStatusTip)
+                                    }
                                 }
 //                            p.status.currentNum = projectObj.currentNum
 //                            p.status.totalNum = projectObj.totalNum
@@ -180,6 +184,32 @@ define(['angular'], function(angular) {
                     }
                     $scope.projectStatus = $scope.projectStatus.map($scope.addStatusTip)
                 })
+            }
+        }
+
+        $scope.addQueueStatusTip = function(data){
+            //只返回等待执行的任务
+            if(data.status != 0){
+                return null
+            }
+            if(!$scope.isObjEmpty(data)){
+                data.statusName = $scope.explainQueueStatus(data.status)
+            } else {
+                data.status.statusTip = "N/A"
+            }
+            return data
+        }
+
+        $scope.explainQueueStatus = function(status){
+            switch(status){
+                //等待执行
+                case 0 : return "等待执行"
+                //执行成功
+                case 1 : return "执行成功"
+                //执行失败
+                case 2 : return "执行失败"
+                //正在执行
+                case 3 : return "正在执行"
             }
         }
 
@@ -457,9 +487,13 @@ define(['angular'], function(angular) {
                 })
             })
         }
-
-        $scope.showQueues = function(index){
-            $scope.isQueueShow[index] = !$scope.isQueueShow[index]
+        $scope.ctab = 1 ;
+        $scope.setCTab =function(ctab){
+            $scope.ctab = ctab ;
+        }
+        $scope.showQueues = function(index, ctab){
+            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
+            $scope.setCTab(ctab);
         }
     }]);
 

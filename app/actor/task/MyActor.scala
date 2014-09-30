@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.{AreaHelper, EnvironmentProjectRelHelper}
-import models.task.{TaskCommand, TaskQueueHelper, TaskQueue}
+import models.task.{TaskTemplateHelper, TaskCommand, TaskQueueHelper, TaskQueue}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.concurrent.Akka
@@ -100,6 +100,9 @@ object MyActor {
 }
 
 class MyActor extends Actor with ActorLogging {
+
+  implicit val taskQueueWrites = Json.writes[TaskQueue]
+
   import context._
   def receive = {
     case CreateNewTaskActor(envId, projectId, cluster) => {
@@ -117,12 +120,32 @@ class MyActor extends Actor with ActorLogging {
         context.child(s"taskExecute_${tKey}").getOrElse(
           actorOf(Props[TaskExecute], s"taskExecute_${tKey}")
         ) ! NextTaskQueue(envId, projectId, cluster)
+      }else {
+        self ! ChangeQueues(envId, projectId, cluster)
       }
     }
+
+    case cq: ChangeQueues => {
+      val tKey = taskKey(cq.envId, cq.projectId, cq.clusterName)
+      //修改队列
+      val queues = TaskQueueHelper.findQueues(cq.envId, cq.projectId, cq.clusterName)
+      val _queuesJson = queues.map{
+        x =>
+          var json = Json.toJson(x)
+          //增加模板名称
+          json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
+          json.as[JsObject]
+      }
+      changeStatus(mergerStatus(tKey, Json.obj("queues" -> _queuesJson)))
+      val size = _queuesJson.size
+      changeStatus(mergerStatus(tKey, Json.obj("queueNum" -> (if(size - 1 > 0){size - 1}else{0}) )))
+    }
+
     case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum, cluster) => {
 //      val key = s"${tq.envId}_${tq.projectId}"
       val key = taskKey(tq.envId, tq.projectId, cluster)
       //1、修改queueNum
+      changeStatus(mergerStatus(key, Json.obj("queueNum" -> queuesJson.size)))
       incQueueNum(key, -1)
       //2、更新queueList
       changeStatus(mergerStatus(key, Json.obj("queues" -> queuesJson)))
@@ -154,6 +177,9 @@ class MyActor extends Actor with ActorLogging {
       changeStatus(mergerStatus(key, Json.obj("endTime" -> Json.toJson(endTime))))
       //3、version
       changeStatus(mergerStatus(key, Json.obj("version" -> version)))
+
+      // 删除所有queues的状态
+      changeStatus(mergerStatus(key, Json.obj("queues" -> Seq.empty[JsObject])))
 
       //TODO NextTaskQueue
       //复用taskExecute
@@ -225,6 +251,7 @@ class MyActor extends Actor with ActorLogging {
     val tKey = taskKey(envId, projectId, clusterName)
     val cName = genClusterName(clusterName)
     val queueNum = (MyActor.statusMap \ tKey \ "queueNum").asOpt[Int]
+
     queueNum match {
       case Some(qm) => {
         if(qm == 0){
@@ -326,6 +353,7 @@ class MyActor extends Actor with ActorLogging {
 
 case class CreateNewTaskActor(envId: Int, projectId: Int, clusterName: Option[String])
 case class NextTaskQueue(envId: Int, projectId: Int, clusterName: Option[String])
+case class ChangeQueues(envId: Int, projectId: Int, clusterName: Option[String])
 
 case class ChangeTaskStatus(taskQueue: TaskQueue, taskName: String, queues: Seq[JsObject], currentNum: Int, totalNum: Int, cluster: Option[String])
 case class ChangeCommandStatus(envId: Int, projectId: Int, currentNum: Int, commandName: String, machine: String, cluster: Option[String])

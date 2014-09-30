@@ -1,7 +1,7 @@
 package controllers.task
 
 import actor.ActorUtils
-import actor.task.{TaskLog, MyActor}
+import actor.task.{ChangeQueues, TaskLog, MyActor}
 import controllers.BaseController
 import enums.TaskEnum
 import org.joda.time.DateTime
@@ -164,10 +164,8 @@ object TaskController extends BaseController {
       case Some(tq) => {
         //1、删除队列；
         TaskQueueHelper.delete(tq)
-        //2、调用方法checkQueueNum修改状态；
-//        TaskProcess.checkQueueNum(tq.envId, tq.projectId)
-        //3、调用推送状态方法；
-        //TODO TaskProcess.pushStatus()
+        //2、调用Actor修改Queue & QueueNum状态；
+        MyActor.superviseTaskActor ! ChangeQueues(tq.envId, tq.projectId, tq.clusterName)
       }
       case _ => {
 
