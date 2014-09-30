@@ -488,12 +488,27 @@ define(['angular'], function(angular) {
             })
         }
         $scope.ctab = 1 ;
+        $scope.c_index = 1;
         $scope.setCTab =function(ctab){
             $scope.ctab = ctab ;
         }
+        $scope.setCIndex =function(cIndex){
+            $scope.c_index = cIndex ;
+        }
         $scope.showQueues = function(index, ctab){
-            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
+            var clusterFlag = true;
+            if($scope.isQueueShow[index] && $scope.ctab == ctab){
+                clusterFlag = false;
+            }
+            //隐藏其他的index
+            $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+                return false ;
+            })
+            if(clusterFlag){
+                $scope.isQueueShow[index] = !$scope.isQueueShow[index];
+            }
             $scope.setCTab(ctab);
+            $scope.setCIndex(index);
         }
     }]);
 

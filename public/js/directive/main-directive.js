@@ -615,11 +615,9 @@ define(['angular'], function(angular) {
             restrict: 'E',
             templateUrl: 'partials/task/cluster-tabs.html',
             controller: function($scope){
-
-                $scope.isClusterShow = function(ctab){
-                    return $scope.ctab == ctab ;
+                $scope.isClusterShow = function(ctab, c_index){
+                    return ($scope.ctab == ctab && $scope.c_index == c_index) ;
                 }
-
             }
         }
     });
@@ -638,7 +636,95 @@ define(['angular'], function(angular) {
                 }
             }]
         }
+    });
 
+    app.directive('taskLog', function(){
+        return {
+            restrict: 'E',
+            require: '^clusterTabs',
+            templateUrl: 'partials/task/task-log.html',
+            controller:['$scope', 'TaskService','$state','$stateParams',
+                function($scope,TaskService,$state,$stateParams){
+                $scope.delayLoad = function(){
+                    var taskId = $scope.c.task.id
+
+                    $scope.envId_search = $scope.activeEnv
+
+                    $scope.proId_search = $scope.pro.id
+
+                    var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+                    var path = PlayRoutes.controllers.task.TaskController.taskLog(taskId).webSocketURL()
+                    var logSocket = new WS(path)
+                    logSocket.onmessage = $scope.receiveEvent
+
+                    $scope.message = ""
+                    $scope.data = ""
+                    $scope.logFirst = ""
+                    $scope.logHeader = ""
+
+                    $scope.receiveEvent = function(event){
+                        $scope.data = JSON.parse(event.data)
+                        if(event.data.error){
+                            console.log("there is errors:"+event.data.error)
+                        }else{
+                            $scope.$apply(function () {
+                                var data = $scope.data
+                                if(data.taskId == taskId){
+                                    if(data.kind == "logFirst"){
+                                        if(!$scope.logFirstHidden && data.message.split(" ")[0] == 0){
+                                            $scope.logFirstHidden = true
+                                        }
+                                        if($scope.logFirst.length == 0){
+                                            $scope.logFirst = data.message
+                                        }
+                                    }else if(data.kind == "logHeader"){
+                                        $scope.logFirstHidden = true
+                                        if($scope.logHeader.length == 0){
+                                            $scope.logHeader = data.message
+                                            $scope.message = $scope.logHeader + $scope.message
+                                        }
+                                    }else{
+                                        if($scope.message.length == 0){
+                                            $scope.message = data.message
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    $scope.closeWs = function(){
+                        logSocket.close()
+                    }
+
+                    $scope.logFirstHidden = false
+
+                    $scope.showHiddenMessage = function(){
+                        var len = parseInt($scope.logFirst.split(" ")[0])
+                        TaskService.readHeader(taskId, len, function(){})
+                    }
+
+                    $scope.TransferString = function(content)
+                    {
+                        var string = content;
+                        try{
+                            string=string.replace(/\r\n/gi,"<br>");
+                            string=string.replace(/\n/gi,"<br>");
+                        }catch(e) {
+                            console.log(e.message);
+                        }
+                        return string;
+                    }
+                }
+            }],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('ctab', function () {
+                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+                        scope.delayLoad();
+                    }
+                });
+            }
+        }
     });
 
     app.directive('confList', function() {

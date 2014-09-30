@@ -1,1 +1,5 @@
-<task-queue ng-show="isClusterShow(2)"></task-queue>
+<!-- 任务队列 -->
+<task-queue ng-show="isClusterShow(2, $index)"></task-queue>
+
+<!-- 任务日志 -->
+<task-log ng-show="isClusterShow(3, $index)"></task-log>
