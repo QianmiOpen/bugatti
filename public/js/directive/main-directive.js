@@ -646,16 +646,18 @@ define(['angular'], function(angular) {
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
                 $scope.delayLoadLog = function(){
-                    var taskId = $scope.c.task.id
+                    if($scope.taskId != $scope.c.task.id){
+                        $scope.taskId = $scope.c.task.id
+                        $scope.envId_search = $scope.activeEnv
 
-                    $scope.envId_search = $scope.activeEnv
+                        $scope.proId_search = $scope.pro.id
 
-                    $scope.proId_search = $scope.pro.id
-
-                    var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-                    var path = PlayRoutes.controllers.task.TaskController.taskLog(taskId).webSocketURL()
-                    var logSocket = new WS(path)
-                    logSocket.onmessage = $scope.receiveEvent
+                        var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+                        var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.taskId).webSocketURL()
+                        var logSocket = new WS(path)
+                        logSocket.onmessage = $scope.receiveEvent
+                    }
+                }
 
                     $scope.message = ""
                     $scope.data = ""
@@ -669,7 +671,8 @@ define(['angular'], function(angular) {
                         }else{
                             $scope.$apply(function () {
                                 var data = $scope.data
-                                if(data.taskId == taskId){
+                                console.log(data)
+                                if(data.taskId == $scope.taskId){
                                     if(data.kind == "logFirst"){
                                         if(!$scope.logFirstHidden && data.message.split(" ")[0] == 0){
                                             $scope.logFirstHidden = true
@@ -701,7 +704,7 @@ define(['angular'], function(angular) {
 
                     $scope.showHiddenMessage = function(){
                         var len = parseInt($scope.logFirst.split(" ")[0])
-                        TaskService.readHeader(taskId, len, function(){})
+                        TaskService.readHeader($scope.taskId, len, function(){})
                     }
 
                     $scope.TransferString = function(content)
@@ -715,7 +718,6 @@ define(['angular'], function(angular) {
                         }
                         return string;
                     }
-                }
             }],
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('ctab', function () {
