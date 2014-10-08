@@ -489,7 +489,7 @@ define(['angular'], function(angular) {
                             $scope.groups = data
                         })
                     }
-                    $scope.delayLoad = function(){
+                    $scope.delayLoadDependency = function(){
                         $scope.showDependencies()
 
                         ProjectService.getExceptSelf($scope.pro.id, function(data){
@@ -516,7 +516,7 @@ define(['angular'], function(angular) {
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('tab', function () {
                     if (scope.tab === 4) {
-                        scope.delayLoad();
+                        scope.delayLoadDependency();
                     }
                 });
             }
@@ -533,7 +533,7 @@ define(['angular'], function(angular) {
                 // ---------------------------------------------
                 // 项目成员管理
                 // ---------------------------------------------
-                $scope.delayLoad = function(){
+                $scope.delayLoadMember = function(){
                     ProjectService.members($scope.pro.id, function(data) {
                         $scope.members = data;
                     });
@@ -602,7 +602,7 @@ define(['angular'], function(angular) {
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('tab', function () {
                     if (scope.tab === 5) {
-                        scope.delayLoad();
+                        scope.delayLoadMember();
                     }
                 });
             }
@@ -645,7 +645,7 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
-                $scope.delayLoad = function(){
+                $scope.delayLoadLog = function(){
                     var taskId = $scope.c.task.id
 
                     $scope.envId_search = $scope.activeEnv
@@ -720,7 +720,7 @@ define(['angular'], function(angular) {
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('ctab', function () {
                     if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoad();
+                        scope.delayLoadLog();
                     }
                 });
             }
