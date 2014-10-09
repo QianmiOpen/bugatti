@@ -795,6 +795,46 @@ define(['angular'], function(angular) {
         }
     });
 
+    app.directive('projectHistory', function(){
+        return{
+            restrict: 'E',
+            require: '^projectTabs',
+            templateUrl: 'partials/task/task-history.html',
+            controller: ['$scope', 'TaskService',
+                function($scope, TaskService){
+                    $scope.delayLoadHistory = function(){
+                        TaskService.findHisTasks($scope.activeEnv, $scope.pro.id, function(data){
+                            $scope.hisTasks = data.map($scope.addStatusTipHistory)
+                        });
+                    }
+
+                    $scope.addStatusTipHistory = function(data){
+                        if(!$scope.isObjEmpty(data)){
+                            data.statusTip = $scope.explainTaskStatus(data.status)
+                            if(data.status == 1){
+                                data.color = {"color": "green"}
+                            }else if(data.status == 2){
+                                data.color = {"color": "red"}
+                            }else {
+                                data.color = {"color": "yellow"}
+                            }
+                        } else {
+                            data.statusTip = "N/A"
+                        }
+                        return data
+                    }
+                }
+            ],
+            link: function postLink(scope, iElement, iAttrs){
+                scope.$watch('tab', function () {
+                    if (scope.tab == 6) {
+                        scope.delayLoadHistory();
+                    }
+                });
+            }
+        }
+    });
+
     app.directive('confList', function() {
         return {
             restrict: 'E',

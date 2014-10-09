@@ -32,6 +32,9 @@ define(['angular'], function(angular) {
             },
             findClusters: function(envId, projectId, callback){
                 $http(PlayRoutes.controllers.task.TaskController.findClusterByEnv_Project(envId, projectId)).success(callback)
+            },
+            findHisTasks: function(envId, projectId, callback){
+                $http(PlayRoutes.controllers.task.TaskController.findHisTasks(envId, projectId)).success(callback)
             }
         }
     });

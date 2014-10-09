@@ -6,6 +6,7 @@
             <li ng-class="{ active:isSet(3) }"><a href ng-click="setTab(3)">配置</a></li>
             <li ng-class="{ active:isSet(4) }"><a href ng-click="setTab(4)">依赖</a></li>
             <li ng-class="{ active:isSet(5) }"><a href ng-click="setTab(5)">委员</a></li>
+            <li ng-class="{ active:isSet(6) }"><a href ng-click="setTab(6)">历史任务</a></li>
         </ul>
     </div>
 
@@ -24,5 +25,8 @@
 
         <!-- project member -->
         <project-member ng-show="isSet(5)"></project-member>
+
+        <!-- history tasks -->
+        <project-history ng-show="isSet(6)"></project-history>
     </div>
 </div>

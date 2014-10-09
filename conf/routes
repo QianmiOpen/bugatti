@@ -131,6 +131,7 @@ POST          /task/version                                       controllers.ta
 GET           /task/templates                                     controllers.task.TaskController.getTemplates(scriptVersion: String)
 GET           /task/terminate                                     controllers.task.TaskController.forceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
 GET           /task/clusters                                      controllers.task.TaskController.findClusterByEnv_Project(envId: Int, projectId: Int)
+GET           /task/history                                       controllers.task.TaskController.findHisTasks(envId: Int, projectId: Int)
 # Task Log
 GET           /task/log/:taskId                                   controllers.task.TaskController.taskLog(taskId: Int)
 GET           /task/logHeader                                     controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)

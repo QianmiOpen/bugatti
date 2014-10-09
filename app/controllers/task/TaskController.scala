@@ -107,6 +107,16 @@ object TaskController extends BaseController {
     }
   }
 
+  def findHisTasks(envId: Int, projectId: Int)= Action {
+    val list = TaskHelper.findHisTasks(envId, projectId)
+    val result = list.map{
+      t =>
+          Logger.info(s"history => ${t._1}, ${t._2}, ${t._3}")
+        Json.toJson(t._1).as[JsObject] ++ Json.obj("vs" -> t._2) ++ Json.obj("desc" -> t._3.name)
+    }
+    Ok(Json.toJson(result))
+  }
+
   def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
     MyActor.join()
   }
