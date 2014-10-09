@@ -1,0 +1,20 @@
+<form name="varForm" novalidate>
+    <table class="table table-striped border-less">
+        <thead>
+        <th class=" col-sm-3">变量名</th>
+        <th class="col-sm-4">变量值</th>
+        <th>&nbsp;</th>
+        </thead>
+        <tbody>
+        <tr ng-repeat="v in vars">
+            <td>
+                <input type="text" class="form-control" ng-model="v.name" disabled>
+            </td>
+            <td >
+                <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="100" placeholder="{{v.meta}}">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-success" ng-click="saveOrUpdateProperties(vars)" ng-disabled="form.$invalid"> 保 存 </button>
+</form>

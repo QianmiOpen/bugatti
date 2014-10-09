@@ -638,6 +638,66 @@ define(['angular'], function(angular) {
         }
     });
 
+    app.directive('clusterProperties', function(){
+       return {
+           restrict: 'E',
+           require: '^clusterTabs',
+           templateUrl: 'partials/task/cluster-properties.html',
+           controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService',
+           function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService) {
+               $scope.delayLoadProperties = function(){
+                   RelationService.get($scope.c.id, function(data) {
+                       $scope.relation = data;
+                       if ($scope.relation) {
+                           if (angular.isUndefined($scope.pro.id) || angular.isUndefined($scope.activeEnv) ) {
+                               return;
+                           }
+                           ProjectService.vars($scope.pro.id, $scope.activeEnv, function(project_vars) {
+                               $scope.vars = project_vars;
+                               angular.forEach($scope.vars, function(pv) {
+                                   pv.meta = pv.value;
+                                   var defVar = findInVars($scope.relation.globalVariable, pv);
+                                   if (defVar !== '') {
+                                       pv.meta = defVar;
+                                       pv.value = defVar;
+                                   } else {
+                                       pv.value = '';
+                                   }
+                               });
+                           });
+                       }
+                   });
+               }
+
+               function findInVars(vars, v) {
+                   var find = '';
+                   angular.forEach(vars, function(_v, index) {
+                       if (_v.name == v.name) {
+                           find = _v.value;
+                           return;
+                       }
+                   });
+                   return find;
+               };
+
+               $scope.saveOrUpdateProperties = function(vars) {
+                   $scope.relation.globalVariable = [];
+                   angular.forEach(vars, function(v) {
+                       $scope.relation.globalVariable.push({name: v.name, value: v.value})
+                   });
+                   RelationService.update($scope.c.id, $scope.relation, function(data) {});
+               };
+           }],
+           link: function postLink(scope, iElement, iAttrs) {
+               scope.$watch('c_index', function () {
+                   if (scope.ctab == 1 && scope.c_index == scope.$index) {
+                       scope.delayLoadProperties();
+                   }
+               });
+           }
+       }
+    });
+
     app.directive('taskLog', function(){
         return {
             restrict: 'E',
