@@ -720,7 +720,7 @@ define(['angular'], function(angular) {
                     }
             }],
             link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('ctab', function () {
+                scope.$watch('c_index', function () {
                     if (scope.ctab == 3 && scope.c_index == scope.$index) {
                         scope.delayLoadLog();
                     }
