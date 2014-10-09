@@ -643,8 +643,8 @@ define(['angular'], function(angular) {
            restrict: 'E',
            require: '^clusterTabs',
            templateUrl: 'partials/task/cluster-properties.html',
-           controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService',
-           function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService) {
+           controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
+           function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
                $scope.delayLoadProperties = function(){
                    RelationService.get($scope.c.id, function(data) {
                        $scope.relation = data;
@@ -685,7 +685,13 @@ define(['angular'], function(angular) {
                    angular.forEach(vars, function(v) {
                        $scope.relation.globalVariable.push({name: v.name, value: v.value})
                    });
-                   RelationService.update($scope.c.id, $scope.relation, function(data) {});
+                   RelationService.update($scope.c.id, $scope.relation, function(data) {
+                       if(data == 1){
+                           growl.addSuccessMessage("修改成功")
+                       }else {
+                           growl.addErrorMessage("修改失败");
+                       }
+                   });
                };
            }],
            link: function postLink(scope, iElement, iAttrs) {
