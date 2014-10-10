@@ -9,18 +9,27 @@
         <th width="15%">操作人</th>
     </tr>
     </thead>
-    <tbody>
-        <tr ng-repeat="t in hisTasks">
+    <tbody ng-repeat="t in hisTasks">
+        <tr>
             <td>{{t.id}}</td>
             <td>{{t.startTime}}</td>
             <td>{{t.clusterName}}</td>
-            <td>{{t.desc}}&nbsp;{{t.vs}}</td>
+            <td>
+                <a href="" ng-click="showHisLog($index, 1, t.id)">
+                    {{t.desc}}&nbsp;{{t.vs}}
+                </a>
+            </td>
             <td>
                 <span ng-style="t.color">
                     {{t.statusTip}}
                 </span>
             </td>
             <td>{{t.operatorId}}</td>
+        </tr>
+        <tr ng-class="isHisLogShow[$index]? 'disp-row' : 'disp-hid'">
+            <td colspan="6">
+                <his-tabs></his-tabs>
+            </td>
         </tr>
     </tbody>
 </table>

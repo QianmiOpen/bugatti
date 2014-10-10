@@ -255,7 +255,36 @@ define(['angular'], function(angular) {
     app.directive('projectBalance', function () {
         return {
             restrict: 'E',
-            templateUrl: 'partials/task/project-balance.html'
+            templateUrl: 'partials/task/project-balance.html',
+            controller: ['$scope',
+                function($scope){
+                    $scope.ctab = 1 ;
+                    $scope.c_index = 1;
+                    $scope.setCTab =function(ctab){
+                        $scope.ctab = ctab ;
+                    }
+                    $scope.setCIndex =function(cIndex){
+                        $scope.c_index = cIndex ;
+                    }
+                    $scope.showQueues = function(index, ctab, taskId){
+                        var clusterFlag = true;
+                        if($scope.isQueueShow[index] && $scope.ctab == ctab){
+                            clusterFlag = false;
+                        }
+                        //隐藏其他的index
+                        $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+                            return false ;
+                        })
+                        if(clusterFlag){
+                            $scope.ctabFlag = !$scope.ctabFlag;
+                            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
+                        }
+                        $scope.taskId = taskId
+                        $scope.setCTab(ctab);
+                        $scope.setCIndex(index);
+                    }
+                }
+            ]
         }
     });
 
@@ -609,7 +638,6 @@ define(['angular'], function(angular) {
         }
     });
 
-
     app.directive('clusterTabs', function(){
         return {
             restrict: 'E',
@@ -617,6 +645,18 @@ define(['angular'], function(angular) {
             controller: function($scope){
                 $scope.isClusterShow = function(ctab, c_index){
                     return ($scope.ctab == ctab && $scope.c_index == c_index);
+                }
+            }
+        }
+    });
+
+    app.directive('hisTabs', function(){
+        return {
+            restrict: 'E',
+            templateUrl: 'partials/task/his-tabs.html',
+            controller: function($scope){
+                $scope.isHisShow = function(stab, s_index){
+                    return ($scope.stab == stab && $scope.s_index == s_index);
                 }
             }
         }
@@ -707,106 +747,96 @@ define(['angular'], function(angular) {
     app.directive('taskLog', function(){
         return {
             restrict: 'E',
-            require: '^clusterTabs',
+//            require: '^clusterTabs',
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
                 $scope.delayLoadLog = function(){
-                    if($scope.c.task.id != undefined){
-                        $scope.taskId = $scope.c.task.id
-                        $scope.envId_search = $scope.activeEnv
-
-                        $scope.proId_search = $scope.pro.id
-
+                    if($scope.taskId != undefined){
                         var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
                         var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.taskId).webSocketURL()
                         $scope.logSocket = new WS(path)
                         $scope.logSocket.onmessage = $scope.receiveEvent
                     }
-
                 }
 
-                    $scope.message = ""
-                    $scope.data = ""
-                    $scope.logFirst = ""
-                    $scope.logHeader = ""
+                $scope.message = ""
+                $scope.data = ""
+                $scope.logFirst = ""
+                $scope.logHeader = ""
 
-                    $scope.receiveEvent = function(event){
-                        $scope.data = JSON.parse(event.data)
-                        if(event.data.error){
-                            console.log("there is errors:"+event.data.error)
-                        }else{
-                            $scope.$apply(function () {
-                                var data = $scope.data
-//                                console.log(data)
-//                                console.log(data.taskId == $scope.taskId)
-                                if(data.taskId == $scope.taskId){
-                                    if(data.kind == "logFirst"){
-                                        $scope.logFirstHidden = false
-                                        $scope.logFirst = data.message
-                                    }else if(data.kind == "logHeader"){
-                                        $scope.logFirstHidden = true
-                                        if($scope.logHeader.length == 0){
-                                            $scope.logHeader = data.message
-                                            $scope.message = $scope.logHeader + $scope.message
-                                        }
-                                    }else{
-                                        $scope.message = data.message
+                $scope.receiveEvent = function(event){
+                    $scope.data = JSON.parse(event.data)
+                    if(event.data.error){
+                        console.log("there is errors:"+event.data.error)
+                    }else{
+                        $scope.$apply(function () {
+                            var data = $scope.data
+                            if(data.taskId == $scope.taskId){
+                                if(data.kind == "logFirst"){
+                                    $scope.logFirstHidden = false
+                                    $scope.logFirst = data.message
+                                }else if(data.kind == "logHeader"){
+                                    $scope.logFirstHidden = true
+                                    if($scope.logHeader.length == 0){
+                                        $scope.logHeader = data.message
+                                        $scope.message = $scope.logHeader + $scope.message
                                     }
+                                }else{
+                                    $scope.message = data.message
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
+                }
 
-                    $scope.closeWs = function(){
-                        $scope.logSocket.close()
+                $scope.closeWs = function(){
+                    $scope.logSocket.close()
+                }
+
+                $scope.logFirstHidden = false
+
+                $scope.showHiddenMessage = function(){
+                    var len = parseInt($scope.logFirst.split(" ")[0])
+                    TaskService.readHeader($scope.taskId, len, function(){})
+                }
+
+                $scope.TransferString = function(content)
+                {
+                    var string = content;
+                    try{
+                        string=string.replace(/\r\n/gi,"<br>");
+                        string=string.replace(/\n/gi,"<br>");
+                    }catch(e) {
+                        console.log(e.message);
                     }
-
-                    $scope.logFirstHidden = false
-
-                    $scope.showHiddenMessage = function(){
-                        var len = parseInt($scope.logFirst.split(" ")[0])
-                        TaskService.readHeader($scope.taskId, len, function(){})
-                    }
-
-                    $scope.TransferString = function(content)
-                    {
-                        var string = content;
-                        try{
-                            string=string.replace(/\r\n/gi,"<br>");
-                            string=string.replace(/\n/gi,"<br>");
-                        }catch(e) {
-                            console.log(e.message);
-                        }
-                        return string;
-                    }
+                    return string;
+                }
             }],
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('c_index', function () {
-                    console.log("ctab=>" + scope.ctab)
-                    console.log("c_index=>" + scope.c_index)
-                    console.log("$index=>" + scope.$index)
-                    console.log(scope.ctab == 3, scope.c_index == scope.$index)
                     if (scope.ctab == 3 && scope.c_index == scope.$index) {
                         scope.delayLoadLog();
                     }
                 });
                 scope.$watch('ctab', function () {
-                    console.log("ctab2=>" + scope.ctab)
-                    console.log("c_index2=>" + scope.c_index)
-                    console.log("$index2=>" + scope.$index)
-                    console.log("2=>", scope.ctab == 3, scope.c_index == scope.$index)
                     if (scope.ctab == 3 && scope.c_index == scope.$index) {
                         scope.delayLoadLog();
                     }
                 });
                 scope.$watch('ctabFlag', function () {
-
-                    console.log("ctab4=>" + scope.ctab)
-                    console.log("c_index4=>" + scope.c_index)
-                    console.log("$index4=>" + scope.$index)
-                    console.log("4=>", scope.ctab == 3, scope.c_index == scope.$index)
                     if (scope.ctab == 3 && scope.c_index == scope.$index) {
+                        scope.delayLoadLog();
+                    }
+                });
+                //历史任务查看
+                scope.$watch('s_index', function () {
+                    if (scope.stab == 1 && scope.s_index == scope.$index) {
+                        scope.delayLoadLog();
+                    }
+                });
+                scope.$watch('stabFlag', function () {
+                    if (scope.stab == 1 && scope.s_index == scope.$index) {
                         scope.delayLoadLog();
                     }
                 });
@@ -823,8 +853,15 @@ define(['angular'], function(angular) {
                 function($scope, TaskService){
                     $scope.delayLoadHistory = function(){
                         TaskService.findHisTasks($scope.activeEnv, $scope.pro.id, function(data){
-                            $scope.hisTasks = data.map($scope.addStatusTipHistory)
+                            $scope.hisTasks = data.map($scope.addStatusTipHistory).map($scope.addShowFlag)
                         });
+                    }
+
+                    $scope.addShowFlag = function(data){
+                        if(!$scope.isObjEmpty(data)){
+                            $scope.isHisLogShow.push(false)
+                        }
+                        return data ;
                     }
 
                     $scope.addStatusTipHistory = function(data){
@@ -841,6 +878,32 @@ define(['angular'], function(angular) {
                             data.statusTip = "N/A"
                         }
                         return data
+                    }
+
+                    $scope.stab = 1 ;
+                    $scope.s_index = 1;
+                    $scope.setSTab =function(stab){
+                        $scope.stab = stab ;
+                    }
+                    $scope.setSIndex =function(sIndex){
+                        $scope.s_index = sIndex ;
+                    }
+                    $scope.showHisLog = function(index, stab, taskId){
+                        var clusterFlag2 = true;
+                        if($scope.isHisLogShow[index] && $scope.stab == stab){
+                            clusterFlag2 = false;
+                        }
+                        //隐藏其他的index
+                        $scope.isHisLogShow = $scope.isHisLogShow.map(function(q){
+                            return false ;
+                        })
+                        if(clusterFlag2){
+                            $scope.stabFlag = !$scope.stabFlag;
+                            $scope.isHisLogShow[index] = !$scope.isHisLogShow[index];
+                        }
+                        $scope.taskId = taskId
+                        $scope.setSTab(stab);
+                        $scope.setSIndex(index);
                     }
                 }
             ],
