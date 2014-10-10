@@ -46,7 +46,7 @@ object TaskController extends BaseController {
    */
   def getVersions(projectId: Int, envId: Int) = Action{
     val list = VersionHelper.findByProjectId_EnvId(projectId, envId)
-    Ok(Json.toJson(list.reverse.drop(list.length - 5).reverse))
+    Ok(Json.toJson(list.reverse.drop(list.length - 30).reverse))
   }
 
   def findLastTaskStatus = Action(parse.json){implicit request =>

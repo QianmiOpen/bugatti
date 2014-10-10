@@ -82,7 +82,7 @@ PUT           /template/:id                                       controllers.co
 GET           /project/:projectId/nexusVersion                    controllers.conf.VersionController.nexusVersions(projectId: Int)
 GET           /project/:projectId/version                         controllers.conf.VersionController.index(projectId: Int, page: Int ?=0, pageSize: Int ?=10)
 GET           /project/:projectId/versoin/total                   controllers.conf.VersionController.count(projectId: Int)
-GET           /project/version/all                                controllers.conf.VersionController.all(pid: Int, top: Int ?=10)
+GET           /project/version/all                                controllers.conf.VersionController.all(pid: Int, top: Int ?=30)
 GET           /project/version/:id                                controllers.conf.VersionController.show(id: Int)
 DELETE        /project/version/:id                                controllers.conf.VersionController.delete(id: Int)
 POST          /porject/version                                    controllers.conf.VersionController.save
