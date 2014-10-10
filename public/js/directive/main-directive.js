@@ -616,7 +616,7 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/task/cluster-tabs.html',
             controller: function($scope){
                 $scope.isClusterShow = function(ctab, c_index){
-                    return ($scope.ctab == ctab && $scope.c_index == c_index) ;
+                    return ($scope.ctab == ctab && $scope.c_index == c_index);
                 }
             }
         }
@@ -712,7 +712,7 @@ define(['angular'], function(angular) {
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
                 $scope.delayLoadLog = function(){
-                    if($scope.taskId != $scope.c.task.id){
+                    if($scope.c.task.id != undefined){
                         $scope.taskId = $scope.c.task.id
                         $scope.envId_search = $scope.activeEnv
 
@@ -720,9 +720,10 @@ define(['angular'], function(angular) {
 
                         var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
                         var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.taskId).webSocketURL()
-                        var logSocket = new WS(path)
-                        logSocket.onmessage = $scope.receiveEvent
+                        $scope.logSocket = new WS(path)
+                        $scope.logSocket.onmessage = $scope.receiveEvent
                     }
+
                 }
 
                     $scope.message = ""
@@ -737,15 +738,12 @@ define(['angular'], function(angular) {
                         }else{
                             $scope.$apply(function () {
                                 var data = $scope.data
-                                console.log(data)
+//                                console.log(data)
+//                                console.log(data.taskId == $scope.taskId)
                                 if(data.taskId == $scope.taskId){
                                     if(data.kind == "logFirst"){
-                                        if(!$scope.logFirstHidden && data.message.split(" ")[0] == 0){
-                                            $scope.logFirstHidden = true
-                                        }
-                                        if($scope.logFirst.length == 0){
-                                            $scope.logFirst = data.message
-                                        }
+                                        $scope.logFirstHidden = false
+                                        $scope.logFirst = data.message
                                     }else if(data.kind == "logHeader"){
                                         $scope.logFirstHidden = true
                                         if($scope.logHeader.length == 0){
@@ -753,9 +751,7 @@ define(['angular'], function(angular) {
                                             $scope.message = $scope.logHeader + $scope.message
                                         }
                                     }else{
-                                        if($scope.message.length == 0){
-                                            $scope.message = data.message
-                                        }
+                                        $scope.message = data.message
                                     }
                                 }
                             });
@@ -763,7 +759,7 @@ define(['angular'], function(angular) {
                     }
 
                     $scope.closeWs = function(){
-                        logSocket.close()
+                        $scope.logSocket.close()
                     }
 
                     $scope.logFirstHidden = false
@@ -787,6 +783,29 @@ define(['angular'], function(angular) {
             }],
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('c_index', function () {
+                    console.log("ctab=>" + scope.ctab)
+                    console.log("c_index=>" + scope.c_index)
+                    console.log("$index=>" + scope.$index)
+                    console.log(scope.ctab == 3, scope.c_index == scope.$index)
+                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+                        scope.delayLoadLog();
+                    }
+                });
+                scope.$watch('ctab', function () {
+                    console.log("ctab2=>" + scope.ctab)
+                    console.log("c_index2=>" + scope.c_index)
+                    console.log("$index2=>" + scope.$index)
+                    console.log("2=>", scope.ctab == 3, scope.c_index == scope.$index)
+                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+                        scope.delayLoadLog();
+                    }
+                });
+                scope.$watch('ctabFlag', function () {
+
+                    console.log("ctab4=>" + scope.ctab)
+                    console.log("c_index4=>" + scope.c_index)
+                    console.log("$index4=>" + scope.$index)
+                    console.log("4=>", scope.ctab == 3, scope.c_index == scope.$index)
                     if (scope.ctab == 3 && scope.c_index == scope.$index) {
                         scope.delayLoadLog();
                     }

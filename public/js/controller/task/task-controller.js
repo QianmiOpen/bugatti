@@ -496,6 +496,7 @@ define(['angular'], function(angular) {
             $scope.c_index = cIndex ;
         }
         $scope.showQueues = function(index, ctab){
+//            $scope.ctabFlag = false;
             var clusterFlag = true;
             if($scope.isQueueShow[index] && $scope.ctab == ctab){
                 clusterFlag = false;
@@ -505,6 +506,7 @@ define(['angular'], function(angular) {
                 return false ;
             })
             if(clusterFlag){
+                $scope.ctabFlag = !$scope.ctabFlag;
                 $scope.isQueueShow[index] = !$scope.isQueueShow[index];
             }
             $scope.setCTab(ctab);
