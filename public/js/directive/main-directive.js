@@ -259,7 +259,7 @@ define(['angular'], function(angular) {
             controller: ['$scope',
                 function($scope){
                     $scope.ctab = 1 ;
-                    $scope.c_index = 1;
+                    $scope.c_index = -1;
                     $scope.setCTab =function(ctab){
                         $scope.ctab = ctab ;
                     }
@@ -747,7 +747,7 @@ define(['angular'], function(angular) {
     app.directive('taskLog', function(){
         return {
             restrict: 'E',
-//            require: '^clusterTabs',
+            require: '^projectTabs',
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
@@ -853,6 +853,7 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/task/task-history.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
+                    $scope.hisTasks = []
                     $scope.delayLoadHistory = function(){
                         TaskService.findHisTasks($scope.activeEnv, $scope.pro.id, function(data){
                             $scope.hisTasks = data.map($scope.addStatusTipHistory).map($scope.addShowFlag)
@@ -883,7 +884,7 @@ define(['angular'], function(angular) {
                     }
 
                     $scope.stab = 1 ;
-                    $scope.s_index = 1;
+                    $scope.s_index = -1;
                     $scope.setSTab =function(stab){
                         $scope.stab = stab ;
                     }

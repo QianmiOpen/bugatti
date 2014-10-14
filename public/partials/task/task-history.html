@@ -1,35 +1,37 @@
-<table class="table table-striped table-hover table-fixed">
-    <thead>
-    <tr>
-        <th width="5%">任务号</th>
-        <th width="20%">开始时间</th>
-        <th width="20%">负载</th>
-        <th width="30%">描述</th>
-        <th width="10%">状态</th>
-        <th width="15%">操作人</th>
-    </tr>
-    </thead>
-    <tbody ng-repeat="t in hisTasks">
+<div ng-if="tab == 6">
+    <table class="table table-striped table-hover table-fixed">
+        <thead>
         <tr>
-            <td>{{t.id}}</td>
-            <td>{{t.startTime}}</td>
-            <td>{{t.clusterName}}</td>
-            <td>
-                <a href="" ng-click="showHisLog($index, 1, t.id)">
-                    {{t.desc}}&nbsp;{{t.vs}}
-                </a>
-            </td>
-            <td>
-                <span ng-style="t.color">
-                    {{t.statusTip}}
-                </span>
-            </td>
-            <td>{{t.operatorId}}</td>
+            <th width="5%">任务号</th>
+            <th width="20%">开始时间</th>
+            <th width="20%">负载</th>
+            <th width="30%">描述</th>
+            <th width="10%">状态</th>
+            <th width="15%">操作人</th>
         </tr>
-        <tr ng-class="isHisLogShow[$index]? 'disp-row' : 'disp-hid'">
-            <td colspan="6">
-                <his-tabs></his-tabs>
-            </td>
-        </tr>
-    </tbody>
-</table>
+        </thead>
+        <tbody ng-if="hisTasks.length > 0" ng-repeat="t in hisTasks">
+            <tr>
+                <td>{{t.id}}</td>
+                <td>{{t.startTime}}</td>
+                <td>{{t.clusterName}}</td>
+                <td>
+                    <a href="" ng-click="showHisLog($index, 1, t.id)">
+                        {{t.desc}}&nbsp;{{t.vs}}
+                    </a>
+                </td>
+                <td>
+                    <span ng-style="t.color">
+                        {{t.statusTip}}
+                    </span>
+                </td>
+                <td>{{t.operatorId}}</td>
+            </tr>
+            <tr ng-class="isHisLogShow[$index]? 'disp-row' : 'disp-hid'">
+                <td colspan="6">
+                    <his-tabs></his-tabs>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

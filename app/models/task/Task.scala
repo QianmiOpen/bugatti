@@ -66,13 +66,25 @@ object TaskHelper {
   }
 
   def findHisTasks(envId: Int, projectId: Int): List[(Task, Option[String], TaskTemplate)] = db withSession { implicit session =>
-    (for{
-      ((task, template), version) <- qTask innerJoin qTaskTemplate on (_.taskTemplateId === _.id) leftJoin qVersion on (_._1.versionId === _.id)
-      if task.envId is envId
-      if task.projectId is projectId
+//    (for{
+//      ((task, template), version) <- qTask innerJoin qTaskTemplate on (_.taskTemplateId === _.id) leftJoin qVersion on (_._1.versionId === _.id)
+//      if task.envId is envId
+//      if task.projectId is projectId
+//    } yield {
+//      (task, version.vs.?, template)
+//    }).sortBy(s => s._1.startTime.desc).take(20).list
+
+    val list = (for{
+      (task, template) <- qTask innerJoin qTaskTemplate on (_.taskTemplateId === _.id)
+      if(task.envId === envId && task.projectId === projectId)
     } yield {
-      (task, version.vs.?, template)
+      (task, template)
     }).sortBy(s => s._1.startTime.desc).take(20).list
+    val versionMap = qVersion.filter(_.projectId === projectId).list.map(t => t.id -> t.vs).toMap[Option[Int], String]
+    list.map{
+      t =>
+        (t._1, versionMap.get(t._1.versionId), t._2)
+    }
   }
 
   def all(page: Int, pageSize: Int) = db withSession { implicit session =>
