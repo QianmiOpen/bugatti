@@ -757,6 +757,8 @@ define(['angular'], function(angular) {
                         var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.taskId).webSocketURL()
                         $scope.logSocket = new WS(path)
                         $scope.logSocket.onmessage = $scope.receiveEvent
+
+                        $scope.logHeader = ""
                     }
                 }
 

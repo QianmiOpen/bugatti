@@ -184,6 +184,7 @@ class TaskExecute extends Actor with ActorLogging {
     }
 
     case tc: TerminateCommands => {
+      log.info(s"taskExecute Terminate taskId ==> ${_taskId}")
       TaskHelper.changeStatus(_taskId, tc.status)
       val (task, version) = getTask_VS(_taskId)
       MyActor.superviseTaskActor ! ChangeOverStatus(_envId, _projectId, tc.status, task.endTime.get, version, _clusterName)
