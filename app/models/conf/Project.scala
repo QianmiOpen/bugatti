@@ -38,6 +38,8 @@ object ProjectHelper extends PlayCache {
 
   import models.AppDB._
 
+  val ProjectNotExistId = -1
+
   val qProject = TableQuery[ProjectTable]
   val qMember = TableQuery[ProjectMemberTable]
   val qpd = TableQuery[ProjectDependencyTable]

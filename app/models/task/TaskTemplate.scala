@@ -63,5 +63,4 @@ object TaskTemplateHelper{
   def updateScriptVersion(oldVersion: String, newVersion: String) = db withSession { implicit session =>
     qTaskTemplate.filter(_.scriptVersion === oldVersion).map(_.scriptVersion).update(newVersion)
   }
-
 }

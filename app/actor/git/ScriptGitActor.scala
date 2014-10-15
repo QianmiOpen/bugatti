@@ -144,6 +144,14 @@ class ScriptGitActor extends Actor with ActorLogging {
     }
   }
 
+  def _getProjectIdFromProjectName(projectName: String): Int = {
+    if (projectName == null || projectName.isEmpty) {
+      ProjectHelper.ProjectNotExistId
+    } else {
+      ProjectHelper.findByName(projectName.trim).map(_.id.get).getOrElse(ProjectHelper.ProjectNotExistId)
+    }
+  }
+
   def _initFromYaml(file: File, tagName: String) = {
     val yaml = new Yaml()
     val io = new FileInputStream(file)
@@ -156,14 +164,23 @@ class ScriptGitActor extends Actor with ActorLogging {
         val templateId = temp.id.get
         // 更新模板说明
         val tempObj = temp.copy(remark = Some(template.get("remark").asInstanceOf[String]),
-          dependentProjectIds = _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String]))
+          dependentProjectIds = Seq.empty)
 
         TemplateHelper.update(templateId, tempObj)
+
+        //        _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])
+        val dependenceProjectIds = template.get("dependences").asInstanceOf[JList[JMap[String, String]]].asScala.map { dependence =>
+          val defaultId  = _getProjectIdFromProjectName(dependence.get("default"))
+          val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("description"), defaultId)
+          val tdId = TemplateDependenceHelper.create(projectDep)
+          defaultId
+        }
+
         // 更新项目依赖
         ProjectHelper.allByTemplateId(templateId).foreach { project =>
           val projectId = project.id.get
           val projectDepIds = ProjectDependencyHelper.findByProjectId(projectId).map(_.dependencyId)
-          tempObj.dependentProjectIds.filterNot(pid => projectDepIds.contains(pid)).foreach { pid =>
+          dependenceProjectIds.filterNot(_ != ProjectHelper.ProjectNotExistId).filterNot(projectDepIds.contains).foreach { pid =>
             ProjectDependencyHelper.add(ProjectDependency(None, projectId, pid))
           }
         }
