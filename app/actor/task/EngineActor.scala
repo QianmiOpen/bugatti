@@ -193,6 +193,10 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         lastLeft = true
       } else {
         lastLeft = false
+        if(!bAppend){
+          num = 0
+          stopNum = 0
+        }
       }
 
       if (c == '}' && num > 0) {
@@ -208,6 +212,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         key = s"$key$c"
       }
     }
+    log.info(s"config keys ==> ${retSeq.toSet}")
     retSeq.toSet.toSeq
   }
 }
