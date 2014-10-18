@@ -594,17 +594,18 @@ define(['angular'], function(angular) {
             });
     }]);
 
-    app.controller('DependencyCtrl', ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService',
-        function($scope, $stateParams, $filter, $state, DependencyService, ProjectService){
+    app.controller('DependencyCtrl', ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
+        function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
             $scope.showDependencies = function(){
                 DependencyService.get($stateParams.id, function(data){
                     $scope.groups = data
                 })
             }
-            $scope.showDependencies()
+
 
             ProjectService.getExceptSelf($stateParams.id, function(data){
                 $scope.projects = data
+                $scope.showDependencies()
             })
 
             $scope.removeDependency = function(parent,child){
@@ -617,6 +618,35 @@ define(['angular'], function(angular) {
                 DependencyService.addDependency(parent, child, function(data){
                     $scope.showDependencies()
                 })
+            }
+
+            $scope.templateFilter = function(dep){
+                return function(p){return p.templateId == dep.templateId};
+            }
+
+            $scope.getTemplateProject = function(dep){
+                var subTemplateProjects = $scope.projects.map(
+                    function(p){
+                        if(p.name == dep.name) {
+                            return p;
+                        }
+                    }
+                ).filter(function(e){return e})
+                if(subTemplateProjects.length > 0){
+                    return subTemplateProjects[0];
+                }
+            }
+
+            $scope.changeTemplateProject = function(parentId, oldId, newId){
+                if(newId != undefined){
+                    DependencyService.changeTemplateProject(parentId, oldId, newId, function(data){
+                        if(data.r == 0){
+                            growl.addWarnMessage("修改失败");
+                        } else if(data.r == 1){
+                            growl.addSuccessMessage("修改成功");
+                        }
+                    })
+                }
             }
         }
     ])

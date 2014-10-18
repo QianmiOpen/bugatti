@@ -16,7 +16,11 @@
                             <div class="category-title angular-ui-tree-handle">
                                 <a href="" class="btn btn-danger btn-xs pull-right" ng-show="d.canRemove"  ng-click="removeDependency(group, d)"><i class="glyphicon glyphicon-remove"></i></a>
                                 <div>
-                                    &nbsp;{{d.name}}
+                                    &nbsp;
+                                    <span ng-if="d.canRemove">{{d.name}}</span>
+                                    <select ng-change="changeTemplateProject(group.id, d.id, templateProject.id)" ng-if="!d.canRemove" class="form-control" ng-init="templateProject = getTemplateProject(d)" ng-model="templateProject" ng-options="p.name + ' -- ' + p.description for p in projects | filter: templateFilter(d)">
+                                        <option value="">-- 选择项目 --</option>
+                                    </select>
                                 </div>
                             </div>
                         </li>

@@ -519,10 +519,9 @@ define(['angular'], function(angular) {
                         })
                     }
                     $scope.delayLoadDependency = function(){
-                        $scope.showDependencies()
-
                         ProjectService.getExceptSelf($scope.pro.id, function(data){
-                            $scope.projects = data
+                            $scope.projects = data ;
+                            $scope.showDependencies() ;
                         })
                     }
 
@@ -539,6 +538,35 @@ define(['angular'], function(angular) {
                             }
                             $scope.showDependencies()
                         })
+                    }
+
+                    $scope.templateFilter = function(dep){
+                        return function(p){return p.templateId == dep.templateId};
+                    }
+
+                    $scope.getTemplateProject = function(dep){
+                        var subTemplateProjects = $scope.projects.map(
+                            function(p){
+                                if(p.name == dep.name) {
+                                    return p;
+                                }
+                            }
+                        ).filter(function(e){return e})
+                        if(subTemplateProjects.length > 0){
+                            return subTemplateProjects[0];
+                        }
+                    }
+
+                    $scope.changeTemplateProject = function(parentId, oldId, newId){
+                        if(newId != undefined){
+                            DependencyService.changeTemplateProject(parentId, oldId, newId, function(data){
+                                if(data.r == 0){
+                                    growl.addWarnMessage("修改失败");
+                                } else if(data.r == 1){
+                                    growl.addSuccessMessage("修改成功");
+                                }
+                            })
+                        }
                     }
                 }
             ],

@@ -181,6 +181,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.DependencyController.show,
         conf.routes.javascript.DependencyController.removeDependency,
         conf.routes.javascript.DependencyController.addDependency,
+        conf.routes.javascript.DependencyController.updateTemplateProject,
 
         // conf
         conf.routes.javascript.ConfController.all,

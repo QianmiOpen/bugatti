@@ -29,8 +29,8 @@ object TaskTools {
    * @param pid
    * @return
    */
-  def findDependencies(pid: Int): Seq[Int] = {
-    ProjectDependencyHelper.findByProjectId(pid).map(_.dependencyId).filter(_ != -1)
+  def findDependencies(pid: Int): Map[Int, Option[String]] = {
+    ProjectDependencyHelper.findByProjectId(pid).map( t => t.dependencyId -> t.alias).toMap
   }
 
   def getFileName() = {
@@ -70,13 +70,19 @@ object TaskTools {
   }
 
   def findDependencies_v(envId: Int, projectId: Int, realVersion: String): Map[String, Project_v] = {
-    findDependencies(projectId).map {
+    val map = findDependencies(projectId)
+    map.keySet.map {
       pid =>
         val project = ProjectHelper.findById(pid).get
         val hosts = findHosts(envId, project.id.get).map(c => Host_v(c.name, c.ip, None))
 //        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion).filter { t => t._1.startsWith("t_")}
         val attrs = getProperties(envId, project.id.get, project.templateId, realVersion)
-        project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs))
+        map.get(pid).get match {
+          case Some(alias) =>
+            alias -> Project_v(s"$projectId", s"${project.templateId}", alias, hosts, Option(attrs))
+          case _ =>
+            project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs))
+        }
     }.toMap
   }
 

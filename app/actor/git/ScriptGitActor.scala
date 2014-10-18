@@ -144,11 +144,23 @@ class ScriptGitActor extends Actor with ActorLogging {
     }
   }
 
-  def _getProjectIdFromProjectName(projectName: String): Int = {
+  def _getProjectIdFromProjectName(typeName: String, projectName: String): Int = {
     if (projectName == null || projectName.isEmpty) {
       ProjectHelper.ProjectNotExistId
     } else {
-      ProjectHelper.findByName(projectName.trim).map(_.id.get).getOrElse(ProjectHelper.ProjectNotExistId)
+      ProjectHelper.findByName(projectName.trim) match {
+        case Some(p) => {
+          val template = TemplateHelper.findById(p.templateId).get
+          if (template.name == typeName) {
+            p.id.get
+          }else {
+            ProjectHelper.ProjectNotExistId
+          }
+        }
+        case _ =>
+          ProjectHelper.ProjectNotExistId
+
+      }
     }
   }
 
@@ -168,21 +180,24 @@ class ScriptGitActor extends Actor with ActorLogging {
 
         TemplateHelper.update(templateId, tempObj)
 
+        //删除原模板
+        TemplateDependenceHelper.deleteByTemplateId(templateId)
+
         //        _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])
-        val dependenceProjectIds = template.get("dependences").asInstanceOf[JList[JMap[String, String]]].asScala.map { dependence =>
-          val defaultId  = _getProjectIdFromProjectName(dependence.get("default"))
-          val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("description"), defaultId)
-          val tdId = TemplateDependenceHelper.create(projectDep)
-          defaultId
+        val templateDependenceProjects = template.get("dependences") match {
+          case null => Seq.empty[TemplateDependence]
+          case d: Any =>
+            d.asInstanceOf[JList[JMap[String, String]]].asScala.map { dependence =>
+            val defaultId  = _getProjectIdFromProjectName(dependence.get("type"), dependence.get("default"))
+            val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("type"), Some(dependence.get("description")), defaultId)
+            TemplateDependenceHelper.create(projectDep)
+            projectDep
+          }
         }
 
         // 更新项目依赖
         ProjectHelper.allByTemplateId(templateId).foreach { project =>
-          val projectId = project.id.get
-          val projectDepIds = ProjectDependencyHelper.findByProjectId(projectId).map(_.dependencyId)
-          dependenceProjectIds.filterNot(_ != ProjectHelper.ProjectNotExistId).filterNot(projectDepIds.contains).foreach { pid =>
-            ProjectDependencyHelper.add(ProjectDependency(None, projectId, pid))
-          }
+          ProjectHelper.updateDependencesAlone(project, templateDependenceProjects)
         }
 
         templateId

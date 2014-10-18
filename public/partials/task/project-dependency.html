@@ -28,10 +28,13 @@
                 <a href="" class="btn btn-xs pull-left" ng-show="!d.canRemove"  ng-click="removeDependency(group, d)"></a>
             </td>
             <td>
-                <span>{{d.name}}</span>
+                <span ng-if="d.canRemove">{{d.name}}</span>
+                <select ng-change="changeTemplateProject(group.id, d.id, templateProject.id)" ng-if="!d.canRemove" class="form-control" ng-init="templateProject = getTemplateProject(d)" ng-model="templateProject" ng-options="p.name + ' -- ' + p.description for p in projects | filter: templateFilter(d)">
+                    <option value="">-- 选择项目 --</option>
+                </select>
             </td>
             <td>
-                <span>{{d.description}}</span>
+                <span tooltip="配置文件中的变量使用‘{{d.alias}}’替换‘{{d.name}}’">{{d.alias}}</span>
             </td>
         </tr>
         </tbody>

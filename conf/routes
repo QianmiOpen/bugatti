@@ -92,6 +92,7 @@ PUT           /project/version/:id                                controllers.co
 GET           /project/dependency/:id                             controllers.conf.DependencyController.show(id: Int)
 DELETE        /project/removeDependency/:parentId/:childId        controllers.conf.DependencyController.removeDependency(parentId: Int, childId: Int)
 POST          /project/addDependency                              controllers.conf.DependencyController.addDependency
+POST          /project/updateTemplateProject                      controllers.conf.DependencyController.updateTemplateProject
 
 # Conf
 GET           /conf/all                                           controllers.conf.ConfController.all(eid: Int, vid: Int)

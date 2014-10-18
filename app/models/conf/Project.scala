@@ -8,6 +8,7 @@ import enums.LevelEnum
 import exceptions.UniqueNameException
 import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.Play.current
 
 import scala.slick.driver.MySQLDriver.simple._
@@ -41,8 +42,10 @@ object ProjectHelper extends PlayCache {
   val ProjectNotExistId = -1
 
   val qProject = TableQuery[ProjectTable]
+  val qTemplate = TableQuery[TemplateTable]
   val qMember = TableQuery[ProjectMemberTable]
   val qpd = TableQuery[ProjectDependencyTable]
+  val qtd = TableQuery[TemplateDependenceTable]
 
   def findById(id: Int): Option[Project] = db withSession { implicit session =>
     qProject.filter(_.id === id).firstOption
@@ -121,11 +124,25 @@ object ProjectHelper extends PlayCache {
     try {
       val pid = qProject.returning(qProject.map(_.id)).insert(project)(session)
       //增加项目依赖初始关系
-      TemplateHelper.findById(project.templateId) match {
-        case Some(template) =>
-          ProjectDependencyHelper.insertWithSeq(template.dependentProjectIds.map(x => ProjectDependency(None, pid, x)))
-        case None => // ignore
+      TemplateDependenceHelper.listByTemplateId(project.templateId).foreach {
+        t =>
+          if(t.defaultId != ProjectHelper.ProjectNotExistId){
+            ProjectDependencyHelper.add(ProjectDependency(None, pid, t.defaultId, Some(t.name)))
+          }else {
+            findProjectNotDependence(t.dependencyType, pid)(session) match {
+              case Some(pn) =>
+                ProjectDependencyHelper.add(ProjectDependency(None, pid, pn.id.get, Some(t.name)))
+              case _ =>
+              //do nothing
+            }
+          }
       }
+
+//      TemplateHelper.findById(project.templateId) match {
+//        case Some(template) =>
+//          ProjectDependencyHelper.insertWithSeq(template.dependentProjectIds.map(x => ProjectDependency(None, pid, x, None)))
+//        case None => // ignore
+//      }
       //修改缓存
       ActorUtils.configuarActor ! UpdateProject(pid, project.name)
       pid
@@ -176,6 +193,14 @@ object ProjectHelper extends PlayCache {
       val result = qProject.filter(_.id === id).update(project2update)(session)
       //修改缓存
       ActorUtils.configuarActor ! UpdateProject(id, project.name)
+
+      //更新项目依赖
+      findById(id) match {
+        case Some(p) =>
+          _updateDependencyProjects(p, project.templateId)(session)
+        case _ =>
+          Logger.error("没有找到项目")
+      }
       result
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
@@ -188,6 +213,72 @@ object ProjectHelper extends PlayCache {
     (for{
       (p, pd) <- qProject innerJoin qpd on(_.id === _.dependencyId) if pd.projectId === id
     } yield p).list
+  }
+
+  def findProjectNotDependence(dependencyType: String, projectId: Int)(implicit session: JdbcBackend#Session): Option[Project] ={
+    qTemplate.filter(t => t.name === dependencyType).firstOption()(session) match {
+      case Some(template) =>
+        val dependencesAlready = qpd.filter(t => t.projectId === projectId).list()(session).map(_.dependencyId)
+        Logger.info(s"dependencesAlready => ${dependencesAlready}")
+        val dependencesWill = qProject.filter(t => t.templateId === template.id.get).list()(session).filterNot(t => dependencesAlready.contains(t.id.get))
+        Logger.info(s"dependencesWill => ${dependencesWill}")
+        if(dependencesWill.size > 0){
+          Some(dependencesWill(0))
+        }else {
+          None
+        }
+      case _ =>
+        None
+    }
+  }
+
+  def _updateDependencyProjects(project: Project, newTemplateId: Int)(implicit session: JdbcBackend#Session)= {
+    val templateDependenceProjects = qtd.filter(t => t.templateId === newTemplateId).list()(session)
+    _updateDependences(project, templateDependenceProjects)
+  }
+
+  def updateDependencesAlone(project: Project, templateDependenceProjects: Seq[TemplateDependence])= db withSession {implicit session =>
+    _updateDependences(project, templateDependenceProjects)(session)
+  }
+
+
+  def _updateDependences(project: Project, templateDependenceProjects: Seq[TemplateDependence])(implicit session: JdbcBackend#Session)={
+    val projectId = project.id.get
+    val projectDeps = qpd.filter(t => t.projectId === projectId).list()(session)
+
+    val templateDependencyTypes = templateDependenceProjects.map(_.dependencyType)
+    //清理该项目依赖中不存在的alias
+    val projectDepsUpdate = projectDeps.map{
+      p =>
+        if(!templateDependencyTypes.contains(p.alias)){
+          val pUpdate = ProjectDependency(None, p.projectId, p.dependencyId, None)
+          qpd.filter(t => t.projectId === p.projectId && t.dependencyId === p.dependencyId).map(_.alias).update(None)(session)
+          pUpdate
+        }else {
+          p
+        }
+    }
+    val projectDepIds = projectDepsUpdate.map(_.dependencyId)
+    val projectDepAlias = projectDepsUpdate.map(_.alias).filterNot(_ == None)
+
+    templateDependenceProjects.foreach { p =>
+      if(projectDepAlias.contains(p.name)){//已绑定模板依赖的项目
+        //do nothing
+      }else if (projectDepIds.contains(p.defaultId)) {//未绑定模板的，需要更新为模板项目绑定
+        qpd.filter(t => t.projectId === projectId && t.dependencyId === p.defaultId).map(_.alias).update(Some(p.name))(session)
+      }else if(p.defaultId == ProjectHelper.ProjectNotExistId){ //没有默认模板项目，选择一个模板下的一个项目
+        findProjectNotDependence(p.dependencyType, projectId)(session) match {
+          case Some(pn) =>
+            val pd = ProjectDependency(None, projectId, pn.id.get, Some(p.name))
+            qpd.insert(pd)(session)
+          case _ =>
+          //do nothing
+        }
+      } else {
+        val pd = ProjectDependency(None, projectId, p.defaultId, None)
+        qpd.insert(pd)(session)
+      }
+    }
   }
 
 }

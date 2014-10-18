@@ -105,7 +105,10 @@ define(['angular'], function(angular) {
            },
            addDependency: function(p, c, callback){
                $http.post(PlayRoutes.controllers.conf.DependencyController.addDependency().url, {'parent': p, 'child': c}).success(callback);
-            }
+           },
+           changeTemplateProject: function(parentId, oldId, newId, callback){
+               $http.post(PlayRoutes.controllers.conf.DependencyController.updateTemplateProject().url, {'parentId': parentId, 'oldId': oldId, 'newId': newId}).success(callback);
+           }
        }
     });
 
