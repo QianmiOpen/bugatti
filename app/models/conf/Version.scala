@@ -3,6 +3,7 @@ package models.conf
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.LevelEnum
 import exceptions.UniqueNameException
+import play.api.Logger
 import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
@@ -10,6 +11,8 @@ import utils.TaskTools
 
 import scala.slick.driver.MySQLDriver.simple._
 import com.github.tototoshi.slick.MySQLJodaSupport._
+
+import scala.slick.jdbc.JdbcBackend
 
 /**
  * 子项目
@@ -34,6 +37,7 @@ object VersionHelper extends PlayCache {
   val SNAPSHOTSUFFIX = "-SNAPSHOT"
 
   val qVersion = TableQuery[VersionTable]
+  val qConf = TableQuery[ConfTable]
 
   def findById(id: Int) = db withSession { implicit session =>
     qVersion.filter(_.id === id).firstOption
@@ -81,9 +85,38 @@ object VersionHelper extends PlayCache {
             ProjectHelper._update(version.projectId, Project(p.id, p.name, p.description, p.templateId, p.subTotal + 1, Some(versionId), Some(version.vs), Some(version.updated)))
           case None =>
       }
+      //增加配置文件copy
+      _copyConfigs(version.copy(Option(versionId)), false)(session)
       versionId
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
+    }
+  }
+
+  def _copyConfigs(version: Version, safeExcept: Boolean)(implicit session: JdbcBackend#Session) = {
+    //1、findAllEnvs except safe
+    val envs = EnvironmentHelper.findByUnsafe()
+    Logger.info(s"envs => ${envs}")
+    //2、envs foreach
+    envs.foreach {
+      e =>
+        //找到当前环境 或者 模板 中最近的版本配置
+        (for{
+          (conf, ver) <- qConf innerJoin qVersion on(_.versionId === _.id)
+          if ((conf.envId === e.id.get || conf.envId === 0) && conf.projectId === version.projectId && ver.updated < version.updated)
+        } yield (conf.envId, ver)).sortBy(t => t._2.updated desc).firstOption match {
+          case Some(v) =>
+            Logger.info(s"v => ${v._1}, ${v._2}")
+            val confs = ConfHelper.findByEnvId_VersionId(v._1, v._2.id.get)
+            Logger.info(s"confs => ${e.id} =>${confs}")
+              confs.foreach { c =>
+              Logger.info(s"c => ${c}")
+              val content = ConfContentHelper.findById(c.id.get)
+              ConfHelper._create(c.copy(id = None, envId = e.id.get, versionId = version.id.get), content)(session)
+            }
+          case _ =>
+            Logger.warn(s"没有找到合适的配置文件!")
+        }
     }
   }
 

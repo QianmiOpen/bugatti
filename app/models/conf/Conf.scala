@@ -9,6 +9,8 @@ import org.joda.time.DateTime
 import scala.slick.driver.MySQLDriver.simple._
 import com.github.tototoshi.slick.MySQLJodaSupport._
 
+import scala.slick.jdbc.JdbcBackend
+
 /**
  * 子项目配置文件
  *
@@ -78,10 +80,14 @@ object ConfHelper extends PlayCache {
 
   @throws[UniqueNameException]
   def create(conf: Conf, confContent: Option[ConfContent]) = db withTransaction { implicit session =>
+    _create(conf, confContent)(session)
+  }
+
+  def _create(conf: Conf, confContent: Option[ConfContent])(implicit session: JdbcBackend#Session)= {
     try {
-      val id = qConf.returning(qConf.map(_.id)).insert(conf)
+      val id = qConf.returning(qConf.map(_.id)).insert(conf)(session)
       confContent.map { _confContent =>
-        ConfContentHelper._create(_confContent.copy(Some(id)))
+        ConfContentHelper._create(_confContent.copy(Some(id)))(session)
       }.size
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
