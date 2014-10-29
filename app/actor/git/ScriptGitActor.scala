@@ -1,6 +1,7 @@
 package actor.git
 
-import java.io.{File, FileFilter, FileInputStream}
+import java.io.{InputStreamReader, File, FileFilter, FileInputStream}
+import java.nio.charset.{CodingErrorAction, Charset}
 import java.text.SimpleDateFormat
 import java.util.{List => JList, Map => JMap}
 
@@ -124,6 +125,7 @@ class ScriptGitActor extends Actor with ActorLogging {
   }
 
   def _loadTemplateFromDir(tagName: String) {
+    log.debug(s"Load tag: ${tagName}")
     gitFormulas.checkout().setName(tagName).call()
 
     val templateDir = new File(s"${gitFormulasDir.getAbsolutePath}${TemplatePath}")
@@ -167,7 +169,10 @@ class ScriptGitActor extends Actor with ActorLogging {
   def _initFromYaml(file: File, tagName: String) = {
     val yaml = new Yaml()
     val io = new FileInputStream(file)
-    val template = yaml.load(io).asInstanceOf[JMap[String, AnyRef]]
+    val decoder = Charset.forName("UTF-8").newDecoder()
+    decoder.onMalformedInput(CodingErrorAction.IGNORE)
+
+    val template = yaml.load(new InputStreamReader(io, decoder)).asInstanceOf[JMap[String, AnyRef]]
 
     val templateName = template.get("name").asInstanceOf[String]
 
