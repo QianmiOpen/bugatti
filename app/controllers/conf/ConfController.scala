@@ -213,8 +213,10 @@ object ConfController extends BaseController {
           val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.envId, copyForm.versionId)
           val confs = (copyForm.ovr, copyForm.copy) match {
             case (true, true) =>
-              targetConfs.filter(t => currConfs.map(_.path).contains(t.path)).foreach( c => ConfHelper.delete(c)) // delete exist
-              targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path)) // return targets
+//              targetConfs.filter(t => currConfs.map(_.path).contains(t.path)).foreach( c => ConfHelper.delete(c)) // delete exist
+//              targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path)) // return targets
+              currConfs.filter(c => targetConfs.map(_.path).contains(c.path)).foreach(c => ConfHelper.delete(c))
+              targetConfs
             case (false, true) =>
               targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path))
             case (true, false) =>
