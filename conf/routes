@@ -105,7 +105,6 @@ POST          /conf/copy                                          controllers.co
 PUT           /conf/:id                                           controllers.conf.ConfController.update(id: Int)
 
 # System
-POST          /system/buildTag                                    controllers.conf.SystemController.buildTag
 PUT           /system/refresh                                     controllers.conf.SystemController.refresh
 
 # Conf Log

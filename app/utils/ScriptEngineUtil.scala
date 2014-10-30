@@ -17,10 +17,11 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
   Logger.debug(s"${engine.eval("JSON.stringify(__t__)")}")
   engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
   engine.eval("var alias = {};")
-
   try {
     projectTask.alias.foreach {
-      case (key, value) => engine.eval(s"alias.$key = $value;")
+      case (key, value) =>
+        Logger.debug(s"$key,$value")
+        engine.eval(s"alias.$key = $value;")
     }
   } catch {
     case e: ScriptException => Logger.error(e.toString)

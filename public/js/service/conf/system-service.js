@@ -7,9 +7,6 @@ define(['angular'], function(angular){
         return {
             refresh: function(callback) {
                 $http.put(PlayRoutes.controllers.conf.SystemController.refresh().url).success(callback);
-            },
-            buildTag: function(callback) {
-                $http.post(PlayRoutes.controllers.conf.SystemController.buildTag().url).success(callback);
             }
         }
     });

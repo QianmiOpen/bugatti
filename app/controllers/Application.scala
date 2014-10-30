@@ -194,7 +194,6 @@ object Application extends ScalaController with Security {
 
         // system
         conf.routes.javascript.SystemController.refresh,
-        conf.routes.javascript.SystemController.buildTag,
 
         // conf logs
         conf.routes.javascript.ConfController.logs,
