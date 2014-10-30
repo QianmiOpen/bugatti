@@ -9,7 +9,8 @@ import enums.ActionTypeEnum._
 import enums.{ActionTypeEnum, ItemTypeEnum}
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
-import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.ListBranchCommand.ListMode
+import org.eclipse.jgit.api.{ListBranchCommand, Git}
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
@@ -20,10 +21,11 @@ import scala.collection.JavaConverters._
 /**
  * Created by mind on 7/24/14.
  */
+
 import ScriptGitActor._
 
 object ScriptGitActor {
-  case class BuildScriptTag(tagName: String = s"r${DateFormat.format(DateTime.now.toDate)}")
+
   case class ReloadFormulasTemplate()
 
   val DateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS")
@@ -69,69 +71,69 @@ class ScriptGitActor extends Actor with ActorLogging {
       _reloadTemplates
       sender ! Ok
     }
-    case BuildScriptTag(tagName) => {
-      _tagScript(tagName)
-      sender ! Ok
-    }
     case x => log.warning(s"Unknown message ${x}")
-  }
-
-  def _tagScript(tagName: String) = {
-    if (gitFormulas != null) {
-      // checkout到master上
-      gitFormulas.checkout().setName(ScriptVersionHelper.Master).call()
-
-      gitFormulas.pull().call()
-
-      gitFormulas.tag().setName(tagName).call()
-
-      gitFormulas.push().setPushTags().call()
-
-      ScriptVersionHelper.create(ScriptVersion(None, tagName, message = Some("")))
-      _loadTemplateFromDir(tagName)
-    }
   }
 
   def _reloadTemplates() {
     if (gitFormulas != null) {
-      gitFormulas.checkout().setName(ScriptVersionHelper.Master).call()
-      gitFormulas.pull().call()
+      // 将版本从线上下载到线下
+      val localBranchNames = gitFormulas.branchList().call.asScala.map(_.getName.split("/").last)
+      val remoteBranches = gitFormulas.branchList().setListMode(ListMode.REMOTE).call().asScala
 
-      val tags = gitFormulas.tagList().call()
-      val scriptNames = ScriptVersionHelper.allName()
-
-      if (tags != null) {
-        // 加载新的tag脚本
-        tags.asScala.map(_.getName.split("/").last).filterNot(scriptNames.contains).foreach { tagName =>
-          log.debug(s"Load tag: ${tagName}")
-          ScriptVersionHelper.create(ScriptVersion(None, tagName, message = Some("")))
-
-          _loadTemplateFromDir(tagName)
+      remoteBranches.foreach { remoteBranche =>
+        val branchName = remoteBranche.getName.split("/").last
+        if (localBranchNames.contains(branchName)){
+          gitFormulas.checkout().setName(branchName).call()
+          gitFormulas.pull().call()
+        }else{
+          gitFormulas.checkout().setCreateBranch(true).setName(branchName).call()
         }
       }
 
-      // 重新加载master,先将老master更新掉
-      log.debug(s"Load tag: ${ScriptVersionHelper.Master}")
-      val backupMasterName = s"master-bak-${DateFormat.format(DateTime.now.toDate)}"
-      TemplateItemHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
-      TaskTemplateHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
-      TemplateAliasHelper.updateScriptVersion(ScriptVersionHelper.Master, backupMasterName)
-
-      _loadTemplateFromDir(ScriptVersionHelper.Master)
+      // 根据本地版本更新版本表格
+      val branches = gitFormulas.branchList().call()
+      if (branches != null) {
+        branches.asScala.map { branch =>
+          val branchName = branch.getName
+          val branchId = branch.getObjectId.toString
+          ScriptVersionHelper.getVersionByName(branchName) match {
+            case Some(sv) => {
+              if (sv.message.get == branchId) {
+                _loadTemplateFromDir(branchName, sv.message)
+                ScriptVersionHelper.updateVersionByName(ScriptVersion(None, branchName, message = Some(branchId)))
+              }
+            }
+            case None =>
+              _loadTemplateFromDir(branchName, None)
+              ScriptVersionHelper.updateVersionByName(ScriptVersion(None, branchName, message = Some(branchId)))
+          }
+        }
+      }
     } else {
       log.warning("Reload template, but git is null")
     }
   }
 
-  def _loadTemplateFromDir(tagName: String) {
-    gitFormulas.checkout().setName(tagName).call()
+  def _loadTemplateFromDir(branchName: String, branchId: Option[String]) {
+    log.debug(s"Load branch: ${branchName}, ${branchId}")
+
+    gitFormulas.checkout().setName(branchName).call()
+
+    branchId match {
+      case Some(bId) =>
+        val backupName = s"$branchName-$bId"
+        TemplateItemHelper.updateScriptVersion(branchName, backupName)
+        TaskTemplateHelper.updateScriptVersion(branchName, backupName)
+        TemplateAliasHelper.updateScriptVersion(branchName, backupName)
+      case None =>
+    }
 
     val templateDir = new File(s"${gitFormulasDir.getAbsolutePath}${TemplatePath}")
     templateDir.listFiles(new FileFilter {
       override def accept(pathname: File): Boolean = pathname.getName.endsWith(TemplateSuffix)
     }).foreach { file =>
       log.debug(s"Load file: ${file}")
-      _initFromYaml(file, tagName)
+      _initFromYaml(file, branchName)
     }
   }
 
@@ -153,7 +155,7 @@ class ScriptGitActor extends Actor with ActorLogging {
           val template = TemplateHelper.findById(p.templateId).get
           if (template.name == typeName) {
             p.id.get
-          }else {
+          } else {
             ProjectHelper.ProjectNotExistId
           }
         }
@@ -188,11 +190,11 @@ class ScriptGitActor extends Actor with ActorLogging {
           case null => Seq.empty[TemplateDependence]
           case d: Any =>
             d.asInstanceOf[JList[JMap[String, String]]].asScala.map { dependence =>
-            val defaultId  = _getProjectIdFromProjectName(dependence.get("type"), dependence.get("default"))
-            val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("type"), Some(dependence.get("description")), defaultId)
-            TemplateDependenceHelper.create(projectDep)
-            projectDep
-          }
+              val defaultId = _getProjectIdFromProjectName(dependence.get("type"), dependence.get("default"))
+              val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("type"), Some(dependence.get("description")), defaultId)
+              TemplateDependenceHelper.create(projectDep)
+              projectDep
+            }
         }
 
         // 更新项目依赖
@@ -203,7 +205,7 @@ class ScriptGitActor extends Actor with ActorLogging {
         templateId
       }
       case None => TemplateHelper.create(Template(None, templateName, Some(template.get("remark").asInstanceOf[String]),
-          _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])))
+        _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])))
     }
 
     // 创建template关联的alias
