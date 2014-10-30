@@ -446,7 +446,7 @@ define(['angular'], function(angular) {
                 if(data.r == 1){
                     $scope.showVm(pid)
                 }else {
-                    console.log("添加失败")
+                    growl.addErrorMessage("添加失败,没有空闲机器")
                 }
             })
         }
