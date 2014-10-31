@@ -11,8 +11,8 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService', 'VersionService', '$state', '$stateParams', '$interval', 'Auth',
-        function($scope,TaskService,EnvService,ProjectService,VersionService,$state,$stateParams, $interval, Auth) {
+    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService', 'VersionService', '$state', '$stateParams', '$interval', 'Auth', '$modal', 'growl',
+        function($scope,TaskService,EnvService,ProjectService,VersionService,$state,$stateParams, $interval, Auth, $modal, growl) {
 
         keepSession($scope, $interval, Auth);
 //=====================================变量========================================
@@ -446,21 +446,34 @@ define(['angular'], function(angular) {
                 if(data.r == 1){
                     $scope.showVm(pid)
                 }else {
-                    console.log("添加失败")
+                    growl.addErrorMessage("添加失败,没有空闲机器")
                 }
             })
         }
 
         $scope.removeCluster = function(pid, cid){
-            console.log(cid)
-            ProjectService.removeCluster(cid, function(data){
+            var modalInstance = $modal.open({
+                templateUrl: "partials/modal-message.html",
+                controller: function ($scope, $modalInstance) {
+                    $scope.message = "您确认要取消绑定?"
+                    $scope.ok = function() {
+                        ProjectService.removeCluster(cid, function(data){
+                            $modalInstance.close(data);
+                        })
+                    };
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss("cancel")
+                    };
+                }
+            });
+            modalInstance.result.then(function(data) {
                 if(data.r == 1){
                     $scope.showVm(pid)
+                    growl.addSuccessMessage("解绑成功")
                 }else {
-                    console.log("解绑失败")
+                    growl.addErrorMessage("解绑失败");
                 }
-            })
-
+            });
         }
 
         $scope.isQueueShow = []
