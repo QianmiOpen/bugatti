@@ -445,7 +445,8 @@ define(['angular'], function(angular) {
             restrict: 'E',
             require: '^projectTabs',
             templateUrl: 'partials/task/project-conf.html',
-            controller: ['$scope', '$filter', 'ConfService', 'VersionService', function($scope, $filter, ConfService, VersionService) {
+            controller: ['$scope', '$filter', 'ConfService', 'VersionService', '$modal', 'growl',
+            function($scope, $filter, ConfService, VersionService, $modal, growl) {
                 $scope.initVersions = function() {
                     VersionService.top($scope.pro.id, function(data) {
                         $scope.versions = data;
@@ -494,6 +495,34 @@ define(['angular'], function(angular) {
                     };
                     langTools.addCompleter(codeCompleter);
                 };
+
+                //生成模板
+                $scope.genTemplateConf = function() {
+                    var copyParam = {projectId: $scope.pro.id, target_eid: $scope.activeEnv, target_vid: $scope.versionId, envId: 0, versionId: $scope.versionId, ovr: true, copy: false};
+                    var modalInstance = $modal.open({
+                        templateUrl: "partials/modal-message.html",
+                        controller: function($scope, $modalInstance){
+                            $scope.message = "把当前环境所有配置文件生成模板?";
+                            $scope.ok = function(){
+                                console.log(copyParam)
+                                ConfService.copy(angular.toJson(copyParam), function(data) {
+                                    $modalInstance.close(data);
+                                });
+                            };
+                            $scope.cancel = function(){
+                                $modalInstance.dismiss("cancel");
+                            }
+                        }
+                    })
+
+                    modalInstance.result.then(function(data) {
+                        if (data.r === 'ok') {
+                            growl.addSuccessMessage("成功");
+                        } else if (data.r === 'exist') {
+                            growl.addWarnMessage("内容已存在");
+                        }
+                    });
+                }
 
             }],
             link: function postLink(scope, iElement, iAttrs) {
