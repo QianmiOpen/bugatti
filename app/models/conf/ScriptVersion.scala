@@ -37,14 +37,14 @@ object ScriptVersionHelper {
     all().map(_.name)
   }
 
-  def getVersionByName(versionName: String): Option[ScriptVersion] = db withSession  { implicit session =>
-    qScriptVersion.filter(_.name === versionName).firstOption
+  def isSameBranch(versionName: String, branchId: String): Boolean = db withSession  { implicit session =>
+    qScriptVersion.filter(x => x.name === versionName && x.message === branchId).length.run > 0
   }
 
   def updateVersionByName(scriptVersion: ScriptVersion) = db withSession { implicit session =>
     qScriptVersion.filter(_.name === scriptVersion.name).firstOption match {
       case Some(tsv) =>
-        qScriptVersion.update(tsv.copy(message = scriptVersion.message, updateTime = scriptVersion.updateTime))
+        qScriptVersion.filter(_.id === tsv.id).update(tsv.copy(message = scriptVersion.message, updateTime = scriptVersion.updateTime))
       case None =>
         qScriptVersion.returning(qScriptVersion.map(_.id)).insert(scriptVersion)
     }

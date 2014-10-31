@@ -6,12 +6,11 @@ import java.text.SimpleDateFormat
 import java.util.{List => JList, Map => JMap}
 
 import akka.actor.{Actor, ActorLogging}
-import enums.ActionTypeEnum._
 import enums.{ActionTypeEnum, ItemTypeEnum}
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
 import org.eclipse.jgit.api.ListBranchCommand.ListMode
-import org.eclipse.jgit.api.{ListBranchCommand, Git}
+import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
@@ -77,16 +76,16 @@ class ScriptGitActor extends Actor with ActorLogging {
 
   def _reloadTemplates() {
     if (gitFormulas != null) {
-      // 将版本从线上下载到线下
+      // 将版本从git仓库下载到本地
       val localBranchNames = gitFormulas.branchList().call.asScala.map(_.getName.split("/").last)
       val remoteBranches = gitFormulas.branchList().setListMode(ListMode.REMOTE).call().asScala
 
       remoteBranches.foreach { remoteBranche =>
         val branchName = remoteBranche.getName.split("/").last
-        if (localBranchNames.contains(branchName)){
+        if (localBranchNames.contains(branchName)) {
           gitFormulas.checkout().setName(branchName).call()
           gitFormulas.pull().call()
-        }else{
+        } else {
           gitFormulas.checkout().setCreateBranch(true).setName(branchName).call()
         }
       }
@@ -95,18 +94,11 @@ class ScriptGitActor extends Actor with ActorLogging {
       val branches = gitFormulas.branchList().call()
       if (branches != null) {
         branches.asScala.map { branch =>
-          val branchName = branch.getName
-          val branchId = branch.getObjectId.toString
-          ScriptVersionHelper.getVersionByName(branchName) match {
-            case Some(sv) => {
-              if (sv.message.get == branchId) {
-                _loadTemplateFromDir(branchName, sv.message)
-                ScriptVersionHelper.updateVersionByName(ScriptVersion(None, branchName, message = Some(branchId)))
-              }
-            }
-            case None =>
-              _loadTemplateFromDir(branchName, None)
-              ScriptVersionHelper.updateVersionByName(ScriptVersion(None, branchName, message = Some(branchId)))
+          val branchName = branch.getName.split("/").last
+          val branchId = branch.getObjectId.getName
+          if (!ScriptVersionHelper.isSameBranch(branchName, branchId)){
+            _loadTemplateFromDir(branchName)
+            ScriptVersionHelper.updateVersionByName(ScriptVersion(None, branchName, message = Some(branchId)))
           }
         }
       }
@@ -115,25 +107,15 @@ class ScriptGitActor extends Actor with ActorLogging {
     }
   }
 
-<<<<<<< HEAD
-  def _loadTemplateFromDir(branchName: String, branchId: Option[String]) {
-    log.debug(s"Load branch: ${branchName}, ${branchId}")
+  def _loadTemplateFromDir(branchName: String) {
+    log.debug(s"Load branch: ${branchName}")
 
-    gitFormulas.checkout().setName(branchName).call()
+    gitFormulas.checkout().setName(branchName).setForce(true).call()
 
-    branchId match {
-      case Some(bId) =>
-        val backupName = s"$branchName-$bId"
-        TemplateItemHelper.updateScriptVersion(branchName, backupName)
-        TaskTemplateHelper.updateScriptVersion(branchName, backupName)
-        TemplateAliasHelper.updateScriptVersion(branchName, backupName)
-      case None =>
-    }
-=======
-  def _loadTemplateFromDir(tagName: String) {
-    log.debug(s"Load tag: ${tagName}")
-    gitFormulas.checkout().setName(tagName).call()
->>>>>>> 38fbcc3e59009c506889a0e06d190a823494b73b
+    val backupName = s"$branchName-bak-${DateFormat.format(DateTime.now.toDate)}"
+    TemplateItemHelper.updateScriptVersion(branchName, backupName)
+    TaskTemplateHelper.updateScriptVersion(branchName, backupName)
+    TemplateAliasHelper.updateScriptVersion(branchName, backupName)
 
     val templateDir = new File(s"${gitFormulasDir.getAbsolutePath}${TemplatePath}")
     templateDir.listFiles(new FileFilter {
@@ -141,15 +123,6 @@ class ScriptGitActor extends Actor with ActorLogging {
     }).foreach { file =>
       log.debug(s"Load file: ${file}")
       _initFromYaml(file, branchName)
-    }
-  }
-
-  def _getProjectIdsFromProjectName(projectNames: String): Seq[Int] = {
-    if (projectNames == null) {
-      Seq.empty
-    } else {
-      projectNames.trim.split(",").filter(_.nonEmpty)
-        .map(p => ProjectHelper.findByName(p.trim)).filter(_.nonEmpty).map(_.get.id.get)
     }
   }
 
@@ -189,33 +162,31 @@ class ScriptGitActor extends Actor with ActorLogging {
         // 更新模板说明
         val tempObj = temp.copy(remark = Some(template.get("remark").asInstanceOf[String]),
           dependentProjectIds = Seq.empty)
-
         TemplateHelper.update(templateId, tempObj)
 
         //删除原模板
         TemplateDependenceHelper.deleteByTemplateId(templateId)
 
-        //        _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])
-        val templateDependenceProjects = template.get("dependences") match {
-          case null => Seq.empty[TemplateDependence]
-          case d: Any =>
-            d.asInstanceOf[JList[JMap[String, String]]].asScala.map { dependence =>
-              val defaultId = _getProjectIdFromProjectName(dependence.get("type"), dependence.get("default"))
-              val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("type"), Some(dependence.get("description")), defaultId)
-              TemplateDependenceHelper.create(projectDep)
-              projectDep
-            }
-        }
-
-        // 更新项目依赖
-        ProjectHelper.allByTemplateId(templateId).foreach { project =>
-          ProjectHelper.updateDependencesAlone(project, templateDependenceProjects)
-        }
-
         templateId
       }
-      case None => TemplateHelper.create(Template(None, templateName, Some(template.get("remark").asInstanceOf[String]),
-        _getProjectIdsFromProjectName(template.get("dependences").asInstanceOf[String])))
+      case None => TemplateHelper.create(Template(None, templateName, Some(template.get("remark").asInstanceOf[String]), Seq.empty))
+    }
+
+    // 更新模板依赖
+    val templateDependenceProjects = template.get("dependences") match {
+      case null => Seq.empty[TemplateDependence]
+      case d: Any =>
+        d.asInstanceOf[JList[JMap[String, String]]].asScala.map { dependence =>
+          val defaultId = _getProjectIdFromProjectName(dependence.get("type"), dependence.get("default"))
+          val projectDep = TemplateDependence(None, templateId, dependence.get("name"), dependence.get("type"), Some(dependence.get("description")), defaultId)
+          TemplateDependenceHelper.create(projectDep)
+          projectDep
+        }
+    }
+
+    // 更新项目依赖
+    ProjectHelper.allByTemplateId(templateId).foreach { project =>
+      ProjectHelper.updateDependencesAlone(project, templateDependenceProjects)
     }
 
     // 创建template关联的alias
