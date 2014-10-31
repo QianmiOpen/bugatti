@@ -88,14 +88,13 @@ object TaskTools {
 
   def findEnvironment_v(envId: Int): Environment_v = {
     val env = EnvironmentHelper.findById(envId).get
-    val realVersion = ScriptVersionHelper.findRealVersion(env.scriptVersion)
     // 如果是master，需要替换成base，在gitfs中，是需要这么映射的
-    val scriptVersion = realVersion match {
+    val scriptVersion = env.scriptVersion match {
       case ScriptVersionHelper.Master => "base"
       case x => x
     }
 
-    Environment_v(s"$envId", env.name, scriptVersion, realVersion)
+    Environment_v(s"$envId", env.name, scriptVersion, env.scriptVersion)
   }
 
   def findAlias(templateId: Int, scriptVersion: String): Map[String, String] = {

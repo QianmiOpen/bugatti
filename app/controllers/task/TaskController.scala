@@ -189,27 +189,16 @@ object TaskController extends BaseController {
    */
   def getTemplates(scriptVersion: String) = Action{
     var map = Map.empty[Int, Seq[TaskTemplate]]
-    var sVersion = Option(ScriptVersionHelper.Master)
     Logger.debug(s"scriptVersion ==> ${scriptVersion}")
-    if(scriptVersion == ScriptVersionHelper.Latest){
-      sVersion = ScriptVersionHelper.findLatest()
-    }
-    Logger.debug(s"sVersion ==> ${sVersion}")
-    sVersion match {
-      case Some(sv) => {
-        TaskTemplateHelper.findByScriptVerison(sv).foreach{
-          template => {
-            //1、从map中获取seq，没有就创建
-            var seq = map.getOrElse(template.typeId, Seq.empty[TaskTemplate])
-            //2、添加到seq
-            seq = seq :+ template
-            //3、覆盖map
-            map += template.typeId -> seq
-          }
-        }
-      }
-      case _ => {
-        //模板返回空
+
+    TaskTemplateHelper.findByScriptVerison(scriptVersion).foreach{
+      template => {
+        //1、从map中获取seq，没有就创建
+        var seq = map.getOrElse(template.typeId, Seq.empty[TaskTemplate])
+        //2、添加到seq
+        seq = seq :+ template
+        //3、覆盖map
+        map += template.typeId -> seq
       }
     }
     Logger.debug(s"templates ==> ${map}")

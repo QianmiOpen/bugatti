@@ -24,36 +24,29 @@ case class ScriptVersionTable(tag: Tag) extends Table[ScriptVersion](tag, "scrip
 }
 
 object ScriptVersionHelper {
-  val Latest = "latest"
   val Master = "master"
 
   import models.AppDB._
   val qScriptVersion = TableQuery[ScriptVersionTable]
-
-  def create(scriptVersion: ScriptVersion) = db withSession { implicit session =>
-    qScriptVersion.returning(qScriptVersion.map(_.id)).insert(scriptVersion)
-  }
 
   def all(): Seq[ScriptVersion] = db withSession { implicit session =>
     qScriptVersion.list()
   }
 
   def allName(): Seq[String] = db withSession { implicit session =>
-    all().map(_.name) ++ Seq(Latest, Master)
+    all().map(_.name)
   }
 
-  def deleteByName(name: String) = db withSession { implicit session =>
-    qScriptVersion.filter(_.name === name).delete
+  def isSameBranch(versionName: String, branchId: String): Boolean = db withSession  { implicit session =>
+    qScriptVersion.filter(x => x.name === versionName && x.message === branchId).length.run > 0
   }
 
-  def findLatest(): Option[String] = db withSession { implicit session =>
-    Query(qScriptVersion.map(_.name).max).first
-  }
-
-  def findRealVersion(currentVersion: String): String = {
-    currentVersion match {
-      case Latest => findLatest.get // todo
-      case x => x
+  def updateVersionByName(scriptVersion: ScriptVersion) = db withSession { implicit session =>
+    qScriptVersion.filter(_.name === scriptVersion.name).firstOption match {
+      case Some(tsv) =>
+        qScriptVersion.filter(_.id === tsv.id).update(tsv.copy(message = scriptVersion.message, updateTime = scriptVersion.updateTime))
+      case None =>
+        qScriptVersion.returning(qScriptVersion.map(_.id)).insert(scriptVersion)
     }
   }
 
