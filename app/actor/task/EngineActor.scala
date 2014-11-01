@@ -6,7 +6,7 @@ import java.util.regex.Pattern
 import akka.actor._
 import com.qianmi.bugatti.actors.TimeOut
 import enums.TaskEnum
-import models.conf.{Conf, ConfContent, ConfContentHelper, ConfHelper}
+import models.conf._
 import models.task.{TaskCommand, TaskTemplateStep}
 import utils._
 
@@ -79,11 +79,18 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       val fileName = s"${rc.taskObj.confFileName}_${rc.hostname}"
       val task = rc.taskObj
       val taskId = task.taskId.toInt
+
       val envId = task.env.id.toInt
       val projectId = task.id.toInt
       val versionId = task.version.get.id.toInt
 
-      val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
+      val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId) match {
+        case seq: Seq[Conf] if seq.isEmpty =>
+          VersionHelper.copyConfigs(envId, versionId)
+          ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
+        case seq: Seq[Conf] if !seq.isEmpty =>
+          seq
+      }
       val baseDir = s"${ConfHelp.confPath}/${taskId}"
       val baseFilesPath = new File(s"${baseDir}/files")
 

@@ -3,6 +3,7 @@ package models.conf
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.LevelEnum
 import exceptions.UniqueNameException
+import org.omg.Messaging.SYNC_WITH_TRANSPORT
 import play.api.Logger
 import play.api.Play.current
 import models.PlayCache
@@ -86,38 +87,40 @@ object VersionHelper extends PlayCache {
           case None =>
       }
       //增加配置文件copy
-      _copyConfigs(version.copy(Option(versionId)), false)(session)
+//      _copyConfigs(version.copy(Option(versionId)), false)(session)
       versionId
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
   }
 
-  def _copyConfigs(version: Version, safeExcept: Boolean)(implicit session: JdbcBackend#Session) = {
-    //1、findAllEnvs except safe
-    val envs = EnvironmentHelper.findByUnsafe()
-    Logger.info(s"envs => ${envs}")
-    //2、envs foreach
-    envs.foreach {
-      e =>
-        //找到当前环境 或者 模板 中最近的版本配置
-        (for{
-          (conf, ver) <- qConf innerJoin qVersion on(_.versionId === _.id)
-          if ((conf.envId === e.id.get || conf.envId === 0) && conf.projectId === version.projectId && ver.updated < version.updated)
-        } yield (conf.envId, ver)).sortBy(t => t._2.updated desc).firstOption match {
-          case Some(v) =>
-            Logger.info(s"v => ${v._1}, ${v._2}")
-            val confs = ConfHelper.findByEnvId_VersionId(v._1, v._2.id.get)
-            Logger.info(s"confs => ${e.id} =>${confs}")
-              confs.foreach { c =>
-              Logger.info(s"c => ${c}")
-              val content = ConfContentHelper.findById(c.id.get)
-              ConfHelper._create(c.copy(id = None, envId = e.id.get, versionId = version.id.get), content)(session)
-            }
-          case _ =>
-            Logger.warn(s"没有找到合适的配置文件!")
-        }
+  def copyConfigs(envId: Int, versionId: Int)= db withTransaction { implicit session =>
+    VersionHelper.findById(versionId) match{
+      case Some(v) =>
+        _copyConfigs(envId, v)(session)
+      case _ =>
+        Logger.error(s"没有找到版本信息,版本号为${versionId}")
     }
+  }
+
+  def _copyConfigs(envId: Int, version: Version)(implicit session: JdbcBackend#Session) = {
+      //找到当前环境 或者 模板 中最近的版本配置
+      (for{
+        (conf, ver) <- qConf innerJoin qVersion on(_.versionId === _.id)
+        if ((conf.envId === envId || conf.envId === 0) && conf.projectId === version.projectId && ver.updated <= version.updated)
+      } yield (conf.envId, ver)).sortBy(t => t._2.updated desc).firstOption match {
+        case Some(v) =>
+          Logger.info(s"v => ${v._1}, ${v._2}")
+          val confs = ConfHelper.findByEnvId_VersionId(v._1, v._2.id.get)
+          Logger.info(s"confs => ${envId} =>${confs}")
+            confs.foreach { c =>
+            Logger.info(s"c => ${c}")
+            val content = ConfContentHelper.findById(c.id.get)
+            ConfHelper._create(c.copy(id = None, envId = envId, versionId = version.id.get), content)(session)
+          }
+        case _ =>
+          Logger.warn(s"没有找到合适的配置文件!")
+      }
   }
 
   def delete(version: Version): Int = db withTransaction { implicit session =>
