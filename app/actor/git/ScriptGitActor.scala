@@ -9,6 +9,7 @@ import akka.actor.{Actor, ActorLogging}
 import enums.{ActionTypeEnum, ItemTypeEnum}
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
+import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode
 import org.eclipse.jgit.api.ListBranchCommand.ListMode
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
@@ -86,7 +87,7 @@ class ScriptGitActor extends Actor with ActorLogging {
           gitFormulas.checkout().setName(branchName).call()
           gitFormulas.pull().call()
         } else {
-          gitFormulas.checkout().setCreateBranch(true).setName(branchName).call()
+          gitFormulas.checkout().setCreateBranch(true).setName(branchName).setUpstreamMode(SetupUpstreamMode.TRACK).setStartPoint(s"origin/$branchName").call()
         }
       }
 
