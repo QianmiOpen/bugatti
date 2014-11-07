@@ -266,7 +266,10 @@ define(['angular'], function(angular) {
                     $scope.setCIndex =function(cIndex){
                         $scope.c_index = cIndex ;
                     }
-                    $scope.showQueues = function(index, ctab, taskId){
+                    $scope.setHostName = function(hostName){
+                        $scope.hostName = hostName;
+                    }
+                    $scope.showQueues = function(index, ctab, taskId, hostName){
                         var clusterFlag = true;
                         if($scope.isQueueShow[index] && $scope.ctab == ctab){
                             clusterFlag = false;
@@ -282,6 +285,7 @@ define(['angular'], function(angular) {
                         $scope.taskId = taskId
                         $scope.setCTab(ctab);
                         $scope.setCIndex(index);
+                        $scope.setHostName(hostName);
                     }
                 }
             ]
@@ -799,6 +803,39 @@ define(['angular'], function(angular) {
                });
            }
        }
+    });
+
+    app.directive('catalinaLog', function(){
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            templateUrl: 'partials/task/catalina-log.html',
+            controller: ['$scope', 'TaskService',
+                function($scope, TaskService){
+                    $scope.delayLoadCatalinaLog = function(){
+                        var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
+                        TaskService.getCatalinaWS(function(data){
+                            console.log(data)
+                            console.log($scope.hostName)
+                            var path = data + "/" + $scope.hostName
+                            $scope.catalinaLogSocket = new WS(path)
+                            $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
+                        })
+                    }
+                    $scope.receiveCatalina = function(event){
+                        var data = angular.fromJson(event.data)
+                        console.log(data)
+                        $scope.message = $scope.message + data.message
+                    }
+                }],
+            link: function postLink(scope, iElement, iAttrs){
+                scope.$watch('ctab', function(){
+                    if(scope.ctab == 4 && scope.c_index == scope.$index){
+                        scope.delayLoadCatalinaLog();
+                    }
+                })
+            }
+        }
     });
 
     app.directive('taskLog', function(){

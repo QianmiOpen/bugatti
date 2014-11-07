@@ -222,6 +222,7 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.forceTerminate,
         task.routes.javascript.TaskController.findClusterByEnv_Project,
         task.routes.javascript.TaskController.findHisTasks,
+        task.routes.javascript.TaskController.findCatalinaWSUrl,
 
         // logs
         logs.routes.javascript.LogsController.search,

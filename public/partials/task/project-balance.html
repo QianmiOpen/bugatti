@@ -13,20 +13,20 @@
     <tr >
         <td><a class="glyphicon glyphicon-minus-sign" href="" ng-click="removeCluster(pro.id, c.id)"></a></td>
         <td>
-            <a href="" ng-click="showQueues($index, 1, c.task.id)">
+            <a href="" ng-click="showQueues($index, 1, c.task.id, c.name)">
                 <span tooltip="{{c.ip}}">
                     {{c.name}}
                 </span>
             </a>
         </td>
         <td>
-            <a href="" ng-click="showQueues($index, 2, c.task.id)">
+            <a href="" ng-click="showQueues($index, 2, c.task.id, c.name)">
                 Queue
                 <span class="badge">{{c.task.queueNum}}</span>
             </a>
         </td>
         <td style="padding:10px 0px 0px 0px;">
-            <a ng-show="showHref(c.task.status)" ng-click="showQueues($index, 3, c.task.id)" href="">{{c.task.endTime}}  {{c.task.statusTip}}!   <span ng-show="showVersionTitle(c.task.version)">版本号：</span>{{c.task.version}}   <span ng-show="showTaskNameTitle(c.task.taskName)">任务:</span> {{c.task.taskName}}</a>
+            <a ng-show="showHref(c.task.status)" ng-click="showQueues($index, 3, c.task.id, c.name)" href="">{{c.task.endTime}}  {{c.task.statusTip}}!   <span ng-show="showVersionTitle(c.task.version)">版本号：</span>{{c.task.version}}   <span ng-show="showTaskNameTitle(c.task.taskName)">任务:</span> {{c.task.taskName}}</a>
             <span ng-show="showText(c.task.status)">{{c.task.endTime}}  {{c.task.statusTip}}!   <span ng-show="showVersionTitle(c.task.version)">版本号：</span>{{c.task.version}}   <span ng-show="showTaskNameTitle(c.task.taskName)">任务:</span> {{c.task.taskName}}</span>
             <div>
                 <span ng-show="showProgress(c.task.status)" >机器 {{c.task.command.machine}}  {{c.task.statusTip}} : {{c.task.command.sls}} </span>
@@ -37,6 +37,7 @@
             </div>
         </td>
         <td>
+            <a ng-show="false" title="catalina日志" href="" ng-click="showQueues($index, 4, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
             <a ng-show="showProgress(c.task.status)" title="终止本次任务" href="" ng-click="forceTerminate(pro.id, c.name)"><span class="glyphicon glyphicon-remove"></span></a>
         </td>
         <td class="show">

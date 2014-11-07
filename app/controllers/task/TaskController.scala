@@ -12,7 +12,7 @@ import utils.DateFormatter._
 import play.api.Logger
 import models.conf._
 import play.api.mvc._
-import utils.TaskTools
+import utils.{ConfHelp, TaskTools}
 import sys.process._
 import scala.io.Source
 import scala.collection.{mutable, Seq}
@@ -233,6 +233,10 @@ object TaskController extends BaseController {
   //=======================任务界面重构===========================================
   def findClusterByEnv_Project(envId: Int, projectId: Int) = Action {
     Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)))
+  }
+
+  def findCatalinaWSUrl() = Action{
+    Ok(ConfHelp.catalinaWSUrl)
   }
 
   implicit val varWrites = Json.writes[Variable]

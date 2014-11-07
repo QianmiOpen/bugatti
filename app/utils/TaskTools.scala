@@ -162,6 +162,8 @@ object ConfHelp {
       key.replace("bugatti.system.", "") -> app.configuration.getString(key).getOrElse("")
     }.toMap
   }
+
+  lazy val catalinaWSUrl = app.configuration.getString("bugatti.catalina.websocketUrl").getOrElse("http://0.0.0.0:3232/")
 }
 
 case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]])
