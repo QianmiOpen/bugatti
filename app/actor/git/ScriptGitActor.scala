@@ -15,7 +15,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
-import play.api.Play
+import play.api.{Logger, Play}
 
 import scala.collection.JavaConverters._
 
@@ -200,12 +200,42 @@ class ScriptGitActor extends Actor with ActorLogging {
 
     // 创建template关联的item
     val templateItems = template.get("items")
+    val envs = EnvironmentHelper.allByBranch(tagName)
+    val projects = ProjectHelper.allByTemplateId(templateId)
     if (templateItems != null) {
       templateItems.asInstanceOf[JList[JMap[String, String]]].asScala.zipWithIndex.foreach {
         case (x: JMap[String, String], index) =>
-          TemplateItemHelper.create(TemplateItem(None, Some(templateId), x.get("itemName"), Some(x.get("itemDesc")),
+          val itemName = x.get("itemName")
+          TemplateItemHelper.create(TemplateItem(None, Some(templateId), itemName, Some(x.get("itemDesc")),
             ItemTypeEnum.withName(Option(x.get("itemType")).getOrElse(ItemTypeEnum.attribute.toString)),
             Some(x.get("default")), index, tagName))
+
+          //找到该模板下的所有项目，查看是否存在，不存在的加上属性以及默认值
+          if(x.get("default") != null){
+              val default = x.get("default")
+              Logger.info(s"${itemName} => default => ${x.get("default")}")
+              projects.foreach {
+                p =>
+                  Logger.info(s"${itemName} => itemType => ${x.get("itemType")}")
+                  val itemType = x.get("itemType")
+                  if(itemType != null) {
+                    //var
+                    envs.foreach {
+                      e =>
+                        val seq = VariableHelper.findByEnvId_ProjectId(e.id.get, p.id.get).filter(s => s.name == itemName)
+                        if (seq.size == 0) {
+                          VariableHelper.create(Seq(Variable(None, e.id, p.id, itemName, default)))
+                        }
+                    }
+                  }else {
+                    //attr
+                    val seq = AttributeHelper.findByProjectId(p.id.get).filter(s => s.name == itemName)
+                    if(seq.size == 0){
+                      AttributeHelper.create(Seq(Attribute(None, p.id, itemName, Option(default))))
+                    }
+                  }
+              }
+          }
       }
     }
 

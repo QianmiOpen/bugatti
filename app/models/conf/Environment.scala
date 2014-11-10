@@ -54,6 +54,10 @@ object EnvironmentHelper {
     qEnvironment.list
   }
 
+  def allByBranch(branchName: String) = db withSession {implicit session =>
+    qEnvironment.filter(t => t.scriptVersion === branchName).list
+  }
+
   @throws[UniqueNameException]
   def create(environment: Environment) = db withSession { implicit session =>
     try {
