@@ -81,11 +81,15 @@ define(['angular'], function(angular) {
                     $scope.wsBool = false
                 }
                 //查询任务表task 返回 projectId, status, string, taskId
-                TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
-                    $scope.lastTasks = data
-                    $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
-                    $scope.mergeTemplates()
-
+//                TaskService.getLastTaskStatus($scope.activeEnv, $scope.pros, function(data){
+//                    $scope.lastTasks = data
+//                    $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+//                    $scope.mergeTemplates()
+//                })
+                $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                $scope.projectStatus = $scope.projectStatus.map(function(data){
+                    data.isOpen = false;
+                    return data;
                 })
             })
         }
