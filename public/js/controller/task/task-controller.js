@@ -87,6 +87,7 @@ define(['angular'], function(angular) {
 //                    $scope.mergeTemplates()
 //                })
                 $scope.projectStatus = $scope.pros.map($scope.changeData).map($scope.addStatusTip)
+                $scope.mergeTemplates()
                 $scope.projectStatus = $scope.projectStatus.map(function(data){
                     data.isOpen = false;
                     return data;
