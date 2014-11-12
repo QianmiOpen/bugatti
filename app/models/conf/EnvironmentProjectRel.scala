@@ -4,28 +4,36 @@ import models.MaybeFilter
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
-
+import enums.ContainerTypeEnum
+import enums.ContainerTypeEnum.Container
 import scala.slick.jdbc.JdbcBackend
 
 /**
  * 环境和项目的关系配置
  */
-case class EnvironmentProjectRel(id: Option[Int], envId: Option[Int], projectId: Option[Int], syndicName: String, name: String, ip: String, globalVariable: Seq[Variable])
+case class EnvironmentProjectRel(id: Option[Int], envId: Option[Int], projectId: Option[Int], areaId: Option[Int],
+                                 syndicName: String, name: String, ip: String,
+                                 containerType: Container, hostIp: Option[String], hostName: Option[String],
+                                 globalVariable: Seq[Variable])
 case class EnvRelForm(envId: Int, projectId: Int, ids: Seq[Int])
 
 class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](tag, "environment_project_rel") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id", O.Nullable)
   def projectId = column[Int]("project_id", O.Nullable)
+  def areaId = column[Int]("area_id", O.Nullable)
   def syndicName = column[String]("syndic_name")
   def name = column[String]("name")
   def ip = column[String]("ip")
+  def containerType = column[Container]("container_type", O.Default(ContainerTypeEnum.vm), O.DBType("ENUM('vm', 'docker')"))
+  def hostIp = column[String]("host_ip", O.Nullable)
+  def hostName = column[String]("host_name", O.Nullable)
   def globalVariable = column[Seq[Variable]]("global_variable", O.DBType("text"))(MappedColumnType.base[Seq[Variable], String](
     _.filter(!_.value.isEmpty).map(v => s"${v.name}:${v.value}").mkString(","),
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
   ))
 
-  override def * = (id.?, envId.?, projectId.?, syndicName, name, ip, globalVariable) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
+  override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, name, ip, containerType, hostIp.?, hostName.?, globalVariable) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
   index("idx_eid_pid", (envId, projectId))
   index("idx_ip", ip)
 }
@@ -53,21 +61,16 @@ object EnvironmentProjectRelHelper {
       qRelation.filter(r => r.envId === envId && r.projectId === projectId).list
   }
 
+  def findByEnvId_AreaId(envId: Int, areaId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.filter(r => r.envId === envId && r.areaId === areaId).list
+  }
+
   def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     qRelation.filter(c => c.syndicName === syndicName && c.envId.isNull).list
   }
 
   def findIpsByEnvId(envId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     qRelation.filter(r => r.envId === envId && r.projectId.isNull).list
-  }
-
-  def updateByEnvId_projectId(envId: Int, pId: Int) = db withSession { implicit session =>
-    val seq = findIpsByEnvId(envId)
-    if(seq.size > 0){
-      qRelation.filter( t => t.id === seq(0).id && t.projectId.isNull).update(seq(0).copy(projectId = Option(pId)))
-    } else {
-      0
-    }
   }
 
   def allNotEmpty: Seq[EnvironmentProjectRel] = db withSession { implicit session =>

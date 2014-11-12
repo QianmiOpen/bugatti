@@ -11,8 +11,10 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('TaskCtrl', ['$scope','TaskService','EnvService','ProjectService', 'VersionService', '$state', '$stateParams', '$interval', 'Auth', '$modal', 'growl',
-        function($scope,TaskService,EnvService,ProjectService,VersionService,$state,$stateParams, $interval, Auth, $modal, growl) {
+    app.controller('TaskCtrl', ['$scope', 'TaskService','EnvService','ProjectService', 'VersionService', 'AreaService', 'RelationService',
+        '$state', '$stateParams', '$interval', 'Auth', '$modal', 'growl', '$http',
+        function($scope, TaskService, EnvService, ProjectService, VersionService, AreaService, RelationService,
+                 $state, $stateParams, $interval, Auth, $modal, growl, $http) {
 
         keepSession($scope, $interval, Auth);
 //=====================================变量========================================
@@ -44,8 +46,17 @@ define(['angular'], function(angular) {
             }
         }
         $scope.wsBool = true
+
         //选择tab页
-        $scope.chooseEnv = function(envId){
+        $scope.chooseEnv = function(envId) {
+            // 加载环境对应可用区域
+            AreaService.list(envId, function(data) {
+                $scope.preAreas = data;
+                if ($scope.preAreas.length > 0) {
+                    $scope.useArea = $scope.preAreas[0].id
+                }
+            });
+
             $scope.scriptVersion = ""
             $scope.activeEnv = envId
             //获取模板
@@ -439,19 +450,26 @@ define(['angular'], function(angular) {
         }
 
     //=============================== new vm task =====================================
-        $scope.addCluster = function(pid){
-            console.log(pid)
-            ProjectService.addCluster($scope.activeEnv, pid, function(data){
-                console.log(data)
-                if(data.r == 1){
-                    $scope.showVm(pid)
-                }else {
+        $scope.addCluster = function(pid, envId, areaId, _ip) {
+            var rel = {projectId: pid, envId: envId, areaId: areaId, ip: _ip}
+            ProjectService.addCluster(angular.toJson(rel), function(data) {
+                if (data.r == 'ok') {
+                    $scope.showVm(pid, areaId)
+                    growl.addSuccessMessage("绑定成功")
+                }
+                else if (data.r == 'none') {
                     growl.addErrorMessage("添加失败,没有空闲机器")
                 }
+                else if (data.r == 'exist') {
+                    growl.addErrorMessage("添加失败,该ip已经被使用")
+                }
+                else {
+                    growl.addErrorMessage("添加失败,无效的ip")
+                }
             })
-        }
+        };
 
-        $scope.removeCluster = function(pid, cid){
+        $scope.removeCluster = function(pid, cid, areaId){
             var modalInstance = $modal.open({
                 templateUrl: "partials/modal-message.html",
                 controller: function ($scope, $modalInstance) {
@@ -468,7 +486,7 @@ define(['angular'], function(angular) {
             });
             modalInstance.result.then(function(data) {
                 if(data.r == 1){
-                    $scope.showVm(pid)
+                    $scope.showVm(pid, areaId)
                     growl.addSuccessMessage("解绑成功")
                 }else {
                     growl.addErrorMessage("解绑失败");
@@ -476,12 +494,20 @@ define(['angular'], function(angular) {
             });
         }
 
-        $scope.isQueueShow = []
-        $scope.isHisLogShow = []
-        $scope.vms = []
+        $scope.isQueueShow = [];
+        $scope.isHisLogShow = [];
+        $scope.vms = [];
 
-        $scope.showVm = function(proId){
-            //根据项目proId & envId 获取关联机器
+        $scope.initHosts = function(areaId) {
+            RelationService.hosts($scope.activeEnv, areaId, function(data) {
+                console.log('data=' + angular.toJson(data));
+                $scope.hosts = data;
+            });
+        };
+
+        $scope.showVm = function(proId, areaId) {
+            $scope.initHosts(areaId)
+            // 根据项目proId & envId 获取关联机器
             TaskService.findClusters($scope.activeEnv, proId, function(data){
                 data.map(function(t){
                     $scope.isQueueShow.push(false)
@@ -501,6 +527,7 @@ define(['angular'], function(angular) {
                 })
             })
         }
+
     }]);
 
     app.controller('TaskLogCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){

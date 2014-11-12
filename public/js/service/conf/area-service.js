@@ -11,6 +11,9 @@ define(['angular'], function(angular){
             getAll: function(callback) {
                 $http(PlayRoutes.controllers.conf.AreaController.all()).success(callback);
             },
+            list: function(envId, callback) {
+                $http(PlayRoutes.controllers.conf.AreaController.list(envId)).success(callback);
+            },
             save: function(area, callback) {
                 $http.post(PlayRoutes.controllers.conf.AreaController.save().url, area).success(callback);
             },

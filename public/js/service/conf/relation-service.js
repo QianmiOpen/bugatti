@@ -29,6 +29,9 @@ define(['angular'], function(angular) {
             },
             update: function(id, relation, callback) {
                 $http.put(PlayRoutes.controllers.conf.RelationController.update(id).url, relation).success(callback)
+            },
+            hosts: function(envId, areaId, callback) {
+                $http(PlayRoutes.controllers.conf.RelationController.hosts(envId, areaId)).success(callback)
             }
         }
     });

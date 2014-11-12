@@ -26,6 +26,7 @@ PUT           /user/:jobNo                                        controllers.co
 
 # Area
 GET           /area                                               controllers.conf.AreaController.all
+GET           /area/list                                          controllers.conf.AreaController.list(envId: Int ?=0)
 GET           /area/:id                                           controllers.conf.AreaController.get(id: Int)
 GET           /area/:id/refresh                                   controllers.conf.AreaController.refresh(id: Int)
 POST          /area                                               controllers.conf.AreaController.save
@@ -60,7 +61,7 @@ DELETE        /project/:id                                        controllers.co
 POST          /project                                            controllers.conf.ProjectController.save
 PUT           /project/:projectId                                 controllers.conf.ProjectController.update(projectId: Int, envId: Int)
 POST          /project/auth                                       controllers.conf.ProjectController.showAuth(envId: Int)
-PUT           /project/addCluster/:envId/:projectId               controllers.conf.ProjectController.addCluster(envId: Int, projectId: Int)
+POST          /project/addCluster                                 controllers.conf.ProjectController.addCluster
 DELETE        /project/removeCluster/:clusterId                   controllers.conf.ProjectController.removeCluster(clusterId: Int)
 # Project member
 GET           /project/:projectId/members                         controllers.conf.ProjectController.members(projectId: Int)
@@ -116,6 +117,7 @@ GET           /conf/log/:id                                       controllers.co
 GET           /relation                                           controllers.conf.RelationController.index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int ?=0, pageSize: Int ?=10)
 GET           /relation/total                                     controllers.conf.RelationController.count(ip: Option[String], envId: Option[Int], projectId: Option[Int])
 GET           /relation/ips                                       controllers.conf.RelationController.ips(envId: Int)
+GET           /relation/hosts                                      controllers.conf.RelationController.hosts(envId: Int, areaId: Int)
 GET           /relation/:id                                       controllers.conf.RelationController.show(id: Int)
 POST          /relation                                           controllers.conf.RelationController.bind
 PUT           /relation/:id                                       controllers.conf.RelationController.update(id: Int)

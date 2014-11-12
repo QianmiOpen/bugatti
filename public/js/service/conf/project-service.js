@@ -55,8 +55,8 @@ define(['angular'], function(angular) {
             updateMember: function(memberId, op, callback) {
                 $http.put(PlayRoutes.controllers.conf.ProjectController.updateMember(memberId, op).url).success(callback);
             },
-            addCluster: function(eid, pid, callback){
-                $http.put(PlayRoutes.controllers.conf.ProjectController.addCluster(eid, pid).url).success(callback)
+            addCluster: function(rel, callback){
+                $http.post(PlayRoutes.controllers.conf.ProjectController.addCluster().url, rel).success(callback)
             },
             removeCluster: function(cid, callback){
                 $http.delete(PlayRoutes.controllers.conf.ProjectController.removeCluster(cid).url).success(callback)

@@ -267,13 +267,45 @@ object ProjectController extends BaseController {
     )
   }
 
-  def addCluster(envId: Int, projectId: Int)= Action { implicit request =>
-    val result = EnvironmentProjectRelHelper.updateByEnvId_projectId(envId, projectId)
-    if(result == 1){
-      //刷新缓存
-      MyActor.superviseTaskActor ! RefreshSyndic()
-    }
-    Ok(Json.obj("r" -> result))
+  case class RelForm(projectId: Int, envId: Int, areaId: Int, ip: Option[String])
+  val relForm = Form(
+    mapping(
+      "projectId" -> number,
+      "envId" -> number,
+      "areaId" -> number,
+      "ip" -> optional(text)
+    )(RelForm.apply)(RelForm.unapply)
+  )
+
+  def addCluster = Action { implicit request =>
+    relForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
+      rel => {
+        val rels = EnvironmentProjectRelHelper.findByEnvId_AreaId(rel.envId, rel.areaId)
+        val unbind = rels.filter(_.projectId.isEmpty)
+        val bind = rels.filter(_.projectId.isDefined)
+        if (unbind.size < 1) {
+          Ok(_None) // 没有可用机器资源
+        } else rel.ip match {
+          case ip if (ip.isEmpty || ip.get.trim.isEmpty) =>
+            val hostIp = unbind.groupBy(_.hostIp).mapValues(_.size).toSeq.sortBy(_._2).last._1
+            val availRel = unbind.filter(_.hostIp == hostIp).head
+            val result = EnvironmentProjectRelHelper.update(availRel.copy(projectId = Some(rel.projectId)))
+            if (result == 1) {
+              // 刷新缓存
+              MyActor.superviseTaskActor ! RefreshSyndic()
+            }
+            Ok(_Success)
+          case Some(ip) if (bind.exists(_.ip == ip)) =>
+            Ok(_Exist)
+          case Some(ip) if (unbind.exists(_.ip == ip)) =>
+            EnvironmentProjectRelHelper.update(unbind.find(_.ip == ip).head.copy(projectId = Some(rel.projectId)))
+            Ok(_Success)
+          case _ =>
+            Ok(_Fail)
+        }
+      }
+    )
   }
 
   def removeCluster(clusterId: Int)= Action { implicit request =>

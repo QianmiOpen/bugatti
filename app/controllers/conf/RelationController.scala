@@ -2,7 +2,7 @@ package controllers.conf
 
 import actor.task.{RefreshSyndic, MyActor}
 import controllers.BaseController
-import enums.{ModEnum, FuncEnum}
+import enums.{ContainerTypeEnum, ModEnum, FuncEnum}
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
@@ -30,9 +30,13 @@ object RelationController extends BaseController {
       "id" -> optional(number),
       "envId" -> optional(number),
       "projectId" -> optional(number),
+      "areaId" -> optional(number),
       "syndicName" -> text,
       "name" -> text,
       "ip" -> text,
+      "containerType" -> enums.form.enum(ContainerTypeEnum),
+      "hostIp" -> optional(text),
+      "hostName" -> optional(text),
       "globalVariable" -> seq (
         mapping(
           "id" -> optional(number),
@@ -104,6 +108,13 @@ object RelationController extends BaseController {
     }
   }
 
-
+  implicit val writer = new Writes[(String, Option[String])] {
+    def writes(c: (String, Option[String])): JsValue = {
+      Json.obj("ip" -> c._1, "host" -> c._2)
+    }
+  }
+  def hosts(envId: Int, areaId: Int) = Action { implicit request =>
+    Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_AreaId(envId, areaId).map(r => (r.ip, r.hostName))))
+  }
 
 }
