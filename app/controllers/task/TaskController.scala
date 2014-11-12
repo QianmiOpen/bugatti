@@ -236,7 +236,7 @@ object TaskController extends BaseController {
   }
 
   def findCatalinaWSUrl(envId: Int) = Action{
-    var ip = "0.0.0.0"
+    var ip = "172.19.0.0"
     TemplateHelper.findByName("logstash") match {
       case Some(template) =>
         val projects = ProjectHelper.allByTemplateId(template.id.get)

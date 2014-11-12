@@ -818,26 +818,34 @@ define(['angular'], function(angular) {
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.delayLoadCatalinaLog = function(){
-                        $scope.catalinaMessage = "正在连接,请稍后"
+                        if($scope.catalinaLogSocket != undefined){
+                            $scope.catalinaLogSocket.close()
+                        }
+                        $scope.catalinaMessage = "正在努力加载中,请稍后..."
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
+
                         TaskService.getCatalinaWS($scope.activeEnv, function(data){
                             console.log(data)
                             console.log($scope.hostName)
                             var path = data + "/" + $scope.hostName
-                            try{
-                                $scope.catalinaLogSocket = new WS(path)
-                                $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
-                            }catch(err) {
-                                $scope.catalinaMessage = path + " 连接失败,请重试!"
-                            }
+
+                            $scope.catalinaLogSocket = new WS(path)
+                            $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
+                            $scope.catalinaLogSocket.onerror = $scope.errorCatalina
+                            $scope.catalinaMessage = ""
                         })
+                    }
+
+                    $scope.errorCatalina = function(err){
+                        console.log(err)
+                        $scope.catalinaMessage = err.srcElement.URL + "连接失败";
                     }
                     $scope.receiveCatalina = function(event){
                         var data = angular.fromJson(event.data)
                         var messageJson = angular.fromJson(data.message)
                         $scope.catalinaMessage = $scope.catalinaMessage +
-                            messageJson["@timestamp"] + "[" + messageJson.thread_name + "]"
-                            + messageJson.level + messageJson["logger_name"] + " - "
+                            messageJson["@timestamp"] + " [" + messageJson.thread_name + "] "
+                            + messageJson.level + " " + messageJson["logger_name"] + " - " +
                             messageJson.message + "\n"
                     }
 
