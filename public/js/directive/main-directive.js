@@ -266,7 +266,10 @@ define(['angular'], function(angular) {
                     $scope.setCIndex =function(cIndex){
                         $scope.c_index = cIndex ;
                     }
-                    $scope.showQueues = function(index, ctab, taskId){
+                    $scope.setHostName = function(hostName){
+                        $scope.hostName = hostName;
+                    }
+                    $scope.showQueues = function(index, ctab, taskId, hostName){
                         var clusterFlag = true;
                         if($scope.isQueueShow[index] && $scope.ctab == ctab){
                             clusterFlag = false;
@@ -282,6 +285,12 @@ define(['angular'], function(angular) {
                         $scope.taskId = taskId
                         $scope.setCTab(ctab);
                         $scope.setCIndex(index);
+                        $scope.setHostName(hostName);
+
+                        //增加重加载
+                        if(ctab == 4){
+                            $scope.catalina_ctab = !$scope.catalina_ctab ;
+                        }
                     }
                 }
             ]
@@ -799,6 +808,62 @@ define(['angular'], function(angular) {
                });
            }
        }
+    });
+
+    app.directive('catalinaLog', function(){
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            templateUrl: 'partials/task/catalina-log.html',
+            controller: ['$scope', 'TaskService',
+                function($scope, TaskService){
+                    $scope.delayLoadCatalinaLog = function(){
+                        if($scope.catalinaLogSocket != undefined){
+                            $scope.catalinaLogSocket.close()
+                        }
+                        $scope.catalinaMessage = "正在努力加载中,请稍后..."
+                        var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
+
+                        TaskService.getCatalinaWS($scope.activeEnv, function(data){
+                            console.log(data)
+                            console.log($scope.hostName)
+                            var path = data + "/" + $scope.hostName
+
+                            $scope.catalinaLogSocket = new WS(path)
+                            $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
+                            $scope.catalinaLogSocket.onerror = $scope.errorCatalina
+                            $scope.catalinaMessage = ""
+                        })
+                    }
+
+                    $scope.errorCatalina = function(err){
+                        console.log(err)
+                        $scope.catalinaMessage = err.srcElement.URL + "连接失败";
+                    }
+                    $scope.receiveCatalina = function(event){
+                        var data = angular.fromJson(event.data)
+                        var messageJson = angular.fromJson(data.message)
+                        $scope.catalinaMessage = $scope.catalinaMessage +
+                            messageJson["@timestamp"] + " [" + messageJson.thread_name + "] "
+                            + messageJson.level + " " + messageJson["logger_name"] + " - " +
+                            messageJson.message + "\n"
+                    }
+
+                }],
+            link: function postLink(scope, iElement, iAttrs){
+                scope.$watch('ctab', function(){
+                    if(scope.ctab == 4 && scope.c_index == scope.$index){
+                        scope.delayLoadCatalinaLog();
+                    }
+                })
+
+                scope.$watch('catalina_ctab', function(){
+                    if(scope.ctab == 4 && scope.c_index == scope.$index){
+                        scope.delayLoadCatalinaLog();
+                    }
+                })
+            }
+        }
     });
 
     app.directive('taskLog', function(){

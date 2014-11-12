@@ -52,6 +52,10 @@ object VariableHelper extends PlayCache {
     qVariable.insertAll(variables: _*)(session)
   }
 
+  def create(variables: Seq[Variable]) = db withSession{ implicit session =>
+    _create(variables)(session)
+  }
+
   def _deleteByProjectId(projectId: Int)(implicit session: JdbcBackend#Session) = {
     qVariable.filter(_.projectId === projectId).delete(session)
   }

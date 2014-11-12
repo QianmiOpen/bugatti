@@ -12,7 +12,7 @@ import utils.DateFormatter._
 import play.api.Logger
 import models.conf._
 import play.api.mvc._
-import utils.TaskTools
+import utils.{ConfHelp, TaskTools}
 import sys.process._
 import scala.io.Source
 import scala.collection.{mutable, Seq}
@@ -233,6 +233,27 @@ object TaskController extends BaseController {
   //=======================任务界面重构===========================================
   def findClusterByEnv_Project(envId: Int, projectId: Int) = Action {
     Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)))
+  }
+
+  def findCatalinaWSUrl(envId: Int) = Action{
+    var ip = "172.19.0.0"
+    TemplateHelper.findByName("logstash") match {
+      case Some(template) =>
+        val projects = ProjectHelper.allByTemplateId(template.id.get)
+        if(!projects.isEmpty){
+          val rels = EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projects(0).id.get)
+          if(!rels.isEmpty){
+            ip = rels(0).ip
+          }else {
+            Logger.error("获取不到logstash机器")
+          }
+        }else {
+          Logger.error("获取不到logstash项目")
+        }
+      case _ =>
+        Logger.error("获取不到logstash模板")
+    }
+    Ok(s"ws://${ip}:3232")
   }
 
   implicit val varWrites = Json.writes[Variable]

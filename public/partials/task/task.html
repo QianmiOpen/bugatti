@@ -13,7 +13,7 @@
     </div>
     <br/>
     <accordion close-others="true">
-        <accordion-group ng-repeat="pro in projectStatus|filter:searchText">
+        <accordion-group ng-repeat="pro in projectStatus|filter:searchText" is-open="pro.isOpen">
             <accordion-heading>
                     <table class="table table-hover table-fixed" style="margin-bottom: 0px;">
                         <tbody style="border-top: 0px;">

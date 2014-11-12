@@ -41,6 +41,10 @@ object AttributeHelper {
     qAttribute.filter(_.id === attribute.id).update(attribute)
   }
 
+  def create(attr: Seq[Attribute]) = db withSession {implicit session =>
+    _create(attr)(session)
+  }
+
   def _create(attribute: Attribute)(implicit session: JdbcBackend#Session) = {
     qAttribute.insert(attribute)
   }
