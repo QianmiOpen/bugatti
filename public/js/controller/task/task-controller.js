@@ -92,6 +92,7 @@ define(['angular'], function(angular) {
                     data.isOpen = false;
                     return data;
                 })
+                console.log($scope.projectStatus)
             })
         }
 

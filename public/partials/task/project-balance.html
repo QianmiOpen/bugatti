@@ -37,7 +37,7 @@
             </div>
         </td>
         <td>
-            <a ng-show="false" title="catalina日志" href="" ng-click="showQueues($index, 4, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
+            <a ng-show="showProgress(c.task.status)" title="catalina日志" href="" ng-click="showQueues($index, 4, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
             <a ng-show="showProgress(c.task.status)" title="终止本次任务" href="" ng-click="forceTerminate(pro.id, c.name)"><span class="glyphicon glyphicon-remove"></span></a>
         </td>
         <td class="show">

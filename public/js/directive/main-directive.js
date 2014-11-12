@@ -286,6 +286,11 @@ define(['angular'], function(angular) {
                         $scope.setCTab(ctab);
                         $scope.setCIndex(index);
                         $scope.setHostName(hostName);
+
+                        //增加重加载
+                        if(ctab == 4){
+                            $scope.catalina_ctab = !$scope.catalina_ctab ;
+                        }
                     }
                 }
             ]
@@ -813,23 +818,38 @@ define(['angular'], function(angular) {
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.delayLoadCatalinaLog = function(){
+                        $scope.catalinaMessage = "正在连接,请稍后"
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
-                        TaskService.getCatalinaWS(function(data){
+                        TaskService.getCatalinaWS($scope.activeEnv, function(data){
                             console.log(data)
                             console.log($scope.hostName)
                             var path = data + "/" + $scope.hostName
-                            $scope.catalinaLogSocket = new WS(path)
-                            $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
+                            try{
+                                $scope.catalinaLogSocket = new WS(path)
+                                $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
+                            }catch(err) {
+                                $scope.catalinaMessage = path + " 连接失败,请重试!"
+                            }
                         })
                     }
                     $scope.receiveCatalina = function(event){
                         var data = angular.fromJson(event.data)
-                        console.log(data)
-                        $scope.message = $scope.message + data.message
+                        var messageJson = angular.fromJson(data.message)
+                        $scope.catalinaMessage = $scope.catalinaMessage +
+                            messageJson["@timestamp"] + "[" + messageJson.thread_name + "]"
+                            + messageJson.level + messageJson["logger_name"] + " - "
+                            messageJson.message + "\n"
                     }
+
                 }],
             link: function postLink(scope, iElement, iAttrs){
                 scope.$watch('ctab', function(){
+                    if(scope.ctab == 4 && scope.c_index == scope.$index){
+                        scope.delayLoadCatalinaLog();
+                    }
+                })
+
+                scope.$watch('catalina_ctab', function(){
                     if(scope.ctab == 4 && scope.c_index == scope.$index){
                         scope.delayLoadCatalinaLog();
                     }

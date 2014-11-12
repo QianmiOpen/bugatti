@@ -235,8 +235,25 @@ object TaskController extends BaseController {
     Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)))
   }
 
-  def findCatalinaWSUrl() = Action{
-    Ok(ConfHelp.catalinaWSUrl)
+  def findCatalinaWSUrl(envId: Int) = Action{
+    var ip = "0.0.0.0"
+    TemplateHelper.findByName("logstash") match {
+      case Some(template) =>
+        val projects = ProjectHelper.allByTemplateId(template.id.get)
+        if(!projects.isEmpty){
+          val rels = EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projects(0).id.get)
+          if(!rels.isEmpty){
+            ip = rels(0).ip
+          }else {
+            Logger.error("获取不到logstash机器")
+          }
+        }else {
+          Logger.error("获取不到logstash项目")
+        }
+      case _ =>
+        Logger.error("获取不到logstash模板")
+    }
+    Ok(s"ws://${ip}:3232")
   }
 
   implicit val varWrites = Json.writes[Variable]

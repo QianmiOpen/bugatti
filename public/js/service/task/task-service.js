@@ -36,8 +36,8 @@ define(['angular'], function(angular) {
             findHisTasks: function(envId, projectId, callback){
                 $http(PlayRoutes.controllers.task.TaskController.findHisTasks(envId, projectId)).success(callback)
             },
-            getCatalinaWS: function(callback){
-                $http(PlayRoutes.controllers.task.TaskController.findCatalinaWSUrl()).success(callback)
+            getCatalinaWS: function(envId, callback){
+                $http(PlayRoutes.controllers.task.TaskController.findCatalinaWSUrl(envId)).success(callback)
             }
         }
     });
