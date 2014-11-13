@@ -276,6 +276,7 @@ define(['angular'], function(angular) {
                         }
                         //隐藏其他的index
                         $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+                            $scope.catalina_ctab = !$scope.catalina_ctab ;
                             return false ;
                         })
                         if(clusterFlag){
@@ -818,9 +819,6 @@ define(['angular'], function(angular) {
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.delayLoadCatalinaLog = function(){
-                        if($scope.catalinaLogSocket != undefined){
-                            $scope.catalinaLogSocket.close()
-                        }
                         $scope.catalinaMessage = "正在努力加载中,请稍后..."
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
 
@@ -829,11 +827,17 @@ define(['angular'], function(angular) {
                             console.log($scope.hostName)
                             var path = data + "/" + $scope.hostName
 
+                            $scope.closeWSCatalina();
                             $scope.catalinaLogSocket = new WS(path)
                             $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
                             $scope.catalinaLogSocket.onerror = $scope.errorCatalina
+                            $scope.catalinaLogSocket.onclose = $scope.closeCatalina
                             $scope.catalinaMessage = ""
                         })
+                    }
+
+                    $scope.closeCatalina = function(event){
+                        console.log("websocket is closed !")
                     }
 
                     $scope.errorCatalina = function(err){
@@ -849,6 +853,14 @@ define(['angular'], function(angular) {
                             messageJson.message + "\n"
                     }
 
+                    $scope.closeWSCatalina = function(){
+                        console.log("$scope.closeWSCatalina is invoked")
+                        if($scope.catalinaLogSocket){
+                            console.log("$scope.catalinaLogSocket is closing")
+                            $scope.catalinaLogSocket.close();
+                        }
+                    }
+
                 }],
             link: function postLink(scope, iElement, iAttrs){
                 scope.$watch('ctab', function(){
@@ -860,6 +872,8 @@ define(['angular'], function(angular) {
                 scope.$watch('catalina_ctab', function(){
                     if(scope.ctab == 4 && scope.c_index == scope.$index){
                         scope.delayLoadCatalinaLog();
+                    }else {
+                        scope.closeWSCatalina();
                     }
                 })
             }
