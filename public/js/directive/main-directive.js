@@ -845,8 +845,7 @@ define(['angular'], function(angular) {
                         $scope.catalinaMessage = err.srcElement.URL + "连接失败";
                     }
                     $scope.receiveCatalina = function(event){
-                        var data = angular.fromJson(event.data)
-                        var messageJson = angular.fromJson(data.message)
+                        var messageJson = angular.fromJson(event.data)
                         $scope.catalinaMessage = $scope.catalinaMessage +
                             messageJson["@timestamp"] + " [" + messageJson.thread_name + "] "
                             + messageJson.level + " " + messageJson["logger_name"] + " - " +
