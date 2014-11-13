@@ -111,6 +111,7 @@ object Application extends ScalaController with Security {
         // area
         conf.routes.javascript.AreaController.all,
         conf.routes.javascript.AreaController.get,
+        conf.routes.javascript.AreaController.list,
         conf.routes.javascript.AreaController.save,
         conf.routes.javascript.AreaController.update,
         conf.routes.javascript.AreaController.delete,
@@ -203,6 +204,7 @@ object Application extends ScalaController with Security {
         // relation
         conf.routes.javascript.RelationController.show,
         conf.routes.javascript.RelationController.index,
+        conf.routes.javascript.RelationController.hosts,
         conf.routes.javascript.RelationController.count,
         conf.routes.javascript.RelationController.ips,
         conf.routes.javascript.RelationController.bind,

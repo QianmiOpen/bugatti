@@ -5,7 +5,7 @@ import actor.salt.{DeleteArea, UpdateArea, AddArea, RefreshHosts}
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
 import exceptions.UniqueNameException
-import models.conf.{AreaInfo, AreaHelper, Area}
+import models.conf.{AreaEnvironmentRelHelper, AreaInfo, AreaHelper, Area}
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -37,6 +37,10 @@ object AreaController extends BaseController {
 
   def get(id: Int) = Action {
     Ok(Json.toJson(AreaHelper.findInfoById(id)))
+  }
+
+  def list(envId: Int) = Action {
+    Ok(Json.toJson(AreaEnvironmentRelHelper.findAreasByEnvId(envId)))
   }
 
   def save = AuthAction(FuncEnum.area) { implicit request =>
