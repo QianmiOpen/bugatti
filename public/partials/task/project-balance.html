@@ -32,7 +32,7 @@
     <tr >
         <td width="10%">
             <a class="glyphicon glyphicon-minus-sign" href="" ng-click="removeCluster(pro.id, c.id, useArea)"></a>
-            所在物理机（{{c.hostIp}}）
+            <span tooltip="{{c.hostIp}}">所在物理机（{{c.hostIp}}）</span>
         </td>
         <td>
             <a href="" ng-click="showQueues($index, 1, c.task.id)">
