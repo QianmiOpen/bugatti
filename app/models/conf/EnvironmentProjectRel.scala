@@ -65,6 +65,10 @@ object EnvironmentProjectRelHelper {
     qRelation.filter(r => r.envId === envId && r.areaId === areaId).list
   }
 
+  def findUnbindByEnvId_AreaId(envId: Int, areaId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
+    qRelation.filter(r => r.envId === envId && r.areaId === areaId && r.projectId.isNull).list
+  }
+
   def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     qRelation.filter(c => c.syndicName === syndicName && c.envId.isNull).list
   }

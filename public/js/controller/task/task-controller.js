@@ -103,7 +103,6 @@ define(['angular'], function(angular) {
                     data.isOpen = false;
                     return data;
                 })
-                console.log($scope.projectStatus)
             })
         }
 
@@ -476,6 +475,7 @@ define(['angular'], function(angular) {
         };
 
         $scope.removeCluster = function(pid, cid, areaId){
+            console.log('areaId1=' + areaId);
             var modalInstance = $modal.open({
                 templateUrl: "partials/modal-message.html",
                 controller: function ($scope, $modalInstance) {
@@ -491,7 +491,8 @@ define(['angular'], function(angular) {
                 }
             });
             modalInstance.result.then(function(data) {
-                if(data.r == 1){
+                if(data.r == 1) {
+                    console.log('areaId2=' + areaId);
                     $scope.showVm(pid, areaId)
                     growl.addSuccessMessage("解绑成功")
                 }else {
@@ -506,7 +507,6 @@ define(['angular'], function(angular) {
 
         $scope.initHosts = function(areaId) {
             RelationService.hosts($scope.activeEnv, areaId, function(data) {
-                console.log('data=' + angular.toJson(data));
                 $scope.hosts = data;
             });
         };

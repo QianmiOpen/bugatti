@@ -114,7 +114,7 @@ object RelationController extends BaseController {
     }
   }
   def hosts(envId: Int, areaId: Int) = Action { implicit request =>
-    Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_AreaId(envId, areaId).map(r => (r.ip, r.hostName))))
+    Ok(Json.toJson(EnvironmentProjectRelHelper.findUnbindByEnvId_AreaId(envId, areaId).map(r => (r.ip, r.hostName))))
   }
 
 }
