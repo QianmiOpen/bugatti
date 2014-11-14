@@ -17,7 +17,7 @@
                     <input type="text" ng-model="ip" placeholder="指定IP地址" typeahead="h as h.ip for h in hosts | filter:{ip:$viewValue}" typeahead-template-url="ipTemplate.html" class="form-control">
                 </div>
                 <div class="col-xs-2" style="padding: 0 0px;">
-                    <button class="btn btn-primary glyphicon glyphicon-plus-sign" ng-click="addCluster(pro.id, activeEnv, useArea, ip.ip)" ></button>
+                    <button class="btn btn-primary glyphicon glyphicon-plus-sign" ng-click="addCluster(pro.id, activeEnv, useArea, ip)" ></button>
                 </div>
             </div>
         </th>

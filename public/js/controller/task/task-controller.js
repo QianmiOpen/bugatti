@@ -456,6 +456,8 @@ define(['angular'], function(angular) {
 
     //=============================== new vm task =====================================
         $scope.addCluster = function(pid, envId, areaId, _ip) {
+            _ip = typeof _ip === 'object' ? _ip.ip : _ip; // fix bug
+
             var rel = {projectId: pid, envId: envId, areaId: areaId, ip: _ip}
             ProjectService.addCluster(angular.toJson(rel), function(data) {
                 if (data.r == 'ok') {
