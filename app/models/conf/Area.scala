@@ -24,7 +24,6 @@ case class AreaTable(tag: Tag) extends Table[Area](tag, "area") {
   override def * = (id.?, name, syndicName, syndicIp) <>(Area.tupled, Area.unapply _)
 
   index("idx_name", name, unique = true)
-  index("idx_syndic_name", syndicName, unique = true)
 }
 
 object AreaHelper {

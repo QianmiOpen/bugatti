@@ -24,9 +24,14 @@ object ProjectController extends BaseController {
   implicit val varWrites = Json.writes[Variable]
   implicit val attributeWrites = Json.writes[Attribute]
   implicit val projectWrites = Json.writes[Project]
+  implicit val relWrites = Json.writes[EnvironmentProjectRel]
 
   def msg(user: String, ip: String, msg: String, data: Project) =
     Json.obj("mod" -> ModEnum.project.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
+
+  def msg_task(user: String, ip: String, msg: String, data: EnvironmentProjectRel) =
+    Json.obj("mod" -> ModEnum.task.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
+
 
   val projectForm = Form(
     mapping(
@@ -277,7 +282,7 @@ object ProjectController extends BaseController {
     )(RelForm.apply)(RelForm.unapply)
   )
 
-  def addCluster = Action { implicit request =>
+  def addCluster = AuthAction(FuncEnum.project) { implicit request =>
     relForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       rel => {
@@ -289,8 +294,9 @@ object ProjectController extends BaseController {
         } else rel.ip match {
           case ip if (ip.isEmpty || ip.get.trim.isEmpty) =>
             val hostIp = unbind.groupBy(_.hostIp).mapValues(_.size).toSeq.sortBy(_._2).last._1
-            val availRel = unbind.filter(_.hostIp == hostIp).head
-            val result = EnvironmentProjectRelHelper.update(availRel.copy(projectId = Some(rel.projectId)))
+            val update2rel = unbind.filter(_.hostIp == hostIp).head.copy(projectId = Some(rel.projectId))
+            val result = EnvironmentProjectRelHelper.update(update2rel)
+            ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
             if (result == 1) {
               // 刷新缓存
               MyActor.superviseTaskActor ! RefreshSyndic()
@@ -299,7 +305,9 @@ object ProjectController extends BaseController {
           case Some(ip) if (bind.exists(_.ip == ip)) =>
             Ok(_Exist)
           case Some(ip) if (unbind.exists(_.ip == ip)) =>
-            EnvironmentProjectRelHelper.update(unbind.find(_.ip == ip).head.copy(projectId = Some(rel.projectId)))
+            val update2rel = unbind.find(_.ip == ip).head.copy(projectId = Some(rel.projectId))
+            EnvironmentProjectRelHelper.update(update2rel)
+            ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
             Ok(_Success)
           case _ =>
             Ok(_Fail)
@@ -308,12 +316,13 @@ object ProjectController extends BaseController {
     )
   }
 
-  def removeCluster(clusterId: Int)= Action { implicit request =>
+  def removeCluster(clusterId: Int) = AuthAction(FuncEnum.project) { implicit request =>
     EnvironmentProjectRelHelper.findById(clusterId) match {
       case Some(rel) => {
         val result = EnvironmentProjectRelHelper.unbind(rel)
-        if(result == 1){
-          //刷新缓存
+        ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "移除机器", rel))
+        if (result == 1) {
+          // 刷新缓存
           MyActor.superviseTaskActor ! RefreshSyndic()
         }
         Ok(Json.obj("r" -> result))
