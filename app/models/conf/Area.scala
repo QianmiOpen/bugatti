@@ -40,8 +40,8 @@ object AreaHelper {
     qArea.filter(_.id === id).firstOption
   }
 
-  def findByName(name: String): Option[Area] = db withSession { implicit session =>
-    qArea.filter(_.name === name).firstOption
+  def findBySyndicName(name: String): Option[Area] = db withSession { implicit session =>
+    qArea.filter(_.syndicName === name).firstOption
   }
 
   def allInfo: Seq[AreaInfo] = db withSession { implicit session =>

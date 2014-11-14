@@ -1,6 +1,6 @@
 package controllers.conf
 
-import actor.task.{RefreshSyndic, MyActor}
+import actor.task.MyActor
 import controllers.BaseController
 import enums.{ContainerTypeEnum, ModEnum, FuncEnum}
 import models.conf._
@@ -87,8 +87,6 @@ object RelationController extends BaseController {
           "ip" -> request.remoteAddress, "msg" -> "绑定关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
         val result = EnvironmentProjectRelHelper.bind(relation)
-        //刷新缓存
-        MyActor.superviseTaskActor ! RefreshSyndic()
         Ok(Json.toJson(result))
       }
     )
@@ -101,8 +99,6 @@ object RelationController extends BaseController {
           "ip" -> request.remoteAddress, "msg" -> "解除关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
         val result = EnvironmentProjectRelHelper.unbind(relation)
-        //刷新缓存
-        MyActor.superviseTaskActor ! RefreshSyndic()
         Ok(Json.toJson(result))
       case None => NotFound
     }

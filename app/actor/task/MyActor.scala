@@ -39,14 +39,6 @@ object MyActor {
 
   var statusMap = Json.obj()
 
-  // envId_projectId -> syndic_name
-  private var envId_projectId_syndic = mutable.Map.empty[String, String]
-  // syndic_name -> ip
-  private var syndic_ip = mutable.Map.empty[String, String]
-
-  //test
-//  generateSchedule()
-
   /**
    * 新建一个任务需要到actor的队列中处理
    */
@@ -86,17 +78,6 @@ object MyActor {
     new WSSchedule().start(socketActor, "notify")
   }
 
-  def refreshSyndic() = {
-    superviseTaskActor ! RefreshSyndic()
-  }
-
-  def get_envId_projectId_syndic(): mutable.Map[String, String] = {
-    envId_projectId_syndic.clone().asInstanceOf[mutable.Map[String, String]]
-  }
-
-  def get_syndic_ip(): mutable.Map[String, String] = {
-    syndic_ip.clone().asInstanceOf[mutable.Map[String, String]]
-  }
 }
 
 class MyActor extends Actor with ActorLogging {
@@ -204,25 +185,7 @@ class MyActor extends Actor with ActorLogging {
     case RemoveStatus(envId, projectId, cluster) => {
       removeStatus(envId, projectId, cluster)
     }
-
-    case RefreshSyndic() => {
-      refreshSyndic()
-    }
   }
-
-  def refreshSyndic() = {
-    EnvironmentProjectRelHelper.allNotEmpty.foreach{
-      r =>
-        MyActor.envId_projectId_syndic += s"${r.envId.get}_${r.projectId.get}" -> r.syndicName
-    }
-    Logger.debug(s"envId_projectId_syndic ==> ${MyActor.envId_projectId_syndic}")
-    AreaHelper.allInfo.foreach {
-      a =>
-        MyActor.syndic_ip += s"${a.syndicName}" -> a.syndicIp
-    }
-    Logger.debug(s"syndic_ip ==> ${MyActor.syndic_ip}")
-  }
-
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
     Json.obj(key -> (MyActor.statusMap \ key).as[JsObject].deepMerge(js))
@@ -360,7 +323,6 @@ case class ChangeCommandStatus(envId: Int, projectId: Int, currentNum: Int, comm
 case class ChangeOverStatus(envId: Int, projectId: Int, taskStatus: TaskStatus, endTime: DateTime, version: String, cluster: Option[String])
 case class RemoveStatus(envId: Int, projectId: Int, clusterName: Option[String])
 case class FindLastStatus(key: String)
-case class RefreshSyndic()
 
 case class ForceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
 

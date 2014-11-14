@@ -129,7 +129,6 @@ object Global extends GlobalSettings {
     }
 
     //需要在taskQueue执行之前被初始化
-    MyActor.refreshSyndic
     MyActor.generateSchedule
 
     //查看队列表中是否有可执行任务

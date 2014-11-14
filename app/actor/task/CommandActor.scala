@@ -234,10 +234,9 @@ class CommandActor extends Actor with ActorLogging {
     } else {
       //正常的salt命令
       //1、根据syndic获取ip
-      val key = s"${_envId}_${_projectId}"
-      val syndicIp = MyActor.get_syndic_ip.get(MyActor.get_envId_projectId_syndic().get(key).getOrElse("0_0")).getOrElse("0.0.0.0")
-      log.debug(s"commnadActor key ==> ${key}")
-      log.debug(s"commnadActor eps ==> ${MyActor.get_envId_projectId_syndic().get(key)}")
+      log.info(s"hostname => ${_clusterName}")
+      log.info(s"taskObj => ${_taskObj}")
+      val syndicIp: String = _taskObj.hosts.filter(_.name == _clusterName.get).map(_.proxyIp).headOption.getOrElse("0.0.0.0")
       log.debug(s"commnadActor syndicIp ==> ${syndicIp}")
 
       val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"

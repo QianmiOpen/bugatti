@@ -1,6 +1,6 @@
 package controllers.conf
 
-import actor.task.{RefreshSyndic, MyActor}
+import actor.task.MyActor
 import controllers.BaseController
 import enums.{FuncEnum, LevelEnum, ModEnum, RoleEnum}
 import exceptions.UniqueNameException
@@ -297,10 +297,6 @@ object ProjectController extends BaseController {
             val update2rel = unbind.filter(_.hostIp == hostIp).head.copy(projectId = Some(rel.projectId))
             val result = EnvironmentProjectRelHelper.update(update2rel)
             ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
-            if (result == 1) {
-              // 刷新缓存
-              MyActor.superviseTaskActor ! RefreshSyndic()
-            }
             Ok(_Success)
           case Some(ip) if (bind.exists(_.ip == ip)) =>
             Ok(_Exist)
@@ -321,10 +317,6 @@ object ProjectController extends BaseController {
       case Some(rel) => {
         val result = EnvironmentProjectRelHelper.unbind(rel)
         ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "移除机器", rel))
-        if (result == 1) {
-          // 刷新缓存
-          MyActor.superviseTaskActor ! RefreshSyndic()
-        }
         Ok(Json.obj("r" -> result))
       }
       case _ => Ok(Json.obj("r" -> 0))
