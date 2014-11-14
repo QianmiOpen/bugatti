@@ -19,10 +19,24 @@ import scalax.io.StandardOpenOption._
 /**
  * Created by jinwei on 14/7/14.
  */
-object CommandActor {
-  val baseLogPath = ConfHelp.logPath
-  //命令执行过程
-  //  var envId_projectIdCommands = Map.empty[String, Seq[TaskCommand]]
+object CommandActor{
+
+  def command2Seq(command: String): Seq[String] = {
+    var retSeq = Seq.empty[String]
+    var bAppend = false
+    command.split(" ").foreach { c =>
+      if (bAppend) {
+        retSeq = retSeq.dropRight(1) :+ (retSeq.last + s" $c")
+      } else {
+        retSeq = retSeq :+ c
+      }
+      if (c.contains("'") && !c.endsWith("'")) {
+        bAppend = !bAppend
+      }
+    }
+
+    retSeq.map(_.replace("'",""))
+  }
 }
 
 class CommandActor extends Actor with ActorLogging {
@@ -197,7 +211,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 
   def insertResultLog(taskId: Int, message: String) = {
-    val baseDir = s"${CommandActor.baseLogPath}/${taskId}"
+    val baseDir = s"${_baseLogPath}/${taskId}"
     val resultLogPath = s"${baseDir}/result.log"
     val logDir = new File(baseDir)
     if (!logDir.exists) {
@@ -208,7 +222,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 
   def executeSalt(taskId: Int, command: TaskCommand, envId: Int, projectId: Int, versionId: Option[Int], order: Int) = {
-    val baseDir = s"${CommandActor.baseLogPath}/${taskId}"
+    val baseDir = s"${_baseLogPath}/${taskId}"
     val resultLogPath = s"${baseDir}/result.log"
 
     val logDir = new File(baseDir)
@@ -218,7 +232,7 @@ class CommandActor extends Actor with ActorLogging {
     val file = new File(resultLogPath)
     val cmd = command.command
     val hostname = command.machine
-    _commandSeq = command2Seq(cmd)
+    _commandSeq = CommandActor.command2Seq(cmd)
     log.info(s"executeSalt ==> ${cmd}")
 
 
@@ -248,22 +262,6 @@ class CommandActor extends Actor with ActorLogging {
         lookupActor ! SaltCommand(_commandSeq)
       }
     }
-  }
-
-  def command2Seq(command: String): Seq[String] = {
-    var retSeq = Seq.empty[String]
-    var bAppend = false
-    command.split(" ").foreach { c =>
-      if (bAppend) {
-        retSeq = retSeq.dropRight(1) :+ (retSeq.last + s" $c")
-      } else {
-        retSeq = retSeq :+ c
-      }
-      if (c.contains("'") && !c.endsWith("'")) {
-        bAppend = !bAppend
-      }
-    }
-    retSeq
   }
 }
 
