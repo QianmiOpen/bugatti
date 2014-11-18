@@ -27,7 +27,7 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
         'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
         'angular-growl','bindonce',
         'angular-ui-tree', 'ext-language-tools',
-        'angular-file-upload', 'angular-file-upload-shim'],
+        './thirdparty/angular-file-upload', 'angular-file-upload-shim'],
     function(angular) {
 
         // Declare app level module which depends on filters, and services

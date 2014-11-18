@@ -354,7 +354,7 @@ define(['angular'], function(angular) {
                         envId: eid,
                         projectId: pid,
                         versionId: vid,
-                        path: $scope.filePath
+                        path: $scope.filePath + ($scope.selectedFiles[index].relativePath || '')
                     },
                     file: $scope.selectedFiles[index],
                     fileFormDataName: 'myFile'

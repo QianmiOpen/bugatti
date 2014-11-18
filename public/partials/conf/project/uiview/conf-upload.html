@@ -6,20 +6,21 @@
             <td>设置上传文件路径：
                 <span style="color: #999">~/</span></td>
             <td colspan="2">
-                <input type="text" style="width:300px;" class="form-control" name="filePath" ng-model="filePath" placeholder="必填，例如：conf/abc" required></td>
+                <input type="text" style="width:300px;" class="form-control" name="filePath" ng-model="filePath" placeholder="必填，例如：conf/abc/" required></td>
 
             <td><div class="has-error"> <span ng-show="uploadForm.filePath.$error.required"  class="control-label">&nbsp;请填写文件路径</span></div></td>
         </tr>
-        <tbody ng-if="filePath.length > 0">
+        <tbody>
         <tr><td>&nbsp;</td></tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td><div ng-file-select="onFileSelect($files)" data-multiple="true" onclick="this.value = null" class="upload-button">点击选择上传文件</div></td>
-        </tr>
-        <tr><td>&nbsp;</td><td>or</td></tr>
+        <!--<tr>-->
+            <!--<td>&nbsp;</td>-->
+            <!--<td><div ng-file-select="onFileSelect($files)" data-multiple="true" onclick="this.value = null" class="upload-button">点击选择上传文件</div></td>-->
+        <!--</tr>-->
+        <!--<tr><td>&nbsp;</td><td>or</td></tr>-->
         <tr>
             <td>&nbsp;</td>
             <td><div class="drop-box" ng-file-drop="onFileSelect($files)" ng-file-drop-available="dropSupported=true" ng-file-drag-over-class="dragOverClass($event)">拖拽文件到这里</div></td>
+            <td><span style="color: #ff0000">（文件夹仅支持ascii码）</span></td>
         </tr>
         </tbody>
     </table>
