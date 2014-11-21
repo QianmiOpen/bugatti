@@ -67,7 +67,8 @@ object TaskTools {
       AreaHelper.findBySyndicName(c.syndicName).map{t => Logger.info(s"syndicIp ==> ${t.syndicIp}");t.syndicIp}.getOrElse("0.0.0.0")))
 
     val attrs = getProperties(envId, projectId, project.templateId, realVersion)
-    Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Some(attrs))
+    val aliases = findAlias(project.templateId, realVersion)
+    Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Some(attrs), aliases)
   }
 
   def findDependencies_v(envId: Int, projectId: Int, realVersion: String): Map[String, Project_v] = {
@@ -78,11 +79,12 @@ object TaskTools {
         val hosts = findHosts(envId, project.id.get).map(c => Host_v(c.name, c.ip, None, ""))
 //        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion).filter { t => t._1.startsWith("t_")}
         val attrs = getProperties(envId, project.id.get, project.templateId, realVersion)
+        val aliases = findAlias(project.templateId, realVersion)
         map.get(pid).get match {
-          case Some(alias) =>
-            alias -> Project_v(s"$projectId", s"${project.templateId}", alias, hosts, Option(attrs))
+          case Some(aliasName) =>
+            aliasName -> Project_v(s"$projectId", s"${project.templateId}", aliasName, hosts, Option(attrs), aliases)
           case _ =>
-            project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs))
+            project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs), aliases)
         }
     }.toMap
   }
@@ -171,7 +173,7 @@ case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]], 
 
 case class Environment_v(id: String, name: String, scriptVersion: String, realVersion: String)
 
-case class Project_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]])
+case class Project_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]], alias: Map[String, String])
 
 case class Version_v(id: String, name: String)
 
