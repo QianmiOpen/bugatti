@@ -97,7 +97,7 @@ object TaskTools {
       case x => x
     }
 
-    Environment_v(s"$envId", env.name, scriptVersion, env.scriptVersion)
+    Environment_v(s"$envId", env.name, scriptVersion, env.scriptVersion, env.level.toString)
   }
 
   def findAlias(templateId: Int, scriptVersion: String): Map[String, String] = {
@@ -171,7 +171,7 @@ object ConfHelp {
 
 case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]], proxyIp: String)
 
-case class Environment_v(id: String, name: String, scriptVersion: String, realVersion: String)
+case class Environment_v(id: String, name: String, scriptVersion: String, realVersion: String, level: String)
 
 case class Project_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]], alias: Map[String, String])
 
