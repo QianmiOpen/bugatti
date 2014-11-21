@@ -235,6 +235,28 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    // 区域名称
+    app.directive('getArea', function() {
+        return {
+            restrict: 'E',
+            scope: {
+                aid: '@',
+                areas: '='
+            },
+            template: '<span>{{aName}}</span>',
+            controller: function($scope) {
+                if (angular.isDefined($scope.areas)) {
+                    angular.forEach($scope.areas, function(a, index) {
+                        if (a.id == $scope.aid) {
+                            $scope.aName = a.name;
+                            return;
+                        }
+                    });
+                }
+            }
+        }
+    });
+
     /* task */
     app.directive('projectTabs', function () {
         return {
