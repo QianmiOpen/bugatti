@@ -24,14 +24,14 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
         project_v.alias.foreach {
           case (key, value) =>
             Logger.debug(s"execute dep alias: $projectName, $key, $value")
-            engine.eval(s"dependence.$projectName.alias.$key = function dcall(){return $value}.call(dependence.$projectName)")
+            engine.eval(s"dependence.$projectName.alias.$key = function (){return $value}.call(dependence.$projectName)")
         }
     }
 
     projectTask.alias.foreach {
       case (key, value) =>
         Logger.debug(s"$key,$value")
-        engine.eval(s"alias.$key = function dcall(){return $value}.call(this)")
+        engine.eval(s"alias.$key = function (){return $value}.call(this)")
     }
   } catch {
     case e: ScriptException => Logger.error(e.toString)
