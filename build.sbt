@@ -41,6 +41,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "angular-loading-bar" % "0.5.1",
   "org.webjars" % "angular-growl" % "0.4.0",
   "org.webjars" % "bindonce" % "0.3.1",
+  "org.webjars" % "angular-chosen" % "1.0.6",
   "org.eclipse.jgit" % "org.eclipse.jgit" % "3.4.1.201406201815-r",
   "com.typesafe.atmos" % "trace-play-2.2.0" % "1.3.0",
   "org.yaml" % "snakeyaml" % "1.13"

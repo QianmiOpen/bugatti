@@ -10,6 +10,8 @@ requirejs.config({
         "angular-ui-tree": webjars.path('angular-ui-tree', 'angular-ui-tree'),
         "angular-loading-bar": webjars.path('angular-loading-bar', 'loading-bar'),
         "angular-growl": webjars.path('angular-growl', 'angular-growl'),
+        "angular-chosen": webjars.path('angular-chosen', 'chosen'),
+        "chosen": webjars.path('chosen', 'chosen.jquery.min'),
         "bindonce": webjars.path('bindonce', 'bindonce')
     },
     shim: {
@@ -18,14 +20,16 @@ requirejs.config({
         "ext-language-tools": ['ace'],
         "angular-loading-bar": [ "angular"],
         "angular-growl": [ "angular"],
+        "chosen": [ "jquery"],
+        "angular-chosen": [ "angular", "chosen"],
         "bindonce": [ "angular"]
     }
 });
 
-require(['angular', 'jquery', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
+require(['angular', 'jquery', 'chosen', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
         'angular-ui-router', 'angular-loading-bar', 'angular-animate',
         'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
-        'angular-growl','bindonce',
+        'angular-growl', 'angular-chosen', 'bindonce',
         'angular-ui-tree', 'ext-language-tools',
         './thirdparty/angular-file-upload', 'angular-file-upload-shim'],
     function(angular) {
@@ -41,6 +45,7 @@ require(['angular', 'jquery', './controller/main-controller', './directive/main-
             'ngAnimate',
             'ngCookies',
             'angular-growl',
+            'localytics.directives',
             'pasvaz.bindonce',
             'bugattiApp.routes',
             'bugattiApp.filters',

@@ -12,6 +12,11 @@
         </ul>
     </div>
     <br/>
+    <style >
+        .panel-group .panel {
+            overflow: visible;
+        }
+    </style>
     <accordion close-others="true">
         <accordion-group ng-repeat="pro in projectStatus|filter:searchText" is-open="pro.isOpen">
             <accordion-heading>
