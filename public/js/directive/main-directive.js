@@ -407,6 +407,7 @@ define(['angular'], function(angular) {
 
                     // variables
                     TemplateService.itemVars($scope.pro.templateId, $scope.scriptVersion, function(item_vars) {
+                        console.log('item_vars=' + angular.toJson(item_vars));
                         var _vars = angular.copy($scope.vars);
                         angular.forEach(_vars, function(v, index) {
                             if (v.name.indexOf('t_') === 0) {
@@ -420,6 +421,11 @@ define(['angular'], function(angular) {
                             if (project_vars.length < 1) {
                                 angular.forEach(item_vars, function(iv) {
                                     _vars.push({name: iv.itemName, value: '', envId: $scope.activeEnv});  // first add
+                                });
+                            }
+                            else if (item_vars.length < 1) {
+                                angular.forEach(project_vars, function(pv) {
+                                    _vars.push({name: pv.name, value: pv.value, envId: $scope.activeEnv});  // first add
                                 });
                             }
                             else {
@@ -536,7 +542,6 @@ define(['angular'], function(angular) {
                         controller: function($scope, $modalInstance){
                             $scope.message = "把当前环境所有配置文件生成模板?";
                             $scope.ok = function(){
-                                console.log(copyParam)
                                 ConfService.copy(angular.toJson(copyParam), function(data) {
                                     $modalInstance.close(data);
                                 });
@@ -845,8 +850,6 @@ define(['angular'], function(angular) {
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
 
                         TaskService.getCatalinaWS($scope.activeEnv, function(data){
-                            console.log(data)
-                            console.log($scope.hostName)
                             var path = data + "/" + $scope.hostName
 
                             $scope.closeWSCatalina();
