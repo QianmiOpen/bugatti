@@ -68,7 +68,7 @@
                 <a ng-repeat="t in pro.templates" class="dropdown-toggle" href="" ng-click="showClick(t.versionMenu, pro.id, t.id, c.name)" title="{{t.name}}">
                     <span class="{{t.css}}"></span>
                 </a>
-                <ul class="dropdown-menu" style="position: static;" ng-show="showVersionMenu()">
+                <ul class="dropdown-menu" ng-show="showVersionMenu()">
                     <li ng-repeat="vs in versions">
                         <a href="" class="dropdown-toggle" ng-click="deploy(pro.id, vs.id, c.name)">{{vs.vs}}</a>
                     </li>
