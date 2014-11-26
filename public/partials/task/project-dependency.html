@@ -11,8 +11,7 @@
                 <form class="form-inline" role="form">
                     &nbsp;&nbsp;&nbsp;
                     <div class="form-group">
-                        <input class="form-control" ng-model="projectFilter" />
-                        <select style="width:250px;" chosen class="form-control" ng-model="project" ng-options="p.name + ' -- ' + p.description for p in projects|filter:projectFilter">
+                        <select style="width:300px;" chosen class="form-control" ng-model="project" ng-options="p.name + ' -- ' + p.description for p in projects">
                             <option value="">-- 选择项目 --</option>
                         </select>
                     </div>
