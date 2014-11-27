@@ -1167,6 +1167,14 @@ define(['angular'], function(angular) {
                     ConfService.get($scope.conf_id, function(data) {
                         $scope.conf = data.conf;
                         $scope.conf.content = data.confContent.content;
+
+
+                        ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
+                            var obj = eval(data);
+                            for (var prop in obj) {
+                                $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
+                            }
+                        });
                     });
 
                     this.update = function() {
@@ -1181,12 +1189,6 @@ define(['angular'], function(angular) {
                         });
                     };
 
-                    ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
-                        var obj = eval(data);
-                        for (var prop in obj) {
-                            $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
-                        }
-                    });
                 }
             }],
             link: function postLink(scope, iElement, iAttrs) {
