@@ -33,7 +33,7 @@ object ConfLogContentHelper extends PlayCache {
     qLogContent.insert(content)(session)
   }
 
-  def delete(id: Int) = db withSession { implicit session =>
+  def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
     qLogContent.filter(_.id === id).delete
   }
 

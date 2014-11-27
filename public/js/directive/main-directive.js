@@ -1294,6 +1294,7 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/conf/project/uiview/conf-upload.html',
             controller: ['$scope', '$timeout', '$upload', function($scope, $timeout, $upload) {
                 $scope.initUploadConf = function() {
+                    $scope.filePath = "";
                     var pid = $scope.pro.id;
                     var vid = $scope.versionId;
                     var eid = $scope.activeEnv;
@@ -1353,7 +1354,7 @@ define(['angular'], function(angular) {
                                 envId: eid,
                                 projectId: pid,
                                 versionId: vid,
-                                path: $scope.filePath
+                                path: $scope.filePath + ($scope.selectedFiles[index].relativePath || '')
                             },
                             file: $scope.selectedFiles[index],
                             fileFormDataName: 'myFile'

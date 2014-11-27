@@ -83,7 +83,7 @@ object ConfHelper extends PlayCache {
     _create(conf, confContent)(session)
   }
 
-  def _create(conf: Conf, confContent: Option[ConfContent])(implicit session: JdbcBackend#Session)= {
+  def _create(conf: Conf, confContent: Option[ConfContent])(implicit session: JdbcBackend#Session) = {
     try {
       val id = qConf.returning(qConf.map(_.id)).insert(conf)(session)
       confContent.map { _confContent =>
@@ -92,6 +92,11 @@ object ConfHelper extends PlayCache {
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
+  }
+
+  def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
+    qConf.filter(_.id === id).delete
+    ConfContentHelper._delete(id)
   }
 
   def delete(conf: Conf) = db withTransaction { implicit session =>

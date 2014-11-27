@@ -123,14 +123,18 @@ object VersionHelper extends PlayCache {
       }
   }
 
-  def delete(version: Version): Int = db withTransaction { implicit session =>
+  def delete(version: Version, cids: Seq[Int]): Int = db withTransaction { implicit session =>
     ProjectHelper.findById(version.projectId) match {
       case Some(p) =>
         val total = if (p.subTotal - 1 < 0) 0 else p.subTotal - 1 // prevent -1
         ProjectHelper._update(version.projectId, p.copy(subTotal = total))
       case None =>
     }
-    qVersion.filter(_.id is version.id).delete
+    cids foreach { cid =>
+      ConfHelper._delete(cid)
+      ConfLogHelper._deleteByConfId(cid)
+    }
+    qVersion.filter(_.id === version.id).delete
   }
 
   @throws[UniqueNameException]

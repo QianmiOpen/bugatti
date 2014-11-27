@@ -55,8 +55,17 @@ object ConfLogHelper extends PlayCache {
     qLog.returning(qLog.map(_.id)).insert(log)(session)
   }
 
-  def delete(id: Int) = db withSession { implicit session =>
-    qLog.filter(_.id is id).delete
+  def _delete(id: Int)(implicit session: JdbcBackend#Session) = {
+    qLog.filter(_.id === id).delete
+  }
+
+  def _deleteByConfId(cid: Int)(implicit session: JdbcBackend#Session) = {
+    qLog.filter(_.confId === cid).firstOption match {
+      case Some(log) =>
+        _delete(log.id.get)
+        ConfLogContentHelper._delete(log.id.get)
+      case _ => 0
+    }
   }
 
   def update(id: Int, log: ConfLog) = db withSession { implicit session =>

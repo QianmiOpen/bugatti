@@ -34,7 +34,7 @@ define(['angular',
         $scope.user = Auth.user;
 
         $scope.login = function() {
-            window.open('/login','千米LDAP登陆','location=yes,left=200,top=100,width=710,height=400,resizable=yes');
+            window.open('/login','千米LDAP登陆','location=yes,left=200,top=100,width=1020,height=568,resizable=no');
         }
 
         $scope.logout = function() {

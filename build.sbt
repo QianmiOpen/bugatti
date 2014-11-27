@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
   // WebJars pull in client-side web libraries
   "org.webjars" %% "webjars-play" % "2.2.1-2",
   "org.webjars" % "requirejs" % "2.1.11-1",
-  "org.webjars" % "angularjs" % "1.2.20",
+  "org.webjars" % "angularjs" % "1.2.27",
   "org.webjars" % "jquery" % "1.11.0",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "angular-ui-router" % "0.2.8-2",

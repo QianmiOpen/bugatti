@@ -295,6 +295,7 @@ define(['angular'], function(angular) {
 
     app.controller('ConfUploadCtrl', ['$scope', '$state', '$stateParams', '$timeout', '$http', '$upload',
         function($scope, $state, $stateParams, $timeout, $http, $upload) {
+            $scope.filePath = "";
             var pid = $stateParams.id;
             var vid = $stateParams.vid;
             var eid = $stateParams.eid;

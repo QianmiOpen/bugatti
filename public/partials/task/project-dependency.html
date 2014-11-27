@@ -11,7 +11,7 @@
                 <form class="form-inline" role="form">
                     &nbsp;&nbsp;&nbsp;
                     <div class="form-group">
-                        <select style="width:300px;" chosen class="form-control" ng-model="project" ng-options="p.name + ' -- ' + p.description for p in projects">
+                        <select style="width:300px;" chosen search-contains="true" class="form-control" ng-model="project" ng-options="p.name + ' -- ' + p.description for p in projects">
                             <option value="">-- 选择项目 --</option>
                         </select>
                     </div>

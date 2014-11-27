@@ -12,21 +12,21 @@
 
     <div class="table-responsive">
         <!-- Project Balance -->
-        <project-balance ng-show="isSet(1)"></project-balance>
+        <project-balance ng-if="isSet(1)"></project-balance>
 
         <!-- Project Item -->
-        <project-item ng-show="isSet(2)"></project-item>
+        <project-item ng-if="isSet(2)"></project-item>
 
         <!-- Project Conf -->
-        <project-conf ng-show="isSet(3)"></project-conf>
+        <project-conf ng-if="isSet(3)"></project-conf>
 
         <!-- Project dependency -->
-        <project-dependency ng-show="isSet(4)"></project-dependency>
+        <project-dependency ng-if="isSet(4)"></project-dependency>
 
         <!-- project member -->
-        <project-member ng-show="isSet(5)"></project-member>
+        <project-member ng-if="isSet(5)"></project-member>
 
         <!-- history tasks -->
-        <project-history ng-show="isSet(6)"></project-history>
+        <project-history ng-if="isSet(6)"></project-history>
     </div>
 </div>

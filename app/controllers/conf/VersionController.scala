@@ -73,12 +73,10 @@ object VersionController extends BaseController {
     VersionHelper.findById(id) match {
       case Some(version) =>
         if (!UserHelper.hasProjectSafe(version.projectId, request.user)) Forbidden
-        else ConfHelper.findByVersionId(id).isEmpty match {
-          case true =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除版本", version))
-            Ok(Json.toJson(VersionHelper.delete(version)))
-          case false =>
-            Ok(_Exist)
+        else {
+          val confs = ConfHelper.findByVersionId(id)
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除版本", version))
+          Ok(Json.toJson(VersionHelper.delete(version, confs.map(_.id.get))))
         }
       case None => NotFound
     }
