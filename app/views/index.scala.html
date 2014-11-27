@@ -11,10 +11,10 @@
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("chosen.min.css"))">
 
         <link rel="stylesheet" href="@routes.Assets.at("css/app.css")">
-        @Html(org.webjars.play.RequireJS.setup("js/app"))
+
         <script type="text/javascript">
         document.domain = "@siteDomain";
-
+        var app_version = "@appVersion";
         // MSIE
         window.onload = function() {
             if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
@@ -23,6 +23,7 @@
         }
         </script>
 
+        @Html(org.webjars.play.RequireJS.setup("js/app"))
     </head>
     <body>
         <div growl></div>

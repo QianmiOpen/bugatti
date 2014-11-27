@@ -1,32 +1,19 @@
 package controllers.task
 
-import actor.ActorUtils
 import actor.task.{ChangeQueues, TaskLog, MyActor}
 import controllers.BaseController
 import enums.TaskEnum
 import org.joda.time.DateTime
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.Action
 import models.task._
 import play.api.libs.json._
 import utils.DateFormatter._
 import play.api.Logger
 import models.conf._
 import play.api.mvc._
-import utils.{ConfHelp, TaskTools}
-import sys.process._
-import scala.io.Source
-import scala.collection.{mutable, Seq}
-import java.io._
-import java.net.{HttpURLConnection, URL}
-import java.util.Properties
-import java.util.concurrent.{Executors, ExecutorService}
-import play.api.libs.json.JsObject
-import models.conf.Attribute
-import models.conf.Environment
+import scala.collection.Seq
 import models.conf.Project
 import play.api.libs.json.JsObject
-
-import play.api.mvc.{JavascriptLitteral, QueryStringBindable}
 
 /**
  * 任务管理
@@ -37,19 +24,13 @@ object TaskController extends BaseController {
 
   val templateDir = "/srv/sls"
 
-  /**
-   * 根据项目id获取最近的5个版本号，按照时间倒序
-   * 在线上环境会过滤掉SNAPSHOT版本号
-   * @param projectId
-   * @param envId
-   * @return
-   */
-  def getVersions(projectId: Int, envId: Int) = Action{
-    val list = VersionHelper.findByProjectId_EnvId(projectId, envId)
-    Ok(Json.toJson(list.reverse.drop(list.length - 30).reverse))
-  }
+  implicit val varWrites = Json.writes[Variable]
+  implicit val projectWrites = Json.writes[Project]
+  implicit val taskWrites = Json.writes[Task]
+  implicit val taskTemplateWrites = Json.writes[TaskTemplate]
+  implicit val envProRelWrites = Json.writes[EnvironmentProjectRel]
 
-  def findLastTaskStatus = Action(parse.json){implicit request =>
+  def findLastTaskStatus = Action(parse.json){ implicit request =>
     request.body match {
       case JsObject(fields) => {
         Ok(Json.toJson(findStatus(fields)))
@@ -255,12 +236,5 @@ object TaskController extends BaseController {
     }
     Ok(s"ws://${ip}:3232")
   }
-
-  implicit val varWrites = Json.writes[Variable]
-  implicit val projectWrites = Json.writes[Project]
-  implicit val taskWrites = Json.writes[Task]
-  implicit val versionWrites = Json.writes[Version]
-  implicit val taskTemplateWrites = Json.writes[TaskTemplate]
-  implicit val envProRelWrites = Json.writes[EnvironmentProjectRel]
 
 }

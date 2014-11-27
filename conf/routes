@@ -80,8 +80,9 @@ POST          /template                                           controllers.co
 PUT           /template/:id                                       controllers.conf.TemplateController.update(id: Int)
 
 # Project Version
+GET           /project/:projectId/version                         controllers.conf.VersionController.getVersions(projectId: Int, envId: Int)
 GET           /project/:projectId/nexusVersion                    controllers.conf.VersionController.nexusVersions(projectId: Int)
-GET           /project/:projectId/version                         controllers.conf.VersionController.index(projectId: Int, page: Int ?=0, pageSize: Int ?=10)
+GET           /project/:projectId/top                             controllers.conf.VersionController.index(projectId: Int, page: Int ?=0, pageSize: Int ?=10)
 GET           /project/:projectId/versoin/total                   controllers.conf.VersionController.count(projectId: Int)
 GET           /project/version/all                                controllers.conf.VersionController.all(pid: Int, top: Int ?=30)
 GET           /project/version/:id                                controllers.conf.VersionController.show(id: Int)
@@ -129,7 +130,6 @@ GET           /task/lastStatusSpecify                             controllers.ta
 GET           /task/joinProcess/:taskId                           controllers.task.TaskController.joinProcess(taskId: Int)
 POST          /task/newTaskQueue                                  controllers.task.TaskController.createNewTaskQueue
 POST          /task/removeTaskQueue                               controllers.task.TaskController.removeTaskQueue(qid: Int)
-POST          /task/version                                       controllers.task.TaskController.getVersions(projectId: Int, envId: Int)
 GET           /task/templates                                     controllers.task.TaskController.getTemplates(scriptVersion: String)
 GET           /task/terminate                                     controllers.task.TaskController.forceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
 GET           /task/clusters                                      controllers.task.TaskController.findClusterByEnv_Project(envId: Int, projectId: Int)

@@ -69,6 +69,18 @@ object VersionController extends BaseController {
     Ok(Json.toJson(VersionHelper.all(projectId, top)))
   }
 
+  /**
+   * 根据项目id获取最近的5个版本号，按照时间倒序
+   * 在线上环境会过滤掉SNAPSHOT版本号
+   * @param projectId
+   * @param envId
+   * @return
+   */
+  def getVersions(projectId: Int, envId: Int) = Action{
+    val list = VersionHelper.findByProjectId_EnvId(projectId, envId)
+    Ok(Json.toJson(list.reverse.drop(list.length - 30).reverse))
+  }
+
   def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
     VersionHelper.findById(id) match {
       case Some(version) =>

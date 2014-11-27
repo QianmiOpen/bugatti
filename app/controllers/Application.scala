@@ -177,6 +177,7 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.VersionController.save,
         conf.routes.javascript.VersionController.update,
         conf.routes.javascript.VersionController.all,
+        conf.routes.javascript.VersionController.getVersions,
 
         // dependency
         conf.routes.javascript.DependencyController.show,
@@ -215,7 +216,6 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.findLastTaskStatus,
         task.routes.javascript.TaskController.findLastStatus,
         task.routes.javascript.TaskController.joinProcess,
-        task.routes.javascript.TaskController.getVersions,
         task.routes.javascript.TaskController.createNewTaskQueue,
         task.routes.javascript.TaskController.getTemplates,
         task.routes.javascript.TaskController.taskLog,

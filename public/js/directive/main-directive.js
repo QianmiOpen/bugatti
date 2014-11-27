@@ -486,7 +486,7 @@ define(['angular'], function(angular) {
             controller: ['$scope', '$filter', 'ConfService', 'VersionService', '$modal', 'growl',
             function($scope, $filter, ConfService, VersionService, $modal, growl) {
                 $scope.initVersions = function() {
-                    VersionService.top($scope.pro.id, function(data) {
+                    VersionService.getVersions($scope.pro.id, $scope.activeEnv, function(data) {
                         $scope.versions = data;
                     });
                 };

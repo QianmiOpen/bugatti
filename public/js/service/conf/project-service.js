@@ -70,6 +70,9 @@ define(['angular'], function(angular) {
             get: function(id, callback) {
                 $http(PlayRoutes.controllers.conf.VersionController.show(id)).success(callback);
             },
+            getVersions: function(pid, eid, callback) {
+                $http(PlayRoutes.controllers.conf.VersionController.getVersions(pid, eid)).success(callback)
+            },
             top: function(projectId, callback) {
                 $http(PlayRoutes.controllers.conf.VersionController.all(projectId)).success(callback);
             },

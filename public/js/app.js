@@ -3,6 +3,7 @@
 'use strict';
 
 requirejs.config({
+    urlArgs: "bust=" + app_version,
     paths: {
         "ace": webjars.path('ace', 'src-min-noconflict/ace'),
         "ext-language-tools": webjars.path('ace', 'src-min-noconflict/ext-language_tools'),
