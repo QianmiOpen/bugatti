@@ -1,6 +1,6 @@
 package controllers.conf
 
-import enums.{ModEnum, RoleEnum, FuncEnum, LevelEnum}
+import enums.{ModEnum, FuncEnum, LevelEnum}
 import exceptions.UniqueNameException
 import models.conf._
 import play.api.mvc._
@@ -57,7 +57,7 @@ object EnvController extends BaseController {
     // 管理员 & 委员长 显示所有环境
     val countSafe = ProjectMemberHelper.count(request.user.jobNo, LevelEnum.safe)
     val seq =
-      if ((request.user.role == request.user.superAdmin) || countSafe > 0) {
+      if (UserHelper.superAdmin_?(request.user) || countSafe > 0) {
         EnvironmentHelper.all()
       }
       else {

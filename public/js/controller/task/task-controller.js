@@ -53,7 +53,7 @@ define(['angular'], function(angular) {
             AreaService.list(envId, function(data) {
                 $scope.preAreas = data;
                 if ($scope.preAreas.length > 0) {
-                    $scope.useArea = $scope.preAreas[0].id
+                    $scope.useArea = { id :$scope.preAreas[0].id }
                 }
             });
 
@@ -455,13 +455,15 @@ define(['angular'], function(angular) {
         }
 
     //=============================== new vm task =====================================
-        $scope.addCluster = function(pid, envId, areaId, _ip) {
+        $scope.addCluster = function(pid, envId, _ip) {
             _ip = typeof _ip === 'object' ? _ip.ip : _ip; // fix bug
+
+            var areaId = $scope.useArea.id;
 
             var rel = {projectId: pid, envId: envId, areaId: areaId, ip: _ip}
             ProjectService.addCluster(angular.toJson(rel), function(data) {
                 if (data.r == 'ok') {
-                    $scope.showVm(pid, areaId)
+                    $scope.showVm(pid)
                     growl.addSuccessMessage("绑定成功")
                 }
                 else if (data.r == 'none') {
@@ -476,7 +478,8 @@ define(['angular'], function(angular) {
             })
         };
 
-        $scope.removeCluster = function(pid, cid, areaId){
+        $scope.removeCluster = function(pid, cid) {
+
             var modalInstance = $modal.open({
                 templateUrl: "partials/modal-message.html",
                 controller: function ($scope, $modalInstance) {
@@ -493,7 +496,7 @@ define(['angular'], function(angular) {
             });
             modalInstance.result.then(function(data) {
                 if(data.r == 1) {
-                    $scope.showVm(pid, areaId)
+                    $scope.showVm(pid)
                     growl.addSuccessMessage("解绑成功")
                 }else {
                     growl.addErrorMessage("解绑失败");
@@ -505,14 +508,15 @@ define(['angular'], function(angular) {
         $scope.isHisLogShow = [];
         $scope.vms = [];
 
-        $scope.initHosts = function(areaId) {
+        $scope.initHosts = function() {
+            var areaId = $scope.useArea.id;
             RelationService.hosts($scope.activeEnv, areaId, function(data) {
                 $scope.hosts = data;
             });
         };
 
-        $scope.showVm = function(proId, areaId) {
-            $scope.initHosts(areaId)
+        $scope.showVm = function(proId) {
+            $scope.initHosts()
             // 根据项目proId & envId 获取关联机器
             TaskService.findClusters($scope.activeEnv, proId, function(data){
                 data.map(function(t){

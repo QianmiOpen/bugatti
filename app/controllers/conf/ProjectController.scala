@@ -1,8 +1,7 @@
 package controllers.conf
 
-import actor.task.MyActor
 import controllers.BaseController
-import enums.{FuncEnum, LevelEnum, ModEnum, RoleEnum}
+import enums._
 import exceptions.UniqueNameException
 import models.conf._
 import org.joda.time.DateTime
@@ -149,11 +148,16 @@ object ProjectController extends BaseController {
   // 任务模块查看
   def showAuth(envId: Int) = AuthAction(FuncEnum.task) { implicit request =>
     val user = request.user
-    //超级管理员才可以看到所有项目
-    if(user.superAdmin || UserHelper.hasEnv(envId, user)){
+    if (UserHelper.superAdmin_?(user)) {
       Ok(Json.toJson(ProjectHelper.all()))
     } else {
-      Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(request.user.jobNo)))
+      val env = EnvironmentHelper.findById(envId)
+      env match {
+        case Some(e) if e.level == LevelEnum.safe =>
+          Ok(Json.toJson(ProjectMemberHelper.findSafeProjectsByJobNo(user.jobNo)))
+        case _ =>
+          Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(user.jobNo)))
+      }
     }
   }
 

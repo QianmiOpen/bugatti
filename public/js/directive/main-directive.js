@@ -550,7 +550,7 @@ define(['angular'], function(angular) {
                                 $modalInstance.dismiss("cancel");
                             }
                         }
-                    })
+                    });
 
                     modalInstance.result.then(function(data) {
                         if (data.r === 'ok') {
