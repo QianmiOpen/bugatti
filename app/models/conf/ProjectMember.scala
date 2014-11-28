@@ -56,7 +56,7 @@ object ProjectMemberHelper extends PlayCache {
   def findSafeProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
     val q = for{
       (m, p) <- qMember innerJoin qProject on (_.projectId === _.id)
-      if m.jobNo === jobNo && m.level == LevelEnum.safe
+      if m.jobNo === jobNo && m.level === LevelEnum.safe
     } yield p
     q.list
   }
