@@ -187,6 +187,7 @@ object Application extends ScalaController with Security {
 
         // conf
         conf.routes.javascript.ConfController.all,
+        conf.routes.javascript.ConfController.defaultAll,
         conf.routes.javascript.ConfController.show,
         conf.routes.javascript.ConfController.save,
         conf.routes.javascript.ConfController.delete,

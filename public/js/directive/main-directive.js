@@ -407,7 +407,6 @@ define(['angular'], function(angular) {
 
                     // variables
                     TemplateService.itemVars($scope.pro.templateId, $scope.scriptVersion, function(item_vars) {
-                        console.log('item_vars=' + angular.toJson(item_vars));
                         var _vars = angular.copy($scope.vars);
                         angular.forEach(_vars, function(v, index) {
                             if (v.name.indexOf('t_') === 0) {
@@ -488,6 +487,8 @@ define(['angular'], function(angular) {
                 $scope.initVersions = function() {
                     VersionService.getVersions($scope.pro.id, $scope.activeEnv, function(data) {
                         $scope.versions = data;
+                        $scope.versions.unshift({id: 0, projectId: $scope.pro.id, updated: 1417228773000, vs: 'default'});
+
                     });
                 };
 
@@ -495,10 +496,15 @@ define(['angular'], function(angular) {
                     $scope.setAction('list');
                     if (vid == null) {
                         $scope.confs = [];
+                    } else if (vid === 0) {
+                        ConfService.getDefaultAll($scope.activeEnv, $scope.pro.id, vid, function(data) {
+                            $scope.confs = data;
+                        });
                     } else {
                         ConfService.getAll($scope.activeEnv, vid, function(data) {
                             $scope.confs = data;
                         });
+
                     }
                 };
 
@@ -534,19 +540,19 @@ define(['angular'], function(angular) {
                     langTools.addCompleter(codeCompleter);
                 };
 
-                //生成模板
+                // 生成模板
                 $scope.genTemplateConf = function() {
-                    var copyParam = {projectId: $scope.pro.id, target_eid: $scope.activeEnv, target_vid: $scope.versionId, envId: 0, versionId: $scope.versionId, ovr: true, copy: false};
+                    var copyParam = {projectId: $scope.pro.id, target_eid: $scope.activeEnv, target_vid: $scope.versionId, envId: $scope.activeEnv, versionId: 0, ovr: true, copy: false};
                     var modalInstance = $modal.open({
                         templateUrl: "partials/modal-message.html",
                         controller: function($scope, $modalInstance){
                             $scope.message = "把当前环境所有配置文件生成模板?";
-                            $scope.ok = function(){
+                            $scope.ok = function() {
                                 ConfService.copy(angular.toJson(copyParam), function(data) {
                                     $modalInstance.close(data);
                                 });
                             };
-                            $scope.cancel = function(){
+                            $scope.cancel = function() {
                                 $modalInstance.dismiss("cancel");
                             }
                         }
@@ -1091,6 +1097,7 @@ define(['angular'], function(angular) {
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('action', function () {
                     if (scope.action === 'list' && !angular.isUndefined(scope.versionId)) {
+
                         scope.changeVersion(scope.versionId)
                     }
                 });
@@ -1242,6 +1249,9 @@ define(['angular'], function(angular) {
         }
     });
 
+    /**
+     * 一键拷贝
+     */
     app.directive('confCopy', function() {
         return {
             restrict: 'E',
@@ -1250,12 +1260,14 @@ define(['angular'], function(angular) {
             controller: ['$scope', 'growl', 'VersionService', 'ConfService', function($scope, growl, VersionService, ConfService) {
                 $scope.initCopyConf = function() {
                     $scope.copyEnvs = angular.copy($scope.envs);
-                    $scope.copyEnvs.unshift({"id": 0, "name": '模板配置', "nfServer": '', "ipRange": '', "level": 'safe', "scriptVersion": '', "jobNo": '', "remark": ''})
+                    //$scope.copyEnvs.unshift({"id": 0, "name": '模板配置', "nfServer": '', "ipRange": '', "level": 'safe', "scriptVersion": '', "jobNo": '', "remark": ''})
 
-                    $scope.copyParam = {projectId: $scope.pro.id, target_eid: null, target_vid: null, envId: $scope.activeEnv, versionId: $scope.versionId, ovr: false};
+                    $scope.copyParam = {projectId: $scope.pro.id, target_eid: $scope.activeEnv, target_vid: null, envId: $scope.activeEnv, versionId: $scope.versionId, ovr: false};
 
                     VersionService.top($scope.pro.id, function(data) {
                         $scope.versions = data;
+                        // 模板
+                        $scope.versions.unshift({id: 0, projectId: $scope.pro.id, updated: 1417228773000, vs: 'default'});
 
                         // default current version
                         var find = false;
@@ -1269,6 +1281,9 @@ define(['angular'], function(angular) {
                     });
 
                     this.ok = function (param) {
+                        //if (param.target_vid == 0) { // 模板
+                        //    param.target_eid = $scope.activeEnv;
+                        //}
                         ConfService.copy(angular.toJson(param), function(data) {
                             if (data.r === 'ok') {
                                 $scope.setAction('list');

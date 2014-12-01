@@ -98,6 +98,7 @@ POST          /project/updateTemplateProject                      controllers.co
 
 # Conf
 GET           /conf/all                                           controllers.conf.ConfController.all(eid: Int, vid: Int)
+GET           /conf/all_def                                       controllers.conf.ConfController.defaultAll(envId: Int, projectId: Int, versionId: Int)
 GET           /conf/completer                                     controllers.conf.ConfController.completer(envId: Int, projectId: Int, versionId: Int)
 GET           /conf/:id                                           controllers.conf.ConfController.show(id: Int)
 DELETE        /conf/:id                                           controllers.conf.ConfController.delete(id: Int)

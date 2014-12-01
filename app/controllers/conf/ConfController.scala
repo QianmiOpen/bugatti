@@ -64,6 +64,10 @@ object ConfController extends BaseController {
     Ok(Json.toJson(ConfHelper.findByEnvId_VersionId(envId, versionId)))
   }
 
+  def defaultAll(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
+    Ok(Json.toJson(ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)))
+  }
+
   def delete(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
     ConfHelper.findById(id) match {
       case Some(conf) =>
@@ -213,8 +217,6 @@ object ConfController extends BaseController {
           val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.envId, copyForm.versionId)
           val confs = (copyForm.ovr, copyForm.copy) match {
             case (true, true) =>
-//              targetConfs.filter(t => currConfs.map(_.path).contains(t.path)).foreach( c => ConfHelper.delete(c)) // delete exist
-//              targetConfs.filterNot(t => currConfs.map(_.path).contains(t.path)) // return targets
               currConfs.filter(c => targetConfs.map(_.path).contains(c.path)).foreach(c => ConfHelper.delete(c))
               targetConfs
             case (false, true) =>

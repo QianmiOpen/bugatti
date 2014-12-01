@@ -15,6 +15,9 @@ define(['angular'], function(angular) {
             getAll: function(envId, vid, callback) {
                 $http(PlayRoutes.controllers.conf.ConfController.all(envId, vid)).success(callback);
             },
+            getDefaultAll: function(envId, pid, vid, callback) {
+                $http(PlayRoutes.controllers.conf.ConfController.defaultAll(envId, pid, vid)).success(callback);
+            },
             save: function(conf, callback) {
                 $http.post(PlayRoutes.controllers.conf.ConfController.save().url, conf).success(callback)
             },

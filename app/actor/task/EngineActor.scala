@@ -86,7 +86,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
       val confSeq = ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId) match {
         case seq: Seq[Conf] if seq.isEmpty =>
-          VersionHelper.copyConfigs(envId, versionId)
+          VersionHelper.copyConfigs(envId, projectId, versionId)
           ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)
         case seq: Seq[Conf] if !seq.isEmpty =>
           seq

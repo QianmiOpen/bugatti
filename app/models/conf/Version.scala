@@ -94,33 +94,26 @@ object VersionHelper extends PlayCache {
     }
   }
 
-  def copyConfigs(envId: Int, versionId: Int)= db withTransaction { implicit session =>
-    VersionHelper.findById(versionId) match{
-      case Some(v) =>
-        _copyConfigs(envId, v)(session)
-      case _ =>
-        Logger.error(s"没有找到版本信息,版本号为${versionId}")
-    }
-  }
+  def copyConfigs(envId: Int, projectId: Int, versionId: Int)= db withTransaction { implicit session =>
+    val defConf = qConf.filter(c => c.envId === envId && c.projectId === projectId && c.versionId === 0).firstOption
 
-  def _copyConfigs(envId: Int, version: Version)(implicit session: JdbcBackend#Session) = {
-      //找到当前环境 或者 模板 中最近的版本配置
-      (for{
-        (conf, ver) <- qConf innerJoin qVersion on(_.versionId === _.id)
-        if ((conf.envId === envId || conf.envId === 0) && conf.projectId === version.projectId && ver.updated <= version.updated)
-      } yield (conf.envId, ver)).sortBy(t => t._2.updated desc).firstOption match {
-        case Some(v) =>
-          Logger.info(s"v => ${v._1}, ${v._2}")
-          val confs = ConfHelper.findByEnvId_VersionId(v._1, v._2.id.get)
-          Logger.info(s"confs => ${envId} =>${confs}")
-            confs.foreach { c =>
-            Logger.info(s"c => ${c}")
-            val content = ConfContentHelper.findById(c.id.get)
-            ConfHelper._create(c.copy(id = None, envId = envId, versionId = version.id.get), content)(session)
-          }
-        case _ =>
-          Logger.warn(s"没有找到合适的配置文件!")
+    val conf = if (defConf.isDefined) { defConf } else {
+      VersionHelper.findById(versionId) match {
+        case Some(v) => qConf.filter(c =>
+          c.envId === envId && c.projectId === projectId && c.versionId === versionId && c.updated <= v.updated).sortBy(_.updated).firstOption
+        case _ => None
       }
+    }
+
+    conf match {
+      case Some(c) =>
+        ConfHelper.findByEnvId_VersionId(c.envId, c.versionId) foreach { c =>
+          val content = ConfContentHelper.findById(c.id.get)
+          ConfHelper._create(c.copy(id = None, envId = envId, versionId = versionId), content)
+        }
+      case None =>
+    }
+
   }
 
   def delete(version: Version, cids: Seq[Int]): Int = db withTransaction { implicit session =>

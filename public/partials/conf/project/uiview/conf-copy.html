@@ -3,7 +3,7 @@
     <div class="form-group">
         <label for="selectVersion" class="col-sm-2 control-label">版本选择：</label>
         <div class="col-sm-5">
-            <select id="selectVersion" class="form-control" ng-model="copyParam.target_vid" ng-options="v.id as v.vs for v in versions" required></select>
+            <select style="width: 350px;" chosen search-contains="true" id="selectVersion" class="form-control" ng-model="copyParam.target_vid" ng-options="v.id as v.vs for v in versions" required></select>
         </div>
     </div>
 

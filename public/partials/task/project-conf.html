@@ -1,9 +1,10 @@
-<br/>
+<div style="height: 5px;"></div>
+
 <select chosen search-contains="true" ng-change="changeVersion(versionId)" class="form-control mt15" ng-model="versionId" ng-options="v.id as v.vs for v in versions">
     <option value="">-- 选择项目版本 --</option>
 </select>
 
-<div class="btn-group mtb15" ng-show="versionId" >
+<div class="btn-group mtb15" ng-show="versionId > 0" >
     <button ng-disabled="isAction('upload')" ng-click="setAction('upload')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-upload"></i>上传</button>
     <button ng-disabled="isAction('create')" ng-click="setAction('create')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i>新建</button>
     <button ng-disabled="isAction('copy')" ng-click="setAction('copy')" type="button" class="btn btn-default">一键拷贝</button>
@@ -11,8 +12,13 @@
     <a ng-click="setAction('list')" class="btn">返回列表</a>
 </div>
 
+<div class="btn-group mtb15" ng-show="versionId == 0" >
+    <a ng-click="setAction('list')" class="btn">返回列表</a>
+</div>
+
 <div class="clearfix"></div>
-<div ng-if="versionId">
+
+<div ng-if="versionId >= 0">
     <conf-list ng-if="isAction('list')"></conf-list>
     <conf-detail ng-if="isAction('detail')"></conf-detail>
     <conf-edit ng-if="isAction('edit')"></conf-edit>
