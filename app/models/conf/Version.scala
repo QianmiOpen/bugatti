@@ -100,7 +100,7 @@ object VersionHelper extends PlayCache {
     val conf = if (defConf.isDefined) { defConf } else {
       VersionHelper.findById(versionId) match {
         case Some(v) => qConf.filter(c =>
-          c.envId === envId && c.projectId === projectId && c.versionId === versionId && c.updated <= v.updated).sortBy(_.updated).firstOption
+          c.envId === envId && c.projectId === projectId && c.versionId === versionId && c.updated <= v.updated).sortBy(_.updated desc).firstOption
         case _ => None
       }
     }
