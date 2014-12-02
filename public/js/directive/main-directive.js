@@ -883,7 +883,8 @@ define(['angular'], function(angular) {
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
 
                         TaskService.getCatalinaWS($scope.activeEnv, function(data){
-                            var path = data + "/" + $scope.hostName.subsstring(0,$scope.hostName.lastIndexOf("."))
+                            var indexofdot = $scope.hostName.lastIndexOf(".");
+                            var path = data + "/" + $scope.hostName.subsstring(0, indexofdot == -1 ?  $scope.hostName.length : indexofdot)
 
                             $scope.closeWSCatalina();
                             $scope.catalinaLogSocket = new WS(path)
