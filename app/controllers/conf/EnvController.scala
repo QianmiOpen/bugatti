@@ -51,7 +51,7 @@ object EnvController extends BaseController {
     Ok(Json.toJson(EnvironmentHelper.count))
   }
 
-  // 任务模块查看
+  // 根据权限加载环境列表
   def showAuth = AuthAction(FuncEnum.task) { implicit request =>
     val user = request.user
     // 管理员 & 委员长 显示所有环境
