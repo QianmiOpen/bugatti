@@ -24,16 +24,17 @@ define(['angular'], function(angular) {
 
 //=====================================环境========================================
         //默认选中的环境id，应根据用户偏好获取
-        $scope.activeEnv = 1
+        $scope.activeEnv = 1;
+        $scope.activeEnvObj = {}
         //环境列表(根据用户类型判断是否显示安全区环境)
         EnvService.getAuth(function(data){
             $scope.envs = [];
             for(var d in data){
                 $scope.envs.push(data[d])
             }
-            $scope.activeEnv = $scope.envs.length == 0 ? 1 : $scope.envs[0].id
+            //$scope.activeEnv = $scope.envs.length == 0 ? 1 : $scope.envs[0].id
             if($scope.envs.length > 0){
-                $scope.chooseEnv($scope.activeEnv)
+                $scope.chooseEnv($scope.envs[0])
             }
         });
 
@@ -48,9 +49,9 @@ define(['angular'], function(angular) {
         $scope.wsBool = true
 
         //选择tab页
-        $scope.chooseEnv = function(envId) {
+        $scope.chooseEnv = function(env) {
             // 加载环境对应可用区域
-            AreaService.list(envId, function(data) {
+            AreaService.list(env.id, function(data) {
                 $scope.preAreas = data;
                 if ($scope.preAreas.length > 0) {
                     $scope.useArea = { id :$scope.preAreas[0].id }
@@ -58,15 +59,15 @@ define(['angular'], function(angular) {
             });
 
             $scope.scriptVersion = ""
-            $scope.activeEnv = envId
+            $scope.activeEnv = env.id
+            $scope.activeEnvObj = env;
             //获取模板
             for(var index in $scope.envs){
                 var envObj = $scope.envs[index]
-                if(envObj.id == envId){
+                if(envObj.id == env.id){
                     $scope.scriptVersion = envObj.scriptVersion
                 }
             }
-//            console.table($scope.envs)
             $scope.getTemplates()
         }
 

@@ -8,7 +8,7 @@
 
     <div class="tabs">
         <ul class="nav nav-tabs">
-            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env.id)" ng-repeat="env in envs">
+            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env)" ng-repeat="env in envs">
                 <a href=""><span ng-class="{'label label-danger': env.level == 'safe' && env.id == activeEnv}">{{env.name}}</span></a>
             </li>
         </ul>

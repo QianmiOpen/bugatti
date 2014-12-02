@@ -42,7 +42,7 @@ class ConfTable(tag: Tag) extends Table[Conf](tag, "conf") {
   override def * = (id.?, envId, projectId, versionId, jobNo, name, path, fileType.?, remark.?, updated) <> (Conf.tupled, Conf.unapply _)
 
   def idx_vid = index("idx_vid", versionId)
-  def idx_path = index("idx_path", (envId, versionId, path), unique = true)
+  def idx_path = index("idx_path", (envId, projectId, versionId, path), unique = true)
   def idx = index("idx_eid_vid", (envId, versionId, updated))
 }
 

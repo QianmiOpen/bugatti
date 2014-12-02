@@ -213,8 +213,10 @@ object ConfController extends BaseController {
           UserHelper.hasEnv(copyForm.envId, request.user) ||
           UserHelper.hasEnv(copyForm.target_eid, request.user)
         ) {
-          val targetConfs = ConfHelper.findByEnvId_VersionId(copyForm.target_eid, copyForm.target_vid)
-          val currConfs = ConfHelper.findByEnvId_VersionId(copyForm.envId, copyForm.versionId)
+          val targetConfs = ConfHelper.findByEnvId_ProjectId_VersionId(copyForm.target_eid, copyForm.projectId, copyForm.target_vid)
+          play.api.Logger.info("========targetConfs=====")
+          val currConfs = ConfHelper.findByEnvId_ProjectId_VersionId(copyForm.envId, copyForm.projectId, copyForm.versionId)
+          play.api.Logger.info("========currConfs=======")
           val confs = (copyForm.ovr, copyForm.copy) match {
             case (true, true) =>
               currConfs.filter(c => targetConfs.map(_.path).contains(c.path)).foreach(c => ConfHelper.delete(c))
