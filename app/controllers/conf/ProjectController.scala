@@ -297,24 +297,32 @@ object ProjectController extends BaseController {
         val rels = EnvironmentProjectRelHelper.findByEnvId_AreaId(rel.envId, rel.areaId)
         val unbind = rels.filter(_.projectId.isEmpty)
         val bind = rels.filter(_.projectId.isDefined)
+        play.api.Logger.info("unbind="+unbind.map(r => (r.id, r.ip, r.hostIp)))
+        play.api.Logger.info("bind="+bind.map(r => (r.id, r.ip, r.hostIp)))
+
         if (unbind.size < 1) {
           Ok(_None) // 没有可用机器资源
         } else rel.ip match {
           case ip if (ip.isEmpty || ip.get.trim.isEmpty) =>
-            val hostIp = unbind.groupBy(_.hostIp).mapValues(_.size).toSeq.sortBy(_._2).last._1
-            val update2rel = unbind.filter(_.hostIp == hostIp).head.copy(projectId = Some(rel.projectId))
-            val result = EnvironmentProjectRelHelper.update(update2rel)
-            ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
-            Ok(_Success)
-          case Some(ip) if (bind.exists(_.ip == ip)) =>
-            Ok(_Exist)
+            val prel = EnvironmentProjectRelHelper.findByEnvId_ProjectId(rel.envId, rel.projectId)
+            val prelHosts = prel.groupBy(_.hostIp).map(_._1).toSet
+            val fn = unbind.filterNot(ub => prelHosts.contains(ub.hostIp))
+            if (fn.isEmpty) {
+              Ok(_None.+("u", Json.toJson("host")))
+            } else {
+              val hostIp = fn.groupBy(_.hostIp).mapValues(_.size).toSeq.sortBy(_._2).last._1
+              val update2rel = fn.filter(_.hostIp == hostIp).head.copy(projectId = Some(rel.projectId))
+              val result = EnvironmentProjectRelHelper.update(update2rel)
+              ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, s"增加机器:$result", update2rel))
+              Ok(_Success)
+            }
+          case Some(ip) if (bind.exists(_.ip == ip)) => Ok(_Exist)
           case Some(ip) if (unbind.exists(_.ip == ip)) =>
             val update2rel = unbind.find(_.ip == ip).head.copy(projectId = Some(rel.projectId))
             EnvironmentProjectRelHelper.update(update2rel)
             ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
             Ok(_Success)
-          case _ =>
-            Ok(_Fail)
+          case _ => Ok(_Fail)
         }
       }
     )
