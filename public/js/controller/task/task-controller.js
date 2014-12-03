@@ -467,6 +467,9 @@ define(['angular'], function(angular) {
                     $scope.showVm(pid)
                     growl.addSuccessMessage("绑定成功")
                 }
+                else if (data.r == 'none' && data.u == 'host') {
+                    growl.addErrorMessage("添加失败,没有互斥主机，请手动添加")
+                }
                 else if (data.r == 'none') {
                     growl.addErrorMessage("添加失败,没有空闲机器")
                 }
