@@ -60,11 +60,7 @@ object ConfController extends BaseController {
     }
   }
 
-  def all(envId: Int, versionId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
-    Ok(Json.toJson(ConfHelper.findByEnvId_VersionId(envId, versionId)))
-  }
-
-  def defaultAll(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
+  def all(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
     Ok(Json.toJson(ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)))
   }
 
