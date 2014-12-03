@@ -523,15 +523,10 @@ define(['angular'], function(angular) {
                     $scope.setAction('list');
                     if (vid == null) {
                         $scope.confs = [];
-                    } else if (vid === 0) {
-                        ConfService.getDefaultAll($scope.activeEnv, $scope.pro.id, vid, function(data) {
-                            $scope.confs = data;
-                        });
                     } else {
-                        ConfService.getAll($scope.activeEnv, vid, function(data) {
+                        ConfService.getAll($scope.activeEnv, $scope.pro.id, vid, function(data) {
                             $scope.confs = data;
                         });
-
                     }
                 };
 

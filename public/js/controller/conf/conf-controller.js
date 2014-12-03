@@ -57,7 +57,7 @@ define(['angular'], function(angular) {
         'ConfService',
         function($scope, $state, $stateParams, $modal, ConfService) {
             if ($stateParams.eid) { // project index forward 'eid:null' error
-                ConfService.getAll($stateParams.eid, $stateParams.vid, function(data) {
+                ConfService.getAll($stateParams.eid, $stateParams.id, $stateParams.vid, function(data) {
                     $scope.confs = data;
                 });
             }
