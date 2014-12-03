@@ -892,13 +892,13 @@ define(['angular'], function(angular) {
                     $scope.delayLoadCatalinaLog = function(){
                         $scope.catalinaMessage = "正在努力加载中,请稍后..."
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
-                        var type = "catalina";
+                        $scope.logType = "catalina";
                         if($scope.ltab == 1){
-                            type = "catalina";
+                            $scope.logType = "catalina";
                         } else if($scope.ltab == 2) {
-                            type = "intflog";
+                            $scope.logType = "intflog";
                         } else if($scope.ltab == 3){
-                            type = "applog";
+                            $scope.logType = "applog";
                         }
                         TaskService.getCatalinaWS($scope.activeEnv, function(data){
                             if($scope.hostName != undefined){
@@ -909,7 +909,7 @@ define(['angular'], function(angular) {
                                     + "/"
                                     + $scope.hostName.substring(0, indexofdot == -1 ?  $scope.hostName.length : indexofdot)
                                     + "/"
-                                    + type
+                                    + $scope.logType
 
                                 $scope.closeWSCatalina();
                                 $scope.catalinaLogSocket = new WS(path)
@@ -941,9 +941,9 @@ define(['angular'], function(angular) {
                     }
 
                     $scope.getLog = function(messageJson){
-                        if(type == "catalina"){
+                        if($scope.logType == "catalina"){
                             return messageJson["logger_name"] + " - " + messageJson.message ;
-                        } else if(type == "intflog"){
+                        } else if($scope.logType == "intflog"){
                             return messageJson["methodName"] + " - " +
                                 messageJson["paramTypes"] + " - " +
                                 messageJson["paramValues"] + " - " +
@@ -954,7 +954,7 @@ define(['angular'], function(angular) {
                                 messageJson["source"] + " - " +
                                 messageJson["srvGroup"] + " - " +
                                 messageJson["message"] + " - "
-                        } else if(type == "applog"){
+                        } else if($scope.logType == "applog"){
                             return messageJson["source"] + " - " +
                                    messageJson["caller_class_name"] + " - " +
                                    "line " + messageJson["caller_line_number"] + " - " +
