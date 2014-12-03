@@ -133,12 +133,17 @@ class ScriptGitActor extends Actor with ActorLogging {
     } else {
       ProjectHelper.findByName(projectName.trim) match {
         case Some(p) => {
-          val template = TemplateHelper.findById(p.templateId).get
-          if (template.name == typeName) {
-            p.id.get
-          } else {
-            ProjectHelper.ProjectNotExistId
+          TemplateHelper.findById(p.templateId) match {
+            case Some(template) =>
+              if (template.name == typeName) {
+                p.id.get
+              } else {
+                ProjectHelper.ProjectNotExistId
+              }
+            case _ =>
+              ProjectHelper.ProjectNotExistId
           }
+
         }
         case _ =>
           ProjectHelper.ProjectNotExistId
