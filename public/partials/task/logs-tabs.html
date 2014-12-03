@@ -1,0 +1,16 @@
+<div class="tabs">
+    <ul class="nav nav-tabs">
+        <li ng-class="{ active:isLogSet(1) }"><a href ng-click="setLogTab(1)">tomcat</a></li>
+        <li ng-class="{ active:isLogSet(2) }"><a href ng-click="setLogTab(2)">接口</a></li>
+        <li ng-class="{ active:isLogSet(3) }"><a href ng-click="setLogTab(3)">应用</a></li>
+    </ul>
+</div>
+
+<div class="table-responsive">
+    <!-- tomcat -->
+    <catalina-log ng-if="isLogSet(1)"></catalina-log>
+    <!-- interface -->
+    <catalina-log ng-if="isLogSet(2)"></catalina-log>
+    <!-- application -->
+    <catalina-log ng-if="isLogSet(3)"></catalina-log>
+</div>
