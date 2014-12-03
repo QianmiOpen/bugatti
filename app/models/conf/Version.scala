@@ -107,7 +107,7 @@ object VersionHelper extends PlayCache {
 
     conf match {
       case Some(c) =>
-        ConfHelper.findByEnvId_VersionId(c.envId, c.versionId) foreach { c =>
+        ConfHelper.findByEnvId_ProjectId_VersionId(c.envId, projectId, c.versionId) foreach { c =>
           val content = ConfContentHelper.findById(c.id.get)
           ConfHelper._create(c.copy(id = None, envId = envId, versionId = versionId), content)
         }

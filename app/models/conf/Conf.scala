@@ -60,10 +60,6 @@ object ConfHelper extends PlayCache {
     qConf.filter(_.versionId === versionId).list
   }
 
-  def findByEnvId_VersionId(envId: Int, versionId: Int): Seq[Conf] = db withSession { implicit session =>
-    qConf.filter(c => c.envId === envId && c.versionId === versionId).sortBy(_.updated desc).list
-  }
-
   def findByEnvId_ProjectId_VersionId(envId: Int, projectId: Int, versionId: Int): Seq[Conf] = db withSession { implicit session =>
     qConf.filter(c => c.envId === envId && c.projectId === projectId && c.versionId === versionId).sortBy(_.updated desc).list
   }
