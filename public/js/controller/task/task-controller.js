@@ -404,7 +404,9 @@ define(['angular'], function(angular) {
             $scope.taskQueue.templateId = $scope.choosedTemplateId
             $scope.taskQueue.operatorId = Auth.user.username
             TaskService.createNewTaskQueue($scope.taskQueue, function(data){
-
+                if(data == -1){
+                    growl.addErrorMessage("任务脚本已更新，请刷新页面再操作");
+                }
             })
         }
 
@@ -428,7 +430,11 @@ define(['angular'], function(angular) {
                 $scope.taskQueue.clusterName = clusterName
                 $scope.taskQueue.templateId = templateId
                 $scope.taskQueue.operatorId = Auth.user.username
-                TaskService.createNewTaskQueue($scope.taskQueue, function(data){})
+                TaskService.createNewTaskQueue($scope.taskQueue, function(data){
+                    if(data == -1){
+                        growl.addErrorMessage("任务脚本已更新，请刷新页面再操作");
+                    }
+                })
                 $scope.versionShow = false
             } else {//部署
                 $scope.choosedTemplateId = templateId

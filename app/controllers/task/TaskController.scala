@@ -119,29 +119,21 @@ object TaskController extends BaseController {
     val clusterName = (tq \ "clusterName").asOpt[String]
     val versionId = (tq \ "versionId").asOpt[Int]
     Logger.info(s"version ==> ${versionId}")
-    val templateId = (tq \ "templateId").as[Int]
+
+    val templateId = (tq \ "templateId").as[Int]\
     val jobNo = (tq \ "operatorId").as[String]
-    val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, jobNo)
-    val taskQueueId = TaskQueueHelper.create(taskQueue)
-    MyActor.createNewTask(envId, projectId, clusterName)
-    //test
-//    var seq = Seq.empty[TaskQueue]
-//    val doEnv = 2
-//    val doPro = 2
-//    for(i <- 1 to doEnv){
-//      for(j <- 1 to doPro){
-//        seq = seq :+ taskQueue.copy(envId = i).copy(projectId = j)
-//      }
-//    }
-//    Logger.info(s"seq ==> $seq")
-//    seq.foreach{
-//      s =>{
-//        TaskQueueHelper.create(s)
-//        EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, Option(s.envId), Option(s.projectId), "t-syndic", "d6a597315b01", "172.19.3.134"))
-//        MyActor.createNewTask(s.envId, s.projectId)
-//      }
-//    }
-    taskQueueId
+
+    //check the templateId is real
+    val esv = EnvironmentHelper.findById(envId).get.scriptVersion
+    val csv = TaskTemplateHelper.findById(templateId).scriptVersion
+    if(esv != csv){
+      -1
+    }else {
+      val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, jobNo)
+      val taskQueueId = TaskQueueHelper.create(taskQueue)
+      MyActor.createNewTask(envId, projectId, clusterName)
+      taskQueueId
+    }
   }
 
   /**
