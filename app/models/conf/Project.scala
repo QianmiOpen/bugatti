@@ -246,11 +246,11 @@ object ProjectHelper extends PlayCache {
     val projectId = project.id.get
     val projectDeps = qpd.filter(t => t.projectId === projectId).list()(session)
 
-    val templateDependencyTypes = templateDependenceProjects.map(_.dependencyType)
+    val templateDependencyTypes = templateDependenceProjects.map(_.name)
     //清理该项目依赖中不存在的alias
     val projectDepsUpdate = projectDeps.map{
       p =>
-        if(!templateDependencyTypes.contains(p.alias)){
+        if(!templateDependencyTypes.contains(if(p.alias == None) p.alias else p.alias.get)){
           val pUpdate = ProjectDependency(None, p.projectId, p.dependencyId, None)
           qpd.filter(t => t.projectId === p.projectId && t.dependencyId === p.dependencyId).map(_.alias).update(None)(session)
           pUpdate
@@ -259,7 +259,7 @@ object ProjectHelper extends PlayCache {
         }
     }
     val projectDepIds = projectDepsUpdate.map(_.dependencyId)
-    val projectDepAlias = projectDepsUpdate.map(_.alias).filterNot(_ == None)
+    val projectDepAlias = projectDepsUpdate.map(_.alias).filterNot(_ == None).map(_.get)
 
     templateDependenceProjects.foreach { p =>
       if(projectDepAlias.contains(p.name)){//已绑定模板依赖的项目
