@@ -120,7 +120,7 @@ object TaskController extends BaseController {
     val versionId = (tq \ "versionId").asOpt[Int]
     Logger.info(s"version ==> ${versionId}")
 
-    val templateId = (tq \ "templateId").as[Int]\
+    val templateId = (tq \ "templateId").as[Int]
     val jobNo = (tq \ "operatorId").as[String]
 
     //check the templateId is real
