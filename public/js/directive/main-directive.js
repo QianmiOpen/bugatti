@@ -141,7 +141,7 @@ define(['angular'], function(angular) {
         }
     }]);
 
-    /* 超级管理员 */
+    /* 环境超级管理员 */
     app.directive('ad', ['Auth', function(Auth) {
         return {
             restrict: 'A',
@@ -167,6 +167,7 @@ define(['angular'], function(angular) {
             }
         }
     }]);
+
 
     /* 判断用户是否为项目成员 */
     app.directive('hasProject', ['Auth', 'ProjectService', function(Auth, ProjectService) {

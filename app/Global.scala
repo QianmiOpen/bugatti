@@ -149,10 +149,10 @@ object AppData {
   def initData = {
     // 初始化超级管理员
     Seq(
-      User("of546", "李允恒", RoleEnum.admin, true, false, None, None),
-      User("of557", "彭毅", RoleEnum.admin, true, false, None, None),
-      User("of729", "金卫", RoleEnum.admin, false, false, None, None),
-      User("of9999", "龚平", RoleEnum.admin, true, false, None, None)
+      User("of546", "李允恒", RoleEnum.admin, true, false, None, None, None),
+      User("of557", "彭毅", RoleEnum.admin, true, false, None, None, None),
+      User("of729", "金卫", RoleEnum.admin, false, false, None, None, None),
+      User("of9999", "龚平", RoleEnum.admin, true, false, None, None, None)
     ).foreach(UserHelper.create)
   }
 }

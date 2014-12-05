@@ -6,8 +6,10 @@ import exceptions.UniqueNameException
 import models.conf._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.libs.Files.TemporaryFile
 import play.api.mvc._
 import play.api.libs.json._
+import utils.SecurityUtil
 
 /**
  * 用户管理
@@ -31,24 +33,37 @@ object UserController extends BaseController {
       "locked" -> boolean,
       "lastIp" -> optional(text),
       "lastVisit" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
+      "sshKey" -> optional(text),
       "functions" ->  text
 //      "functions" ->  text.verifying("Bad phone number", {_.grouped(2).size == 5})
     )(UserForm.apply)(UserForm.unapply)
   )
 
-  def show(jobNo: String) = Action {
-    Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
+  def show(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
+    if (request.user.role == RoleEnum.admin) {
+      Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
+    } else {
+      Ok(Json.toJson(UserHelper.findByJobNo(request.user.jobNo)))
+    }
   }
 
-  def index(jobNo: Option[String], page: Int, pageSize: Int) = Action {
-    Ok(Json.toJson(UserHelper.all(jobNo.filterNot(_.isEmpty), page, pageSize)))
+  def index(jobNo: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.user) { implicit request =>
+    if (request.user.role == RoleEnum.admin) {
+      Ok(Json.toJson(UserHelper.all(jobNo.filterNot(_.isEmpty), page, pageSize)))
+    } else {
+      Ok(Json.toJson(UserHelper.all(Some(request.user.jobNo), page, pageSize)))
+    }
   }
 
-  def count(jobNo: Option[String]) = Action {
-    Ok(Json.toJson(UserHelper.count(jobNo.filterNot(_.isEmpty))))
+  def count(jobNo: Option[String]) = AuthAction(FuncEnum.user) { implicit request =>
+    if (request.user.role == RoleEnum.admin) {
+      Ok(Json.toJson(UserHelper.count(jobNo.filterNot(_.isEmpty))))
+    } else {
+      Ok(Json.toJson(UserHelper.count(Some(request.user.jobNo))))
+    }
   }
 
-  def permissions(jobNo: String) = Action {
+  def permissions(jobNo: String) = AuthAction(FuncEnum.user) {
     Ok(Json.toJson(PermissionHelper.findByJobNo(jobNo.toLowerCase)))
   }
 
@@ -103,6 +118,23 @@ object UserController extends BaseController {
         }
       }
     )
+  }
+
+  def upload(jobNo: String) = AuthAction[TemporaryFile](FuncEnum.user) { implicit request =>
+    if (UserHelper.superAdmin_?(request.user) || request.user.jobNo == jobNo) {
+      val result = request.body.asMultipartFormData.map { body =>
+        val fileContent = body.file("myFile").filter(f => f.ref.file.length() < 1 * 1024 * 1024).map { tempFile =>
+          scalax.io.Resource.fromFile(tempFile.ref.file).string
+        }
+        (UserHelper.findByJobNo(jobNo), fileContent) match {
+          case (Some(user), Some(value)) =>
+            val update2user = user.copy(sshKey = Some(SecurityUtil.encryptUK(value)))
+            UserHelper.update(jobNo, update2user)
+          case _ => 0
+        }
+      }
+      Ok(if (result == Some(1)) _Success else _Fail)
+    } else Forbidden
   }
 
 }

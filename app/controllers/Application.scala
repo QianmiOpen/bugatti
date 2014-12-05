@@ -57,8 +57,8 @@ object Application extends ScalaController with Security {
           }
         case _ =>
           val user = User(jobNo = profile.getId.toLowerCase, name = profile.getAttributes.get("displayName").toString,
-            RoleEnum.user, superAdmin = false, locked = false, lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now))
-          val permission = Permission(jobNo = user.jobNo, List(FuncEnum.task))
+            RoleEnum.user, superAdmin = false, locked = false, lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now), None)
+          val permission = Permission(jobNo = user.jobNo, List(FuncEnum.user, FuncEnum.task))
           UserHelper.create(user, permission)
           Logger.info(s"init new user, jobNo: ${user.jobNo}.")
           Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)

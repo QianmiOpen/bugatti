@@ -19,9 +19,9 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class User(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime])
-case class UserForm(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], functions: String) {
-  def toUser = User(jobNo.toLowerCase, name, role, superAdmin, locked, lastIp, lastVisit)
+case class User(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String])
+case class UserForm(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String], functions: String) {
+  def toUser = User(jobNo.toLowerCase, name, role, superAdmin, locked, lastIp, lastVisit, sshKey)
   def toPermission = Permission(jobNo.toLowerCase, functions.split(",").filterNot(_.isEmpty).map(i => FuncEnum(i.toInt)).toList)
 }
 
@@ -33,8 +33,8 @@ class UserTable(tag: Tag) extends Table[User](tag, "app_user") {
   def locked = column[Boolean]("locked", O.Default(false), O.DBType("ENUM('y', 'n')"))(MappedColumnType.base[Boolean, String](if(_) "y" else "n",  _ == "y")) // 账号锁定
   def lastIp = column[String]("last_ip", O.Nullable, O.DBType("VARCHAR(40)")) // 最近登录ip
   def lastVisit = column[DateTime]("last_visit", O.Nullable, O.Default(DateTime.now())) // 最近登录时间
-
-  override def * = (jobNo, name, role, superAdmin, locked, lastIp.?, lastVisit.?) <> (User.tupled, User.unapply _)
+  def sshKey = column[String]("ssh_key", O.Nullable, O.DBType("VARCHAR(1025)"))
+  override def * = (jobNo, name, role, superAdmin, locked, lastIp.?, lastVisit.?, sshKey.?) <> (User.tupled, User.unapply _)
 
   def idx = index("idx_job_no", jobNo)
 }

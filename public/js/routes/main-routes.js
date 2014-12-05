@@ -74,6 +74,7 @@ define(['angular',
             data: { access: 'anon' }
         });
 
+
     }]);
 
 });
