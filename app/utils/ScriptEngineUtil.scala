@@ -14,7 +14,7 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
 
   engine.eval(s"var __t__ = ${Json.toJson(projectTask).toString}")
 
-  Logger.debug(s"${engine.eval("JSON.stringify(__t__)")}")
+  Logger.info(s"${engine.eval("JSON.stringify(__t__)")}")
   engine.eval("for (__attr in __t__) {this[__attr] = __t__[__attr];}")
   engine.eval("var alias = {};")
   try {
@@ -88,7 +88,11 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
           |         var __arr = obj[__o];
           |         var __p = prefix + __o;
           |         for (__a in __arr) {
-          |           pushMap(__arr[__a], __p + '[' + __a + '].', m);
+          |           if (typeof __a === 'string') {
+          |             m[__p + '[' + __a + ']'] = __arr[__a];
+          |           } else {
+          |             pushMap(__arr[__a], __p + '[' + __a + '].', m);
+          |           }
           |         }
           |       } else {
           |         m[prefix + __o] = 'object';

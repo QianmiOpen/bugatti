@@ -1,5 +1,6 @@
 package utils
 
+import enums.LevelEnum
 import models.conf._
 import play.api.{Logger, Play}
 import play.api.libs.json.Json
@@ -68,7 +69,10 @@ object TaskTools {
 
     val attrs = getProperties(envId, projectId, project.templateId, realVersion)
     val aliases = findAlias(project.templateId, realVersion)
-    Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Some(attrs), aliases)
+    val users = ProjectMemberHelper.findByProjectId(projectId)
+    val leaders = users.filter(p => p.level == LevelEnum.safe).map(_.jobNo)
+    val members = users.filter(p => p.level == LevelEnum.unsafe).map(_.jobNo)
+    Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Some(attrs), aliases, leaders, members)
   }
 
   def findDependencies_v(envId: Int, projectId: Int, realVersion: String): Map[String, Project_v] = {
@@ -82,9 +86,9 @@ object TaskTools {
         val aliases = findAlias(project.templateId, realVersion)
         map.get(pid).get match {
           case Some(aliasName) =>
-            aliasName -> Project_v(s"$projectId", s"${project.templateId}", aliasName, hosts, Option(attrs), aliases)
+            aliasName -> Project_v(s"$projectId", s"${project.templateId}", aliasName, hosts, Option(attrs), aliases, Seq.empty, Seq.empty)
           case _ =>
-            project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs), aliases)
+            project.name -> Project_v(s"$projectId", s"${project.templateId}", project.name, hosts, Option(attrs), aliases, Seq.empty, Seq.empty)
         }
     }.toMap
   }
@@ -124,9 +128,8 @@ object TaskTools {
     val env = findEnvironment_v(envId)
 
     val project = findProject(envId, projectId, env.realVersion)
-    val alias = findAlias(project.templateId.toInt, env.realVersion)
     val d = findDependencies_v(envId, projectId, env.realVersion)
-    new ProjectTask_v(project, alias, d, env, s"$taskId", version, s"${getFileName()}", None, ConfHelp.system)
+    new ProjectTask_v(project, d, env, s"$taskId", version, s"${getFileName()}", None, ConfHelp.system)
   }
 
   def generateCurrent(machine: String, task: ProjectTask_v): Host_v = {
@@ -173,15 +176,15 @@ case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]], 
 
 case class Environment_v(id: String, name: String, scriptVersion: String, realVersion: String, level: String)
 
-case class Project_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]], alias: Map[String, String])
+case class Project_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]], alias: Map[String, String], leaders: Seq[String], members: Seq[String])
 
 case class Version_v(id: String, name: String)
 
-case class ProjectTask_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]],
-                         alias: Map[String, String], dependence: Map[String, Project_v], env: Environment_v,
+case class ProjectTask_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]], alias: Map[String, String], leaders: Seq[String], members: Seq[String],
+                         dependence: Map[String, Project_v], env: Environment_v,
                          taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String]) {
-  def this(project: Project_v, alias: Map[String, String], dependence: Map[String, Project_v], env: Environment_v,
+  def this(project: Project_v, dependence: Map[String, Project_v], env: Environment_v,
            taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String]) =
-    this(project.id, project.templateId, project.name, project.hosts, project.attrs,
-      alias, dependence, env, taskId, version, confFileName, cHost, system)
+    this(project.id, project.templateId, project.name, project.hosts, project.attrs, project.alias, project.leaders, project.members,
+      dependence, env, taskId, version, confFileName, cHost, system)
 }
