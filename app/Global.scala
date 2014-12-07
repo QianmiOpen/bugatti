@@ -1,6 +1,7 @@
 
 import java.io.File
 import java.util.Scanner
+import actor.git.AddUsers
 import actor.git.ScriptGitActor.ReloadFormulasTemplate
 import actor.conf.ConfigureActor
 import play.api.mvc.RequestHeader
@@ -102,6 +103,12 @@ object Global extends GlobalSettings {
     if (app.configuration.getBoolean("area.init").getOrElse(true)) {
       AreaHelper.all.foreach(ActorUtils.areas ! AddArea(_))
     }
+
+    // 启动时，重新加载formulas
+    ActorUtils.scriptGit ! ReloadFormulasTemplate
+
+    // 启动时，增加已有账号的key文件
+    ActorUtils.keyGit ! AddUsers(UserHelper.all())
 
     /**
      * 升级脚本文件需满足3个条件：
@@ -212,8 +219,6 @@ object AppTestData {
       Area(None, "测试", "t-syndic", "192.168.59.3"),
       Area(None, "syndic", "syndic", "172.19.3.131")
     ).foreach(AreaHelper.create)
-
-    ActorUtils.scriptGit ! ReloadFormulasTemplate
   }
 }
 

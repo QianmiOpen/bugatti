@@ -1,21 +1,21 @@
 package actor.git
 
-import java.io.{InputStreamReader, File, FileFilter, FileInputStream}
-import java.nio.charset.{CodingErrorAction, Charset}
+import java.io.{File, FileFilter, FileInputStream, InputStreamReader}
+import java.nio.charset.{Charset, CodingErrorAction}
 import java.text.SimpleDateFormat
 import java.util.{List => JList, Map => JMap}
 
 import akka.actor.{Actor, ActorLogging}
+import akka.event.LoggingReceive
 import enums.{ActionTypeEnum, ItemTypeEnum}
 import models.conf._
 import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode
-import org.eclipse.jgit.api.ListBranchCommand.ListMode
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.api.ListBranchCommand.ListMode
 import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
-import play.api.{Logger, Play}
+import play.api.Logger
 
 import scala.collection.JavaConverters._
 
@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
  * Created by mind on 7/24/14.
  */
 
-import ScriptGitActor._
+import actor.git.ScriptGitActor._
 
 object ScriptGitActor {
 
@@ -32,42 +32,21 @@ object ScriptGitActor {
   val DateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS")
 }
 
-class ScriptGitActor extends Actor with ActorLogging {
+class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
   val TemplateSuffix = ".yaml"
   val TemplatePath = "/templates"
   val Ok = "Ok"
 
-  val app = Play.current
-  lazy val gitFormulasDir: File = new File(app.configuration.getString("git.formulas.dir").getOrElse("target/formulas"))
-  lazy val gitFormulasUrl = app.configuration.getString("git.formulas.url").getOrElse("http://git.dev.ofpay.com/git/TDA/salt-formulas.git")
-
   var gitFormulas: Git = null
+  var gitFormulasDir: File = null
 
   override def preStart(): Unit = {
-    // 启动时初始化git目录
-    if (app.configuration.getBoolean("git.init").getOrElse(true)) {
-      gitFormulas = _initGitDir(gitFormulasDir, gitFormulasUrl)
-    }
+      val result = GitUtil.initGitDir(gitInfo)
+      gitFormulas = result._1
+      gitFormulasDir = result._2
   }
 
-  def _initGitDir(workDir: File, girUrl: String) = {
-    val gitWorkDir = new File(s"${workDir.getAbsolutePath}/.git")
-    if (!workDir.exists() || !gitWorkDir.exists()) {
-      _delDir(workDir)
-      val clone = Git.cloneRepository()
-      clone.setDirectory(workDir).setURI(girUrl)
-      clone.call()
-    }
-
-    val builder = new FileRepositoryBuilder()
-    val repo = builder.setGitDir(gitWorkDir).build()
-
-    val git = new Git(repo)
-    log.info(s"Init git: ${git.getRepository}")
-    git
-  }
-
-  override def receive: Receive = {
+  override def receive: Receive = LoggingReceive {
     case ReloadFormulasTemplate => {
       _reloadTemplates
       sender ! Ok
@@ -147,7 +126,6 @@ class ScriptGitActor extends Actor with ActorLogging {
         }
         case _ =>
           ProjectHelper.ProjectNotExistId
-
       }
     }
   }
@@ -260,19 +238,6 @@ class ScriptGitActor extends Actor with ActorLogging {
             TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1))
           }
       }
-    }
-  }
-
-  def _delDir(dir: File) {
-    if (dir.exists()) {
-      dir.listFiles().foreach { x =>
-        if (x.isDirectory()) {
-          _delDir(x)
-        } else {
-          x.delete()
-        }
-      }
-      dir.delete()
     }
   }
 }

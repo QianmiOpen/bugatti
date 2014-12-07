@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   cache,
   "com.typesafe.akka" %% "akka-remote" % "2.2.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.2.2",
+  "com.typesafe.akka" %% "akka-testkit" % "2.2.2" % "test",
   "com.qianmi.bugatti" % "spirit_2.10" % "1.3.1",
   "mysql" % "mysql-connector-java" % "5.1.29",
   "com.typesafe.slick" %% "slick" % "2.0.1",

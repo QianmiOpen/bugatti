@@ -57,6 +57,10 @@ object UserHelper extends PlayCache {
     query.length.run
   }
 
+  def all(): Seq[User] = db withSession { implicit session =>
+    qUser.list()
+  }
+
   def all(jobNo: Option[String], page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
     val offset = pageSize * page
     val query = MaybeFilter(qUser).filter(jobNo)(v => b => b.jobNo === v).query
