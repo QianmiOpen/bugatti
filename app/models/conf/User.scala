@@ -1,5 +1,7 @@
 package models.conf
 
+import actor.ActorUtils
+import actor.git.{AddUser, DeleteUser, UpdateUser}
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import exceptions.UniqueNameException
 import play.api.Play.current
@@ -8,6 +10,7 @@ import enums.{LevelEnum, FuncEnum, RoleEnum}
 import enums.RoleEnum.Role
 import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
+import utils.SecurityUtil
 
 import scala.slick.driver.MySQLDriver.simple._
 import com.github.tototoshi.slick.MySQLJodaSupport._
@@ -48,7 +51,12 @@ object UserHelper extends PlayCache {
 
   def findByJobNo(jobNo: String) = Cache.getOrElse[Option[User]](_cacheNoKey(jobNo)) {
     db withSession { implicit session =>
-      qUser.filter(_.jobNo === jobNo).firstOption
+      val user = qUser.filter(_.jobNo === jobNo).firstOption
+      user match {
+        case Some(u) if u.sshKey.isDefined =>
+          Some(u.copy(sshKey = Some(SecurityUtil.decryptUK(u.sshKey.get))))
+        case _ => user
+      }
     }
   }
 
@@ -79,6 +87,7 @@ object UserHelper extends PlayCache {
   def _create(user: User)(implicit session: JdbcBackend#Session) = {
     Cache.remove(_cacheNoKey(user.jobNo)) // clean cache
     try {
+      ActorUtils.keyGit ! AddUser(user)
       qUser.insert(user)(session)
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
@@ -91,6 +100,7 @@ object UserHelper extends PlayCache {
 
   def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
     Cache.remove(_cacheNoKey(jobNo)) // clean cache
+    ActorUtils.keyGit ! DeleteUser(jobNo)
     qUser.filter(_.jobNo === jobNo).delete(session)
   }
 

@@ -63,6 +63,28 @@ object Global extends GlobalSettings {
     Config.setClients(new Clients(callbackUrl, casClient))
 
     val _db = AppDB.db
+
+    /**
+     * 升级脚本文件需满足3个条件：
+     * 1. 不允许有select语句
+     * 2. 不允许有注释
+     * 3. 以 ; 分号结尾一个完整sql语句
+     */
+    import AutoUpdate._
+    defining(getCurrentVersion()) { currentVersion =>
+      if (currentVersion == headVersion) {
+        Logger.debug("No update")
+      } else if (!versions.contains(currentVersion)) {
+        Logger.warn(s"Skip migration because ${currentVersion.versionString} is illegal version.")
+      } else {
+        _db.withSession { implicit session =>
+          versions.takeWhile(_ != currentVersion).reverse.foreach(_.update)
+          Files.writeFile(versionFile, headVersion.versionString)
+          Logger.debug(s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
+        }
+      }
+    }
+
     if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
       _db.withSession { implicit session =>
         TableQuery[ConfLogContentTable] ::
@@ -109,27 +131,6 @@ object Global extends GlobalSettings {
 
     // 启动时，增加已有账号的key文件
     ActorUtils.keyGit ! AddUsers(UserHelper.all())
-
-    /**
-     * 升级脚本文件需满足3个条件：
-     * 1. 不允许有select语句
-     * 2. 不允许有注释
-     * 3. 以 ; 分号结尾一个完整sql语句
-     */
-    import AutoUpdate._
-    defining(getCurrentVersion()) { currentVersion =>
-      if (currentVersion == headVersion) {
-        Logger.debug("No update")
-      } else if (!versions.contains(currentVersion)) {
-        Logger.warn(s"Skip migration because ${currentVersion.versionString} is illegal version.")
-      } else {
-        _db.withSession { implicit session =>
-          versions.takeWhile(_ != currentVersion).reverse.foreach(_.update)
-          Files.writeFile(versionFile, headVersion.versionString)
-          Logger.debug(s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
-        }
-      }
-    }
 
     if (app.configuration.getBoolean("sql.test.init").getOrElse(true)) {
       AppTestData.initData
@@ -269,6 +270,7 @@ object AutoUpdate {
   }
 
   val versions = Seq(
+    Version(1, 10),
     Version(1, 9),
     Version(1, 8),
     Version(1, 7),

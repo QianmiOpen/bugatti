@@ -1,5 +1,7 @@
 package controllers.conf
 
+import actor.ActorUtils
+import actor.git.UpdateUser
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum, RoleEnum}
 import exceptions.UniqueNameException
@@ -7,7 +9,6 @@ import models.conf._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.Files.TemporaryFile
-import play.api.mvc._
 import play.api.libs.json._
 import utils.SecurityUtil
 
@@ -128,6 +129,7 @@ object UserController extends BaseController {
         }
         (UserHelper.findByJobNo(jobNo), fileContent) match {
           case (Some(user), Some(value)) =>
+            ActorUtils.keyGit ! UpdateUser(user.copy(sshKey = Some(value)))
             val update2user = user.copy(sshKey = Some(SecurityUtil.encryptUK(value)))
             UserHelper.update(jobNo, update2user)
           case _ => 0
