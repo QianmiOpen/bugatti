@@ -88,10 +88,10 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
           |         var __arr = obj[__o];
           |         var __p = prefix + __o;
           |         for (__a in __arr) {
-          |           if (typeof __a === 'string') {
-          |             m[__p + '[' + __a + ']'] = __arr[__a];
-          |           } else {
+          |           if (typeof __arr[__a] === 'object') {
           |             pushMap(__arr[__a], __p + '[' + __a + '].', m);
+          |           } else {
+          |             m[__p + '[' + __a + ']'] = __arr[__a];
           |           }
           |         }
           |       } else {
