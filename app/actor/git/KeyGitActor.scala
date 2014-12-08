@@ -87,12 +87,16 @@ class KeyGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
     case x => log.warning(s"Unknown ${x}")
   }
 
+  def _getEnv(jobNo: String): String = {
+    s"""environment="SSH_USER=$jobNo""""
+  }
+
   def _getKey(sshKey: Option[String], jobNo: String): String = {
     sshKey match {
       case Some(x) => {
         val keyStringList = x.split(" ")
         if (keyStringList.length > 1 && keyStringList(1).length > 300) {
-          s"environment='SSH_USER=$jobNo' ${keyStringList(0)} ${keyStringList(1)}"
+          s"${_getEnv(jobNo)} ${keyStringList(0)} ${keyStringList(1)}"
         } else {
           _getNewKey(jobNo)
         }
@@ -105,7 +109,7 @@ class KeyGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
     val keygen = KeyPairGenerator.getInstance("RSA")
     keygen.initialize(2048)
     val strKey = new String(new Base64().encode(keygen.generateKeyPair().getPublic.getEncoded))
-    s"environment='SSH_USER=$jobNo' ssh-rsa $strKey"
+    s"${_getEnv(jobNo)} ssh-rsa $strKey"
   }
 
   def _generateKeyFile(sshKey: Option[String], jobNo: String): Boolean = {
