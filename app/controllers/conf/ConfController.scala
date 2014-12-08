@@ -142,8 +142,8 @@ object ConfController extends BaseController {
           }
           Ok(Json.toJson(result))
         } else Forbidden
-      } getOrElse(BadRequest)
-    } getOrElse(BadRequest)
+      } getOrElse(BadRequest("ConfForm Errors:" + confForm.bindFromRequest.errorsAsJson))
+    } getOrElse(BadRequest("multipartFormData error"))
   }
 
   def completer(envId: Int, projectId: Int, versionId: Int) = Action { implicit request =>

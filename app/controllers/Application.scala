@@ -39,6 +39,7 @@ object Application extends ScalaController with Security {
   }
 
   def login = RequiresAuthentication("CasClient") { profile =>
+    Logger.debug(s"CasClient login back, profile:$profile")
     def makeToken = java.util.UUID.randomUUID().toString
     Action { implicit request =>
       UserHelper.findByJobNo(profile.getId) match {

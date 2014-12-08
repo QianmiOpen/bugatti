@@ -21,8 +21,8 @@ libraryDependencies ++= Seq(
   "com.github.tototoshi" %% "slick-joda-mapper" % "1.1.0",
   "commons-net" % "commons-net" % "3.3",
   "commons-io" % "commons-io" % "2.4",
-  "org.pac4j" % "play-pac4j_scala" % "1.2.0",
-  "org.pac4j" % "pac4j-cas" % "1.5.0",
+  "org.pac4j" % "play-pac4j_scala" % "1.2.2",
+  "org.pac4j" % "pac4j-cas" % "1.6.0",
   // WebJars pull in client-side web libraries
   "org.webjars" %% "webjars-play" % "2.2.1-2",
   "org.webjars" % "requirejs" % "2.1.11-1",
