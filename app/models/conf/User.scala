@@ -51,12 +51,13 @@ object UserHelper extends PlayCache {
 
   def findByJobNo(jobNo: String) = Cache.getOrElse[Option[User]](_cacheNoKey(jobNo)) {
     db withSession { implicit session =>
-      val user = qUser.filter(_.jobNo === jobNo).firstOption
-      user match {
-        case Some(u) if u.sshKey.isDefined =>
-          Some(u.copy(sshKey = Some(SecurityUtil.decryptUK(u.sshKey.get))))
-        case _ => user
-      }
+      qUser.filter(_.jobNo === jobNo).firstOption
+//      update error
+//      user match {
+//        case Some(u) if u.sshKey.isDefined =>
+//          Some(u.copy(sshKey = Some(SecurityUtil.decryptUK(u.sshKey.get))))
+//        case _ => user
+//      }
     }
   }
 
