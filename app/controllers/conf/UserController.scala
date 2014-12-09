@@ -41,11 +41,7 @@ object UserController extends BaseController {
   )
 
   def show(jobNo: String) = AuthAction(FuncEnum.user) { implicit request =>
-    if (request.user.role == RoleEnum.admin) {
-      Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
-    } else {
-      Ok(Json.toJson(UserHelper.findByJobNo(request.user.jobNo)))
-    }
+    Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
   }
 
   def index(jobNo: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.user) { implicit request =>
