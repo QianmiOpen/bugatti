@@ -35,7 +35,7 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
 
   override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, name, ip, containerType, hostIp.?, hostName.?, globalVariable) <> (EnvironmentProjectRel.tupled, EnvironmentProjectRel.unapply _)
   index("idx_eid_pid", (envId, projectId))
-  index("idx_ip", ip)
+  index("idx_ip", ip, unique = true)
 }
 
 object EnvironmentProjectRelHelper {
