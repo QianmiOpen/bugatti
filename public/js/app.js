@@ -27,13 +27,13 @@ requirejs.config({
     }
 });
 
-require(['angular', 'jquery', 'chosen', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
+require(['jquery', 'angular', 'chosen', './controller/main-controller', './directive/main-directive', './filter/main-filter', './service/main-service', './routes/main-routes',
         'angular-ui-router', 'angular-loading-bar', 'angular-animate',
         'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
         'angular-growl', 'angular-chosen', 'bindonce',
         'angular-ui-tree', 'ext-language-tools',
         './thirdparty/angular-file-upload', 'angular-file-upload-shim'],
-    function(angular) {
+    function($, angular) {
 
         // Declare app level module which depends on filters, and services
         var module = angular.module('bugattiApp', [
