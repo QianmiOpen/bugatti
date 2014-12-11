@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.2.1-2",
   "org.webjars" % "requirejs" % "2.1.11-1",
   "org.webjars" % "angularjs" % "1.2.27",
-  "org.webjars" % "jquery" % "1.11.0",
+  "org.webjars" % "jquery" % "1.11.1",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "angular-ui-router" % "0.2.8-2",
   "org.webjars" % "angular-sanitize" % "1.2.15",

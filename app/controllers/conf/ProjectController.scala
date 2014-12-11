@@ -297,8 +297,6 @@ object ProjectController extends BaseController {
         val rels = EnvironmentProjectRelHelper.findByEnvId_AreaId(rel.envId, rel.areaId)
         val unbind = rels.filter(_.projectId.isEmpty)
         val bind = rels.filter(_.projectId.isDefined)
-        play.api.Logger.info("unbind="+unbind.map(r => (r.id, r.ip, r.hostIp)))
-        play.api.Logger.info("bind="+bind.map(r => (r.id, r.ip, r.hostIp)))
 
         if (unbind.size < 1) {
           Ok(_None) // 没有可用机器资源
