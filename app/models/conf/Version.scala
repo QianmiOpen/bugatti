@@ -35,8 +35,6 @@ object VersionHelper extends PlayCache {
 
   import models.AppDB._
 
-  val SAFE_VERSION = List("alpha", "snapshot")
-
   val qVersion = TableQuery[VersionTable]
   val qConf = TableQuery[ConfTable]
 
@@ -58,7 +56,7 @@ object VersionHelper extends PlayCache {
         val list = findByProjectId(projectId)
         env.level match {
           case LevelEnum.unsafe => list
-          case _ => list.filterNot(t => SAFE_VERSION.exists(t.vs.toLowerCase.contains(_)))
+          case _ => list.filter(t => t.vs.endsWith("RELEASE"))
         }
       case None => Nil
     }
