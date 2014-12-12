@@ -65,7 +65,21 @@
             <a ng-show="showProgress(c.task.status)" title="终止本次任务" href="" ng-click="forceTerminate(pro.id, c.name)"><span class="glyphicon glyphicon-remove"></span></a>
         </td>
         <td class="show">
-            <div class="dropdown">
+            <div class="dropdown" ng-if="activeEnvObj.level == 'safe'">
+                <a ng-repeat="t in pro.templates" ng-if="t['versionMenu']" class="dropdown-toggle" href="" ng-click="showClick(t.versionMenu, pro.id, t.id, c.name)" title="{{t.name}}">
+                    <span class="{{t.css}}"></span>
+                </a>
+                <a ng-repeat="t in pro.templates"  ng-if="!t['versionMenu']" href="" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="showClick(t.versionMenu, pro.id, t.id, c.name)" title="{{t.name}}">
+                    <span class="{{t.css}}"></span>
+                </a>
+                <ul class="dropdown-menu" ng-show="showVersionMenu()">
+                    <li ng-repeat="vs in versions">
+                        <a href="" class="dropdown-toggle" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(pro.id, vs.id, c.name)">{{vs.vs}}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="dropdown" ng-if="activeEnvObj.level == 'unsafe'">
                 <a ng-repeat="t in pro.templates" class="dropdown-toggle" href="" ng-click="showClick(t.versionMenu, pro.id, t.id, c.name)" title="{{t.name}}">
                     <span class="{{t.css}}"></span>
                 </a>
@@ -75,6 +89,7 @@
                     </li>
                 </ul>
             </div>
+
         </td>
     </tr>
 

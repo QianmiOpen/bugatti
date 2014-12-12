@@ -114,7 +114,7 @@ define(['angular'], function(angular) {
         $scope.getTemplates = function(){
             //查询项目模板（操作按钮）
             TaskService.getTemplates($scope.scriptVersion, function(data){
-                $scope.templates = data
+                $scope.templates = data;
                 //触发查询环境下的项目列表
                 $scope.showProjects()
             })
