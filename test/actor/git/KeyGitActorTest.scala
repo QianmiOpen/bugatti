@@ -27,7 +27,7 @@ class KeyGitActorTest extends Specification {
 
   val of557KeyPrefix = "environment=\"SSH_USER=of557\" ssh-rsa"
   val of558Key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGhpLNJnGRAMeHlWhm2lNDeCjaweFw93v1mWTME/3a23TJekMJkh84EGPSphFaawXAilnloriQYp4tztYpjY10YSLKSU16jGbt6Gnedrmob8tNZm/yeWMMJdLSATriCp7Eoa39ttwhQ7ROYaiY1X8huoxLNXXrYlDLs4K0NELV5sEA/lXXmygK2ma+krMskTfH2NOBPN57Q/ugb4y828yE8ZjpNRnFKrS0QqOUpicMwaousdh/f8AzIssYFTiKG37D1cINoNh0/gCcmTnxDAiXAicGC2tIVVLfRRrw/2qocNMofvWWBt3w9Wuncayt0Ak2BeVkYh5fh40ARkCOX4LB of557"
-  val gitInfo = GitInfo("ssh://cicode@git.dev.ofpay.com:29418/cicode/salt-keys.git", new File("target/keys"))
+  val gitInfo = GitInfo("git@git.dev.qianmi.com:cicode/salt-keys.git", new File("target/keys"))
 
   sequential
 
