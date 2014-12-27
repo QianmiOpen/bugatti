@@ -75,14 +75,14 @@ object TaskQueueHelper{
         }
       }
       case _ => {
-        val minTime = qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId && tq.clusterName.isNull).groupBy(_.projectId).map {
+        val minTime = qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId && tq.clusterName.?.isEmpty).groupBy(_.projectId).map {
           case (id, row) => row.map(_.importTime).min
         }.firstOption
         Logger.info("time is " + minTime)
 
         minTime match {
           case Some(time) => {
-            qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId && tq.importTime === time && tq.clusterName.isNull).firstOption
+            qTaskQueue.filter(tq => tq.envId === envId && tq.projectId === projectId && tq.importTime === time && tq.clusterName.?.isEmpty).firstOption
           }
           case _ => {
             None

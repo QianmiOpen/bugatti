@@ -44,9 +44,11 @@ class UserTable(tag: Tag) extends Table[User](tag, "app_user") {
 
 object UserHelper extends PlayCache {
 
+  implicit def maybeFilterConversor[X,Y](q:Query[X,Y,Seq]) = new MaybeFilter(q)
   import models.AppDB._
 
   val qUser = TableQuery[UserTable]
+
   def _cacheNoKey(jobNo: String) = s"user.$jobNo"
 
   def findByJobNo(jobNo: String) = Cache.getOrElse[Option[User]](_cacheNoKey(jobNo)) {
@@ -62,17 +64,17 @@ object UserHelper extends PlayCache {
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
-    val query = MaybeFilter(qUser).filter(jobNo)(v => b => b.jobNo === v).query
+    val query = qUser.filteredBy(jobNo)(_.jobNo === jobNo).query
     query.length.run
   }
 
   def all(): Seq[User] = db withSession { implicit session =>
-    qUser.list()
+    qUser.list
   }
 
   def all(jobNo: Option[String], page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
     val offset = pageSize * page
-    val query = MaybeFilter(qUser).filter(jobNo)(v => b => b.jobNo === v).query
+    val query = qUser.filteredBy(jobNo)(_.jobNo === jobNo).query
     query.drop(offset).take(pageSize).list
   }
 

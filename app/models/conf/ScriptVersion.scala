@@ -30,7 +30,7 @@ object ScriptVersionHelper {
   val qScriptVersion = TableQuery[ScriptVersionTable]
 
   def all(): Seq[ScriptVersion] = db withSession { implicit session =>
-    qScriptVersion.list()
+    qScriptVersion.list
   }
 
   def allName(): Seq[String] = db withSession { implicit session =>

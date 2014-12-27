@@ -118,20 +118,20 @@ object TaskHelper {
       case (e, p) if e != -1 && p != -1 => {
         (for {
           ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
-          if task.envId is envId
-          if task.projectId is projectId
+          if task.envId === envId
+          if task.projectId === projectId
         } yield (task,environment,project)).sortBy(s => s._1.startTime.desc).drop(offset).take(pageSize).list
       }
       case (e, p) if e != -1 && p == -1 => {
         (for {
           ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
-          if task.envId is envId
+          if task.envId === envId
         } yield (task,environment,project)).sortBy(s => s._1.startTime.desc).drop(offset).take(pageSize).list
       }
       case (e, p) if e == -1 && p != -1 => {
         (for {
           ((task, environment),project) <- qTask innerJoin  qEnvironment on (_.envId === _.id) innerJoin qProject on (_._1.projectId === _.id)
-          if task.projectId is projectId
+          if task.projectId === projectId
         } yield (task,environment,project)).sortBy(s => s._1.startTime.desc).drop(offset).take(pageSize).list
       }
       case _ => all(page, pageSize)
