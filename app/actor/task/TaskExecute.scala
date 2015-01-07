@@ -1,7 +1,9 @@
 package actor.task
 
-import akka.actor.{ActorLogging, Props, Actor}
+import akka.actor.SupervisorStrategy.Escalate
+import akka.actor.{OneForOneStrategy, ActorLogging, Props, Actor}
 import enums.TaskEnum
+import exceptions.TaskExecuteException
 import models.conf._
 import models.task._
 import play.api.libs.json.{JsValue, Json, JsObject}
@@ -12,56 +14,50 @@ import utils.{ProjectTask_v, SaltTools, TaskTools}
  */
 class TaskExecute extends Actor with ActorLogging {
   import context._
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      postStop()
+      Escalate
+  }
+
+  override def postStop(): Unit ={
+    terminate(TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName))
+  }
+
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
-  var _tqId = 0
   var _envId = 0
   var _projectId = 0
 
-//  val _reg = """\{\{ *[^}]+ *\}\}""".r
-
-  var _hosts = Seq.empty[EnvironmentProjectRel]
-  var _hostsIndex = 0
-
-  var _templateStep = Seq.empty[TaskTemplateStep]
-  var _taskObj: ProjectTask_v = null
-
   var (_commandList, _json) = (Seq.empty[TaskCommand], Json.obj())
-
-  var _taskId = 0
-  var _taskName = ""
-  var _tqExecute: TaskQueue = null
-  var _queuesJson = List.empty[JsObject]
-  var _totalNum = 0
 
   var _clusterName = Option.empty[String]
 
   def receive = {
     case tgc: TaskGenerateCommand => {
-      _envId = tgc.envId
-      _projectId = tgc.projectId
-      _clusterName = tgc.clusterName
-      val taskQueue = TaskQueueHelper.findExecuteTask(_envId, _projectId, _clusterName)
+      val taskQueue = TaskQueueHelper.findExecuteTask(tgc.epc.envId, tgc.epc.projectId, tgc.epc.clusterName)
       taskQueue match {
         case Some(tq) => {
-          _tqId = tq.id.get
-          _tqExecute = tq
+//          _tqId = tq.id.get
+//          _tqExecute = tq
           //1、获取任务名称
-          _taskName = TaskTemplateHelper.findById(_tqExecute.taskTemplateId).name
+          val taskName = TaskTemplateHelper.findById(tq.taskTemplateId).name
           //2、insert 任务表
-          _taskId = TaskHelper.addByTaskQueue(_tqExecute)
+          val taskId = TaskHelper.addByTaskQueue(tq)
           //获取队列信息
-          val queues = TaskQueueHelper.findQueues(_tqExecute.envId, _tqExecute.projectId, _clusterName)
-          _queuesJson = queues.map{
+          val queues = TaskQueueHelper.findQueues(tq.envId, tq.projectId, tgc.epc.clusterName)
+          val queuesJson = queues.map{
             x =>
               var json = Json.toJson(x)
               //增加模板名称
               json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
               json.as[JsObject]
           }
-
+          var taskObj: ProjectTask_v = null
           try{
-            _taskObj = TaskTools.generateTaskObject(_taskId, tq.envId, tq.projectId, tq.versionId)
+            taskObj = TaskTools.generateTaskObject(taskId, tq.envId, tq.projectId, tq.versionId).copy(taskName = taskName)
           }catch {
             case e: Exception => {
               _commandList = Seq.empty[TaskCommand]
@@ -78,22 +74,22 @@ class TaskExecute extends Actor with ActorLogging {
             log.error(Json.prettyPrint(_json))
           }
           //3、生成命令列表
-          _templateStep = TaskTemplateStepHelper.findStepsByTemplateId(_tqExecute.taskTemplateId)
-          _clusterName match {
+          val templateStep = TaskTemplateStepHelper.findStepsByTemplateId(tq.taskTemplateId)
+          val totalNum =  tgc.epc.clusterName match {
             case Some(c) => {
-              _totalNum = _templateStep.length
+              templateStep.length
             }
             case _ => {
-              _totalNum = _hosts.length * _templateStep.length
+              tgc.epc.hosts.length * templateStep.length
             }
           }
-          _hostsIndex = 0
+          val hostsIndex = tgc.epc.hostIndex
           _commandList = Seq.empty[TaskCommand]
-          self ! GenerateCommands()
-          MyActor.superviseTaskActor ! ChangeTaskStatus(_tqExecute, _taskName, _queuesJson, 0, _totalNum, _clusterName)
+          self ! GenerateCommands(tq, templateStep, tgc.epc.hosts, hostsIndex, taskObj)
+          MyActor.superviseTaskActor ! ChangeTaskStatus(tq, taskName, queuesJson, hostsIndex, totalNum, tgc.epc.clusterName)
         }
         case _ => {
-          MyActor.superviseTaskActor ! RemoveStatus(_envId, _projectId, _clusterName)
+          MyActor.superviseTaskActor ! RemoveStatus(tgc.epc.envId, tgc.epc.projectId, tgc.epc.clusterName)
           context.stop(self)
         }
       }
@@ -102,42 +98,42 @@ class TaskExecute extends Actor with ActorLogging {
     case next: NextTaskQueue => {
       next.clusterName match {
         case Some(c) => {
-          self ! TaskGenerateCommand(next.envId, next.projectId, next.clusterName)
+          self ! TaskGenerateCommand(EPCParams(next.envId, next.projectId, next.clusterName, Seq.empty[EnvironmentProjectRel], 0))
         }
         case _ => {
-          _hosts = EnvironmentProjectRelHelper.findByEnvId_ProjectId(next.envId, next.projectId)
-          self ! TaskGenerateCommand(next.envId, next.projectId, None)
+          val hosts = EnvironmentProjectRelHelper.findByEnvId_ProjectId(next.envId, next.projectId)
+          self ! TaskGenerateCommand(EPCParams(next.envId, next.projectId, next.clusterName, hosts, 0))
         }
       }
     }
 
     case gcommand: GenerateCommands => {
-      log.info(s"_hostIndex ==> ${_hostsIndex}")
-      log.info(s"_hosts ==> ${_hosts}")
+      log.info(s"_hostIndex ==> ${gcommand.hostsIndex}")
+      log.info(s"_hosts ==> ${gcommand.hosts}")
       //增加对机器级别的控制
-      _clusterName match {
+      gcommand.tq.clusterName match {
         case Some(c) =>{
-          if(_hostsIndex == 0 && _json.keys.size == 0){
-            val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${_envId}_${_projectId}_${c}")
-            clusterActor ! GenerateClusterCommands(_taskId, _taskObj, _templateStep, c)
-            _hostsIndex = _hostsIndex + 1
+          if(gcommand.hostsIndex == 0 && _json.keys.size == 0){
+            val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${gcommand.tq.envId}_${gcommand.tq.projectId}_${c}")
+            clusterActor ! GenerateClusterCommands(gcommand.taskObj.taskId.toInt, gcommand.taskObj, gcommand.templateStep, c, gcommand.tq, gcommand.hosts, gcommand.hostsIndex)
+//            _hostsIndex = _hostsIndex + 1
           }else {
             //发送CommandActor
-            self ! SendCommandActor()
+            self ! SendCommandActor(gcommand.tq, gcommand.taskObj)
             TaskCommandHelper.create(_commandList)
           }
         }
         case _ => {
-          if(_hostsIndex <= _hosts.length-1 && _json.keys.size == 0){
-            val cluster = _hosts(_hostsIndex).name
-            val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${_envId}_${_projectId}_${cluster}")
-            log.info(s"TaskExecute.gcc.templateStep ==> ${_templateStep}")
-            log.info(s"TaskExecute.gcc.taskId ==> ${_taskId}")
-            clusterActor ! GenerateClusterCommands(_taskId, _taskObj, _templateStep, cluster)
-            _hostsIndex = _hostsIndex + 1
+          if(gcommand.hostsIndex <= gcommand.hosts.length-1 && _json.keys.size == 0){
+            val cluster = gcommand.hosts(gcommand.hostsIndex).name
+            val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${gcommand.tq.envId}_${gcommand.tq.projectId}_${cluster}")
+            log.info(s"TaskExecute.gcc.templateStep ==> ${gcommand.templateStep}")
+            log.info(s"TaskExecute.gcc.taskId ==> ${gcommand.taskObj.taskId}")
+            clusterActor ! GenerateClusterCommands(gcommand.taskObj.taskId.toInt, gcommand.taskObj, gcommand.templateStep, cluster, gcommand.tq, gcommand.hosts, gcommand.hostsIndex)
+//            _hostsIndex = _hostsIndex + 1
           }else {
             //发送CommandActor
-            self ! SendCommandActor()
+            self ! SendCommandActor(gcommand.tq, gcommand.taskObj)
             TaskCommandHelper.create(_commandList)
           }
         }
@@ -147,14 +143,14 @@ class TaskExecute extends Actor with ActorLogging {
     case successReplace: SuccessReplaceCommand => {
       _commandList = _commandList ++ successReplace.commandList
       log.info(s"successReplace ==> ${_commandList}")
-      self ! GenerateCommands()
+      self ! GenerateCommands(successReplace.tq, successReplace.templateStep, successReplace.hosts, successReplace.hostsIndex, successReplace.taskObj)
     }
 
     case errorReplace: ErrorReplaceCommand => {
       log.info(s"TaskExecute errorCommand")
       _commandList = Seq.empty[TaskCommand]
       _json = Json.obj("error" -> s"变量异常! ${errorReplace.keys}")
-      self ! GenerateCommands()
+      self ! GenerateCommands(errorReplace.tq, errorReplace.templateStep, errorReplace.hosts, errorReplace.hostsIndex, errorReplace.taskObj)
     }
 
     case timeout: TimeoutReplace => {
@@ -164,33 +160,50 @@ class TaskExecute extends Actor with ActorLogging {
 
     case sc: SendCommandActor => {
 //      val key = s"${_envId}_${_projectId}"
-      val key = taskKey(_envId, _projectId, _clusterName)
+      val key = taskKey(sc.tq.envId, sc.tq.projectId, sc.tq.clusterName)
       context.child(s"commandActor_${key}").getOrElse(
         actorOf(Props[CommandActor], s"commandActor_${key}")
-      ) ! InsertCommands(_taskId, _tqExecute.envId, _tqExecute.projectId, _tqExecute.versionId, _commandList, _json, _taskObj, _clusterName)
+      ) ! InsertCommands(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName)
     }
 
     case removeTaskQueue: RemoveTaskQueue => {
-      val key = taskKey(_envId, _projectId, _clusterName)
+
+      val key = taskKey(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName)
       context.child(s"commandActor_${key}") match {
         case Some(actor) => {
           context.stop(actor)
         }
         case _ =>
       }
-      TaskQueueHelper.deleteById(_tqId)
+      TaskQueueHelper.findExecuteTask(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName) match {
+        case Some(tq) =>
+          TaskQueueHelper.deleteById(tq.id.get)
+        case _ =>
+      }
+
+
       //没有任务，删除MyActor中的缓存
-      MyActor.superviseTaskActor ! RemoveStatus(_envId, _projectId, _clusterName)
+      MyActor.superviseTaskActor ! RemoveStatus(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName)
     }
 
     case tc: TerminateCommands => {
-      log.info(s"taskExecute Terminate taskId ==> ${_taskId}")
-      TaskHelper.changeStatus(_taskId, tc.status)
-      val (task, version) = getTask_VS(_taskId)
-      MyActor.superviseTaskActor ! ChangeOverStatus(_envId, _projectId, tc.status, task.endTime.get, version, _clusterName)
-
+      terminate(tc)
     }
 
+  }
+
+  def terminate(tc: TerminateCommands): Unit ={
+    TaskHelper.findLastTask(tc.envId, tc.projectId, tc.clusterName) match {
+      case Some(t) =>
+        log.info(s"taskExecute Terminate taskId ==> ${t.id}")
+        TaskHelper.changeStatus(t.id.get, tc.status)
+        val (task, version) = getTask_VS(t.id.get)
+        MyActor.superviseTaskActor ! ChangeOverStatus(task.envId, task.projectId, tc.status, task.endTime.get, version, task.clusterName)
+      case _ =>
+        val err = s"环境:${tc.envId} 项目:${tc.projectId} 负载: ${tc.clusterName} 找不到相应的任务"
+        log.error(err)
+        throw new TaskExecuteException(err)
+    }
   }
 
   /**
@@ -250,8 +263,10 @@ class TaskExecute extends Actor with ActorLogging {
 }
 
 
-case class TaskGenerateCommand(envId: Int, projectId: Int, clusterName: Option[String])
-case class RemoveTaskQueue()
+case class TaskGenerateCommand(epc: EPCParams)
+case class RemoveTaskQueue(envId: Int, projectId: Int, clusterName: Option[String])
 
-case class GenerateCommands()
-case class SendCommandActor()
+case class GenerateCommands(tq: TaskQueue, templateStep: Seq[TaskTemplateStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
+case class SendCommandActor(tq: TaskQueue, taskObj: ProjectTask_v)
+
+case class EPCParams(envId: Int, projectId: Int, clusterName: Option[String], hosts: Seq[EnvironmentProjectRel], hostIndex: Int)

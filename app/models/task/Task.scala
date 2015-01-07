@@ -169,6 +169,10 @@ object TaskHelper {
     taskQuery.list
   }
 
+  def findLastTask(envId: Int, projectId: Int, cluster: Option[String]): Option[Task] = db withSession { implicit session =>
+    qTask.filter(t => t.envId === envId && t.projectId === projectId && t.clusterName === cluster).sortBy(s => s.startTime.desc).firstOption
+  }
+
   implicit def taskQueue2Task(tq: TaskQueue): Task ={
     Task(None, tq.envId, tq.projectId, tq.clusterName, tq.versionId, tq.taskTemplateId, enums.TaskEnum.TaskProcess, Option(new DateTime()), None, tq.operatorId)
   }

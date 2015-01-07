@@ -1,6 +1,7 @@
 package actor.task
 
 import actor.ActorUtils
+import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -83,6 +84,12 @@ object MyActor {
 class MyActor extends Actor with ActorLogging {
 
   implicit val taskQueueWrites = Json.writes[TaskQueue]
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      Escalate
+  }
 
   import context._
   def receive = {
@@ -170,7 +177,7 @@ class MyActor extends Actor with ActorLogging {
 
       context.child(s"taskExecute_${key}").getOrElse(
         actorOf(Props[TaskExecute], s"taskExecute_${key}")
-      ) ! RemoveTaskQueue()
+      ) ! RemoveTaskQueue(envId, projectId, cluster)
 
     }
 
@@ -179,7 +186,7 @@ class MyActor extends Actor with ActorLogging {
       val key = taskKey(envId, projectId, clusterName)
       context.child(s"taskExecute_${key}").getOrElse(
         actorOf(Props[TaskExecute], s"taskExecute_${key}")
-      ) ! TerminateCommands(TaskEnum.TaskFailed)
+      ) ! TerminateCommands(TaskEnum.TaskFailed, envId, projectId, clusterName)
     }
 
     case RemoveStatus(envId, projectId, cluster) => {

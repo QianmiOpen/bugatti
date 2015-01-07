@@ -3,7 +3,7 @@ package utils
 import enums.LevelEnum
 import models.conf._
 import play.api.{Logger, Play}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 /**
  * Created by jinwei on 1/7/14.
@@ -182,9 +182,9 @@ case class Version_v(id: String, name: String)
 
 case class ProjectTask_v(id: String, templateId: String, name: String, hosts: Seq[Host_v], attrs: Option[Map[String, String]], alias: Map[String, String], leaders: Seq[String], members: Seq[String],
                          dependence: Map[String, Project_v], env: Environment_v,
-                         taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String]) {
+                         taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String], taskName: String, grains: JsObject = Json.parse("").as[JsObject]) {
   def this(project: Project_v, dependence: Map[String, Project_v], env: Environment_v,
            taskId: String, version: Option[Version_v], confFileName: String, cHost: Option[Host_v], system: Map[String, String]) =
     this(project.id, project.templateId, project.name, project.hosts, project.attrs, project.alias, project.leaders, project.members,
-      dependence, env, taskId, version, confFileName, cHost, system)
+      dependence, env, taskId, version, confFileName, cHost, system, "")
 }

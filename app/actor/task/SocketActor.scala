@@ -1,6 +1,7 @@
 package actor.task
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.SupervisorStrategy.Escalate
+import akka.actor.{OneForOneStrategy, Actor, ActorLogging}
 import play.api.libs.iteratee.{Concurrent, Enumerator}
 import play.api.libs.json.{JsValue, Json}
 
@@ -8,6 +9,13 @@ import play.api.libs.json.{JsValue, Json}
  * Created by jinwei on 13/7/14.
  */
 class SocketActor extends Actor with ActorLogging {
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      Escalate
+  }
+
   val (out, channel) = Concurrent.broadcast[JsValue]
 
   def receive = {

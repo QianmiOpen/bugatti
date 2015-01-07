@@ -3,11 +3,12 @@ package actor.task
 import java.io.File
 import java.util.regex.Pattern
 
+import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
-import com.qianmi.bugatti.actors.TimeOut
+import com.qianmi.bugatti.actors.{SaltTimeOut}
 import enums.TaskEnum
 import models.conf._
-import models.task.{TaskCommand, TaskTemplateStep}
+import models.task.{TaskQueue, TaskCommand, TaskTemplateStep}
 import utils._
 
 import scala.concurrent.duration._
@@ -19,6 +20,12 @@ import scalax.file.Path
  */
 class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      Escalate
+  }
+
   import context._
 
   val _reg = """\{\{ *[^}]+ *\}\}""".r
@@ -29,9 +36,11 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
   var _lastReplaceKey = ""
 
+  val host_status_commnad = "bugatti hostStatus"
+
   override def preStart(): Unit = {
     log.info(s"preStart is invoked!")
-    timeOutSchedule = context.system.scheduler.scheduleOnce(TimeOutSeconds, self, TimeOut)
+    timeOutSchedule = context.system.scheduler.scheduleOnce(TimeOutSeconds, self, SaltTimeOut)
   }
 
   override def postStop(): Unit = {
@@ -48,6 +57,9 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       val engine = new ScriptEngineUtil(replaceCommand.taskObj, Some(hostname))
 
       var taskCommandSeq = Seq.empty[TaskCommand]
+      //所有任务前,增加查询机器状态
+      taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, host_status_commnad, hostname, "All", TaskEnum.TaskWait, 0)
+
       var errors = Set.empty[String]
 
       replaceCommand.templateStep.foreach { templateStep =>
@@ -67,9 +79,9 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       }
 
       if (errors isEmpty) {
-        sender ! SuccessReplaceCommand(taskCommandSeq)
+        sender ! SuccessReplaceCommand(taskCommandSeq, replaceCommand.tq, replaceCommand.templateStep, replaceCommand.hosts, replaceCommand.hostsIndex + 1, replaceCommand.taskObj)
       } else {
-        sender ! ErrorReplaceCommand(errors.mkString("""\\\n"""))
+        sender ! ErrorReplaceCommand(errors.mkString("""\\\n"""), replaceCommand.tq, replaceCommand.templateStep, replaceCommand.hosts, replaceCommand.hostsIndex + 1, replaceCommand.taskObj)
       }
 
       context.stop(self)
@@ -110,14 +122,14 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       Seq("rm", "-r", s"${baseDir}/files").!!
 
       if (isSuccess) {
-        sender ! SuccessReplaceConf(taskId, envId, projectId, Option(versionId))
+        sender ! SuccessReplaceConf(taskId, envId, projectId, Option(versionId), rc.order)
       } else {
         sender ! ErrorReplaceConf(str)
       }
       context.stop(self)
     }
 
-    case TimeOut => {
+    case SaltTimeOut => {
       context.parent ! TimeoutReplace(_lastReplaceKey)
       context.stop(self)
     }
@@ -224,6 +236,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String)
+case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
 
-case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String)
+case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String, order: Int)

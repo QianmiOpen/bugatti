@@ -2,12 +2,13 @@ package actor.task
 
 import java.io.File
 
-import akka.actor.{ActorLogging, Actor, Props}
-import com.qianmi.bugatti.actors.{TimeOut, SaltCommand, SaltResult}
+import akka.actor.SupervisorStrategy.Escalate
+import akka.actor._
+import com.qianmi.bugatti.actors.{SaltStatusResult, SaltTimeOut, SaltStatus, SaltCommand}
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
-import models.task.{Task, TaskCommand, TaskHelper}
+import models.task.{TaskQueue, Task, TaskCommand, TaskHelper}
 import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
 import utils.{ProjectTask_v, ConfHelp}
 
@@ -40,6 +41,13 @@ object CommandActor{
 }
 
 class CommandActor extends Actor with ActorLogging {
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      Escalate
+  }
+
   var _commands = Seq.empty[TaskCommand]
   var _taskId = 0
   var _envId = 0
@@ -70,13 +78,13 @@ class CommandActor extends Actor with ActorLogging {
         closeSelf
       } else {
         _commands = insertCommands.commandList
-        self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, 1)
+        self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, 0)
       }
     }
     case executeCommand: ExecuteCommand => {
       _order = executeCommand.order
-      if (_order <= _commands.length) {
-        val command = _commands(_order - 1)
+      if (_order < _commands.length) {
+        val command = _commands(_order)
         //TODO 推送状态
         MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine, _clusterName)
         //TODO 修改数据库状态 （暂时取消这个步骤，因为和日志有重合功能）
@@ -92,11 +100,25 @@ class CommandActor extends Actor with ActorLogging {
       terminateCommand(tcs.status)
     }
 
+    case ssr: SaltStatusResult => {
+      if(!ssr.canPing){
+        self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
+        commandOver("远程ip ping不通!")
+      }else if(!ssr.canSPing){
+        self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
+        commandOver("远程salt ping不通!")
+      }else{
+        //重构taskObj的grains
+        _taskObj = _taskObj.copy(grains = Json.parse(ssr.mmInfo).as[JsObject])
+        self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
+      }
+    }
+
     case sr: SaltResult => {
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
       log.debug(s"result.size ==> ${srResult.size}")
-      val jsonResult = Json.parse(srResult)
+      val jsonResult = Json.parse("")
       jsonResult.validate[Seq[JsObject]] match {
         case s: JsSuccess[Seq[JsObject]] => {
           s.get.foreach { jResult =>
@@ -128,7 +150,7 @@ class CommandActor extends Actor with ActorLogging {
                 } else {
                   //命令执行失败
                   (Seq("echo", "命令执行失败") #>> file lines)
-                  self ! TerminateCommands(TaskEnum.TaskFailed)
+                  self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
                 }
                 (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
               }
@@ -144,17 +166,17 @@ class CommandActor extends Actor with ActorLogging {
       }
     }
 
-    case saltTimeOut: TimeOut => {
-      self ! TerminateCommands(TaskEnum.TaskFailed)
-      commandOver("任务执行超时!")
+    case saltTimeOut: SaltTimeOut => {
+      self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
+      commandOver("远程任务执行超时!")
     }
 
     case IdentityNone() => {
-      self ! TerminateCommands(TaskEnum.TaskFailed)
+      self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
       commandOver("远程spirit异常!")
     }
     case ccf: ConfCopyFailed => {
-      self ! TerminateCommands(TaskEnum.TaskFailed)
+      self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
       commandOver(ccf.str)
     }
 
@@ -244,23 +266,34 @@ class CommandActor extends Actor with ActorLogging {
           val confActor = context.actorOf(Props[ConfActor], s"confActor_${envId}_${projectId}_${order}")
           confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson, hostname, _taskObj)
         }
+        case "hostStatus" => {
+          getRemoteActor(envId, projectId, order) ! SaltStatus(hostname, _taskObj.cHost.get.ip)
+        }
       }
     } else {
       //正常的salt命令
-      //1、根据syndic获取ip
-      log.info(s"hostname => ${_clusterName}")
-      log.info(s"taskObj => ${_taskObj}")
-      val syndicIp: String = _taskObj.hosts.filter(_.name == _clusterName.get).map(_.proxyIp).headOption.getOrElse("0.0.0.0")
-      log.debug(s"commnadActor syndicIp ==> ${syndicIp}")
+      callRemote(envId, projectId, order, _commandSeq)
+    }
+  }
 
-      val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
-      log.info(s"remotePath ==> ${remotePath}")
-      val lookupActor = context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${_taskId}_${order}")
-      //3、触发远程命令
-      import context._
-      context.system.scheduler.scheduleOnce(1.second) {
-        lookupActor ! SaltCommand(_commandSeq)
-      }
+  def getRemoteActor(envId: Int, projectId: Int, order: Int): ActorRef ={
+    //1、根据syndic获取ip
+    log.info(s"hostname => ${_clusterName}")
+    log.info(s"taskObj => ${_taskObj}")
+    val syndicIp: String = _taskObj.hosts.filter(_.name == _clusterName.get).map(_.proxyIp).headOption.getOrElse("0.0.0.0")
+    log.debug(s"commnadActor syndicIp ==> ${syndicIp}")
+
+    val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
+    log.info(s"remotePath ==> ${remotePath}")
+    context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${_taskId}_${order}")
+  }
+
+  def callRemote(envId: Int, projectId: Int, order: Int, commandSeq: Seq[String]): Unit ={
+    val lookupActor = getRemoteActor(envId, projectId, order)
+    //3、触发远程命令
+    import context._
+    context.system.scheduler.scheduleOnce(1.second) {
+      lookupActor ! SaltCommand(commandSeq)
     }
   }
 }
@@ -269,6 +302,6 @@ case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Op
 
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 
-case class TerminateCommands(status: TaskStatus)
+case class TerminateCommands(status: TaskStatus, envId: Int, projectId: Int, clusterName: Option[String])
 
 case class ConfCopyFailed(str: String)

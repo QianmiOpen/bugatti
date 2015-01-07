@@ -1,19 +1,28 @@
 package actor.task
 
-import akka.actor.{Props, ActorLogging, Actor}
-import models.task.{TaskCommand, TaskTemplateStep}
+import akka.actor.SupervisorStrategy.Escalate
+import akka.actor.{OneForOneStrategy, Props, ActorLogging, Actor}
+import models.conf.EnvironmentProjectRel
+import models.task.{TaskQueue, TaskCommand, TaskTemplateStep}
 import utils.ProjectTask_v
 
 /**
  * Created by jinwei on 21/8/14.
  */
 class ClusterActor extends Actor with ActorLogging{
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      Escalate
+  }
+
   def receive = {
     case gcc: GenerateClusterCommands => {
-      context.actorOf(Props(classOf[EngineActor], 3)) ! ReplaceCommand(gcc.taskObj, gcc.templateStep, gcc.hostname)
+      context.actorOf(Props(classOf[EngineActor], 3)) ! ReplaceCommand(gcc.taskObj, gcc.templateStep, gcc.hostname, gcc.tq, gcc.hosts, gcc.hostsIndex)
     }
     case success: SuccessReplaceCommand => {
-      context.parent ! SuccessReplaceCommand(success.commandList)
+      context.parent ! SuccessReplaceCommand(success.commandList, success.tq, success.templateStep, success.hosts, success.hostsIndex, success.taskObj)
       context.stop(self)
     }
     case error: ErrorReplaceCommand => {
@@ -22,7 +31,7 @@ class ClusterActor extends Actor with ActorLogging{
       context.stop(self)
     }
     case gcc: GenerateClusterConfs => {
-      context.actorOf(Props(classOf[EngineActor], 15)) ! ReplaceConfigure(gcc.taskObj, gcc.hostname)
+      context.actorOf(Props(classOf[EngineActor], 15)) ! ReplaceConfigure(gcc.taskObj, gcc.hostname, gcc.order)
     }
     case successConf: SuccessReplaceConf => {
       context.parent ! successConf
@@ -39,12 +48,12 @@ class ClusterActor extends Actor with ActorLogging{
   }
 }
 
-case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String)
-case class SuccessReplaceCommand(commandList: Seq[TaskCommand])
-case class ErrorReplaceCommand(keys: String)
+case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
+case class SuccessReplaceCommand(commandList: Seq[TaskCommand], tq: TaskQueue, templateStep: Seq[TaskTemplateStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
+case class ErrorReplaceCommand(keys: String, tq: TaskQueue, templateStep: Seq[TaskTemplateStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
 
-case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: ProjectTask_v, hostname: String)
-case class SuccessReplaceConf(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int])
+case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: ProjectTask_v, hostname: String, order: Int)
+case class SuccessReplaceConf(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 case class ErrorReplaceConf(str: String)
 
 case class TimeoutReplace(key: String)
