@@ -136,8 +136,11 @@ object ConfController extends BaseController {
             val _path = if (filePath.last != '/') filePath + '/' else filePath
             val confFormat = _confForm.copy(jobNo = request.user.jobNo, name = Some(tempFile.filename), path = _path + tempFile.filename, content = "")
 
-            val bytes = scalax.io.Resource.fromFile(tempFile.ref.file).byteArray
+            var bytes = scalax.io.Resource.fromFile(tempFile.ref.file).byteArray
             val isOctet = isOctet_?(tempFile.filename, bytes)
+            if (!isOctet) {
+              bytes = new String(bytes, "UTF-8").replaceAll("(\r\n)|(\n\r)|\r", "\n").getBytes("UTF-8")
+            }
             Json.obj("fileName" -> tempFile.filename, "status" -> ConfHelper.create(confFormat.toConf, Some(ConfContent(None, isOctet, bytes))))
           }
           Ok(Json.toJson(result))

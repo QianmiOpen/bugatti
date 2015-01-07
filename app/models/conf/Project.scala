@@ -36,7 +36,7 @@ class ProjectTable(tag: Tag) extends Table[Project](tag, "project") {
 }
 
 object ProjectHelper extends PlayCache {
-
+  implicit def maybeFilterConversor[X,Y](q:Query[X,Y,Seq]) = new MaybeFilter(q)
   import models.AppDB._
 
   val ProjectNotExistId = -1
@@ -66,10 +66,9 @@ object ProjectHelper extends PlayCache {
           p <- qProject
           m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
-        val query = MaybeFilter(queryJoin.map(_._1)).filter(projectName)(v => b => b.name like s"${v}%").query
+        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"${projectName}%").query
         query.length.run
-      case None =>
-        MaybeFilter(qProject).filter(projectName)(v => b => b.name like s"${v}%").query.length.run
+      case None => qProject.filteredBy(projectName)(_.name like s"${projectName}%").query.length.run
     }
   }
 
@@ -81,10 +80,10 @@ object ProjectHelper extends PlayCache {
           p <- qProject
           m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
-        val query = MaybeFilter(queryJoin.map(_._1)).filter(projectName)(v => b => b.name like s"${v}%").query
+        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"${projectName}%").query
         query.drop(offset).take(pageSize).list
       case None =>
-        val query = MaybeFilter(qProject).filter(projectName)(v => b => b.name like s"${v}%").query
+        val query = qProject.filteredBy(projectName)(_.name like s"${projectName}%").query
         query.drop(offset).take(pageSize).list
     }
   }
@@ -216,11 +215,11 @@ object ProjectHelper extends PlayCache {
   }
 
   def findProjectNotDependence(dependencyType: String, projectId: Int)(implicit session: JdbcBackend#Session): Option[Project] ={
-    qTemplate.filter(t => t.name === dependencyType).firstOption()(session) match {
+    qTemplate.filter(t => t.name === dependencyType).firstOption(session) match {
       case Some(template) =>
-        val dependencesAlready = qpd.filter(t => t.projectId === projectId).list()(session).map(_.dependencyId)
+        val dependencesAlready = qpd.filter(t => t.projectId === projectId).list(session).map(_.dependencyId)
         Logger.info(s"dependencesAlready => ${dependencesAlready}")
-        val dependencesWill = qProject.filter(t => t.templateId === template.id.get).list()(session).filterNot(t => dependencesAlready.contains(t.id.get))
+        val dependencesWill = qProject.filter(t => t.templateId === template.id.get).list(session).filterNot(t => dependencesAlready.contains(t.id.get))
         Logger.info(s"dependencesWill => ${dependencesWill}")
         if(dependencesWill.size > 0){
           Some(dependencesWill(0))
@@ -233,7 +232,7 @@ object ProjectHelper extends PlayCache {
   }
 
   def _updateDependencyProjects(project: Project, newTemplateId: Int)(implicit session: JdbcBackend#Session)= {
-    val templateDependenceProjects = qtd.filter(t => t.templateId === newTemplateId).list()(session)
+    val templateDependenceProjects = qtd.filter(t => t.templateId === newTemplateId).list(session)
     _updateDependences(project, templateDependenceProjects)
   }
 
@@ -244,7 +243,7 @@ object ProjectHelper extends PlayCache {
 
   def _updateDependences(project: Project, templateDependenceProjects: Seq[TemplateDependence])(implicit session: JdbcBackend#Session)={
     val projectId = project.id.get
-    val projectDeps = qpd.filter(t => t.projectId === projectId).list()(session)
+    val projectDeps = qpd.filter(t => t.projectId === projectId).list(session)
 
     val templateDependencyTypes = templateDependenceProjects.map(_.name)
     //清理该项目依赖中不存在的alias

@@ -41,7 +41,7 @@ object TaskTemplateHelper{
   }
 
   def all = db withSession {implicit session =>
-    qTaskTemplate.sortBy(x => (x.typeId, x.orderNum)).list()
+    qTaskTemplate.sortBy(x => (x.typeId, x.orderNum)).list
   }
 
   def create(template: TaskTemplate) = db withSession { implicit session =>
@@ -57,7 +57,7 @@ object TaskTemplateHelper{
   }
 
   def findTaskTemplateByTemplateId(templateId: Int) = db withSession { implicit session =>
-    qTaskTemplate.filter(_.typeId === templateId).list()
+    qTaskTemplate.filter(_.typeId === templateId).list
   }
 
   def updateScriptVersion(oldVersion: String, newVersion: String) = db withSession { implicit session =>

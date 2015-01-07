@@ -17,7 +17,7 @@ object GitUtil {
 
   def getGitInfo(app: play.api.Application, gitType: String): GitInfo = {
     val workDir = new File(app.configuration.getString(s"git.$gitType.dir").getOrElse(s"target/$gitType"))
-    val gitUrl = app.configuration.getString(s"git.$gitType.url").getOrElse(s"http://git.dev.ofpay.com/git/TDA/salt-$gitType.git")
+    val gitUrl = app.configuration.getString(s"git.$gitType.url").getOrElse(s"http://git.dev.qianmi.com/tda/salt-$gitType.git")
 
     GitInfo(gitUrl, workDir)
   }

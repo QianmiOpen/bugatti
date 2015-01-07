@@ -19,21 +19,17 @@ object LogsHelper {
     val and = " and timestmp > ? and timestmp < ? order by event_id desc"
     (logs.jobNo, logs.mode) match {
       case (Some(jobNo), Some(mode)) =>
-        val sql = Q[(String, String, String), (Int, String, String)] +
-          select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}"
-        sql.list(s"""{"mod":"${mode}","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String, String), (Int, String, String)](select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}")
+        sql.apply(s"""{"mod":"${mode}","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).list
       case (Some(jobNo), None) =>
-        val sql = Q[(String, String, String), (Int, String, String)] +
-          select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}"
-        sql.list(s"""{"mod":"%","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String, String), (Int, String, String)](select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}")
+        sql.apply(s"""{"mod":"%","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).list
       case (None, Some(mode)) =>
-        val sql = Q[(String, String, String), (Int, String, String)] +
-          select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}"
-        sql.list(s"""{"mod":"${mode}","user":"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String, String), (Int, String, String)](select + """where formatted_message like ?""" + and + s" limit ${offset}, ${pageSize}")
+        sql.apply(s"""{"mod":"${mode}","user":"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).list
       case (None, None) =>
-        val sql = Q[(String, String), (Int, String, String)] +
-          select + and.replaceFirst("and", "where") + s" limit ${offset}, ${pageSize}"
-        sql.list(logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String), (Int, String, String)](select + and.replaceFirst("and", "where") + s" limit ${offset}, ${pageSize}")
+        sql.apply(logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).list
     }
   }
 
@@ -42,21 +38,17 @@ object LogsHelper {
     val and = " and timestmp > ? and timestmp < ?"
     (logs.jobNo, logs.mode) match {
       case (Some(jobNo), Some(mode)) =>
-        val sql = Q[(String, String, String), Int] +
-          select + """where formatted_message like ? """ + and
-        sql.first(s"""{"mod":"${mode}","user":"${jobNo}"%}""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String, String), Int](select + """where formatted_message like ? """ + and)
+        sql.apply(s"""{"mod":"${mode}","user":"${jobNo}"%}""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).first
       case (Some(jobNo), None) =>
-        val sql = Q[(String, String, String), Int] +
-          select + """where formatted_message like ? """ + and
-        sql.first(s"""{"mod":"%","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String, String), Int](select + """where formatted_message like ? """ + and)
+        sql.apply(s"""{"mod":"%","user":"${jobNo}"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).first
       case (None, Some(mode)) =>
-        val sql = Q[(String, String, String), Int] +
-          select + """where formatted_message like ? """ + and
-        sql.first(s"""{"mod":"${mode}","user":"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String, String), Int](select + """where formatted_message like ? """ + and)
+        sql.apply(s"""{"mod":"${mode}","user":"%""", logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).first
       case (None, None) =>
-        val sql = Q[(String, String), Int] +
-          select + and.replaceFirst("and", "where")
-        sql.first(logs.startTime.getMillis.toString, logs.endTime.getMillis.toString)
+        val sql = Q.query[(String, String), Int](select + and.replaceFirst("and", "where"))
+        sql.apply(logs.startTime.getMillis.toString, logs.endTime.getMillis.toString).first
     }
   }
 

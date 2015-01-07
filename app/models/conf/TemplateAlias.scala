@@ -26,7 +26,7 @@ object TemplateAliasHelper {
   val qTemplateAlias = TableQuery[TemplateAliasTable]
 
   def findByTemplateId_Version(templateId: Int, scriptVersion: String): Seq[TemplateAlias] = db withSession { implicit session =>
-    qTemplateAlias.filter(t => t.templateId === templateId && t.scriptVersion === scriptVersion).list()
+    qTemplateAlias.filter(t => t.templateId === templateId && t.scriptVersion === scriptVersion).list
   }
 
   def create(templateAlias: TemplateAlias): Int = db withSession { implicit session =>

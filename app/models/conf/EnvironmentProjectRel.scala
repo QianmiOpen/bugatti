@@ -39,6 +39,7 @@ class EnvironmentProjectRelTable(tag: Tag) extends Table[EnvironmentProjectRel](
 }
 
 object EnvironmentProjectRelHelper {
+  implicit def maybeFilterConversor[X,Y](q:Query[X,Y,Seq]) = new MaybeFilter(q)
   import models.AppDB._
   val qRelation = TableQuery[EnvironmentProjectRelTable]
   val qEnv = TableQuery[EnvironmentTable]
@@ -66,27 +67,27 @@ object EnvironmentProjectRelHelper {
   }
 
   def findUnbindByEnvId_AreaId(envId: Int, areaId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.filter(r => r.envId === envId && r.areaId === areaId && r.projectId.isNull).list
+    qRelation.filter(r => r.envId === envId && r.areaId === areaId && r.projectId.?.isEmpty).list
   }
 
   def findEmptyEnvsBySyndicName(syndicName: String): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.filter(c => c.syndicName === syndicName && c.envId.isNull).list
+    qRelation.filter(c => c.syndicName === syndicName && c.envId.?.isEmpty).list
   }
 
   def findIpsByEnvId(envId: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.filter(r => r.envId === envId && r.projectId.isNull).list
+    qRelation.filter(r => r.envId === envId && r.projectId.?.isEmpty).list
   }
 
   def allNotEmpty: Seq[EnvironmentProjectRel] = db withSession { implicit session =>
-    qRelation.filter(r => r.envId.isNotNull && r.projectId.isNotNull).list
+    qRelation.filter(r => r.envId.?.isDefined && r.projectId.?.isDefined).list
   }
 
   def all(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int): Seq[EnvironmentProjectRel] = db withSession { implicit session =>
     val offset = pageSize * page
-    var query = MaybeFilter(qRelation)
-      .filter(envId)(v => b => b.envId === v)
-      .filter(projectId)(v => b => b.projectId === projectId)
-      .filter(ip)(v => b => b.ip === ip).query
+    var query = qRelation
+      .filteredBy(envId)(_.envId === envId)
+      .filteredBy(projectId)(_.projectId === projectId)
+      .filteredBy(ip)(_.ip === ip).query
     sort match {
       case Some(s) if s == "ip" =>
         query = direction match { case Some(d) if d == "desc" => query.sortBy(_.ip desc); case _ => query.sortBy(_.ip asc)}
@@ -97,10 +98,10 @@ object EnvironmentProjectRelHelper {
   }
 
   def count(ip: Option[String], envId: Option[Int], projectId: Option[Int]): Int = db withSession { implicit session =>
-    val query = MaybeFilter(qRelation)
-      .filter(envId)(v => b => b.envId === v)
-      .filter(projectId)(v => b => b.projectId === projectId)
-      .filter(ip)(v => b => b.ip === ip).query
+    val query = qRelation
+      .filteredBy(envId)(_.envId === envId)
+      .filteredBy(projectId)(_.projectId === projectId)
+      .filteredBy(ip)(_.ip === ip).query
     query.length.run
   }
   
