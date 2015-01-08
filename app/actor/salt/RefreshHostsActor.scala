@@ -3,7 +3,7 @@ package actor.salt
 import actor.ActorUtils
 import akka.actor.{ActorRef, Actor, ActorLogging}
 import akka.event.LoggingReceive
-import com.qianmi.bugatti.actors.{TimeOut, SaltResult, SaltCommand}
+import com.qianmi.bugatti.actors.{SaltTimeOut, SaltJobOk, SaltCommand}
 import enums.ContainerTypeEnum
 import models.conf._
 import org.apache.commons.net.util.SubnetUtils
@@ -21,7 +21,7 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
 
   var step = 0
 
-  var saltResult: SaltResult = _
+  var saltResult: SaltJobOk = _
 
   override def receive = LoggingReceive {
     case Run => {
@@ -38,12 +38,12 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
       }
     }
 
-    case sr: SaltResult => {
+    case sr: SaltJobOk => {
       saltResult = sr
       self ! Run
     }
 
-    case TimeOut() => {
+    case SaltTimeOut() => {
       realSender ! Error
 
       context.stop(self)
@@ -52,7 +52,7 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
     case x => log.debug(s"Unknown message ${x}")
   }
 
-  def parseResult(sr: SaltResult) = {
+  def parseResult(sr: SaltJobOk) = {
     val retJson = Json.parse(sr.result)
 
     retJson.validate[Seq[JsObject]] match {

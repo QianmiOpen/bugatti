@@ -3,7 +3,7 @@ package actor.salt
 import actor.ActorUtils
 import akka.actor.{ActorRef, Actor, ActorLogging}
 import akka.event.LoggingReceive
-import com.qianmi.bugatti.actors.{TimeOut, SaltCommand, SaltResult}
+import com.qianmi.bugatti.actors.{SaltTimeOut, SaltJobOk, SaltCommand}
 
 /**
  * Created by mind on 8/4/14.
@@ -29,11 +29,11 @@ class RefreshFilesActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
       }
     }
 
-    case sr: SaltResult => {
+    case sr: SaltJobOk => {
       self ! Run
     }
 
-    case TimeOut() => {
+    case SaltTimeOut() => {
       realSender ! Error
 
       context.stop(self)

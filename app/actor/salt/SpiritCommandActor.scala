@@ -2,7 +2,7 @@ package actor.salt
 
 import akka.actor.{ActorRef, Cancellable, Actor, ActorLogging}
 import akka.event.LoggingReceive
-import com.qianmi.bugatti.actors.{SpiritResult, TimeOut}
+import com.qianmi.bugatti.actors.{SaltTimeOut, SpiritResult}
 import scala.concurrent.duration._
 
 /**
@@ -17,7 +17,7 @@ class SpiritCommandActor(realSender: ActorRef) extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     timeOutSchedule = context.system.scheduler.scheduleOnce(TimeOutSeconds) {
-      realSender ! TimeOut
+      realSender ! SaltTimeOut
       context.stop(self)
     }
   }

@@ -4,7 +4,7 @@ import java.io.File
 
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
-import com.qianmi.bugatti.actors.{SaltStatusResult, SaltTimeOut, SaltStatus, SaltCommand}
+import com.qianmi.bugatti.actors._
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
@@ -62,6 +62,7 @@ class CommandActor extends Actor with ActorLogging {
   var _taskObj: ProjectTask_v = null
 
   var _clusterName = Option.empty[String]
+  var _jid = ""
 
   def receive = {
     case insertCommands: InsertCommands => {
@@ -85,12 +86,10 @@ class CommandActor extends Actor with ActorLogging {
       _order = executeCommand.order
       if (_order < _commands.length) {
         val command = _commands(_order)
-        //TODO 推送状态
+        //TODO 增加判断do...if...
+
         MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine, _clusterName)
-        //TODO 修改数据库状态 （暂时取消这个步骤，因为和日志有重合功能）
-
         executeSalt(_taskId, command, _envId, _projectId, _versionId, _order)
-
       } else {
         terminateCommand(TaskEnum.TaskSuccess)
       }
@@ -114,7 +113,21 @@ class CommandActor extends Actor with ActorLogging {
       }
     }
 
-    case sr: SaltResult => {
+    case sjb: SaltJobBegin => {
+      _jid = sjb.jid
+      val msg = s"任务:${_jid}开始,执行时间:${sjb.excuteMicroseconds}"
+      log.debug(msg)
+      commandOver(msg)
+    }
+
+    case sje: SaltJobError => {
+      val msg = s"任务:${_jid}执行失败,${sje.msg},执行时间:${sje.excuteMicroseconds}"
+      log.error(msg)
+      commandOver(msg)
+      self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
+    }
+
+    case sr: SaltJobOk => {
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
       log.debug(s"result.size ==> ${srResult.size}")
