@@ -60,3 +60,5 @@ resolvers ++= Seq(
 )
 
 play.Project.playScalaSettings
+
+scalacOptions in ThisBuild ++= Seq("-feature")

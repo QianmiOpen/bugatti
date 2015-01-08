@@ -7,6 +7,8 @@ import play.api.Play.current
 import enums.ContainerTypeEnum
 import enums.ContainerTypeEnum.Container
 import scala.slick.jdbc.JdbcBackend
+import scala.language.postfixOps
+import scala.language.implicitConversions
 
 /**
  * 环境和项目的关系配置

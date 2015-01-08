@@ -12,6 +12,7 @@ import akka.pattern.ask
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
  * Created by mind on 8/1/14.

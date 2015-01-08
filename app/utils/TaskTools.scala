@@ -4,6 +4,7 @@ import enums.LevelEnum
 import models.conf._
 import play.api.{Logger, Play}
 import play.api.libs.json.{JsObject, Json}
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 1/7/14.

@@ -4,6 +4,7 @@ package models
 import play.api.Application
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.cache.Cache
+import scala.language.implicitConversions
 
 trait PlaySlick {
   def db(implicit app: Application) = Database.forDataSource(play.api.db.DB.getDataSource())

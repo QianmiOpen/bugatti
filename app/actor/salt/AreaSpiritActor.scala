@@ -5,6 +5,7 @@ import akka.event.LoggingReceive
 import com.qianmi.bugatti.actors.SpiritCommand
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
  * Created by mind on 8/1/14.

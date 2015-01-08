@@ -19,6 +19,7 @@ import scala.collection.mutable
 import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.Play.current
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 13/7/14.

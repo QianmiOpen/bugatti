@@ -31,10 +31,10 @@ object SpiritHelper {
   }
 
   def delete(id: Int) = db withSession { implicit session =>
-    qSpirit.filter(_.id == id).delete
+    qSpirit.filter(_.id === id).delete
   }
 
   def update(spirit: Spirit) = db withSession { implicit session =>
-    qSpirit.filter(_.id == spirit.id).update(spirit)
+    qSpirit.filter(_.id === spirit.id).update(spirit)
   }
 }

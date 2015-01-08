@@ -11,6 +11,7 @@ import play.api.libs.json.Json
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
  * 区域管理

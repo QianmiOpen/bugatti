@@ -8,6 +8,7 @@ import scala.slick.driver.MySQLDriver.simple._
 import com.github.tototoshi.slick.MySQLJodaSupport._
 
 import scala.slick.jdbc.JdbcBackend
+import scala.language.postfixOps
 
 /**
  * 子项目配置文件修改记录

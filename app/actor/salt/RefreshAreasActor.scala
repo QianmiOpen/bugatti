@@ -8,6 +8,7 @@ import akka.util.Timeout
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.pattern.ask
+import scala.language.postfixOps
 
 /**
  * Created by mind on 7/31/14.

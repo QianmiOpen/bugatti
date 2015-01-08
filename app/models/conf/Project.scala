@@ -13,6 +13,7 @@ import play.api.Play.current
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend
+import scala.language.implicitConversions
 
 case class Project(id: Option[Int], name: String, description: Option[String], templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime])
 case class ProjectForm(id: Option[Int], name: String, description: Option[String], templateId: Int, subTotal: Int, lastVid: Option[Int], lastVersion: Option[String], lastUpdated: Option[DateTime], items: Seq[Attribute], variables: Seq[Variable]) {

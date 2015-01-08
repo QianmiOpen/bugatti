@@ -1,19 +1,15 @@
 package models.conf
 
+import com.github.tototoshi.slick.MySQLJodaSupport._
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.LevelEnum
 import exceptions.UniqueNameException
-import org.omg.Messaging.SYNC_WITH_TRANSPORT
-import play.api.Logger
-import play.api.Play.current
 import models.PlayCache
 import org.joda.time.DateTime
-import utils.TaskTools
+import play.api.Play.current
 
+import scala.language.postfixOps
 import scala.slick.driver.MySQLDriver.simple._
-import com.github.tototoshi.slick.MySQLJodaSupport._
-
-import scala.slick.jdbc.JdbcBackend
 
 /**
  * 子项目

@@ -14,6 +14,7 @@ import utils._
 import scala.concurrent.duration._
 import scala.sys.process._
 import scalax.file.Path
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 21/8/14.

@@ -1,20 +1,19 @@
 package models.conf
 
 import actor.ActorUtils
-import actor.git.{AddUser, DeleteUser, UpdateUser}
+import actor.git.{AddUser, DeleteUser}
+import com.github.tototoshi.slick.MySQLJodaSupport._
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
-import exceptions.UniqueNameException
-import play.api.Play.current
-import play.api.cache.Cache
-import enums.{LevelEnum, FuncEnum, RoleEnum}
 import enums.RoleEnum.Role
+import enums.{FuncEnum, LevelEnum, RoleEnum}
+import exceptions.UniqueNameException
 import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
-import utils.SecurityUtil
+import play.api.Play.current
+import play.api.cache.Cache
 
+import scala.language.implicitConversions
 import scala.slick.driver.MySQLDriver.simple._
-import com.github.tototoshi.slick.MySQLJodaSupport._
-
 import scala.slick.jdbc.JdbcBackend
 
 /**

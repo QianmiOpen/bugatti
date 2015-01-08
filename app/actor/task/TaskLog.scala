@@ -13,6 +13,7 @@ import play.api.libs.json.{JsString, JsObject, JsValue}
 import play.api.libs.concurrent.Execution.Implicits._
 import utils.{Reader, ConfHelp}
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 5/8/14.
