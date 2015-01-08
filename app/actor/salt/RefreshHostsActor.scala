@@ -65,11 +65,11 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
                 )
             }
 
-            val addedHosts = EnvironmentProjectRelHelper.findBySyndicName(area.syndicName).map(_.name)
+            val addedHosts = HostHelper.findBySyndicName(area.syndicName).map(_.name)
             val newHosts = hostList.filterNot(x => x._2.isEmpty).filterNot(x => addedHosts.contains(x._1))
 
             newHosts.foreach { newhost =>
-              EnvironmentProjectRelHelper.create(EnvironmentProjectRel(None, None, None, None, area.syndicName, newhost._1, newhost._2, ContainerTypeEnum.vm, None, None, Seq.empty[Variable]))
+              HostHelper.create(Host(None, None, None, None, area.syndicName, newhost._1, newhost._2, ContainerTypeEnum.vm, None, None, Seq.empty[Variable]))
             }
 
             refreshSetHostEnv(area.syndicName)
@@ -86,13 +86,13 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
       (env.id, env.ipRange.map(_.split(";").toList).getOrElse(Seq.empty[String]).map { x => new SubnetUtils(x)})
     }
 
-    EnvironmentProjectRelHelper.findEmptyEnvsBySyndicName(syndicName).map { envProjectRel =>
+    HostHelper.findEmptyEnvsBySyndicName(syndicName).map { envProjectRel =>
       val env = subnetUtils.filter { case (id, subs) =>
         subs.exists(sub => sub.getInfo.isInRange(envProjectRel.ip))
       }
 
       val envRel = envProjectRel.copy(envId = if (env.size == 0) None else env(0)._1)
-      EnvironmentProjectRelHelper.update(envRel)
+      HostHelper.update(envRel)
     }
   }
 }

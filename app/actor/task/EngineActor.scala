@@ -236,6 +236,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
+case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[Host], hostsIndex: Int)
 
 case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String, order: Int)

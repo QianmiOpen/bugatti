@@ -152,7 +152,7 @@ object ProjectHelper extends PlayCache {
 
   def delete(id: Int) = db withTransaction { implicit session =>
     // relation
-    EnvironmentProjectRelHelper._unbindByProjectId(Some(id))
+    HostHelper._unbindByProjectId(Some(id))
     // attribute
     AttributeHelper._deleteByProjectId(id)
     // member

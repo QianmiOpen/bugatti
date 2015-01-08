@@ -15,7 +15,7 @@ import play.api.mvc.Action
  */
 object RelationController extends BaseController {
   implicit val variableWrites = Json.writes[Variable]
-  implicit val relationWrites = Json.writes[EnvironmentProjectRel]
+  implicit val relationWrites = Json.writes[Host]
 
   val relationForm = Form(
     mapping(
@@ -46,33 +46,33 @@ object RelationController extends BaseController {
           "value" -> text
         )(Variable.apply)(Variable.unapply)
       )
-    )(EnvironmentProjectRel.apply)(EnvironmentProjectRel.unapply)
+    )(Host.apply)(Host.unapply)
   )
 
   def show(id: Int) = Action {
-    Ok(Json.toJson(EnvironmentProjectRelHelper.findById(id)))
+    Ok(Json.toJson(HostHelper.findById(id)))
   }
 
   def index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
-    val result = EnvironmentProjectRelHelper.all(
+    val result = HostHelper.all(
       ip.filterNot(_.isEmpty), envId, projectId, sort, direction, page, pageSize)
     Ok(Json.toJson(result))
   }
 
   def count(ip: Option[String], envId: Option[Int], projectId: Option[Int]) = AuthAction(FuncEnum.relation) {
-    val result = EnvironmentProjectRelHelper.count(ip.filterNot(_.isEmpty), envId, projectId)
+    val result = HostHelper.count(ip.filterNot(_.isEmpty), envId, projectId)
     Ok(Json.toJson(result))
   }
 
   def ips(envId: Int) = AuthAction(FuncEnum.relation) {
-    Ok(Json.toJson(EnvironmentProjectRelHelper.findIpsByEnvId(envId)))
+    Ok(Json.toJson(HostHelper.findIpsByEnvId(envId)))
   }
 
   def update(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
     varRelForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
-        Ok(Json.toJson(EnvironmentProjectRelHelper.update(relation)))
+        Ok(Json.toJson(HostHelper.update(relation)))
       }
     )
   }
@@ -86,19 +86,19 @@ object RelationController extends BaseController {
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
           "ip" -> request.remoteAddress, "msg" -> "绑定关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
-        val result = EnvironmentProjectRelHelper.bind(relation)
+        val result = HostHelper.bind(relation)
         Ok(Json.toJson(result))
       }
     )
   }
 
   def unbind(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
-    EnvironmentProjectRelHelper.findById(id) match {
+    HostHelper.findById(id) match {
       case Some(relation) =>
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
           "ip" -> request.remoteAddress, "msg" -> "解除关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
-        val result = EnvironmentProjectRelHelper.unbind(relation)
+        val result = HostHelper.unbind(relation)
         Ok(Json.toJson(result))
       case None => NotFound
     }
@@ -110,7 +110,7 @@ object RelationController extends BaseController {
     }
   }
   def hosts(envId: Int, areaId: Int) = Action { implicit request =>
-    Ok(Json.toJson(EnvironmentProjectRelHelper.findUnbindByEnvId_AreaId(envId, areaId).map(r => (r.ip, r.hostName))))
+    Ok(Json.toJson(HostHelper.findUnbindByEnvId_AreaId(envId, areaId).map(r => (r.ip, r.hostName))))
   }
 
 }

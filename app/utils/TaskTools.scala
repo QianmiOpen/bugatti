@@ -57,8 +57,8 @@ object TaskTools {
     attrMap ++ varMap
   }
 
-  def findHosts(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = {
-    EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)
+  def findHosts(envId: Int, projectId: Int): Seq[Host] = {
+    HostHelper.findByEnvId_ProjectId(envId, projectId)
   }
 
   def findProject(envId: Int, projectId: Int, realVersion: String): Project_v = {

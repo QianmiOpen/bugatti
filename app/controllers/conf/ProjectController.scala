@@ -23,12 +23,12 @@ object ProjectController extends BaseController {
   implicit val varWrites = Json.writes[Variable]
   implicit val attributeWrites = Json.writes[Attribute]
   implicit val projectWrites = Json.writes[Project]
-  implicit val relWrites = Json.writes[EnvironmentProjectRel]
+  implicit val relWrites = Json.writes[Host]
 
   def msg(user: String, ip: String, msg: String, data: Project) =
     Json.obj("mod" -> ModEnum.project.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
-  def msg_task(user: String, ip: String, msg: String, data: EnvironmentProjectRel) =
+  def msg_task(user: String, ip: String, msg: String, data: Host) =
     Json.obj("mod" -> ModEnum.task.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
 
@@ -294,7 +294,7 @@ object ProjectController extends BaseController {
     relForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       rel => {
-        val rels = EnvironmentProjectRelHelper.findByEnvId_AreaId(rel.envId, rel.areaId)
+        val rels = HostHelper.findByEnvId_AreaId(rel.envId, rel.areaId)
         val unbind = rels.filter(_.projectId.isEmpty)
         val bind = rels.filter(_.projectId.isDefined)
 
@@ -302,7 +302,7 @@ object ProjectController extends BaseController {
           Ok(_None) // 没有可用机器资源
         } else rel.ip match {
           case ip if (ip.isEmpty || ip.get.trim.isEmpty) =>
-            val prel = EnvironmentProjectRelHelper.findByEnvId_ProjectId(rel.envId, rel.projectId)
+            val prel = HostHelper.findByEnvId_ProjectId(rel.envId, rel.projectId)
             val prelHosts = prel.groupBy(_.hostIp).map(_._1).toSet
             val fn = unbind.filterNot(ub => prelHosts.contains(ub.hostIp))
             if (fn.isEmpty) {
@@ -310,14 +310,14 @@ object ProjectController extends BaseController {
             } else {
               val hostIp = fn.groupBy(_.hostIp).mapValues(_.size).toSeq.sortBy(_._2).last._1
               val update2rel = fn.filter(_.hostIp == hostIp).head.copy(projectId = Some(rel.projectId))
-              val result = EnvironmentProjectRelHelper.update(update2rel)
+              val result = HostHelper.update(update2rel)
               ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, s"增加机器:$result", update2rel))
               Ok(_Success)
             }
           case Some(ip) if (bind.exists(_.ip == ip)) => Ok(_Exist)
           case Some(ip) if (unbind.exists(_.ip == ip)) =>
             val update2rel = unbind.find(_.ip == ip).head.copy(projectId = Some(rel.projectId))
-            EnvironmentProjectRelHelper.update(update2rel)
+            HostHelper.update(update2rel)
             ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
             Ok(_Success)
           case _ => Ok(_Fail)
@@ -327,9 +327,9 @@ object ProjectController extends BaseController {
   }
 
   def removeCluster(clusterId: Int) = AuthAction(FuncEnum.project) { implicit request =>
-    EnvironmentProjectRelHelper.findById(clusterId) match {
+    HostHelper.findById(clusterId) match {
       case Some(rel) => {
-        val result = EnvironmentProjectRelHelper.unbind(rel)
+        val result = HostHelper.unbind(rel)
         ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "移除机器", rel))
         Ok(Json.obj("r" -> result))
       }

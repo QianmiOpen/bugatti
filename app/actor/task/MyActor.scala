@@ -8,7 +8,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
-import models.conf.{AreaHelper, EnvironmentProjectRelHelper}
+import models.conf.{AreaHelper, HostHelper}
 import models.task.{TemplateActionHelper, TaskCommand, TaskQueueHelper, TaskQueue}
 import org.joda.time.DateTime
 import play.api.Logger

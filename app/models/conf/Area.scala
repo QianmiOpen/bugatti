@@ -30,7 +30,7 @@ object AreaHelper {
   import models.AppDB._
 
   val qArea = TableQuery[AreaTable]
-  val qRel = TableQuery[EnvironmentProjectRelTable]
+  val qRel = TableQuery[HostTable]
 
   def all: Seq[Area] = db withSession { implicit session =>
     qArea.list

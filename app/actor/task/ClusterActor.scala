@@ -2,7 +2,7 @@ package actor.task
 
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{OneForOneStrategy, Props, ActorLogging, Actor}
-import models.conf.EnvironmentProjectRel
+import models.conf.Host
 import models.task.{TaskQueue, TaskCommand, TemplateActionStep}
 import utils.ProjectTask_v
 
@@ -48,9 +48,9 @@ class ClusterActor extends Actor with ActorLogging{
   }
 }
 
-case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
-case class SuccessReplaceCommand(commandList: Seq[TaskCommand], tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
-case class ErrorReplaceCommand(keys: String, tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
+case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[Host], hostsIndex: Int)
+case class SuccessReplaceCommand(commandList: Seq[TaskCommand], tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[Host], hostsIndex: Int, taskObj: ProjectTask_v)
+case class ErrorReplaceCommand(keys: String, tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[Host], hostsIndex: Int, taskObj: ProjectTask_v)
 
 case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: ProjectTask_v, hostname: String, order: Int)
 case class SuccessReplaceConf(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)

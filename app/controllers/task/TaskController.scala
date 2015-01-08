@@ -28,7 +28,7 @@ object TaskController extends BaseController {
   implicit val projectWrites = Json.writes[Project]
   implicit val taskWrites = Json.writes[Task]
   implicit val taskTemplateWrites = Json.writes[TemplateAction]
-  implicit val envProRelWrites = Json.writes[EnvironmentProjectRel]
+  implicit val envProRelWrites = Json.writes[Host]
 
   def findLastTaskStatus = Action(parse.json){ implicit request =>
     request.body match {
@@ -205,7 +205,7 @@ object TaskController extends BaseController {
 
   //=======================任务界面重构===========================================
   def findClusterByEnv_Project(envId: Int, projectId: Int) = Action {
-    Ok(Json.toJson(EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)))
+    Ok(Json.toJson(HostHelper.findByEnvId_ProjectId(envId, projectId)))
   }
 
   def findCatalinaWSUrl(envId: Int) = Action{
@@ -214,7 +214,7 @@ object TaskController extends BaseController {
       case Some(template) =>
         val projects = ProjectHelper.allByTemplateId(template.id.get)
         if(!projects.isEmpty){
-          val rels = EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projects(0).id.get)
+          val rels = HostHelper.findByEnvId_ProjectId(envId, projects(0).id.get)
           if(!rels.isEmpty){
             ip = rels(0).ip
           }else {
