@@ -27,7 +27,7 @@ object TaskController extends BaseController {
   implicit val varWrites = Json.writes[Variable]
   implicit val projectWrites = Json.writes[Project]
   implicit val taskWrites = Json.writes[Task]
-  implicit val taskTemplateWrites = Json.writes[TaskTemplate]
+  implicit val taskTemplateWrites = Json.writes[TemplateAction]
   implicit val envProRelWrites = Json.writes[EnvironmentProjectRel]
 
   def findLastTaskStatus = Action(parse.json){ implicit request =>
@@ -49,7 +49,7 @@ object TaskController extends BaseController {
           }
           case _ => {}
         }
-        TaskTemplateHelper.findById(t.taskTemplateId) match {
+        TemplateActionHelper.findById(t.taskTemplateId) match {
           case template => {
             tJson = tJson ++ Json.obj("taskName" -> template.name)
           }
@@ -77,7 +77,7 @@ object TaskController extends BaseController {
           }
           case _ => {}
         }
-        TaskTemplateHelper.findById(t.taskTemplateId) match {
+        TemplateActionHelper.findById(t.taskTemplateId) match {
           case template => {
             tJson = tJson ++ Json.obj("taskName" -> template.name)
           }
@@ -125,7 +125,7 @@ object TaskController extends BaseController {
 
     //check the templateId is real
     val esv = EnvironmentHelper.findById(envId).get.scriptVersion
-    val csv = TaskTemplateHelper.findById(templateId).scriptVersion
+    val csv = TemplateActionHelper.findById(templateId).scriptVersion
     if(esv != csv){
       -1
     }else {
@@ -161,13 +161,13 @@ object TaskController extends BaseController {
    * 获取所有项目类型的模板
    */
   def getTemplates(scriptVersion: String) = Action{
-    var map = Map.empty[Int, Seq[TaskTemplate]]
+    var map = Map.empty[Int, Seq[TemplateAction]]
     Logger.debug(s"scriptVersion ==> ${scriptVersion}")
 
-    TaskTemplateHelper.findByScriptVerison(scriptVersion).foreach{
+    TemplateActionHelper.findByScriptVerison(scriptVersion).foreach{
       template => {
         //1、从map中获取seq，没有就创建
-        var seq = map.getOrElse(template.typeId, Seq.empty[TaskTemplate])
+        var seq = map.getOrElse(template.typeId, Seq.empty[TemplateAction])
         //2、添加到seq
         seq = seq :+ template
         //3、覆盖map
@@ -178,7 +178,7 @@ object TaskController extends BaseController {
     Ok(map2Json(map))
   }
 
-  def map2Json(map: Map[Int, Seq[TaskTemplate]]): JsValue = {
+  def map2Json(map: Map[Int, Seq[TemplateAction]]): JsValue = {
     var result = Json.obj()
     map.foreach{
       m => {

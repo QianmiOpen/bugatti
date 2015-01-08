@@ -8,7 +8,7 @@ import akka.actor._
 import com.qianmi.bugatti.actors.{SaltTimeOut}
 import enums.TaskEnum
 import models.conf._
-import models.task.{TaskQueue, TaskCommand, TaskTemplateStep}
+import models.task.{TaskQueue, TaskCommand, TemplateActionStep}
 import utils._
 
 import scala.concurrent.duration._
@@ -236,6 +236,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TaskTemplateStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
+case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
 
 case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String, order: Int)

@@ -43,7 +43,7 @@ class TaskExecute extends Actor with ActorLogging {
 //          _tqId = tq.id.get
 //          _tqExecute = tq
           //1、获取任务名称
-          val taskName = TaskTemplateHelper.findById(tq.taskTemplateId).name
+          val taskName = TemplateActionHelper.findById(tq.taskTemplateId).name
           //2、insert 任务表
           val taskId = TaskHelper.addByTaskQueue(tq)
           //获取队列信息
@@ -52,7 +52,7 @@ class TaskExecute extends Actor with ActorLogging {
             x =>
               var json = Json.toJson(x)
               //增加模板名称
-              json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
+              json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TemplateActionHelper.findById(x.taskTemplateId).name)
               json.as[JsObject]
           }
           var taskObj: ProjectTask_v = null
@@ -74,7 +74,7 @@ class TaskExecute extends Actor with ActorLogging {
             log.error(Json.prettyPrint(_json))
           }
           //3、生成命令列表
-          val templateStep = TaskTemplateStepHelper.findStepsByTemplateId(tq.taskTemplateId)
+          val templateStep = TemplateActionStepHelper.findStepsByTemplateId(tq.taskTemplateId)
           val totalNum =  tgc.epc.clusterName match {
             case Some(c) => {
               templateStep.length
@@ -266,7 +266,7 @@ class TaskExecute extends Actor with ActorLogging {
 case class TaskGenerateCommand(epc: EPCParams)
 case class RemoveTaskQueue(envId: Int, projectId: Int, clusterName: Option[String])
 
-case class GenerateCommands(tq: TaskQueue, templateStep: Seq[TaskTemplateStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
+case class GenerateCommands(tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
 case class SendCommandActor(tq: TaskQueue, taskObj: ProjectTask_v)
 
 case class EPCParams(envId: Int, projectId: Int, clusterName: Option[String], hosts: Seq[EnvironmentProjectRel], hostIndex: Int)

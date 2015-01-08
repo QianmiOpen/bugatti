@@ -100,8 +100,8 @@ object Global extends GlobalSettings {
           TableQuery[TemplateItemTable] ::
           TableQuery[TemplateTable] ::
           TableQuery[UserTable] ::
-          TableQuery[TaskTemplateTable] ::
-          TableQuery[TaskTemplateStepTable] ::
+          TableQuery[TemplateActionTable] ::
+          TableQuery[TemplateActionStepTable] ::
           TableQuery[TaskCommandTable] ::
           TableQuery[TaskQueueTable] ::
           TableQuery[TaskSchemeTable] ::
@@ -270,6 +270,7 @@ object AutoUpdate {
   }
 
   val versions = Seq(
+    Version(1, 11),
     Version(1, 10),
     Version(1, 9),
     Version(1, 8),

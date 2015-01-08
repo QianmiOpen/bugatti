@@ -9,7 +9,7 @@ import akka.actor.{Actor, ActorLogging}
 import akka.event.LoggingReceive
 import enums.{ActionTypeEnum, ItemTypeEnum}
 import models.conf._
-import models.task.{TaskTemplate, TaskTemplateHelper, TaskTemplateStep, TaskTemplateStepHelper}
+import models.task.{TemplateAction, TemplateActionHelper, TemplateActionStep, TemplateActionStepHelper}
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand.ListMode
@@ -94,7 +94,7 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
 
     val backupName = s"$branchName-bak-${DateFormat.format(DateTime.now.toDate)}"
     TemplateItemHelper.updateScriptVersion(branchName, backupName)
-    TaskTemplateHelper.updateScriptVersion(branchName, backupName)
+    TemplateActionHelper.updateScriptVersion(branchName, backupName)
     TemplateAliasHelper.updateScriptVersion(branchName, backupName)
 
     val templateDir = new File(s"${gitFormulasDir.getAbsolutePath}${TemplatePath}")
@@ -227,7 +227,7 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
     if (actions != null) {
       actions.asInstanceOf[JList[JMap[String, AnyRef]]].asScala.zipWithIndex.foreach {
         case (action, index) =>
-          val taskId = TaskTemplateHelper.create(TaskTemplate(None, action.get("name").asInstanceOf[String],
+          val taskId = TemplateActionHelper.create(TemplateAction(None, action.get("name").asInstanceOf[String],
             action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean],
             templateId, index + 1, tagName,
             ActionTypeEnum.withName(Option(action.get("actionType")).getOrElse(ActionTypeEnum.project.toString).asInstanceOf[String])))
@@ -235,7 +235,7 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
           val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
           steps.zipWithIndex.foreach { case (step, index) =>
             val seconds = step.get("seconds").asInstanceOf[Int]
-            TaskTemplateStepHelper.create(TaskTemplateStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1))
+            TemplateActionStepHelper.create(TemplateActionStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1, Option(step.get("doIf"))))
           }
       }
     }

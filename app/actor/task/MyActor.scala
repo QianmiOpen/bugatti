@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
 import models.conf.{AreaHelper, EnvironmentProjectRelHelper}
-import models.task.{TaskTemplateHelper, TaskCommand, TaskQueueHelper, TaskQueue}
+import models.task.{TemplateActionHelper, TaskCommand, TaskQueueHelper, TaskQueue}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.concurrent.Akka
@@ -121,7 +121,7 @@ class MyActor extends Actor with ActorLogging {
         x =>
           var json = Json.toJson(x)
           //增加模板名称
-          json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TaskTemplateHelper.findById(x.taskTemplateId).name)
+          json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TemplateActionHelper.findById(x.taskTemplateId).name)
           json.as[JsObject]
       }
       changeStatus(mergerStatus(tKey, Json.obj("queues" -> _queuesJson)))

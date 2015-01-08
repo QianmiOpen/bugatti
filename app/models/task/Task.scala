@@ -58,14 +58,14 @@ object TaskHelper {
   val qTaskAttribute = TableQuery[AttributeTable]
   val qTaskQueue = TableQuery[TaskQueueTable]
   val qVersion = TableQuery[VersionTable]
-  val qTaskTemplate = TableQuery[TaskTemplateTable]
+  val qTaskTemplate = TableQuery[TemplateActionTable]
 
   def findById(taskId: Int) = db withSession { implicit session =>
     val task = qTask.filter(_.id === taskId).first
     task
   }
 
-  def findHisTasks(envId: Int, projectId: Int): List[(Task, Option[String], TaskTemplate)] = db withSession { implicit session =>
+  def findHisTasks(envId: Int, projectId: Int): List[(Task, Option[String], TemplateAction)] = db withSession { implicit session =>
 //    (for{
 //      ((task, template), version) <- qTask innerJoin qTaskTemplate on (_.taskTemplateId === _.id) leftJoin qVersion on (_._1.versionId === _.id)
 //      if task.envId is envId
