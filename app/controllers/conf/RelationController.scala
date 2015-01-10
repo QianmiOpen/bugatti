@@ -1,11 +1,10 @@
 package controllers.conf
 
-import actor.task.MyActor
 import controllers.BaseController
-import enums.{ContainerTypeEnum, ModEnum, FuncEnum}
+import enums.{ContainerTypeEnum, FuncEnum, ModEnum}
 import models.conf._
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
 import play.api.libs.json._
 import play.api.mvc.Action
 

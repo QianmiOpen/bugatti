@@ -66,8 +66,7 @@ class SpiritActor(startPath: String) extends Actor with ActorLogging {
     }
 
     case sc: SpiritCommand => {
-      val spiritCmd = context.actorOf(Props(classOf[SpiritCommandActor], sender))
-      actor.!(sc)(spiritCmd)
+      actor forward  sc
     }
 
     case Connected => sender ! true
