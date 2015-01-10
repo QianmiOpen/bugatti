@@ -14,7 +14,7 @@ import scala.language.implicitConversions
  * 环境和项目的关系配置
  */
 case class Host(id: Option[Int], envId: Option[Int], projectId: Option[Int], areaId: Option[Int],
-                                 syndicName: String, name: String, ip: String,
+                                 syndicName: String, spiritId: Int, name: String, ip: String,
                                  containerType: Container, hostIp: Option[String], hostName: Option[String],
                                  globalVariable: Seq[Variable])
 case class EnvRelForm(envId: Int, projectId: Int, ids: Seq[Int])
@@ -25,6 +25,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def projectId = column[Int]("project_id", O.Nullable)
   def areaId = column[Int]("area_id", O.Nullable)
   def syndicName = column[String]("syndic_name")
+  def spiritId = column[Int]("spirit_id")
   def name = column[String]("name")
   def ip = column[String]("ip")
   def containerType = column[Container]("container_type", O.Default(ContainerTypeEnum.vm), O.DBType("ENUM('vm', 'docker')"))
@@ -35,7 +36,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
   ))
 
-  override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, name, ip, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
+  override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, spiritId, name, ip, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
   index("idx_eid_pid", (envId, projectId))
   index("idx_ip", ip, unique = true)
 }
@@ -57,6 +58,10 @@ object HostHelper {
 
   def findBySyndicName(syndicName: String): Seq[Host] = db withSession{ implicit session =>
     qHost.filter(_.syndicName === syndicName).list
+  }
+
+  def findBySpiritId(spiritId: Int): Seq[Host] = db withSession{ implicit session =>
+    qHost.filter(_.spiritId === spiritId).list
   }
 
   def findByEnvId_ProjectId(envId: Int, projectId: Int): Seq[Host] = db withSession {

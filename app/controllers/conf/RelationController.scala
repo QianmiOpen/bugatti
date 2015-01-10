@@ -32,6 +32,7 @@ object RelationController extends BaseController {
       "projectId" -> optional(number),
       "areaId" -> optional(number),
       "syndicName" -> text,
+      "spiritId" -> number,
       "name" -> text,
       "ip" -> text,
       "containerType" -> enums.form.enum(ContainerTypeEnum),
