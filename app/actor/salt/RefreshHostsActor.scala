@@ -1,55 +1,60 @@
 package actor.salt
 
-import actor.ActorUtils
-import akka.actor.{ActorRef, Actor, ActorLogging}
-import akka.event.LoggingReceive
-import com.qianmi.bugatti.actors.{SaltTimeOut, SaltJobOk, SaltCommand}
+import actor.salt.RefreshHostsActor._
+import akka.actor._
+import com.qianmi.bugatti.actors.{SaltJobOk, SaltStatusResult}
 import enums.ContainerTypeEnum
 import models.conf._
 import org.apache.commons.net.util.SubnetUtils
-import play.api.libs.json.{JsObject, JsError, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
+
+import scala.language.postfixOps
+import scala.concurrent.duration._
 
 /**
  * Created by mind on 8/4/14.
  */
-class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with ActorLogging {
+
+case class Run()
+
+object RefreshHostsActor {
+  sealed trait State
+  case object S_Init extends State
+  case object S_GetHostsInfo extends State
+  case object S_Finish extends State
+}
+
+class RefreshHostsActor(spiritId: Int, realSender: ActorRef) extends LoggingFSM[State, Seq[SaltStatusResult]] {
   val commands = Seq(
     Seq("salt-run", "fileserver.update"),
     Seq("salt", "*", "saltutil.sync_returners"),
     Seq("salt", "*", "grains.get", "ip_interfaces:eth0")
   )
 
-  var step = 0
+  startWith(S_Init, Seq.empty)
 
-  var saltResult: SaltJobOk = _
+  when(S_Init) {
+    case Event(Run, _) =>
+      goto(S_GetHostsInfo)
+  }
 
-  override def receive = LoggingReceive {
-    case Run => {
-      if (step < commands.length) {
-        log.debug(s"Refresh files run ${commands(step)}")
-        ActorUtils.areas ! RemoteSpirit(SaltCommand(commands(step)), areaId = areaId)
-        step += 1
-      } else {
-        parseResult(saltResult)
-
-        realSender ! Finish
-
-        context.stop(self)
-      }
+  when(S_GetHostsInfo, 60 second) {
+    case Event(StateTimeout, _) => {
+      goto(S_Finish)
     }
+  }
 
-    case sr: SaltJobOk => {
-      saltResult = sr
-      self ! Run
-    }
+  when(S_Finish)(FSM.NullFunction)
 
-    case SaltTimeOut() => {
-      realSender ! Error
+  whenUnhandled {
+    case Event(e, s) =>
+      log.warning("received unhandled request {} in state {}/{}", e, stateName, s)
+      stay
+  }
 
-      context.stop(self)
-    }
+  onTransition {
+    case S_Init -> S_GetHostsInfo =>
 
-    case x => log.debug(s"Unknown message ${x}")
   }
 
   def parseResult(sr: SaltJobOk) = {
@@ -57,7 +62,7 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
 
     retJson.validate[Seq[JsObject]] match {
       case s: JsSuccess[Seq[JsObject]] => {
-        AreaHelper.findById(areaId) match {
+        AreaHelper.findById(spiritId) match {
           case Some(area) => {
             val hostList = s.get.map { hostJson =>
               ((hostJson \ "result" \ "id").validate[String].get,
@@ -74,7 +79,7 @@ class RefreshHostsActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
 
             refreshSetHostEnv(area.syndicName)
           }
-          case None => log.debug(s"Unknown area: ${areaId}") // ignore
+          case None => log.debug(s"Unknown area: ${spiritId}") // ignore
         }
       }
       case e: JsError => log.warning(s"Errors: ${JsError.toFlatJson(e)}")

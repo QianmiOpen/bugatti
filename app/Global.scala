@@ -9,7 +9,7 @@ import play.api.mvc.Results._
 import utils.ControlUtil._
 
 import actor.ActorUtils
-import actor.salt.AddArea
+import actor.salt.AddSpirit
 import actor.task.MyActor
 import enums.{ContainerTypeEnum, LevelEnum, RoleEnum}
 import models.AppDB
@@ -121,9 +121,9 @@ object Global extends GlobalSettings {
       AppData.initData
     }
 
-    // 初始化区域
-    if (app.configuration.getBoolean("area.init").getOrElse(true)) {
-      AreaHelper.all.foreach(ActorUtils.areas ! AddArea(_))
+    // 初始化spirit
+    if (app.configuration.getBoolean("spirit.init").getOrElse(true)) {
+      SpiritHelper.all.foreach(ActorUtils.spirits ! AddSpirit(_))
     }
 
     // 启动时，重新加载formulas

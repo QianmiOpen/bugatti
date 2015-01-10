@@ -8,7 +8,7 @@ import com.qianmi.bugatti.actors.{SaltTimeOut, SaltJobOk, SaltCommand}
 /**
  * Created by mind on 8/4/14.
  */
-class RefreshFilesActor(areaId: Int, realSender: ActorRef) extends Actor with ActorLogging {
+class RefreshFilesActor(spiritId: Int, realSender: ActorRef) extends Actor with ActorLogging {
   val commands = Seq(
     Seq("salt-run", "fileserver.update"),
     Seq("salt", "*", "saltutil.sync_returners")
@@ -20,7 +20,7 @@ class RefreshFilesActor(areaId: Int, realSender: ActorRef) extends Actor with Ac
     case Run => {
       if (step < commands.length) {
         log.debug(s"Refresh files run ${commands(step)}")
-        ActorUtils.areas ! RemoteSpirit(SaltCommand(commands(step)), areaId = areaId)
+        ActorUtils.spirits ! RemoteSpirit(spiritId, SaltCommand(commands(step)))
         step += 1
       } else {
         realSender ! Finish

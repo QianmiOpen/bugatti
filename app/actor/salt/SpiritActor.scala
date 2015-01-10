@@ -14,7 +14,7 @@ case class Reconnect(path: String)
 case class ConnectStoped()
 case class Connected()
 
-class AreaSpiritActor(startPath: String) extends Actor with ActorLogging {
+class SpiritActor(startPath: String) extends Actor with ActorLogging {
   import context._
   var path = startPath
 
@@ -50,7 +50,7 @@ class AreaSpiritActor(startPath: String) extends Actor with ActorLogging {
     case Connected                   => sender ! false
     case _                           => {
       sender ! ConnectStoped
-      log.debug("Not ready yet")
+      log.warning("Not ready yet")
     }
   }
 
@@ -80,6 +80,8 @@ class AreaSpiritActor(startPath: String) extends Actor with ActorLogging {
       sendIdentifyRequest()
       context.become(identifying)
     }
-    case ReceiveTimeout => //      ignore
+    case ReceiveTimeout => log.warning("ReceiveTimeout")//      ignore
+
+    case x => log.warning(s"Unknown message $x")
   }
 }

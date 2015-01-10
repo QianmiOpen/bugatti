@@ -2,7 +2,7 @@ package actor
 
 import actor.conf.ConfigureActor
 import actor.git.{KeyGitActor, GitUtil, ScriptGitActor}
-import actor.salt.{RefreshAreasActor, AreasActor}
+import actor.salt.{RefreshSpiritsActor, SpiritsActor}
 import akka.actor.{ActorRef, Props, ActorSystem}
 import play.api.Play
 
@@ -30,9 +30,9 @@ object ActorUtils {
     }
   }
 
-  val areas = system.actorOf(Props[AreasActor], name = "Areas")
+  val spirits = system.actorOf(Props[SpiritsActor], name = "Spirits")
 
-  val areaRefresh = system.actorOf(Props[RefreshAreasActor], name = "AreaRefresh")
+  val areaRefresh = system.actorOf(Props[RefreshSpiritsActor], name = "AreaRefresh")
 
   val configuarActor = system.actorOf(Props[ConfigureActor], name = "configuarActor")
 }
