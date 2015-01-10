@@ -4,6 +4,7 @@ import enums.LevelEnum
 import models.conf._
 import play.api.{Logger, Play}
 import play.api.libs.json.{JsObject, Json}
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 1/7/14.
@@ -57,8 +58,8 @@ object TaskTools {
     attrMap ++ varMap
   }
 
-  def findHosts(envId: Int, projectId: Int): Seq[EnvironmentProjectRel] = {
-    EnvironmentProjectRelHelper.findByEnvId_ProjectId(envId, projectId)
+  def findHosts(envId: Int, projectId: Int): Seq[Host] = {
+    HostHelper.findByEnvId_ProjectId(envId, projectId)
   }
 
   def findProject(envId: Int, projectId: Int, realVersion: String): Project_v = {

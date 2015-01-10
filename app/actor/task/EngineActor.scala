@@ -14,6 +14,7 @@ import utils._
 import scala.concurrent.duration._
 import scala.sys.process._
 import scalax.file.Path
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 21/8/14.
@@ -258,6 +259,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
   }
 }
 
-case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[EnvironmentProjectRel], hostsIndex: Int)
+case class ReplaceCommand(taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[Host], hostsIndex: Int)
 
 case class ReplaceConfigure(taskObj: ProjectTask_v, hostname: String, order: Int)

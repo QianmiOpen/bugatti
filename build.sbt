@@ -16,7 +16,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-remote" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-    "com.qianmi.bugatti" % "spirit_2.10" % "1.4.1",
+    "com.qianmi.bugatti" % "spirit_2.10" % "1.4.2",
     "mysql" % "mysql-connector-java" % "5.1.34",
     "com.typesafe.slick" %% "slick" % "2.1.0",
     "org.slf4j" % "slf4j-nop" % "1.6.4",
@@ -49,7 +49,8 @@ libraryDependencies ++= {
     "org.webjars" % "angular-chosen" % "1.0.6",
     "org.eclipse.jgit" % "org.eclipse.jgit" % "3.4.1.201406201815-r",
     "com.typesafe.atmos" % "trace-play-2.2.0" % "1.3.0",
-    "org.yaml" % "snakeyaml" % "1.13"
+    "org.yaml" % "snakeyaml" % "1.13",
+    "org.scalatest" % "scalatest_2.10" % "2.2.1" % "test"
   )
 }
 
@@ -60,3 +61,5 @@ resolvers ++= Seq(
 )
 
 play.Project.playScalaSettings
+
+scalacOptions in ThisBuild ++= Seq("-feature")

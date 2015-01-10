@@ -9,7 +9,7 @@ import play.api.mvc.Results._
 import utils.ControlUtil._
 
 import actor.ActorUtils
-import actor.salt.AddArea
+import actor.salt.AddSpirit
 import actor.task.MyActor
 import enums.{ContainerTypeEnum, LevelEnum, RoleEnum}
 import models.AppDB
@@ -107,7 +107,7 @@ object Global extends GlobalSettings {
           TableQuery[TaskSchemeTable] ::
           TableQuery[TaskTable] ::
           TableQuery[AreaTable] ::
-          TableQuery[EnvironmentProjectRelTable] ::
+          TableQuery[HostTable] ::
           TableQuery[ScriptVersionTable] ::
           TableQuery[VariableTable] ::
           TableQuery[ProjectDependencyTable] ::
@@ -121,9 +121,9 @@ object Global extends GlobalSettings {
       AppData.initData
     }
 
-    // 初始化区域
-    if (app.configuration.getBoolean("area.init").getOrElse(true)) {
-      AreaHelper.all.foreach(ActorUtils.areas ! AddArea(_))
+    // 初始化spirit
+    if (app.configuration.getBoolean("spirit.init").getOrElse(true)) {
+      SpiritHelper.all.foreach(ActorUtils.spirits ! AddSpirit(_))
     }
 
     // 启动时，重新加载formulas
@@ -210,10 +210,10 @@ object AppTestData {
 
     // 初始化环境关系表
     Seq(
-      EnvironmentProjectRel(None, Option(4), Option(1), Option(1), "t-syndic", "d6a597315b01", "172.19.3.134", ContainerTypeEnum.vm
+      Host(None, Option(4), Option(1), Option(1), "t-syndic", "d6a597315b01", "172.19.3.134", ContainerTypeEnum.vm
         , Option(""), Option("") ,Seq.empty[Variable])
       //EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "8e6499e6412a", "172.19.3.134")
-    ).foreach(EnvironmentProjectRelHelper.create)
+    ).foreach(HostHelper.create)
 
     // 初始化区域
     Seq(

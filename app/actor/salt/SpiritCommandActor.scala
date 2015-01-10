@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, Cancellable, Actor, ActorLogging}
 import akka.event.LoggingReceive
 import com.qianmi.bugatti.actors.{SaltTimeOut, SpiritResult}
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
  * Created by mind on 8/3/14.

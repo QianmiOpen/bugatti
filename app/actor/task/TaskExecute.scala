@@ -68,7 +68,7 @@ class TaskExecute extends Actor with ActorLogging {
             }
           }
 
-          val seqMachines = EnvironmentProjectRelHelper.findByEnvId_ProjectId(tq.envId, tq.projectId)
+          val seqMachines = HostHelper.findByEnvId_ProjectId(tq.envId, tq.projectId)
           if (seqMachines.length == 0) {
             _commandList = Seq.empty[TaskCommand]
             _json = Json.obj("error" -> s"未关联机器")
@@ -99,10 +99,10 @@ class TaskExecute extends Actor with ActorLogging {
     case next: NextTaskQueue => {
       next.clusterName match {
         case Some(c) => {
-          self ! TaskGenerateCommand(EPCParams(next.envId, next.projectId, next.clusterName, Seq.empty[EnvironmentProjectRel], 0))
+          self ! TaskGenerateCommand(EPCParams(next.envId, next.projectId, next.clusterName, Seq.empty[Host], 0))
         }
         case _ => {
-          val hosts = EnvironmentProjectRelHelper.findByEnvId_ProjectId(next.envId, next.projectId)
+          val hosts = HostHelper.findByEnvId_ProjectId(next.envId, next.projectId)
           self ! TaskGenerateCommand(EPCParams(next.envId, next.projectId, next.clusterName, hosts, 0))
         }
       }
@@ -272,8 +272,8 @@ class TaskExecute extends Actor with ActorLogging {
 case class TaskGenerateCommand(epc: EPCParams)
 case class RemoveTaskQueue(envId: Int, projectId: Int, clusterName: Option[String])
 
-case class GenerateCommands(tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
+case class GenerateCommands(tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[Host], hostsIndex: Int, taskObj: ProjectTask_v)
 case class SendCommandActor(tq: TaskQueue, taskObj: ProjectTask_v)
 case class UpdateCommandStatus(taskId: Int, orderNum: Int, status: TaskStatus)
 
-case class EPCParams(envId: Int, projectId: Int, clusterName: Option[String], hosts: Seq[EnvironmentProjectRel], hostIndex: Int)
+case class EPCParams(envId: Int, projectId: Int, clusterName: Option[String], hosts: Seq[Host], hostIndex: Int)

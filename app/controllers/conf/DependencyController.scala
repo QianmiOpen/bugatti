@@ -28,8 +28,9 @@ object DependencyController extends BaseController{
     val result = Seq(
       DependencyNest(id, project.name, false, "", project.templateId, dependencyNests)
     )
-    Logger.info(s"${Json.prettyPrint(Json.toJson(result))}")
-    Ok(Json.toJson(result))
+// TODO   Logger.info(s"${Json.prettyPrint(Json.toJson(result))}")
+//    Ok(Json.toJson(result))
+    Ok("")
   }
 
   def removeDependency(parentId: Int, childId: Int) = Action {
@@ -46,13 +47,15 @@ object DependencyController extends BaseController{
   }
   def add(fields: Seq[(String, JsValue)]): Int = {
     val fieldsJson = Json.toJson(fields.toMap)
-    val p = (fieldsJson \ "parent").as[DependencyNest]
-    val c = (fieldsJson \ "child").as[Project]
-    try{
-      ProjectDependencyHelper.addByP_C(p, c)
-    } catch {
-      case e: Exception => 0
-    }
+    0
+//    TODO
+//    val p = (fieldsJson \ "parent").as[DependencyNest]
+//    val c = (fieldsJson \ "child").as[Project]
+//    try{
+//      ProjectDependencyHelper.addByP_C(p, c)
+//    } catch {
+//      case e: Exception => 0
+//    }
   }
 
   def updateTemplateProject = Action(parse.json){implicit request =>

@@ -16,6 +16,7 @@ import scala.concurrent.duration._
 import scala.sys.process._
 import scalax.file.Path
 import scalax.io.StandardOpenOption._
+import scala.language.postfixOps
 
 /**
  * Created by jinwei on 14/7/14.

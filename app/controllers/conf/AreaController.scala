@@ -1,7 +1,7 @@
 package controllers.conf
 
 import actor.ActorUtils
-import actor.salt.{DeleteArea, UpdateArea, AddArea, RefreshHosts}
+import actor.salt.{DeleteSpirit, UpdateSpirit, AddSpirit, RefreshHosts}
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
 import exceptions.UniqueNameException
@@ -51,7 +51,6 @@ object AreaController extends BaseController {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增区域", area))
           val areaId = AreaHelper.create(area)
           val newArea = area.copy(id = Option(areaId))
-          ActorUtils.areas ! AddArea(newArea)
           Ok(Json.toJson(areaId))
         } catch {
           case un: UniqueNameException => Ok(resultUnique(un.getMessage))
@@ -65,7 +64,6 @@ object AreaController extends BaseController {
       area =>
         try {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改区域", area))
-          ActorUtils.areas ! UpdateArea(area)
           Ok(Json.toJson(AreaHelper.update(area)))
         } catch {
           case un: UniqueNameException => Ok(resultUnique(un.getMessage))
@@ -77,7 +75,6 @@ object AreaController extends BaseController {
     AreaHelper.findById(id) match {
       case Some(area) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除区域", area))
-        ActorUtils.areas ! DeleteArea(id)
         Ok(Json.toJson(AreaHelper.delete(id)))
       case None => NotFound
     }
