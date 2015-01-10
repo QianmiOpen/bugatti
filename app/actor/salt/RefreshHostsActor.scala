@@ -1,8 +1,9 @@
 package actor.salt
 
+import actor.ActorUtils
 import actor.salt.RefreshHostsActor._
 import akka.actor._
-import com.qianmi.bugatti.actors.{SaltJobOk, SaltStatusResult}
+import com.qianmi.bugatti.actors.{ListHostsResult, ListHosts, SaltJobOk, SaltStatusResult}
 import enums.ContainerTypeEnum
 import models.conf._
 import org.apache.commons.net.util.SubnetUtils
@@ -20,14 +21,14 @@ case class Run()
 object RefreshHostsActor {
   sealed trait State
   case object S_Init extends State
+  case object S_GetHostList extends State
   case object S_GetHostsInfo extends State
   case object S_Finish extends State
+
 }
 
 class RefreshHostsActor(spiritId: Int, realSender: ActorRef) extends LoggingFSM[State, Seq[SaltStatusResult]] {
   val commands = Seq(
-    Seq("salt-run", "fileserver.update"),
-    Seq("salt", "*", "saltutil.sync_returners"),
     Seq("salt", "*", "grains.get", "ip_interfaces:eth0")
   )
 
@@ -35,13 +36,32 @@ class RefreshHostsActor(spiritId: Int, realSender: ActorRef) extends LoggingFSM[
 
   when(S_Init) {
     case Event(Run, _) =>
-      goto(S_GetHostsInfo)
+      goto(S_GetHostList)
   }
 
-  when(S_GetHostsInfo, 60 second) {
+  when(S_GetHostList, 10 second) {
+    case Event(ListHostsResult(hostNames), ssrs: Seq[SaltStatusResult]) => {
+      if (hostNames == null || hostNames.isEmpty) {
+        goto(S_Finish)
+      } else {
+        val hosts = HostHelper.findBySpiritId(spiritId)
+//        val
+
+        goto(S_GetHostsInfo)
+      }
+    }
     case Event(StateTimeout, _) => {
       goto(S_Finish)
     }
+  }
+
+  when(S_GetHostsInfo, 60 second) {
+    case Event(ssr: SaltStatusResult, ssrs: Seq[SaltStatusResult]) => {
+
+      goto(S_Finish)
+    }
+    case Event(StateTimeout, _) =>
+      goto(S_Finish)
   }
 
   when(S_Finish)(FSM.NullFunction)
@@ -53,8 +73,8 @@ class RefreshHostsActor(spiritId: Int, realSender: ActorRef) extends LoggingFSM[
   }
 
   onTransition {
-    case S_Init -> S_GetHostsInfo =>
-
+    case S_Init -> S_GetHostList =>
+      ActorUtils.spirits ! RemoteSpirit(spiritId, ListHosts())
   }
 
   def parseResult(sr: SaltJobOk) = {
@@ -74,7 +94,7 @@ class RefreshHostsActor(spiritId: Int, realSender: ActorRef) extends LoggingFSM[
             val newHosts = hostList.filterNot(x => x._2.isEmpty).filterNot(x => addedHosts.contains(x._1))
 
             newHosts.foreach { newhost =>
-              HostHelper.create(Host(None, None, None, None, area.syndicName, newhost._1, newhost._2, ContainerTypeEnum.vm, None, None, Seq.empty[Variable]))
+              HostHelper.create(Host(None, None, None, None, area.syndicName, spiritId, newhost._1, newhost._2, ContainerTypeEnum.vm, None, None, Seq.empty[Variable]))
             }
 
             refreshSetHostEnv(area.syndicName)

@@ -14,3 +14,5 @@ CREATE TABLE `spirit` (
 
 
 rename table `environment_project_rel` to `host`;
+
+ALTER TABLE `host` ADD COLUMN `spirit_id` int(11) NOT NULL COMMENT 'spirit id' AFTER `syndic_name`;
