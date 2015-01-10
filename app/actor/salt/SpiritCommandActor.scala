@@ -32,7 +32,8 @@ class SpiritCommandActor(realSender: ActorRef) extends Actor with ActorLogging {
   override def receive = LoggingReceive {
     case sr: SpiritResult => {
       realSender ! sr
-      context.stop(self)
+//      context.stop(self)
+
     }
 
     case cs : ConnectStoped => {

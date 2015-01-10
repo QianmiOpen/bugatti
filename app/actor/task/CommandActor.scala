@@ -2,6 +2,8 @@ package actor.task
 
 import java.io.File
 
+import actor.ActorUtils
+import actor.salt.RemoteSpirit
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
 import com.qianmi.bugatti.actors._
@@ -91,8 +93,8 @@ class CommandActor extends Actor with ActorLogging {
       _order = executeCommand.order
       if (_order < _commands.length) {
         val command = _commands(_order)
-        //TODO 增加判断do...if...
         val doif = _taskDoif(_order)
+        log.info(s"doif is $doif")
         val (flag, result) = engine.eval(doif)
         if(doif == "" || (flag && result == "true")){
           commandOver(s"命令:${command.command}(${command.sls})")
@@ -126,7 +128,10 @@ class CommandActor extends Actor with ActorLogging {
         commandOver("远程salt ping不通!")
       }else{
         //重构taskObj的grains
+        log.info(s"mminfo is ${ssr.mmInfo}")
         _taskObj = _taskObj.copy(grains = Json.parse(ssr.mmInfo).as[JsObject])
+        log.info(Json.prettyPrint(_taskObj.grains))
+        commandOver(Json.prettyPrint(_taskObj.grains))
         self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
       }
     }
@@ -134,7 +139,8 @@ class CommandActor extends Actor with ActorLogging {
     case sjb: SaltJobBegin => {
       _jid = sjb.jid
       val msg = s"任务:${_jid}开始,执行时间:${sjb.excuteMicroseconds}"
-      log.debug(msg)
+      log.info(msg)
+      log.info(s"$self")
       commandOver(msg)
     }
 
@@ -149,18 +155,20 @@ class CommandActor extends Actor with ActorLogging {
     case sr: SaltJobOk => {
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
-      log.debug(s"result.size ==> ${srResult.size}")
+      log.info(s"result.size ==> ${srResult.size}")
       val jsonResult = Json.parse(srResult)
-      jsonResult.validate[Seq[JsObject]] match {
-        case s: JsSuccess[Seq[JsObject]] => {
-          s.get.foreach { jResult =>
+      log.info(s"jsonResult is ${Json.prettyPrint(jsonResult)}")
+      jsonResult.validate[JsObject] match {
+        case s: JsSuccess[JsObject] => {
+//          s.get.foreach { jResult =>
+            val jResult = s.get
             val funType = (jResult \ "result" \ "fun").asOpt[String]
             funType match {
               case Some(fun) => {
                 //1、写日志
                 val baseDir = s"${`_baseLogPath`}/${`_taskId`}"
                 val resultLogPath = s"${baseDir}/result.log"
-                log.debug(s"commandActor resultLogPath ==> ${resultLogPath}")
+                log.info(s"commandActor resultLogPath ==> ${resultLogPath}")
                 val logDir = new File(baseDir)
                 if (!logDir.exists) {
                   logDir.mkdirs()
@@ -195,7 +203,7 @@ class CommandActor extends Actor with ActorLogging {
               }
             }
           }
-        }
+//        }
 
         case e: JsError => log.warning(s"Errors: ${JsError.toFlatJson(e)}")
       }
@@ -303,40 +311,43 @@ class CommandActor extends Actor with ActorLogging {
           confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson, hostname, _taskObj)
         }
         case "hostStatus" => {
-          val remoteActor = getRemoteActor(envId, projectId, order)
-          Thread.sleep(10000)
-          log.info(s"remoteActor ==> ${remoteActor}")
-          log.info(s"$hostname,${_taskObj.cHost.get.ip}")
-
-          remoteActor ! SaltStatus(hostname, _taskObj.cHost.get.ip)
+          ActorUtils.spirits ! RemoteSpirit(_taskObj.cHost.get.spiritId, SaltStatus(hostname, _taskObj.cHost.get.ip))
+//          val remoteActor = getRemoteActor(envId, projectId, order)
+//          Thread.sleep(10000)
+//          log.info(s"remoteActor ==> ${remoteActor}")
+//          log.info(s"$hostname,${_taskObj.cHost.get.ip}")
+//
+//          remoteActor ! SaltStatus(hostname, _taskObj.cHost.get.ip)
         }
       }
     } else {
       //正常的salt命令
-      callRemote(envId, projectId, order, _commandSeq)
+//      callRemote(envId, projectId, order, _commandSeq)
+      ActorUtils.spirits ! RemoteSpirit(_taskObj.cHost.get.spiritId, SaltCommand(_commandSeq))
     }
   }
 
-  def getRemoteActor(envId: Int, projectId: Int, order: Int): ActorRef ={
+//  def getRemoteActor(envId: Int, projectId: Int, order: Int): ActorRef ={
     //1、根据syndic获取ip
-    log.info(s"hostname => ${_clusterName}")
-    log.info(s"taskObj => ${_taskObj}")
-    val syndicIp: String = _taskObj.hosts.filter(_.name == _clusterName.get).map(_.proxyIp).headOption.getOrElse("0.0.0.0")
-    log.debug(s"commnadActor syndicIp ==> ${syndicIp}")
+//    log.info(s"hostname => ${_clusterName}")
+//    log.info(s"taskObj => ${_taskObj}")
+//    val syndicIp: String = _taskObj.hosts.filter(_.name == _clusterName.get).map(_.proxyIp).headOption.getOrElse("0.0.0.0")
+//    log.debug(s"commnadActor syndicIp ==> ${syndicIp}")
 
-    val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
-    log.info(s"remotePath ==> ${remotePath}")
-    context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${_taskId}_${order}")
-  }
+//    val remotePath = s"akka.tcp://Spirit@${syndicIp}:2552/user/SpiritCommands"
+//    log.info(s"remotePath ==> ${remotePath}")
+//    context.actorOf(Props(classOf[LookupActor], remotePath), s"lookupActor_${envId}_${projectId}_${_taskId}_${order}")
 
-  def callRemote(envId: Int, projectId: Int, order: Int, commandSeq: Seq[String]): Unit ={
-    val lookupActor = getRemoteActor(envId, projectId, order)
-    //3、触发远程命令
-    import context._
-    context.system.scheduler.scheduleOnce(1.second) {
-      lookupActor ! SaltCommand(commandSeq)
-    }
-  }
+//  }
+
+//  def callRemote(envId: Int, projectId: Int, order: Int, commandSeq: Seq[String]): Unit ={
+//    val lookupActor = getRemoteActor(envId, projectId, order)
+//    //3、触发远程命令
+//    import context._
+//    context.system.scheduler.scheduleOnce(1.second) {
+//      lookupActor ! SaltCommand(commandSeq)
+//    }
+//  }
 }
 
 case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v, cluster: Option[String], taskDoif: Seq[String])

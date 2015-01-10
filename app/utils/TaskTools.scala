@@ -65,8 +65,7 @@ object TaskTools {
   def findProject(envId: Int, projectId: Int, realVersion: String): Project_v = {
     val project = ProjectHelper.findById(projectId).get
 
-    val hosts = findHosts(envId, projectId).map(c => Host_v(c.name, c.ip, Some(c.globalVariable.map(v => v.name -> v.value).toMap),
-      AreaHelper.findBySyndicName(c.syndicName).map{t => Logger.info(s"syndicIp ==> ${t.syndicIp}");t.syndicIp}.getOrElse("0.0.0.0")))
+    val hosts = findHosts(envId, projectId).map(c => Host_v(c.name, c.ip, Some(c.globalVariable.map(v => v.name -> v.value).toMap),c.spiritId))
 
     val attrs = getProperties(envId, projectId, project.templateId, realVersion)
     val aliases = findAlias(project.templateId, realVersion)
@@ -81,7 +80,7 @@ object TaskTools {
     map.keySet.map {
       pid =>
         val project = ProjectHelper.findById(pid).get
-        val hosts = findHosts(envId, project.id.get).map(c => Host_v(c.name, c.ip, None, ""))
+        val hosts = findHosts(envId, project.id.get).map(c => Host_v(c.name, c.ip, None, -1))
 //        val attrs = getProperties(envId, project.id.get, project.templateId, realVersion).filter { t => t._1.startsWith("t_")}
         val attrs = getProperties(envId, project.id.get, project.templateId, realVersion)
         val aliases = findAlias(project.templateId, realVersion)
@@ -172,7 +171,7 @@ object ConfHelp {
   lazy val catalinaWSUrl = app.configuration.getString("bugatti.catalina.websocketUrl").getOrElse("http://0.0.0.0:3232/")
 }
 
-case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]], proxyIp: String)
+case class Host_v(name: String, ip: String, attrs: Option[Map[String, String]], spiritId: Int)
 
 case class Environment_v(id: String, name: String, scriptVersion: String, realVersion: String, level: String)
 
