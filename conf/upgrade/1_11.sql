@@ -8,7 +8,7 @@ ALTER TABLE `template_action_step` ADD COLUMN `do_if` VARCHAR(2000) NULL COMMENT
 CREATE TABLE `spirit` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL,
-  `spirit_ip` varchar(16) NOT NULL,
+  `ip` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
