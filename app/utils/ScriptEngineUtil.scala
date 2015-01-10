@@ -60,6 +60,22 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
     }
   }
 
+  def setCHost: ProjectTask_v= {
+    if(projectTask.hosts.length > 0){
+      hostname match {
+        case Some(name) => {
+          projectTask.copy(cHost = projectTask.hosts.filter(_.name == name).headOption)
+        }
+        case _ => {
+          projectTask
+        }
+      }
+    }else {
+      projectTask
+    }
+  }
+
+
   def eval(script: String): (Boolean, String) = {
     try {
       val ret = engine.eval(script)

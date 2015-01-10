@@ -3,6 +3,7 @@ package actor.task
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{OneForOneStrategy, ActorLogging, Props, Actor}
 import enums.TaskEnum
+import enums.TaskEnum._
 import exceptions.TaskExecuteException
 import models.conf._
 import models.task._
@@ -17,7 +18,7 @@ class TaskExecute extends Actor with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
-      log.error(s"${self} catch ${sender} exception: ${e.getStackTrace}")
+      log.error(s"${self} catch ${sender} exception: ${e.getStackTraceString}")
       postStop()
       Escalate
   }
@@ -31,7 +32,7 @@ class TaskExecute extends Actor with ActorLogging {
   var _envId = 0
   var _projectId = 0
 
-  var (_commandList, _json) = (Seq.empty[TaskCommand], Json.obj())
+  var (_commandList, _taskDoifList, _json) = (Seq.empty[TaskCommand], Seq.empty[String], Json.obj())
 
   var _clusterName = Option.empty[String]
 
@@ -62,8 +63,8 @@ class TaskExecute extends Actor with ActorLogging {
             case e: Exception => {
               _commandList = Seq.empty[TaskCommand]
               _json = Json.obj("error" -> e.getMessage())
-              log.error(e.toString)
-              log.error(e.getMessage)
+              log.error(s"${e.getStackTrace}")
+              log.error(s"errorMessage => ${e.getMessage}")
             }
           }
 
@@ -77,10 +78,10 @@ class TaskExecute extends Actor with ActorLogging {
           val templateStep = TemplateActionStepHelper.findStepsByTemplateId(tq.taskTemplateId)
           val totalNum =  tgc.epc.clusterName match {
             case Some(c) => {
-              templateStep.length
+              templateStep.length + 1 //获取机器状态是后来拼接到命令列表，因此命令总数需要+1
             }
             case _ => {
-              tgc.epc.hosts.length * templateStep.length
+              tgc.epc.hosts.length * templateStep.length + 1
             }
           }
           val hostsIndex = tgc.epc.hostIndex
@@ -119,6 +120,8 @@ class TaskExecute extends Actor with ActorLogging {
 //            _hostsIndex = _hostsIndex + 1
           }else {
             //发送CommandActor
+            log.info(s"_commandList => ${_commandList}")
+            log.info(s"_taskDoifList => ${_taskDoifList}")
             self ! SendCommandActor(gcommand.tq, gcommand.taskObj)
             TaskCommandHelper.create(_commandList)
           }
@@ -142,6 +145,7 @@ class TaskExecute extends Actor with ActorLogging {
 
     case successReplace: SuccessReplaceCommand => {
       _commandList = _commandList ++ successReplace.commandList
+      _taskDoifList = _taskDoifList ++ successReplace.taskDoif
       log.info(s"successReplace ==> ${_commandList}")
       self ! GenerateCommands(successReplace.tq, successReplace.templateStep, successReplace.hosts, successReplace.hostsIndex, successReplace.taskObj)
     }
@@ -163,7 +167,7 @@ class TaskExecute extends Actor with ActorLogging {
       val key = taskKey(sc.tq.envId, sc.tq.projectId, sc.tq.clusterName)
       context.child(s"commandActor_${key}").getOrElse(
         actorOf(Props[CommandActor], s"commandActor_${key}")
-      ) ! InsertCommands(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName)
+      ) ! InsertCommands(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName, _taskDoifList)
     }
 
     case removeTaskQueue: RemoveTaskQueue => {
@@ -190,6 +194,8 @@ class TaskExecute extends Actor with ActorLogging {
       terminate(tc)
     }
 
+    case ucs: UpdateCommandStatus =>
+      TaskCommandHelper.update(ucs.taskId, ucs.orderNum, ucs.status)
   }
 
   def terminate(tc: TerminateCommands): Unit ={
@@ -268,5 +274,6 @@ case class RemoveTaskQueue(envId: Int, projectId: Int, clusterName: Option[Strin
 
 case class GenerateCommands(tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[EnvironmentProjectRel], hostsIndex: Int, taskObj: ProjectTask_v)
 case class SendCommandActor(tq: TaskQueue, taskObj: ProjectTask_v)
+case class UpdateCommandStatus(taskId: Int, orderNum: Int, status: TaskStatus)
 
 case class EPCParams(envId: Int, projectId: Int, clusterName: Option[String], hosts: Seq[EnvironmentProjectRel], hostIndex: Int)

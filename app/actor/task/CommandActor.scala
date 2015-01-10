@@ -10,7 +10,7 @@ import enums.TaskEnum.TaskStatus
 import models.conf.VersionHelper
 import models.task.{TaskQueue, Task, TaskCommand, TaskHelper}
 import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
-import utils.{ProjectTask_v, ConfHelp}
+import utils.{ScriptEngineUtil, ProjectTask_v, ConfHelp}
 
 import scala.concurrent.duration._
 import scala.sys.process._
@@ -49,6 +49,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 
   var _commands = Seq.empty[TaskCommand]
+  var _taskDoif = Seq.empty[String]
   var _taskId = 0
   var _envId = 0
   var _projectId = 0
@@ -73,6 +74,7 @@ class CommandActor extends Actor with ActorLogging {
       _returnJson = insertCommands.json
       _taskObj = insertCommands.taskObj
       _clusterName = insertCommands.cluster
+      _taskDoif = insertCommands.taskDoif
 
       if (insertCommands.commandList.length == 0) {
         noCommands(_taskId, _envId, _projectId, insertCommands.json)
@@ -83,13 +85,28 @@ class CommandActor extends Actor with ActorLogging {
       }
     }
     case executeCommand: ExecuteCommand => {
+      val engine = new ScriptEngineUtil(_taskObj, _clusterName)
+      _taskObj = engine.setCHost
       _order = executeCommand.order
       if (_order < _commands.length) {
         val command = _commands(_order)
         //TODO 增加判断do...if...
+        val doif = _taskDoif(_order)
+        val (flag, result) = engine.eval(doif)
+        if(doif == "" || (flag && result == "true")){
+          commandOver(s"命令:${command.command}(${command.sls})")
+          MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine, _clusterName)
+          executeSalt(_taskId, command, _envId, _projectId, _versionId, _order)
+        }else {
+          commandOver(s"${command}跳过执行,原因:${doif}")
+          //更新taskCommand状态
+          context.parent ! UpdateCommandStatus(_taskId, _order, TaskEnum.TaskPass)
+          //执行下一个任务
+          self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
+        }
 
-        MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine, _clusterName)
-        executeSalt(_taskId, command, _envId, _projectId, _versionId, _order)
+//        MyActor.superviseTaskActor ! ChangeCommandStatus(_envId, _projectId, _order, command.sls, command.machine, _clusterName)
+//        executeSalt(_taskId, command, _envId, _projectId, _versionId, _order)
       } else {
         terminateCommand(TaskEnum.TaskSuccess)
       }
@@ -124,6 +141,7 @@ class CommandActor extends Actor with ActorLogging {
       val msg = s"任务:${_jid}执行失败,${sje.msg},执行时间:${sje.excuteMicroseconds}"
       log.error(msg)
       commandOver(msg)
+      context.parent ! UpdateCommandStatus(_taskId, _order, TaskEnum.TaskFailed)
       self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
     }
 
@@ -131,7 +149,7 @@ class CommandActor extends Actor with ActorLogging {
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
       log.debug(s"result.size ==> ${srResult.size}")
-      val jsonResult = Json.parse("")
+      val jsonResult = Json.parse(srResult)
       jsonResult.validate[Seq[JsObject]] match {
         case s: JsSuccess[Seq[JsObject]] => {
           s.get.foreach { jResult =>
@@ -158,16 +176,19 @@ class CommandActor extends Actor with ActorLogging {
                 if (!seqResult.contains(false) && !exeResult.contains(false)) {
                   //命令执行成功
                   //3、调用commandActor
+                  context.parent ! UpdateCommandStatus(_taskId, _order, TaskEnum.TaskSuccess)
                   (Seq("echo", "命令执行成功") #>> file lines)
                   self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
                 } else {
                   //命令执行失败
+                  context.parent ! UpdateCommandStatus(_taskId, _order, TaskEnum.TaskFailed)
                   (Seq("echo", "命令执行失败") #>> file lines)
                   self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
                 }
                 (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
               }
               case _ => {
+                context.parent ! UpdateCommandStatus(_taskId, _order, TaskEnum.TaskSuccess)
                 //如果不是state.sls 则直接返回成功
                 self ! ExecuteCommand(_taskId, _envId, _projectId, _versionId, _order + 1)
               }
@@ -185,6 +206,7 @@ class CommandActor extends Actor with ActorLogging {
     }
 
     case IdentityNone() => {
+      log.error(s"远程spirit异常!")
       self ! TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName)
       commandOver("远程spirit异常!")
     }
@@ -280,7 +302,9 @@ class CommandActor extends Actor with ActorLogging {
           confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, _returnJson, hostname, _taskObj)
         }
         case "hostStatus" => {
-          getRemoteActor(envId, projectId, order) ! SaltStatus(hostname, _taskObj.cHost.get.ip)
+          val remoteActor = getRemoteActor(envId, projectId, order)
+          log.info(s"remoteActor ==> ${remoteActor}")
+          remoteActor ! SaltStatus(hostname, _taskObj.cHost.get.ip)
         }
       }
     } else {
@@ -311,7 +335,7 @@ class CommandActor extends Actor with ActorLogging {
   }
 }
 
-case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v, cluster: Option[String])
+case class InsertCommands(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v, cluster: Option[String], taskDoif: Seq[String])
 
 case class ExecuteCommand(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], order: Int)
 

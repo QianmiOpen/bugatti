@@ -57,12 +57,15 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       val engine = new ScriptEngineUtil(replaceCommand.taskObj, Some(hostname))
 
       var taskCommandSeq = Seq.empty[TaskCommand]
+      var taskDoif = Seq.empty[String]
       //所有任务前,增加查询机器状态
-      taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, host_status_commnad, hostname, "All", TaskEnum.TaskWait, 0)
+      taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, host_status_commnad, hostname, "获取机器状态", TaskEnum.TaskWait, 0)
+      taskDoif = taskDoif :+ ""
 
       var errors = Set.empty[String]
 
       replaceCommand.templateStep.foreach { templateStep =>
+        //命令
         var command = templateStep.sls
         getContentKeys(command).foreach { key =>
           _lastReplaceKey = key
@@ -74,12 +77,31 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
             log.error(value)
           }
         }
+        //doif
+        var doif = ""
+        templateStep.doIf match {
+          case Some(d) =>
+            doif = d
+            getContentKeys(doif).foreach { key =>
+              _lastReplaceKey = key
+              val (ret, value) = engine.eval(key)
+              if (ret) {
+                doif = doif.replaceAll(Pattern.quote(s"{{${key}}}"), value)
+              } else {
+                errors += s"${key}: ${value}"
+                log.error(value)
+              }
+            }
+          case _ =>
+            doif = ""
+        }
 
+        taskDoif = taskDoif :+ doif
         taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, command, hostname, templateStep.name, TaskEnum.TaskWait, templateStep.orderNum)
       }
 
       if (errors isEmpty) {
-        sender ! SuccessReplaceCommand(taskCommandSeq, replaceCommand.tq, replaceCommand.templateStep, replaceCommand.hosts, replaceCommand.hostsIndex + 1, replaceCommand.taskObj)
+        sender ! SuccessReplaceCommand(taskCommandSeq, replaceCommand.tq, replaceCommand.templateStep, replaceCommand.hosts, replaceCommand.hostsIndex + 1, replaceCommand.taskObj, taskDoif)
       } else {
         sender ! ErrorReplaceCommand(errors.mkString("""\\\n"""), replaceCommand.tq, replaceCommand.templateStep, replaceCommand.hosts, replaceCommand.hostsIndex + 1, replaceCommand.taskObj)
       }

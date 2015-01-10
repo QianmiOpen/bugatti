@@ -408,6 +408,7 @@ define(['angular'], function(angular) {
                     growl.addErrorMessage("任务脚本已更新，请刷新页面再操作");
                 }
             })
+//            $scope.versionShow = false
         }
 
         $scope.start = function(){
