@@ -304,7 +304,10 @@ class CommandActor extends Actor with ActorLogging {
         }
         case "hostStatus" => {
           val remoteActor = getRemoteActor(envId, projectId, order)
+          Thread.sleep(10000)
           log.info(s"remoteActor ==> ${remoteActor}")
+          log.info(s"$hostname,${_taskObj.cHost.get.ip}")
+
           remoteActor ! SaltStatus(hostname, _taskObj.cHost.get.ip)
         }
       }
