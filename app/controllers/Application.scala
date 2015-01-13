@@ -136,7 +136,11 @@ object Application extends ScalaController with Security {
 
         // spirit
         conf.routes.javascript.SpiritController.all,
+        conf.routes.javascript.SpiritController.get,
         conf.routes.javascript.SpiritController.refresh,
+        conf.routes.javascript.SpiritController.add,
+        conf.routes.javascript.SpiritController.delete,
+        conf.routes.javascript.SpiritController.update,
 
         // project
         conf.routes.javascript.ProjectController.show,

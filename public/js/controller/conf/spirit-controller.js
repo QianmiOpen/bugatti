@@ -41,7 +41,7 @@ define(['angular'], function(angular) {
                 }
             });
             modalInstance.result.then(function(data) {
-                $scope.spirit.splice(index, 1);
+                $scope.spirits.splice(index, 1);
                 SpiritService.count(function(num) {
                     $scope.totalItems = num;
                 });

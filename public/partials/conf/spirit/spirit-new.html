@@ -1,0 +1,45 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button>
+    <h1 class="pull-left m0">网关{{$stateParams.id ? "修改" : "添加"}}</h1>
+</div>
+
+<form name="form" class="form-horizontal" novalidate>
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">名称：</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" ng-model="spirit.name" name="name" id="name" ng-maxlength="60" placeholder="名称" required>
+        </div>
+        <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
+            <span ng-show="form.name.$error.required" class="control-label">请输入网关名称</span>
+            <span ng-show="form.name.$error.maxLength" class="control-label">超过长度</span>
+            <span ng-show="form.name.$error.exists" class="control-label">该区域已经存在，请换一个名称</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="ip" class="col-sm-3 control-label">ip：</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" ng-model="spirit.ip" name="ip" id="ip" ng-maxlength="16" placeholder="网关ip" required>
+        </div>
+        <div ng-show="form.ip.$dirty && form.ip.$invalid" class="has-error">
+            <span ng-show="form.ip.$error.required" class="control-label">请输入ip地址</span>
+            <span ng-show="form.ip.$error.maxLength" class="control-label">超过长度</span>
+            <span ng-show="form.ip.$error.exists" class="control-label">该主机已经存在，请换一个名称</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="info" class="col-sm-3 control-label">描述：</label>
+        <div class="col-sm-5">
+            <textarea class="form-control" ng-model="spirit.info" name="info" id="info" ng-maxlength="256" cols="30" rows="6" placeholder="网关描述"></textarea>
+        </div>
+        <div ng-show="form.info.$dirty && form.info.$invalid" class="has-error">
+            <span ng-show="form.info.$error.maxLength" class="control-label">超过长度</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-5">
+            <button class="btn btn-success" ng-click="saveOrUpdate(spirit)" ng-disabled="form.$invalid"> 保 存 </button>
+            <button ng-if="$stateParams.id" class="btn btn-link" ng-click="reset()" ng-disabled="isUnchanged(spirit)" >重置</button>
+        </div>
+    </div>
+</form>

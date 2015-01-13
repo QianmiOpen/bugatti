@@ -7,8 +7,9 @@
     <table class="table table-striped table-hover table-fixed">
         <thead>
         <tr>
-            <th width="40%">名称</th>
-            <th width="40%">IP</th>
+            <th width="20%">名称</th>
+            <th width="20%">IP</th>
+            <th width="40%">描述</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -16,6 +17,7 @@
         <tr ng-repeat="spirit in spirits">
             <td><a tooltip="{{spirit.name}}" ui-sref="conf.spirit.detail({id: spirit.id})">{{spirit.name}}</a></td>
             <td><span tooltip="{{spirit.ip}}">{{spirit.ip}}</span></td>
+            <td><span tooltip="{{spirit.info}}">{{spirit.info}}</span></td>
             <td>
                 <a ng-click="refresh(spirit.id)" href="" title="刷新"><span class="glyphicon glyphicon-refresh"></span></a>
                 <a ui-sref="conf.spirit.edit({id: spirit.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
@@ -25,7 +27,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="3">&nbsp;</td>
+            <td colspan="4">&nbsp;</td>
         </tr>
         </tfoot>
     </table>

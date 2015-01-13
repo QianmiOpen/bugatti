@@ -7,14 +7,15 @@ import play.api.Play.current
  * Created by mind on 1/8/15.
  */
 
-case class Spirit(id: Option[Int], name: String, ip: String)
+case class Spirit(id: Option[Int], name: String, ip: String, info: Option[String])
 
 case class SpiritTable(tag: Tag) extends Table[Spirit](tag, "spirit") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name", O.DBType("VARCHAR(200)"))
+  def name = column[String]("name", O.DBType("VARCHAR(64)"))
   def ip = column[String]("ip", O.DBType("VARCHAR(16)"))
+  def info = column[String]("info", O.DBType("VARCHAR(256)"))
 
-  override def * = (id.?, name, ip) <> (Spirit.tupled, Spirit.unapply _)
+  override def * = (id.?, name, ip, info.?) <> (Spirit.tupled, Spirit.unapply _)
 
   index("idx_ip", ip, unique = true)
 }
