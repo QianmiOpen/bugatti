@@ -4,10 +4,17 @@ import actor.ActorUtils
 import akka.actor.{ActorRef, Actor, ActorLogging}
 import akka.event.LoggingReceive
 import com.qianmi.bugatti.actors.{SaltTimeOut, SaltJobOk, SaltCommand}
+import actor.salt.RefreshFilesActor._
 
 /**
  * Created by mind on 8/4/14.
  */
+
+object RefreshFilesActor {
+  case object Run
+  case object Finish
+  case object Error
+}
 class RefreshFilesActor(spiritId: Int, realSender: ActorRef) extends Actor with ActorLogging {
   val commands = Seq(
     Seq("salt-run", "fileserver.update"),

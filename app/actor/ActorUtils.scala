@@ -32,7 +32,7 @@ object ActorUtils {
 
   val spirits = system.actorOf(Props[SpiritsActor], name = "Spirits")
 
-  val areaRefresh = system.actorOf(Props[RefreshSpiritsActor], name = "AreaRefresh")
+  val spiritsRefresh = system.actorOf(Props[RefreshSpiritsActor], name = "SpiritRefresh")
 
   val configuarActor = system.actorOf(Props[ConfigureActor], name = "configuarActor")
 }

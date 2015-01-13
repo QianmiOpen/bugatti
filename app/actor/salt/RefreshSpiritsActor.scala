@@ -9,13 +9,19 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.pattern.ask
 import scala.language.postfixOps
+import actor.salt.RefreshSpiritsActor._
 
 /**
  * Created by mind on 7/31/14.
  */
 
-case class RefreshHosts(areaId: Int) // refresh host include refresh files
-case class RefreshFiles(areaId: Int) // refresh file include refresh file server and returner
+
+object RefreshSpiritsActor {
+  case class RefreshHosts(spiritId: Int) // refresh host include refresh files
+  case class RefreshFiles(spiritId: Int) // refresh file include refresh file server and returner
+
+  case object RefreshSpiritsHosts
+}
 
 class RefreshSpiritsActor extends Actor with ActorLogging {
   import context._
@@ -47,20 +53,14 @@ class RefreshSpiritsActor extends Actor with ActorLogging {
     case RefreshHosts(spiritId) => {
       log.debug(s"Refresh Hosts, begin refresh hosts: ${spiritId}")
       val rha = context.actorOf(Props(classOf[RefreshHostsActor], spiritId, sender))
-      rha ! Run
+      rha ! RefreshHostsActor.Run
     }
 
     case RefreshFiles(spiritId) => {
       val rfa = context.actorOf(Props(classOf[RefreshFilesActor], spiritId, sender))
-      rfa ! Run
+      rfa ! RefreshFilesActor.Run
     }
 
     case x => log.debug(s"RefreshSpiritsActor receive unknown message ${x}")
   }
 }
-
-//case class Run()
-case class Finish()
-case class Error()
-
-private case class RefreshSpiritsHosts()

@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{ContainerTypeEnum, FuncEnum, ModEnum}
+import enums.{StateEnum, ContainerTypeEnum, FuncEnum, ModEnum}
 import models.conf._
 import play.api.data.Forms._
 import play.api.data._
@@ -34,6 +34,7 @@ object RelationController extends BaseController {
       "spiritId" -> number,
       "name" -> text,
       "ip" -> text,
+      "state" -> enums.form.enum(StateEnum),
       "containerType" -> enums.form.enum(ContainerTypeEnum),
       "hostIp" -> optional(text),
       "hostName" -> optional(text),

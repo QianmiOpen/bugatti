@@ -24,12 +24,6 @@ class SpiritActor(startPath: String) extends Actor with ActorLogging {
     context.actorSelection(path) ! Identify(path)
   }
 
-  override def postStop = {
-    context.children.foreach { child =>
-      child ! ConnectStoped
-    }
-  }
-
   def receive = identifying
 
   def identifying: Actor.Receive = LoggingReceive {
@@ -55,6 +49,10 @@ class SpiritActor(startPath: String) extends Actor with ActorLogging {
   }
 
   def active(actor: ActorRef): Actor.Receive = LoggingReceive {
+    case sc: SpiritCommand => {
+      actor forward  sc
+    }
+
     case Reconnect(newPath) => {
       context.children.foreach { child =>
         child ! ConnectStoped
@@ -63,10 +61,6 @@ class SpiritActor(startPath: String) extends Actor with ActorLogging {
       path = newPath
       sendIdentifyRequest()
       context.become(identifying)
-    }
-
-    case sc: SpiritCommand => {
-      actor forward  sc
     }
 
     case Connected => sender ! true
