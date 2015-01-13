@@ -2,7 +2,7 @@ package controllers.conf
 
 import actor.ActorUtils
 import actor.git.ScriptGitActor._
-import actor.salt.{RefreshFiles, ConnectedSpirits, RefreshHosts}
+import actor.salt.{ConnectedSpirits, RefreshSpiritsActor}
 import akka.pattern.ask
 import akka.util.Timeout
 import controllers.BaseController
@@ -24,16 +24,15 @@ object SystemController extends BaseController {
   def refresh = AuthAction(FuncEnum.system) { implicit request =>
     val result = ActorUtils.scriptGit ? ReloadFormulasTemplate
 
-//    val future = ActorUtils.areas ? ConnectedAreas
-//    val areaIds = Await.result(future, timeout.duration).asInstanceOf[Seq[Int]]
-//
-//    ALogger.debug(s"Auto refresh server files, areaIds: ${areaIds}")
-//
-//    areaIds.foreach { areaId =>
-//      ActorUtils.areaRefresh ! RefreshFiles(areaId)
-//    }
+    val future = ActorUtils.spirits ? ConnectedSpirits
+    val spiritIds = Await.result(future, timeout.duration).asInstanceOf[Seq[Int]]
 
-    // TODO: 刷新所有spirit
+    ALogger.debug(s"Auto refresh server files, spiritIds: ${spiritIds}")
+
+    spiritIds.foreach { spiritId =>
+      ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshFiles(spiritId)
+    }
+
     Await.result(result, 30 seconds)
     Ok(Json.toJson(0))
   }

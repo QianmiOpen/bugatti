@@ -15,6 +15,8 @@ case class SpiritTable(tag: Tag) extends Table[Spirit](tag, "spirit") {
   def ip = column[String]("ip", O.DBType("VARCHAR(16)"))
 
   override def * = (id.?, name, ip) <> (Spirit.tupled, Spirit.unapply _)
+
+  index("idx_ip", ip, unique = true)
 }
 
 object SpiritHelper {
@@ -36,5 +38,9 @@ object SpiritHelper {
 
   def update(spirit: Spirit) = db withSession { implicit session =>
     qSpirit.filter(_.id === spirit.id).update(spirit)
+  }
+
+  def findById(id: Int): Option[Spirit] = db withSession { implicit session =>
+    qSpirit.filter(_.id === id).firstOption
   }
 }

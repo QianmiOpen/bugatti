@@ -4,17 +4,18 @@ import models.MaybeFilter
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
-import enums.ContainerTypeEnum
+import enums.{StateEnum, ContainerTypeEnum}
 import enums.ContainerTypeEnum.Container
 import scala.slick.jdbc.JdbcBackend
 import scala.language.postfixOps
 import scala.language.implicitConversions
+import enums.StateEnum.State
 
 /**
  * 环境和项目的关系配置
  */
 case class Host(id: Option[Int], envId: Option[Int], projectId: Option[Int], areaId: Option[Int],
-                                 syndicName: String, spiritId: Int, name: String, ip: String,
+                                 syndicName: String, spiritId: Int, name: String, ip: String, state: State,
                                  containerType: Container, hostIp: Option[String], hostName: Option[String],
                                  globalVariable: Seq[Variable])
 case class EnvRelForm(envId: Int, projectId: Int, ids: Seq[Int])
@@ -28,6 +29,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def spiritId = column[Int]("spirit_id")
   def name = column[String]("name")
   def ip = column[String]("ip")
+  def state = column[State]("state", O.Default(StateEnum.noKey))
   def containerType = column[Container]("container_type", O.Default(ContainerTypeEnum.vm), O.DBType("ENUM('vm', 'docker')"))
   def hostIp = column[String]("host_ip", O.Nullable)
   def hostName = column[String]("host_name", O.Nullable)
@@ -36,7 +38,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
   ))
 
-  override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, spiritId, name, ip, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
+  override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, spiritId, name, ip, state, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
   index("idx_eid_pid", (envId, projectId))
   index("idx_ip", ip, unique = true)
 }
@@ -112,8 +114,8 @@ object HostHelper {
     query.length.run
   }
   
-  def create(envProjectRel: Host) = db withSession { implicit session =>
-    qHost.returning(qHost.map(_.id)).insert(envProjectRel)
+  def create(host: Host) = db withSession { implicit session =>
+    qHost.returning(qHost.map(_.id)).insert(host)
   }
 
   def bind(relForm: EnvRelForm): Int = db withSession { implicit session =>
@@ -126,12 +128,16 @@ object HostHelper {
     qHost.filter(_.projectId === projectId).map(_.projectId.?).update(None)(session)
   }
 
-  def unbind(rel: Host) = db withTransaction { implicit session =>
-    qHost.filter(_.id === rel.id).update(rel.copy(projectId = None))
+  def unbind(host: Host) = db withTransaction { implicit session =>
+    qHost.filter(_.id === host.id).update(host.copy(projectId = None))
   }
 
-  def update(rel: Host) = db withSession { implicit session =>
-    qHost.filter(_.id === rel.id).update(rel)
+  def update(host: Host) = db withSession { implicit session =>
+    qHost.filter(_.id === host.id).update(host)
+  }
+
+  def updateStateBySpiritId_Name(spiritId: Int, name: String, state: State) = db withSession { implicit session =>
+    qHost.filter(x => x.spiritId === spiritId && x.name === name).map(_.state).update(state)
   }
 
 }

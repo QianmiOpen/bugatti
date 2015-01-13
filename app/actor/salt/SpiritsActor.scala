@@ -31,13 +31,18 @@ class SpiritsActor extends Actor with ActorLogging {
 
   val spiritMap = mutable.Map.empty[Int, Spirit]
 
-  val spiritIdMap = mutable.Map.empty[Int, ActorRef]
-
   val RemotePath = s"akka.tcp://Spirit@%s:${DefaultSpiritPort}/user/SpiritCommands"
 
   val SpiritName = s"Spirit_%d"
 
   override def receive = LoggingReceive {
+    case rsc: RemoteSpirit => {
+      context.child(SpiritName.format(rsc.spiritId)) match {
+        case Some(spiritActor) => spiritActor forward rsc.saltCommand
+        case None => sender ! ConnectStoped
+      }
+    }
+
     case AddSpirit(spirit) => {
       val spiritId = spirit.id.get
 
@@ -46,7 +51,6 @@ class SpiritsActor extends Actor with ActorLogging {
         case None => {
           val spiritActor = context.actorOf(Props(classOf[SpiritActor], RemotePath.format(spirit.ip)), name = SpiritName.format(spiritId))
 
-          spiritIdMap.put(spiritId, spiritActor)
           spiritMap.put(spiritId, spirit)
 
           log.debug(s"Add spirit, Actor is ${spiritActor}")
@@ -80,25 +84,20 @@ class SpiritsActor extends Actor with ActorLogging {
 
       spiritMap.get(spiritId) match {
         case Some(area) => {
-          spiritIdMap.remove(spiritId)
           spiritMap.remove(spiritId)
         }
         case None => // ignore
       }
     }
 
-    case rsc: RemoteSpirit => {
-      spiritIdMap.get(rsc.spiritId) match {
-        case Some(spiritActor) => spiritActor forward rsc.saltCommand
-        case None => sender ! ConnectStoped
-      }
-    }
-
     case ConnectedSpirits => {
       implicit val timeout = Timeout(5 seconds)
 
-      val spiritsFuture = spiritIdMap.map { case (spiritId, spiritActor) =>
-        (spiritId, spiritActor ? Connected)
+      val spiritsFuture = spiritMap.map { case (spiritId, _) =>
+        context.child((SpiritName.format(spiritId))) match {
+          case Some(spiritActor) => (spiritId, spiritActor ? Connected)
+          case None => (spiritId, Actor.noSender ? Connected)
+        }
       }
 
       val spiritsResult = spiritsFuture.map { case (spiritId, spiritFuture) =>

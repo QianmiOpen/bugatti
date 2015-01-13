@@ -1,7 +1,8 @@
 package controllers.conf
 
 import actor.ActorUtils
-import actor.salt.{DeleteSpirit, UpdateSpirit, AddSpirit, RefreshHosts}
+import actor.salt.RefreshSpiritsActor.RefreshHosts
+import actor.salt._
 import controllers.BaseController
 import enums.{ModEnum, FuncEnum}
 import exceptions.UniqueNameException
@@ -83,7 +84,7 @@ object AreaController extends BaseController {
   def refresh(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
     AreaHelper.findById(id) match {
       case Some(area) => {
-        ActorUtils.areaRefresh ! RefreshHosts(id)
+        ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshHosts(id)
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "刷新区域", area))
         Ok(Json.toJson(AreaHelper.findInfoById(id)))
       }

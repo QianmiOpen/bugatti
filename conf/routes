@@ -50,6 +50,10 @@ GET           /env/:envId/member/:jobNo                           controllers.co
 POST          /env/:envId/member                                  controllers.conf.EnvController.saveMember(envId: Int, jobNo: String)
 DELETE        /env/member/:memberId                               controllers.conf.EnvController.deleteMember(envId: Int, memberId: Int)
 
+# Spirit
+GET           /spirit                                             controllers.conf.SpiritController.all
+GET           /spirit/refresh/:id                                 controllers.conf.SpiritController.refresh(id: Int)
+
 # Project
 GET           /project                                            controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?=false, page: Int?=0, pageSize: Int ?=30)
 GET           /project/total                                      controllers.conf.ProjectController.count(projectName: Option[String], my: Boolean ?=false)
