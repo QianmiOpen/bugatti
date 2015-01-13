@@ -51,7 +51,7 @@
     <logger name="org.jboss.netty" level="INFO"/>
     <logger name="actor" level="INFO"/>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>

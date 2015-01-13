@@ -22,7 +22,7 @@ class ClusterActor extends Actor with ActorLogging{
       context.actorOf(Props(classOf[EngineActor], 3)) ! ReplaceCommand(gcc.taskObj, gcc.templateStep, gcc.hostname, gcc.tq, gcc.hosts, gcc.hostsIndex)
     }
     case success: SuccessReplaceCommand => {
-      context.parent ! SuccessReplaceCommand(success.commandList, success.tq, success.templateStep, success.hosts, success.hostsIndex, success.taskObj)
+      context.parent ! SuccessReplaceCommand(success.commandList, success.tq, success.templateStep, success.hosts, success.hostsIndex, success.taskObj, success.taskDoif)
       context.stop(self)
     }
     case error: ErrorReplaceCommand => {
@@ -48,8 +48,9 @@ class ClusterActor extends Actor with ActorLogging{
   }
 }
 
+
 case class GenerateClusterCommands(taskId: Int, taskObj: ProjectTask_v, templateStep: Seq[TemplateActionStep], hostname: String, tq: TaskQueue, hosts: Seq[Host], hostsIndex: Int)
-case class SuccessReplaceCommand(commandList: Seq[TaskCommand], tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[Host], hostsIndex: Int, taskObj: ProjectTask_v)
+case class SuccessReplaceCommand(commandList: Seq[TaskCommand], tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[Host], hostsIndex: Int, taskObj: ProjectTask_v, taskDoif: Seq[String])
 case class ErrorReplaceCommand(keys: String, tq: TaskQueue, templateStep: Seq[TemplateActionStep], hosts: Seq[Host], hostsIndex: Int, taskObj: ProjectTask_v)
 
 case class GenerateClusterConfs(envId: Int, projectId: Int, versionId: Int, taskObj: ProjectTask_v, hostname: String, order: Int)
