@@ -11,7 +11,7 @@ import scala.language.postfixOps
  * Created by mind on 8/1/14.
  */
 case class Reconnect(path: String)
-case class ConnectStoped()
+case object ConnectStoped
 case class Connected()
 
 class SpiritActor(startPath: String) extends Actor with ActorLogging {
@@ -66,8 +66,7 @@ class SpiritActor(startPath: String) extends Actor with ActorLogging {
     }
 
     case sc: SpiritCommand => {
-      val spiritCmd = context.actorOf(Props(classOf[SpiritCommandActor], sender))
-      actor.!(sc)(spiritCmd)
+      actor forward  sc
     }
 
     case Connected => sender ! true

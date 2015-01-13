@@ -1,5 +1,6 @@
 package actor.salt
 
+import actor.salt.ConnectStoped._
 import akka.actor.{ActorRef, Cancellable, Actor, ActorLogging}
 import akka.event.LoggingReceive
 import com.qianmi.bugatti.actors.{SaltTimeOut, SpiritResult}
@@ -36,8 +37,8 @@ class SpiritCommandActor(realSender: ActorRef) extends Actor with ActorLogging {
 
     }
 
-    case cs : ConnectStoped => {
-      realSender ! cs
+    case ConnectStoped => {
+      realSender ! ConnectStoped
       context.stop(self)
     }
 

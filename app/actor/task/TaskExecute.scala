@@ -166,8 +166,8 @@ class TaskExecute extends Actor with ActorLogging {
 //      val key = s"${_envId}_${_projectId}"
       val key = taskKey(sc.tq.envId, sc.tq.projectId, sc.tq.clusterName)
       context.child(s"commandActor_${key}").getOrElse(
-        actorOf(Props[CommandActor], s"commandActor_${key}")
-      ) ! InsertCommands(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName, _taskDoifList)
+        actorOf(Props[CommandFSMActor], s"commandActor_${key}")
+      ) ! Insert(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName, _taskDoifList)
     }
 
     case removeTaskQueue: RemoveTaskQueue => {
@@ -196,6 +196,12 @@ class TaskExecute extends Actor with ActorLogging {
 
     case ucs: UpdateCommandStatus =>
       TaskCommandHelper.update(ucs.taskId, ucs.orderNum, ucs.status)
+
+    case st: StopTask =>
+      val key = taskKey(st.envId, st.projectId, st.clusterName)
+      context.child(s"commandActor_${key}").getOrElse(
+        actorOf(Props[CommandFSMActor], s"commandActor_${key}")
+      ) ! st
   }
 
   def terminate(tc: TerminateCommands): Unit ={
@@ -277,3 +283,4 @@ case class SendCommandActor(tq: TaskQueue, taskObj: ProjectTask_v)
 case class UpdateCommandStatus(taskId: Int, orderNum: Int, status: TaskStatus)
 
 case class EPCParams(envId: Int, projectId: Int, clusterName: Option[String], hosts: Seq[Host], hostIndex: Int)
+case class StopTask(envId: Int, projectId: Int, clusterName: Option[String])

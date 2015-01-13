@@ -50,7 +50,8 @@ class ConfActor extends Actor with ActorLogging{
     }
 
     case successConf: SuccessReplaceConf => {
-      context.parent ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, successConf.order + 1)
+//      context.parent ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, successConf.order + 1)
+      context.parent ! Execute()
       context.stop(self)
     }
 

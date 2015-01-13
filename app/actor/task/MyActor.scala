@@ -183,11 +183,14 @@ class MyActor extends Actor with ActorLogging {
     }
 
     case ForceTerminate(envId, projectId, clusterName) => {
-//      val key = s"${envId}_${projectId}"
       val key = taskKey(envId, projectId, clusterName)
+//      context.child(s"taskExecute_${key}").getOrElse(
+//        actorOf(Props[TaskExecute], s"taskExecute_${key}")
+//      ) ! TerminateCommands(TaskEnum.TaskFailed, envId, projectId, clusterName)
+
       context.child(s"taskExecute_${key}").getOrElse(
         actorOf(Props[TaskExecute], s"taskExecute_${key}")
-      ) ! TerminateCommands(TaskEnum.TaskFailed, envId, projectId, clusterName)
+      ) ! StopTask(envId, projectId, clusterName)
     }
 
     case RemoveStatus(envId, projectId, cluster) => {
