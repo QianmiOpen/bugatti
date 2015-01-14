@@ -52,7 +52,12 @@ DELETE        /env/member/:memberId                               controllers.co
 
 # Spirit
 GET           /spirit                                             controllers.conf.SpiritController.all
+GET           /spirit/:id                                         controllers.conf.SpiritController.get(id: Int)
 GET           /spirit/refresh/:id                                 controllers.conf.SpiritController.refresh(id: Int)
+DELETE        /spirit/:id                                         controllers.conf.SpiritController.delete(id: Int)
+POST          /spirit                                             controllers.conf.SpiritController.add
+PUT           /spirit/:id                                         controllers.conf.SpiritController.update(id: Int)
+
 
 # Project
 GET           /project                                            controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?=false, page: Int?=0, pageSize: Int ?=30)

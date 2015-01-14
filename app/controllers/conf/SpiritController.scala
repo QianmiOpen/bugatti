@@ -23,13 +23,18 @@ object SpiritController extends BaseController {
   val spiritForm = Form(
     mapping(
       "id" -> optional(number),
-      "name" -> nonEmptyText(maxLength = 30),
-      "ip" -> nonEmptyText(maxLength = 16)
+      "name" -> nonEmptyText(maxLength = 60),
+      "ip" -> nonEmptyText(maxLength = 16),
+      "info" -> optional(text(maxLength = 255))
     )(Spirit.apply)(Spirit.unapply)
   )
 
-  def all = Action {
+  def all = AuthAction(FuncEnum.spirit) {
     Ok(Json.toJson(SpiritHelper.all))
+  }
+
+  def get(id: Int) = AuthAction(FuncEnum.spirit) {
+    Ok(Json.toJson(SpiritHelper.findById(id)))
   }
 
   def add = AuthAction(FuncEnum.spirit) { implicit request =>
