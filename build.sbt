@@ -9,7 +9,7 @@ name := "bugatti2"
 scalaVersion := "2.10.4"
 
 libraryDependencies ++= {
-  val akkaVersion = "2.2.4"
+  val akkaVersion = "2.3.8"
   Seq(
     jdbc,
     cache,
@@ -25,14 +25,14 @@ libraryDependencies ++= {
     "com.github.tototoshi" %% "slick-joda-mapper" % "1.2.0",
     "commons-net" % "commons-net" % "3.3",
     "commons-io" % "commons-io" % "2.4",
-    "org.pac4j" % "play-pac4j_scala" % "1.2.2",
+    "org.pac4j" % "play-pac4j_scala2.10" % "1.3.0",
     "org.pac4j" % "pac4j-cas" % "1.6.0",
     // WebJars pull in client-side web libraries
-    "org.webjars" %% "webjars-play" % "2.2.1-2",
-    "org.webjars" % "requirejs" % "2.1.11-1",
+    "org.webjars" %% "webjars-play" % "2.3.0-2",
+    "org.webjars" % "bootstrap" % "3.1.1-2",
+    "org.webjars" % "requirejs" % "2.1.15",
     "org.webjars" % "angularjs" % "1.2.27",
-    "org.webjars" % "jquery" % "1.11.1",
-    "org.webjars" % "bootstrap" % "3.1.1",
+    "org.webjars" % "jquery" % "1.11.2",
     "org.webjars" % "angular-ui-router" % "0.2.8-2",
     "org.webjars" % "angular-sanitize" % "1.2.15",
     "org.webjars" % "angular-ui-bootstrap" % "0.11.0-2",
@@ -48,18 +48,16 @@ libraryDependencies ++= {
     "org.webjars" % "bindonce" % "0.3.1",
     "org.webjars" % "angular-chosen" % "1.0.6",
     "org.eclipse.jgit" % "org.eclipse.jgit" % "3.4.1.201406201815-r",
-    "com.typesafe.atmos" % "trace-play-2.2.0" % "1.3.0",
+//    "com.typesafe.atmos" % "trace-play-2.2.0" % "1.3.0",
     "org.yaml" % "snakeyaml" % "1.13",
-    "org.scalatest" % "scalatest_2.10" % "2.2.1" % "test"
+    "org.scalatest" % "scalatest_2.10" % "2.2.1" % "test",
+    "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
   )
 }
 
-resolvers ++= Seq(
-  "Nexus repository" at "http://nexus.dev.ofpay.com/nexus/content/groups/public/",
-  "JBoss repository" at "https://repository.jboss.org/nexus/content/repositories/",
-  "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
-)
+//play.Project.playScalaSettings
 
-play.Project.playScalaSettings
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalacOptions in ThisBuild ++= Seq("-feature")
+
