@@ -18,7 +18,7 @@ class TaskExecute extends Actor with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
-      log.error(s"${self} catch ${sender} exception: ${e.getStackTraceString}")
+      log.error(s"${self} catch exception: ${e.getStackTraceString}")
       postStop()
       Escalate
   }
@@ -39,6 +39,10 @@ class TaskExecute extends Actor with ActorLogging {
   def receive = {
     case tgc: TaskGenerateCommand => {
       val taskQueue = TaskQueueHelper.findExecuteTask(tgc.epc.envId, tgc.epc.projectId, tgc.epc.clusterName)
+      //for postStop
+      _envId = tgc.epc.envId
+      _projectId = tgc.epc.projectId
+      _clusterName = tgc.epc.clusterName
       taskQueue match {
         case Some(tq) => {
 //          _tqId = tq.id.get

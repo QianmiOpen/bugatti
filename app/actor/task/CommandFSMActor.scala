@@ -4,8 +4,11 @@ import java.io.File
 
 import actor.ActorUtils
 import actor.salt.{ConnectStoped, RemoteSpirit}
+import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
+import akka.pattern._
 import actor.task.CommandFSMActor._
+import akka.util.Timeout
 import com.qianmi.bugatti.actors._
 import enums.TaskEnum
 import enums.TaskEnum._
@@ -35,12 +38,22 @@ case class TaskInfo(taskId: Int, envId: Int, projectId: Int, versionId: Option[I
 case class CommandStatus(commands: Seq[TaskCommand], taskDoif: Seq[String], commandSeq: Seq[String], order: Int, taskObj: ProjectTask_v, jid: String, taskInfo: TaskInfo, json: JsObject, engine: ScriptEngineUtil, status: TaskStatus)
 
 class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case e: Exception =>
+      log.error(s"${self} catch exception: ${e.getStackTraceString}")
+      commandOver(_taskId, s"${e.getStackTraceString}")
+      Escalate
+  }
+
+  var _taskId = 0
   val _baseLogPath = ConfHelp.logPath
 
   startWith(Init, CommandStatus(Seq.empty[TaskCommand], Seq.empty[String], Seq.empty[String], 0, null, "", null, null, null, TaskEnum.TaskProcess))
 
   when(Init, stateTimeout = 10 second){
     case Event(insert: Insert, data: CommandStatus) =>
+      _taskId = insert.taskId
       val taskInfo = TaskInfo(insert.taskId, insert.envId, insert.projectId, insert.versionId, insert.cluster)
       val engine = new ScriptEngineUtil(insert.taskObj, taskInfo.clusterName)
       val taskObj = engine.setCHost
