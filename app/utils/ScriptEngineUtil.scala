@@ -10,7 +10,7 @@ import TaskTools._
  * Created by mind on 8/23/14.
  */
 class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
-  val engine = new ScriptEngineManager().getEngineByName("js")
+  val engine = new ScriptEngineManager(null).getEngineByName("js")
 
   engine.eval(s"var __t__ = ${Json.toJson(projectTask).toString}")
 
