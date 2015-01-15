@@ -18,4 +18,4 @@ rename table `environment_project_rel` to `host`;
 
 ALTER TABLE `host` ADD COLUMN `spirit_id` int(11) NOT NULL COMMENT 'spirit id' AFTER `syndic_name`;
 
-ALTER TABLE `host` ADD COLUMN `state` int(11) NOT NULL COMMENT 'state[1:noKey; 2:offline; 3:arrived; 4:online]' AFTER `ip`;
+ALTER TABLE `host` ADD COLUMN `state` int(11) NOT NULL COMMENT 'state[0:noKey, 1:offline, 2:arrived, 3:online]' AFTER `ip`;

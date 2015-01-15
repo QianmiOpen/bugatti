@@ -11,8 +11,7 @@ import TaskTools._
  */
 class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
   val engine = new ScriptEngineManager(null).getEngineByName("js")
-  Logger.info(s"json is ${Json.toJson(projectTask)}")
-  Logger.info(s"${new ScriptEngineManager().get("js")}")
+
   engine.eval(s"var __t__ = ${Json.toJson(projectTask).toString}")
 
   Logger.info(s"${engine.eval("JSON.stringify(__t__)")}")
@@ -24,18 +23,27 @@ class ScriptEngineUtil(projectTask: ProjectTask_v, hostname: Option[String]) {
         Logger.debug(s"execute dep alias: $projectName")
         project_v.alias.foreach {
           case (key, value) =>
-            Logger.debug(s"execute dep alias: $projectName, $key, $value")
-            engine.eval(s"dependence.$projectName.alias.$key = function (project){return $value}.call(dependence.$projectName, this)")
+            try {
+              Logger.debug(s"execute dep alias: $projectName, $key, $value")
+              engine.eval(s"dependence.$projectName.alias.$key = function (project){return $value}.call(dependence.$projectName, this)")
+            } catch {
+              case e: Exception => Logger.warn(e.toString)
+            }
+
         }
     }
 
     projectTask.alias.foreach {
       case (key, value) =>
-        Logger.debug(s"$key,$value")
-        engine.eval(s"alias.$key = function (project){return $value}.call(this, this)")
+        try {
+          Logger.debug(s"$key,$value")
+          engine.eval(s"alias.$key = function (project){return $value}.call(this, this)")
+        } catch {
+          case e: Exception => Logger.warn(e.toString)
+        }
     }
   } catch {
-    case e: ScriptException => Logger.error(e.toString)
+    case e: Exception => Logger.error(e.toString)
   }
 
   if (projectTask.hosts.length > 0) {
