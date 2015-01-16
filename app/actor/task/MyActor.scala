@@ -199,6 +199,7 @@ class MyActor extends Actor with ActorLogging {
   }
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
+    log.info(s"mergeStatus key ${key}, ${js}")
     Json.obj(key -> (MyActor.statusMap \ key).as[JsObject].deepMerge(js))
   }
 
