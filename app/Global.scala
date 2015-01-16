@@ -1,5 +1,7 @@
 
 import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.util.Scanner
 import actor.git.AddUsers
 import actor.git.ScriptGitActor.ReloadFormulasTemplate
@@ -21,7 +23,6 @@ import org.pac4j.core.client.Clients
 import org.pac4j.play.Config
 import play.api.Play.current
 import play.api._
-import play.api.libs.Files
 import utils.Directory._
 
 import scala.concurrent.Future
@@ -79,7 +80,7 @@ object Global extends GlobalSettings {
       } else {
         _db.withSession { implicit session =>
           versions.takeWhile(_ != currentVersion).reverse.foreach(_.update)
-          Files.writeFile(versionFile, headVersion.versionString)
+          Files.write(versionFile.toPath, headVersion.versionString.getBytes(StandardCharsets.UTF_8))
           Logger.debug(s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
         }
       }
@@ -300,7 +301,7 @@ object AutoUpdate {
    */
   def getCurrentVersion(): Version = {
     if (versionFile.exists) {
-      Files.readFile(versionFile).trim.split("\\.") match {
+      new String(Files.readAllBytes(versionFile.toPath), StandardCharsets.UTF_8).trim.split("\\.") match {
         case Array(majorVersion, minorVersion) => {
           versions.find { v =>
             v.majorVersion == majorVersion.toInt && v.minorVersion == minorVersion.toInt

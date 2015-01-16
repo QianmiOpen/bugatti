@@ -1,14 +1,14 @@
 package actor.task
 
 import java.io.File
+import java.nio.file.{StandardOpenOption, Paths, Files}
+import java.nio.charset.StandardCharsets
 
 import actor.ActorUtils
 import actor.salt.{ConnectStoped, RemoteSpirit}
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
-import akka.pattern._
 import actor.task.CommandFSMActor._
-import akka.util.Timeout
 import com.qianmi.bugatti.actors._
 import enums.TaskEnum
 import enums.TaskEnum._
@@ -18,8 +18,6 @@ import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
 import utils.{ScriptEngineUtil, ConfHelp, ProjectTask_v}
 import scala.sys.process._
 import scala.language.postfixOps
-import scalax.file.Path
-import scalax.io.StandardOpenOption._
 import scala.concurrent.duration._
 
 /**
@@ -139,9 +137,8 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
               val baseDir = s"${`_baseLogPath`}/${data.taskInfo.taskId}"
               val resultLogPath = s"${baseDir}/result.log"
               val file = new File(resultLogPath)
-              implicit val codec = scalax.io.Codec.UTF8
-              val f = Path(file).outputStream(WriteAppend: _*)
-              f.write(s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}")
+              val exec_command = s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
+              Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND)
               val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
               val exeResult: Seq[Boolean] = (jResult \ "result" \\ "success").map(js => js.as[Boolean])
               if (!seqResult.contains(false) && !exeResult.contains(false)) {

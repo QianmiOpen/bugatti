@@ -1,5 +1,8 @@
 package controllers.conf
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+
 import actor.ActorUtils
 import actor.git.UpdateUser
 import controllers.BaseController
@@ -121,7 +124,7 @@ object UserController extends BaseController {
     if (UserHelper.superAdmin_?(request.user) || request.user.jobNo == jobNo) {
       val result = request.body.asMultipartFormData.map { body =>
         val fileContent = body.file("myFile").filter(f => f.ref.file.length() < 1 * 1024 * 1024).map { tempFile =>
-          scalax.io.Resource.fromFile(tempFile.ref.file).string
+          new String(Files.readAllBytes(tempFile.ref.file.toPath), StandardCharsets.UTF_8)
         }
         (UserHelper.findByJobNo(jobNo), fileContent) match {
           case (Some(user), Some(value)) =>

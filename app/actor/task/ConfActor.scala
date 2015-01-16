@@ -1,15 +1,10 @@
 package actor.task
 
-import java.io.File
 
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{ActorLogging, OneForOneStrategy, Props, Actor}
-import enums.TaskEnum
-import models.conf.{ConfContent, ConfContentHelper, ConfHelper}
-import play.api.libs.json.{Json, JsObject}
-import utils.{ProjectTask_v, SaltTools, TaskTools, ConfHelp}
-import scala.sys.process._
-import scalax.file.Path
+import play.api.libs.json.{JsObject}
+import utils.{ProjectTask_v}
 
 /**
  * Created by jinwei on 14/7/14.
