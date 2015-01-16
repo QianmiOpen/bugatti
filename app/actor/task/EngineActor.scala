@@ -170,7 +170,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
             val (isSuccess, str) = fillConfFile(conf, engine)
             if (isSuccess) {
               val f = new File(s"${baseDir}/files/${xf.path}")
-              f.getParentFile.mkdir()
+              f.getParentFile.mkdirs()
               val path = f.toPath
               if (conf.octet) {
                 Files.write(path, confContent.get.content)
