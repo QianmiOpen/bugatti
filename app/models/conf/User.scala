@@ -50,15 +50,17 @@ object UserHelper extends PlayCache {
 
   def _cacheNoKey(jobNo: String) = s"user.$jobNo"
 
-  def findByJobNo(jobNo: String) = Cache.getOrElse[Option[User]](_cacheNoKey(jobNo)) {
-    db withSession { implicit session =>
-      qUser.filter(_.jobNo === jobNo).firstOption
-//      update error
-//      user match {
-//        case Some(u) if u.sshKey.isDefined =>
-//          Some(u.copy(sshKey = Some(SecurityUtil.decryptUK(u.sshKey.get))))
-//        case _ => user
-//      }
+  def findByJobNo(jobNo: String): Option[User] = {
+    Cache.getAs[User](_cacheNoKey(jobNo)) match {
+      case Some(user) => Some(user)
+      case None => db withSession { implicit session =>
+        qUser.filter(_.jobNo === jobNo).firstOption match {
+          case Some(user) =>
+            Cache.set(_cacheNoKey(jobNo), user)
+            Some(user)
+          case None => None
+        }
+      }
     }
   }
 

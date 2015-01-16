@@ -1,5 +1,7 @@
 package controllers.conf
 
+import java.nio.file.{Paths, Files}
+
 import exceptions.UniqueNameException
 import play.api.mvc.Action
 import utils.{TaskTools, FileUtil}
@@ -136,7 +138,7 @@ object ConfController extends BaseController {
             val _path = if (filePath.last != '/') filePath + '/' else filePath
             val confFormat = _confForm.copy(jobNo = request.user.jobNo, name = Some(tempFile.filename), path = _path + tempFile.filename, content = "")
 
-            var bytes = scalax.io.Resource.fromFile(tempFile.ref.file).byteArray
+            var bytes = Files.readAllBytes(tempFile.ref.file.toPath)
             val isOctet = isOctet_?(tempFile.filename, bytes)
             if (!isOctet) {
               bytes = new String(bytes, "UTF-8").replaceAll("(\r\n)|(\n\r)|\r", "\n").getBytes("UTF-8")

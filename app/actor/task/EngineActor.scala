@@ -1,6 +1,8 @@
 package actor.task
 
 import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path, Paths}
 import java.util.regex.Pattern
 
 import akka.actor.SupervisorStrategy.Escalate
@@ -13,7 +15,6 @@ import utils._
 
 import scala.concurrent.duration._
 import scala.sys.process._
-import scalax.file.Path
 import scala.language.postfixOps
 
 /**
@@ -168,14 +169,13 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
           case Some(conf) =>
             val (isSuccess, str) = fillConfFile(conf, engine)
             if (isSuccess) {
-              val newFile = new File(s"${baseDir}/files/${xf.path}")
-              newFile.getParentFile().mkdirs()
-              implicit val codec = scalax.io.Codec.UTF8
-              val f = Path(newFile)
+              val f = new File(s"${baseDir}/files/${xf.path}")
+              f.getParentFile.mkdir()
+              val path = f.toPath
               if (conf.octet) {
-                f.write(confContent.get.content)
+                Files.write(path, confContent.get.content)
               } else {
-                f.write(str)
+                Files.write(path, str.getBytes(StandardCharsets.UTF_8))
               }
             } else {
               //替换失败，输出错误变量

@@ -1,6 +1,8 @@
 package actor.git
 
 import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Paths, Files, FileSystems}
 import java.security.KeyPairGenerator
 
 import akka.actor.{Actor, ActorLogging}
@@ -10,7 +12,6 @@ import org.apache.commons.codec.binary.Base64
 import org.eclipse.jgit.api.Git
 
 import scala.io.Source
-import scalax.file.Path
 
 /**
  * Created by mind on 12/6/14.
@@ -52,8 +53,8 @@ class KeyGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
         val keyInFile = _getKeyFromFile(user.jobNo)
         val currentKey = _getKey(user.sshKey, user.jobNo)
         if (keyInFile != currentKey) {
-          val keyFile = _getPath(user.jobNo)
-          keyFile.write(currentKey)
+          val path = _getPath(user.jobNo)
+          Files.write(path, currentKey.getBytes(StandardCharsets.UTF_8))
           git.add().addFilepattern(".").call()
           _commitGit(s"Update ${user.jobNo} file")
         }
@@ -62,8 +63,8 @@ class KeyGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
 
     case DeleteUser(jobNo) => {
       if (keyDir != null) {
-        val keyFile = _getPath(jobNo)
-        if (keyFile.exists) {
+        val path = _getPath(jobNo)
+        if (Files.exists(path)) {
           git.rm().addFilepattern(s"$keyPath/${jobNo.trim}").call()
           _commitGit(s"Remote $jobNo file")
         }
@@ -113,25 +114,25 @@ class KeyGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
   }
 
   def _generateKeyFile(sshKey: Option[String], jobNo: String): Boolean = {
-    val file = _getPath(jobNo)
-    if (file.exists) {
+    val path = _getPath(jobNo)
+    if (Files.exists(path)) {
       false
     } else {
-      file.write(_getKey(sshKey, jobNo))
+      Files.write(path, _getKey(sshKey, jobNo).getBytes(StandardCharsets.UTF_8))
       true
     }
   }
 
   def _getKeyFromFile(jobNo: String): String = {
-    val file = _getPath(jobNo)
-    if (file.exists) {
-      Source.fromFile(file.path).getLines().mkString
+    val path = _getPath(jobNo)
+    if (Files.exists(path)) {
+      new String(Files.readAllBytes(path), StandardCharsets.UTF_8)
     } else {
       _getNewKey(jobNo)
     }
   }
 
-  def _getPath(jobNo: String) = Path.fromString(s"${keyDir.getAbsolutePath}/${jobNo.trim}")
+  def _getPath(jobNo: String) = Paths.get(s"${keyDir.getAbsolutePath}/${jobNo.trim}")
 
   def _commitGit(commitMsg: String): Unit = {
     git.commit().setMessage(commitMsg).call()
