@@ -65,7 +65,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
     case Event(StateTimeout, data: CommandStatus) =>
       commandOver(data.taskInfo.taskId, s"任务号:${data.taskInfo.taskId} Init执行超时")
-      goto(Finish)
+      goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
   }
 
   when(Executing, stateTimeout = 600 second){
@@ -188,7 +188,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
     case Event(StateTimeout, data: CommandStatus) =>
       commandOver(data.taskInfo.taskId, s"任务号:${data.taskInfo.taskId} Executing执行超时")
-      goto(Finish)
+      goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
 
   }
 
@@ -206,7 +206,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
     case Event(StateTimeout, data: CommandStatus) =>
       commandOver(data.taskInfo.taskId, s"任务号:${data.taskInfo.taskId} Stopping执行超时")
-      goto(Finish)
+      goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
   }
 
   when(Failure){FSM.NullFunction}
