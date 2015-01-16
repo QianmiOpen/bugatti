@@ -19,11 +19,12 @@ class TaskExecute extends Actor with ActorLogging {
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
       log.error(s"${self} catch exception: ${e.getStackTraceString}")
-      postStop()
+//      postStop()
+      taskFailed()
       Escalate
   }
 
-  override def postStop(): Unit ={
+  def taskFailed(): Unit ={
     terminate(TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName))
   }
 
