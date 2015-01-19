@@ -1035,6 +1035,7 @@ define(['angular'], function(angular) {
                     $scope.data = JSON.parse(event.data)
                     if(event.data.error){
                         console.log("there is errors:"+event.data.error)
+                        $scope.closeWs()
                     }else{
                         $scope.$apply(function () {
                             var data = $scope.data

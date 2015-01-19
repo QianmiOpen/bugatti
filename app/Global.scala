@@ -1,7 +1,7 @@
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
+import java.nio.file.{StandardOpenOption, Files}
 import java.util.Scanner
 import actor.git.AddUsers
 import actor.git.ScriptGitActor.ReloadFormulasTemplate
@@ -80,7 +80,7 @@ object Global extends GlobalSettings {
       } else {
         _db.withSession { implicit session =>
           versions.takeWhile(_ != currentVersion).reverse.foreach(_.update)
-          Files.write(versionFile.toPath, headVersion.versionString.getBytes(StandardCharsets.UTF_8))
+          Files.write(versionFile.toPath, headVersion.versionString.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING)
           Logger.debug(s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
         }
       }

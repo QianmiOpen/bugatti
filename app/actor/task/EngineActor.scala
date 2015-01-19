@@ -2,7 +2,7 @@ package actor.task
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{StandardOpenOption, Files, Path, Paths}
 import java.util.regex.Pattern
 
 import akka.actor.SupervisorStrategy.Escalate
@@ -24,7 +24,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
-      log.error(s"${self} catch ${sender} exception: ${e.getStackTraceString}")
+      log.error(s"${self} catch ${sender} exception: ${e.getMessage} ${e.getStackTraceString}")
       Escalate
   }
 
@@ -173,9 +173,9 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
               f.getParentFile.mkdirs()
               val path = f.toPath
               if (conf.octet) {
-                Files.write(path, confContent.get.content)
+                Files.write(path, confContent.get.content, Seq(StandardOpenOption.CREATE, StandardOpenOption.SYNC):_*)
               } else {
-                Files.write(path, str.getBytes(StandardCharsets.UTF_8))
+                Files.write(path, str.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.CREATE, StandardOpenOption.SYNC):_*)
               }
             } else {
               //替换失败，输出错误变量

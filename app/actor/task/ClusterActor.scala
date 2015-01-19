@@ -13,7 +13,7 @@ class ClusterActor extends Actor with ActorLogging{
 
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
-      log.error(s"${self} catch exception: ${e.getStackTraceString}")
+      log.error(s"${self} catch exception: ${e.getMessage} ${e.getStackTraceString}")
       Escalate
   }
 

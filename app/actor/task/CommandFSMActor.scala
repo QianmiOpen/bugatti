@@ -39,8 +39,8 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
-      log.error(s"${self} catch exception: ${e.getStackTraceString}")
-      commandOver(_taskId, s"${e.getStackTraceString}")
+      log.error(s"${self} catch exception: ${e.getMessage} ${e.getStackTraceString}")
+      commandOver(_taskId, s" ${e.getMessage} ${e.getStackTraceString}")
       Escalate
   }
 
@@ -138,7 +138,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
               val resultLogPath = s"${baseDir}/result.log"
               val file = new File(resultLogPath)
               val exec_command = s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
-              Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND)
+              Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.APPEND, StandardOpenOption.SYNC):_*)
               val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
               val exeResult: Seq[Boolean] = (jResult \ "result" \\ "success").map(js => js.as[Boolean])
               if (!seqResult.contains(false) && !exeResult.contains(false)) {
