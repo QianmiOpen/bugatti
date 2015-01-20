@@ -164,7 +164,7 @@ class TaskExecute extends Actor with ActorLogging {
 
     case timeout: TimeoutReplace => {
       sender ! ConfCopyFailed(s"${timeout.key} 表达式执行超时!")
-      context.stop(self)
+//      context.stop(self)
     }
 
     case sc: SendCommandActor => {

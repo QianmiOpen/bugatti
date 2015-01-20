@@ -40,22 +40,23 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
       log.error(s"${self} catch exception: ${e.getMessage} ${e.getStackTraceString}")
-      commandOver(_taskId, s" ${e.getMessage} ${e.getStackTraceString}")
+      commandOver(_taskInfo.taskId, s" ${e.getMessage} ${e.getStackTraceString}")
       Escalate
   }
 
-  var _taskId = 0
+//  var _taskId = 0
+  var _taskInfo = TaskInfo(0, 0, 0, None, None)
   val _baseLogPath = ConfHelp.logPath
 
   startWith(Init, CommandStatus(Seq.empty[TaskCommand], Seq.empty[String], Seq.empty[String], 0, null, "", null, null, null, TaskEnum.TaskProcess))
 
   when(Init, stateTimeout = 10 second){
     case Event(insert: Insert, data: CommandStatus) =>
-      _taskId = insert.taskId
-      val taskInfo = TaskInfo(insert.taskId, insert.envId, insert.projectId, insert.versionId, insert.cluster)
-      val engine = new ScriptEngineUtil(insert.taskObj, taskInfo.clusterName)
+//      _taskId = insert.taskId
+      _taskInfo = TaskInfo(insert.taskId, insert.envId, insert.projectId, insert.versionId, insert.cluster)
+      val engine = new ScriptEngineUtil(insert.taskObj, _taskInfo.clusterName)
       val taskObj = engine.setCHost
-      val commandStatus = data.copy(commands = insert.commandList, taskDoif = insert.taskDoif, taskObj = taskObj, taskInfo = taskInfo, json = insert.json, engine = engine)
+      val commandStatus = data.copy(commands = insert.commandList, taskDoif = insert.taskDoif, taskObj = taskObj, taskInfo = _taskInfo, json = insert.json, engine = engine)
 
       if (commandStatus.commands.isEmpty) {
         goto(Failure) using commandStatus
@@ -64,13 +65,13 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       }
 
     case Event(StateTimeout, data: CommandStatus) =>
-      commandOver(data.taskInfo.taskId, s"任务号:${data.taskInfo.taskId} Init执行超时")
+      commandOver(_taskInfo.taskId, s"任务号:${_taskInfo.taskId} Init执行超时 actor is ${self}")
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
   }
 
-  when(Executing, stateTimeout = 600 second){
+  when(Executing, stateTimeout = 180 second){
     case Event(ec: Execute, data: CommandStatus) =>
-      log.info(s"executing excute")
+      log.info(s"executing execute")
       val engine = data.engine
       if(data.order < data.commands.length){
         val taskInfo = data.taskInfo
@@ -103,11 +104,16 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       }else {
         val taskInfo = data.taskInfo
         log.info(s"mminfo is ${ssr.mmInfo}")
-        val taskObj = data.taskObj.copy(grains = Json.parse(ssr.mmInfo).as[JsObject])
-        log.info(Json.prettyPrint(taskObj.grains))
-        commandOver(taskInfo.taskId, Json.prettyPrint(taskObj.grains))
-        self ! Execute()
-        stay using data.copy(taskObj = taskObj)
+        if(ssr.mmInfo.isEmpty){
+          commandOver(data.taskInfo.taskId, "grains为空")
+          goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
+        }else {
+          val taskObj = data.taskObj.copy(grains = Json.parse(ssr.mmInfo).as[JsObject])
+          log.info(Json.prettyPrint(taskObj.grains))
+          commandOver(taskInfo.taskId, Json.prettyPrint(taskObj.grains))
+          self ! Execute()
+          stay using data.copy(taskObj = taskObj)
+        }
       }
     }
     case Event(sjb: SaltJobBegin, data: CommandStatus) => {
@@ -117,6 +123,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       stay using data.copy(jid = sjb.jid)
     }
     case Event(sje: SaltJobError, data: CommandStatus) => {
+      log.info(s"任务${data.jid} has receive SaltJobError")
       val msg = s"任务:${data.jid}执行失败,${sje.msg},执行时间:${sje.excuteMicroseconds}"
       log.error(msg)
       commandOver(data.taskInfo.taskId, msg)
@@ -124,6 +131,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
     }
     case Event(sr: SaltJobOk, data: CommandStatus) =>{
+      log.info(s"任务${data.jid} has receive SaltJobOk")
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
       val jsonResult = Json.parse(srResult)
@@ -187,6 +195,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
     }
 
     case Event(StateTimeout, data: CommandStatus) =>
+      log.info(s"任务${data.jid} has receive StateTimeout")
       commandOver(data.taskInfo.taskId, s"任务号:${data.taskInfo.taskId} Executing执行超时")
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
 
@@ -250,8 +259,6 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         commandOver(nextStateData.taskInfo.taskId, s"jid为空,等待jid返回...")
       }
     }
-
-
   }
 
   def insertResultLog(taskId: Int, message: String) = {
@@ -266,14 +273,18 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
   }
 
   def commandOver(taskId: Int, msg: String) = {
-    val baseDir = s"${_baseLogPath}/${taskId}"
-    val resultLogPath = s"${baseDir}/result.log"
-    val logDir = new File(baseDir)
-    if (!logDir.exists) {
-      logDir.mkdirs()
+    if(taskId != 0){
+      val baseDir = s"${_baseLogPath}/${taskId}"
+      val resultLogPath = s"${baseDir}/result.log"
+      val logDir = new File(baseDir)
+      if (!logDir.exists) {
+        logDir.mkdirs()
+      }
+      val file = new File(resultLogPath)
+      (Seq("echo", s"${msg}") #>> file lines)
+    } else {
+      log.error(s"taskId is 0 and msg is ${msg}")
     }
-    val file = new File(resultLogPath)
-    (Seq("echo", s"${msg}") #>> file lines)
   }
 
   def getTask_VS(taskId: Int): (Task, String) = {
