@@ -108,7 +108,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         sender ! ErrorReplaceCommand(errors.mkString("""\\\n"""), replaceCommand.tq, replaceCommand.templateStep, replaceCommand.hosts, replaceCommand.hostsIndex + 1, replaceCommand.taskObj)
       }
 
-      context.stop(self)
+//      context.stop(self)
     }
 
     case rc: ReplaceConfigure => {
@@ -150,12 +150,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       } else {
         sender ! ErrorReplaceConf(str)
       }
-      context.stop(self)
+//      context.stop(self)
     }
 
     case SaltTimeOut => {
       context.parent ! TimeoutReplace(_lastReplaceKey)
-      context.stop(self)
+//      context.stop(self)
     }
 
     case _ =>

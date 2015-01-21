@@ -153,7 +153,7 @@ class TaskLog extends Actor with ActorLogging{
     case readQuit: ReadQuit => {
       _count -= 1
       if(_count == 0){
-        context.stop(self)
+//        context.stop(self)
         log.info(s"TaskLog_${_taskId} Actor已关闭!")
       }
     }

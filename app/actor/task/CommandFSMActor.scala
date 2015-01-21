@@ -316,7 +316,10 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
     if (cmd.startsWith("bugatti")) {
       commandSeq(1) match {
         case "copyfile" => {
-          val confActor = context.actorOf(Props[ConfActor], s"confActor_${envId}_${projectId}_${order}")
+          val actorName = s"confActor_${envId}_${projectId}_${order}"
+          val confActor = context.child(actorName).getOrElse(
+            context.actorOf(Props[ConfActor], actorName)
+          )
           confActor ! CopyConfFile(taskId, envId, projectId, versionId.get, order, returnJson, hostname, taskObj)
         }
         case "hostStatus" => {

@@ -120,7 +120,8 @@ class TaskExecute extends Actor with ActorLogging {
       gcommand.tq.clusterName match {
         case Some(c) =>{
           if(gcommand.hostsIndex == 0 && _json.keys.size == 0){
-            val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${gcommand.tq.envId}_${gcommand.tq.projectId}_${c}")
+            val actorName = s"clusterActor_${gcommand.tq.envId}_${gcommand.tq.projectId}_${c}"
+            val clusterActor = context.child(actorName).getOrElse(context.actorOf(Props[ClusterActor], actorName))
             clusterActor ! GenerateClusterCommands(gcommand.taskObj.taskId.toInt, gcommand.taskObj, gcommand.templateStep, c, gcommand.tq, gcommand.hosts, gcommand.hostsIndex)
 //            _hostsIndex = _hostsIndex + 1
           }else {
@@ -134,7 +135,8 @@ class TaskExecute extends Actor with ActorLogging {
         case _ => {
           if(gcommand.hostsIndex <= gcommand.hosts.length-1 && _json.keys.size == 0){
             val cluster = gcommand.hosts(gcommand.hostsIndex).name
-            val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${gcommand.tq.envId}_${gcommand.tq.projectId}_${cluster}")
+            val actorName = s"clusterActor_${gcommand.tq.envId}_${gcommand.tq.projectId}_${cluster}"
+            val clusterActor = context.child(actorName).getOrElse(context.actorOf(Props[ClusterActor], actorName))
             log.info(s"TaskExecute.gcc.templateStep ==> ${gcommand.templateStep}")
             log.info(s"TaskExecute.gcc.taskId ==> ${gcommand.taskObj.taskId}")
             clusterActor ! GenerateClusterCommands(gcommand.taskObj.taskId.toInt, gcommand.taskObj, gcommand.templateStep, cluster, gcommand.tq, gcommand.hosts, gcommand.hostsIndex)

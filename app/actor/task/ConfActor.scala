@@ -40,24 +40,25 @@ class ConfActor extends Actor with ActorLogging{
     }
 
     case gc: GenerateConf => {
-      val clusterActor = context.actorOf(Props[ClusterActor], s"clusterActor_${gc.envId}_${gc.projectId}_${gc.hostname}")
+      val actorName = s"clusterActor_${gc.envId}_${gc.projectId}_${gc.hostname}"
+      val clusterActor = context.child(actorName).getOrElse(context.actorOf(Props[ClusterActor], actorName))
       clusterActor ! GenerateClusterConfs(gc.envId, gc.projectId, gc.versionId, gc.taskObj, gc.hostname, gc.order)
     }
 
     case successConf: SuccessReplaceConf => {
 //      context.parent ! ExecuteCommand(successConf.taskId, successConf.envId, successConf.projectId, successConf.versionId, successConf.order + 1)
       context.parent ! Execute()
-      context.stop(self)
+//      context.stop(self)
     }
 
     case errorConf: ErrorReplaceConf => {
       context.parent ! ConfCopyFailed(errorConf.str)
-      context.stop(self)
+//      context.stop(self)
     }
 
     case timeout: TimeoutReplace => {
       context.parent ! ConfCopyFailed(s"${timeout.key} 表达式执行超时!")
-      context.stop(self)
+//      context.stop(self)
     }
   }
 }
