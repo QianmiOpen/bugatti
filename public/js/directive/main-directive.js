@@ -20,6 +20,42 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    app.directive('focusIf', ['$timeout', function($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+                scope.$watch(attr.focusIf, function (v) {
+                    if (v) {
+                        $timeout(function() {
+                            element[0].focus();
+                        });
+                    }
+                });
+            }
+        };
+    }]);
+
+    app.directive('banner', ['$window', function($window) {
+        return function (scope, element, attrs) {
+            element.height($window.innerHeight - 258);
+        }
+    }]);
+
+    /* input enter */
+    app.directive('ngEnter', function () {
+        return function (scope, element, attrs) {
+            element.bind("keydown keypress", function (event) {
+                if(event.which === 13) {
+                    scope.$apply(function (){
+                        scope.$eval(attrs.ngEnter);
+                    });
+
+                    event.preventDefault();
+                }
+            });
+        };
+    });
+
     /**
      * A generic confirmation for risky actions.
      * Usage: Add attributes: ng-really-message="Are you sure"? ng-really-click="takeAction()" function
@@ -389,7 +425,7 @@ define(['angular'], function(angular) {
                         $scope.varForm.varName.$invalid = true;
                         $scope.varForm.varName.$error.unique = true;
                         return;
-                    };
+                    }
                     if (v.name.trim().length < 1 && v.value.trim().length < 1) {
                         $scope.varForm.varName.$invalid = true;
                         $scope.varForm.varValue.$invalid = true;
@@ -421,7 +457,7 @@ define(['angular'], function(angular) {
                         }
                     });
                     return find;
-                };
+                }
 
                 $scope.editVar = function(repeat$scope) {
                     repeat$scope.mode = 'edit';
@@ -864,7 +900,7 @@ define(['angular'], function(angular) {
                            });
                        }
                    });
-               }
+               };
 
                function findInVars(vars, v) {
                    var find = '';
@@ -875,7 +911,7 @@ define(['angular'], function(angular) {
                        }
                    });
                    return find;
-               };
+               }
 
                $scope.saveOrUpdateProperties = function(vars) {
                    $scope.relation.globalVariable = [];
