@@ -59,10 +59,15 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       val commandStatus = data.copy(commands = insert.commandList, taskDoif = insert.taskDoif, taskObj = taskObj, taskInfo = _taskInfo, json = insert.json, engine = engine)
 
       if (commandStatus.commands.isEmpty) {
-        goto(Failure) using commandStatus
+        goto(Failure) using commandStatus.copy(status = TaskEnum.TaskFailed)
       }else {
         goto(Executing) using commandStatus
       }
+
+    case Event(st: StopTask, data: CommandStatus) => {
+      commandOver(_taskInfo.taskId, s"用户选择停止任务")
+      goto(Stopping) using data
+    }
 
     case Event(StateTimeout, data: CommandStatus) =>
       commandOver(_taskInfo.taskId, s"任务号:${_taskInfo.taskId} Init执行超时 actor is ${self}")
@@ -71,7 +76,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
   when(Executing, stateTimeout = 180 second){
     case Event(ec: Execute, data: CommandStatus) =>
-      log.info(s"executing execute")
+      log.info(s"executing taskId:${_taskInfo.taskId}, envId:${_taskInfo.envId}, projectId:${_taskInfo.projectId}, order:${data.order}")
       val engine = data.engine
       if(data.order < data.commands.length){
         val taskInfo = data.taskInfo
@@ -117,13 +122,13 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       }
     }
     case Event(sjb: SaltJobBegin, data: CommandStatus) => {
-      val msg = s"任务:${sjb.jid}开始,执行时间:${sjb.excuteMicroseconds}"
+      val msg = s"任务:${sjb.jid}开始, envId:${_taskInfo.envId}, proId:${_taskInfo.projectId}, 执行时间:${sjb.excuteMicroseconds}"
       log.info(msg)
       commandOver(data.taskInfo.taskId, msg)
       stay using data.copy(jid = sjb.jid)
     }
     case Event(sje: SaltJobError, data: CommandStatus) => {
-      log.info(s"任务${data.jid} has receive SaltJobError")
+      log.info(s"任务:${data.jid} has receive SaltJobError")
       val msg = s"任务:${data.jid}执行失败,${sje.msg},执行时间:${sje.excuteMicroseconds}"
       log.error(msg)
       commandOver(data.taskInfo.taskId, msg)
@@ -131,7 +136,9 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
     }
     case Event(sr: SaltJobOk, data: CommandStatus) =>{
-      log.info(s"任务${data.jid} has receive SaltJobOk")
+      val msg = s"任务:${data.jid} has receive SaltJobOk, envId:${_taskInfo.envId}, proId:${_taskInfo.projectId}"
+      log.info(msg)
+      commandOver(data.taskInfo.taskId, msg)
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
       val jsonResult = Json.parse(srResult)
@@ -147,7 +154,14 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
               val file = new File(resultLogPath)
               val exec_command = s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
               Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.APPEND, StandardOpenOption.SYNC):_*)
-              val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js => js.as[Boolean])
+              val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js =>
+                try{
+                  js.as[Boolean]
+                }catch{
+                  case e: Exception =>
+                    false
+                }
+              )
               val exeResult: Seq[Boolean] = (jResult \ "result" \\ "success").map(js => js.as[Boolean])
               if (!seqResult.contains(false) && !exeResult.contains(false)) {
                 //命令执行成功
@@ -237,7 +251,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       self ! Execute()
     }
     case Init -> Failure => {
-      val taskInfo = nextStateData.taskInfo
+      val taskInfo = _taskInfo
       val taskId = taskInfo.taskId
       insertResultLog(taskId, s"[error] ${nextStateData.json \ "error"}")
       TaskHelper.changeStatus(taskId, TaskEnum.TaskFailed)
@@ -245,8 +259,8 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, TaskEnum.TaskFailed, task.endTime.get, version, taskInfo.clusterName)
     }
 
-    case (Init | Executing | Stopping) -> Finish => {
-      val taskInfo = nextStateData.taskInfo
+    case (Init | Executing | Stopping) -> (Finish | Stopping) => {
+      val taskInfo = _taskInfo
       TaskHelper.changeStatus(taskInfo.taskId, nextStateData.status)
       val (task, version) = getTask_VS(taskInfo.taskId)
       MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, nextStateData.status, task.endTime.get, version, taskInfo.clusterName)
