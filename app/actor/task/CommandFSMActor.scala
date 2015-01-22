@@ -64,10 +64,10 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         goto(Executing) using commandStatus
       }
 
-    case Event(st: StopTask, data: CommandStatus) => {
-      commandOver(_taskInfo.taskId, s"用户选择停止任务")
-      goto(Stopping) using data
-    }
+//    case Event(st: StopTask, data: CommandStatus) => {
+//      commandOver(_taskInfo.taskId, s"用户选择停止任务${_taskInfo.taskId}, envId:${_taskInfo.envId}, proId:${_taskInfo.projectId}")
+//      goto(Stopping) using data
+//    }
 
     case Event(StateTimeout, data: CommandStatus) =>
       commandOver(_taskInfo.taskId, s"任务号:${_taskInfo.taskId} Init执行超时 actor is ${self}")
@@ -204,7 +204,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
     }
 
     case Event(st: StopTask, data: CommandStatus) => {
-      commandOver(data.taskInfo.taskId, s"用户选择停止任务")
+      commandOver(data.taskInfo.taskId, s"用户选择停止任务${_taskInfo.taskId}, envId:${_taskInfo.envId}, proId:${_taskInfo.projectId}")
       goto(Stopping) using data
     }
 
@@ -224,6 +224,20 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
     }
     case Event(sjs: SaltJobStoped, data: CommandStatus) => {
       commandOver(data.taskInfo.taskId, s"任务号${data.jid}已被停止")
+      goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
+    }
+
+    case Event(saltTimeOut: SaltTimeOut, data: CommandStatus) => {
+      commandOver(data.taskInfo.taskId, s"远程任务执行超时! 当前状态${stateName}")
+      goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
+    }
+
+    case Event(sje: SaltJobError, data: CommandStatus) => {
+      log.info(s"任务:${data.jid} has receive SaltJobError, 当前状态${stateName}")
+      val msg = s"任务:${data.jid}执行失败,${sje.msg},执行时间:${sje.excuteMicroseconds}, 当前状态${stateName}"
+      log.error(msg)
+      commandOver(data.taskInfo.taskId, msg)
+      context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskFailed)
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
     }
 
@@ -259,7 +273,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, TaskEnum.TaskFailed, task.endTime.get, version, taskInfo.clusterName)
     }
 
-    case (Init | Executing | Stopping) -> (Finish | Stopping) => {
+    case (Init | Executing | Stopping) -> Finish => {
       val taskInfo = _taskInfo
       TaskHelper.changeStatus(taskInfo.taskId, nextStateData.status)
       val (task, version) = getTask_VS(taskInfo.taskId)
