@@ -263,7 +263,8 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       val taskInfo = _taskInfo
       TaskHelper.changeStatus(taskInfo.taskId, nextStateData.status)
       val (task, version) = getTask_VS(taskInfo.taskId)
-      MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, nextStateData.status, task.endTime.get, version, taskInfo.clusterName)
+//      MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, nextStateData.status, task.endTime.get, version, taskInfo.clusterName)
+      context.parent ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, nextStateData.status, task.endTime.get, version, taskInfo.clusterName)
     }
 
     case Executing -> Stopping => {

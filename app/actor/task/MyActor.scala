@@ -86,11 +86,11 @@ class MyActor extends Actor with ActorLogging {
 
   implicit val taskQueueWrites = Json.writes[TaskQueue]
 
-  override val supervisorStrategy = OneForOneStrategy() {
-    case e: Exception =>
-      log.error(s"${self} catch exception: ${e.getMessage} ${e.getStackTraceString}")
-      Escalate
-  }
+//  override val supervisorStrategy = OneForOneStrategy() {
+//    case e: Exception =>
+//      log.error(s"${self} catch exception: ${e.getMessage} ${e.getStackTraceString}")
+//      Escalate
+//  }
 
   import context._
   def receive = {

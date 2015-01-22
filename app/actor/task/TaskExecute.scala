@@ -19,13 +19,13 @@ class TaskExecute extends Actor with ActorLogging {
   override val supervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
       log.error(s"${self} catch exception: ${e.getMessage} ${e.getStackTraceString}")
-//      postStop()
-      taskFailed()
+      postStop()
+//      taskFailed()
       Escalate
   }
 
-  def taskFailed(): Unit ={
-    terminate(TerminateCommands(TaskEnum.TaskFailed, _envId, _projectId, _clusterName))
+  override def postStop(): Unit ={
+    terminate(TerminateCommands(_status, _envId, _projectId, _clusterName))
   }
 
   implicit val taskQueueWrites = Json.writes[TaskQueue]
@@ -36,6 +36,8 @@ class TaskExecute extends Actor with ActorLogging {
   var (_commandList, _taskDoifList, _json) = (Seq.empty[TaskCommand], Seq.empty[String], Json.obj())
 
   var _clusterName = Option.empty[String]
+  //初始化任务状态,防止出现异常
+  var _status = TaskEnum.TaskFailed
 
   def receive = {
     case tgc: TaskGenerateCommand => {
@@ -52,6 +54,8 @@ class TaskExecute extends Actor with ActorLogging {
           val taskName = TemplateActionHelper.findById(tq.taskTemplateId).name
           //2、insert 任务表
           val taskId = TaskHelper.addByTaskQueue(tq)
+          //当有新的任务生成时，重置状态，防止出现异常
+          _status = TaskEnum.TaskFailed
           //获取队列信息
           val queues = TaskQueueHelper.findQueues(tq.envId, tq.projectId, tgc.epc.clusterName)
           val queuesJson = queues.map{
@@ -209,6 +213,11 @@ class TaskExecute extends Actor with ActorLogging {
       context.child(s"commandActor_${key}").getOrElse(
         actorOf(Props[CommandFSMActor], s"commandActor_${key}")
       ) ! st
+
+    case changeOverStatus: ChangeOverStatus => {
+      _status = changeOverStatus.taskStatus
+      context.parent ! changeOverStatus
+    }
   }
 
   def terminate(tc: TerminateCommands): Unit ={
