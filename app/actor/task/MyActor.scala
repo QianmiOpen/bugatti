@@ -50,12 +50,12 @@ object MyActor {
 
   def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
 
-    val js: JsValue = MyActor.statusMap
-    (socketActor ? JoinProcess(js)).map{
+//    val js: JsValue = MyActor.statusMap
+    (socketActor ? JoinProcess()).map{
       case ConnectedSocket(out) => {
         val in = Iteratee.foreach[JsValue]{ event =>
           //这个是为了client主动调用
-          socketActor ! AllTaskStatus()
+//          socketActor ! AllTaskStatus()
         }.map{ _ =>
           socketActor ! QuitProcess()
         }
@@ -77,7 +77,7 @@ object MyActor {
 
   //在global被初始化
   def generateSchedule() = {
-    new WSSchedule().start(socketActor, "notify")
+    new WSSchedule().start(superviseTaskActor)
   }
 
 }
@@ -99,6 +99,7 @@ class MyActor extends Actor with ActorLogging {
       val key = taskKey(envId, projectId, cluster)
       incQueueNum(key, 1)
       self ! NextTaskQueue(envId, projectId, cluster)
+      self ! PushTaskStatus
     }
     case NextTaskQueue(envId, projectId, cluster) => {
       val key = s"${envId}_${projectId}"
@@ -128,6 +129,8 @@ class MyActor extends Actor with ActorLogging {
       changeStatus(mergerStatus(tKey, Json.obj("queues" -> _queuesJson)))
       val size = _queuesJson.size
       changeStatus(mergerStatus(tKey, Json.obj("queueNum" -> (if(size - 1 > 0){size - 1}else{0}) )))
+
+      self ! PushTaskStatus
     }
 
     case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum, cluster) => {
@@ -146,6 +149,8 @@ class MyActor extends Actor with ActorLogging {
       changeStatus(mergerStatus(key, Json.obj("currentNum" -> currentNum)))
       //6、taskName
       changeStatus(mergerStatus(key, Json.obj("taskName" -> taskName)))
+
+      self ! PushTaskStatus
     }
     case ChangeCommandStatus(envId, projectId, order, sls, machine, cluster) => {
 //      val key = s"${envId}_${projectId}"
@@ -156,6 +161,8 @@ class MyActor extends Actor with ActorLogging {
       //3、comamnd.machine
       val json = Json.obj("command" -> Json.obj("sls" -> sls, "machine" -> machine))
       changeStatus(mergerStatus(key, json))
+
+      self ! PushTaskStatus
     }
     case ChangeOverStatus(envId, projectId, status, endTime, version, cluster) => {
 //      val key = s"${envId}_${projectId}"
@@ -180,6 +187,8 @@ class MyActor extends Actor with ActorLogging {
         actorOf(Props[TaskExecute], s"taskExecute_${key}")
       ) ! RemoveTaskQueue(envId, projectId, cluster)
 
+      self ! PushTaskStatus
+
     }
 
     case ForceTerminate(envId, projectId, clusterName) => {
@@ -195,7 +204,11 @@ class MyActor extends Actor with ActorLogging {
 
     case RemoveStatus(envId, projectId, cluster) => {
       removeStatus(envId, projectId, cluster)
+      self ! PushTaskStatus
     }
+
+    case PushTaskStatus =>
+      MyActor.socketActor ! AllTaskStatus(MyActor.statusMap)
   }
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
@@ -337,14 +350,15 @@ case class RemoveStatus(envId: Int, projectId: Int, clusterName: Option[String])
 case class FindLastStatus(key: String)
 
 case class ForceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
+case object PushTaskStatus
 
 class WSSchedule{
-  def start(socketActor: ActorRef, notify: String): Cancellable = {
+  def start(myActor: ActorRef): Cancellable = {
     Akka.system.scheduler.schedule(
       1 second,
-      0.5 second,
-      socketActor,
-      notify
+      3 second,
+      myActor,
+      PushTaskStatus
     )
   }
 }

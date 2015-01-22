@@ -22,17 +22,17 @@ class SocketActor extends Actor with ActorLogging {
     case FindLastStatus(key) => {
       notifyAllSocket(Json.obj(s"${key}_last" -> key))
     }
-    case JoinProcess(js) => {
+    case jp: JoinProcess => {
       sender ! ConnectedSocket(out)
     }
     case QuitProcess() => {
       log.info("有一个客户端关闭了连接")
     }
-    case AllTaskStatus() => {
-      notifyAllSocket(MyActor.statusMap)
+    case AllTaskStatus(js) => {
+      notifyAllSocket(js)
     }
     case "notify" => {
-      self ! AllTaskStatus()
+//      self ! AllTaskStatus()
     }
   }
 
@@ -55,8 +55,8 @@ class SocketActor extends Actor with ActorLogging {
   }
 }
 
-case class JoinProcess(js: JsValue)
+case class JoinProcess()
 case class ConnectedSocket(out: Enumerator[JsValue])
 case class CannotConnect(msg: String)
-case class AllTaskStatus()
+case class AllTaskStatus(js: JsValue)
 case class QuitProcess()
