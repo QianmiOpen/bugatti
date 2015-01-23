@@ -35,7 +35,9 @@
                     </table>
             </accordion-heading>
             <!-- Project Tabs -->
-            <project-tabs></project-tabs>
+            <div ng-if="projectTabFlag">
+                <project-tabs></project-tabs>
+            </div>
         </accordion-group>
     </accordion>
 </div>

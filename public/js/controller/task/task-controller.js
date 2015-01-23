@@ -50,6 +50,7 @@ define(['angular'], function(angular) {
 
         //选择tab页
         $scope.chooseEnv = function(env) {
+            $scope.projectTabFlag = false
             // 加载环境对应可用区域
             AreaService.list(env.id, function(data) {
                 $scope.preAreas = data;
@@ -527,6 +528,8 @@ define(['angular'], function(angular) {
         };
 
         $scope.showVm = function(proId) {
+            $scope.projectTabFlag = true
+            $scope.projectIdSelected = proId
             $scope.initHosts()
             // 根据项目proId & envId 获取关联机器
             TaskService.findClusters($scope.activeEnv, proId, function(data){

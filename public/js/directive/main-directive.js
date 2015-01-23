@@ -1026,8 +1026,6 @@ define(['angular'], function(angular) {
                     }
                 }
 
-
-
                 $scope.showHiddenMessage = function(){
                     var len = parseInt($scope.logHeader.split(" ")[0])
                     TaskService.readHeader($scope.activeEnv, $scope.pro.id, $scope.taskId, len, function(data){
