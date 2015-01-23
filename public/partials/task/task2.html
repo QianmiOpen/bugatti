@@ -23,7 +23,7 @@
 
             <ul class="nav nav-pills nav-stacked" ng-if="env" bindonce ng-repeat="project in projects | filter:_search">
                 <li ng-class="{active: $state.params.pid == project.id}">
-                    <a class="btn-link" ui-sref="task2.list.info({eid: env.id, pid: project.id})" bo-bind="project.name"></a>
+                    <a class="btn-link" ui-sref="task2.list.info({eid: env.id, pid: project.id, top: top})" bo-bind="project.name"></a>
                 </li>
             </ul>
         </div>

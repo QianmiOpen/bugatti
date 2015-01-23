@@ -81,7 +81,7 @@ define(['angular'], function(angular) {
         }
     }]);
 
-    app.directive("scroll", ['$state', '$window', function ($state, $window) {
+    app.directive("scroll", ['$state', '$window', '$interval', function ($state, $window, $interval) {
         return function($scope, element, attrs) {
 
             if (angular.isDefined($state.params.top)) {
@@ -89,13 +89,25 @@ define(['angular'], function(angular) {
             }
 
             element.bind("scroll", function() {
-                var h= $state.href($state.current, { top: this.scrollTop });
-                $window.history.replaceState(null, "test", '/' + h);
-                //$scope.$apply();
+                $scope.top = this.scrollTop;
+                //var h= $state.href($state.current, { top: this.scrollTop });
+                //$window.history.replaceState(null, "test", '/' + h);
+                $scope.$apply();
             });
 
+            //var stopTime = $interval(function() {
+            //    console.log('interval');
+            //    if ($scope.top != $state.params.top) {
+            //        var h= $state.href($state.current, { top: $scope.top });
+            //        console.log('h='+h);
+            //        //console.log('$window',$window.history)
+            //        $window.history.pushState(null, "test", '/' + h);
+            //    }
+            //}, 5000);
 
-
+            //element.on('$destroy', function() {
+            //    $interval.cancel(stopTime);
+            //});
 
         };
     }]);

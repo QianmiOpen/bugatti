@@ -15,6 +15,7 @@ define(['angular'], function(angular) {
         function($scope, $state, $stateParams, EnvService, ProjectService) {
 
             console.log('state', $state);
+
         // init
         $scope.env = {};
         $scope.envs = [];
@@ -53,7 +54,7 @@ define(['angular'], function(angular) {
         $scope.activeEnv = function(e) {
             $scope.env = e;
             if (angular.isDefined($state.params.pid)) {
-                $state.go('task2.list.info', { eid: e.id, pid: $state.params.pid});
+                $state.go('task2.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
             } else {
                 $state.go('task2.list', { eid: e.id });
             }
