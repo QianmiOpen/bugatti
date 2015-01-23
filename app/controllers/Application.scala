@@ -227,13 +227,13 @@ object Application extends ScalaController with Security {
         task.routes.javascript.TaskController.joinProcess,
         task.routes.javascript.TaskController.createNewTaskQueue,
         task.routes.javascript.TaskController.getTemplates,
-        task.routes.javascript.TaskController.taskLog,
-        task.routes.javascript.TaskController.taskLogFirst,
+        task.routes.javascript.TaskController.logHeaderContent,
         task.routes.javascript.TaskController.removeTaskQueue,
         task.routes.javascript.TaskController.forceTerminate,
         task.routes.javascript.TaskController.findClusterByEnv_Project,
         task.routes.javascript.TaskController.findHisTasks,
         task.routes.javascript.TaskController.findCatalinaWSUrl,
+        task.routes.javascript.TaskController.logReader,
 
         // logs
         logs.routes.javascript.LogsController.search,

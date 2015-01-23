@@ -146,8 +146,9 @@ GET           /task/clusters                                      controllers.ta
 GET           /task/history                                       controllers.task.TaskController.findHisTasks(envId: Int, projectId: Int)
 GET           /task/catalinaWS                                    controllers.task.TaskController.findCatalinaWSUrl(envId: Int)
 # Task Log
-GET           /task/log/:taskId                                   controllers.task.TaskController.taskLog(taskId: Int)
-GET           /task/logHeader                                     controllers.task.TaskController.taskLogFirst(taskId: Int, byteSize: Int)
+#GET           /task/log/:taskId                                   controllers.task.TaskController.taskLog(taskId: Int)
+GET           /task/logHeaderContent                              controllers.task.TaskController.logHeaderContent(taskId: Int, byteSize: Int)
+GET           /task/LogReader                                     controllers.task.TaskController.logReader(taskId: Int)
 
 # Logs(user action)
 POST          /logs                                               controllers.logs.LogsController.search(page: Int ?=0, pageSize: Int ?=10)

@@ -21,8 +21,11 @@ define(['angular'], function(angular) {
             getTemplates: function(scriptVersion, callback){
                 $http(PlayRoutes.controllers.task.TaskController.getTemplates(scriptVersion)).success(callback)
             },
+            LogReader: function(taskId, callback){
+              $http(PlayRoutes.controllers.task.TaskController.logReader(taskId)).success(callback)
+            },
             readHeader: function(taskId, byteSize, callback){
-                $http(PlayRoutes.controllers.task.TaskController.taskLogFirst(taskId, byteSize)).success(callback)
+                $http(PlayRoutes.controllers.task.TaskController.logHeaderContent(taskId, byteSize)).success(callback)
             },
             forceTerminate: function(envId, projectId, clusterName, callback){
                 $http(PlayRoutes.controllers.task.TaskController.forceTerminate(envId, projectId, clusterName)).success(callback)

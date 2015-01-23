@@ -88,7 +88,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
           commandOver(taskInfo.taskId, s"命令(${command.sls}):${command.command}")
           MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
           executeSalt(taskInfo.taskId, command, taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
-        }else {
+        } else {
           commandOver(taskInfo.taskId, s"${command}跳过执行,原因:${doif}")
           //更新taskCommand状态
           context.parent ! UpdateCommandStatus(taskInfo.taskId, data.order, TaskEnum.TaskPass)
@@ -264,6 +264,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
     case Init -> Executing => {
       self ! Execute()
     }
+
     case Init -> Failure => {
       val taskInfo = _taskInfo
       val taskId = taskInfo.taskId
@@ -311,7 +312,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       }
       val file = new File(resultLogPath)
       (Seq("echo", s"${msg}") #>> file lines)
-    } else {
+    }else {
       log.error(s"taskId is 0 and msg is ${msg}")
     }
   }
