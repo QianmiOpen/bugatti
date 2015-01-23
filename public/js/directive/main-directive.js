@@ -1021,11 +1021,12 @@ define(['angular'], function(angular) {
                             console.log(data)
                             $scope.logHeader = data.logHeader
                             $scope.logContent = data.logContent
+                            $scope.logHeaderShow = true
                         })
                     }
                 }
 
-                $scope.logHeaderShow = true
+
 
                 $scope.showHiddenMessage = function(){
                     var len = parseInt($scope.logHeader.split(" ")[0])
