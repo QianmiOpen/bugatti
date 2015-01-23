@@ -14,8 +14,6 @@ define(['angular'], function(angular) {
     app.controller('Task2Ctrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService',
         function($scope, $state, $stateParams, EnvService, ProjectService) {
 
-            console.log('state', $state);
-
         // init
         $scope.env = {};
         $scope.envs = [];
