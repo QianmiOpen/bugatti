@@ -11,6 +11,71 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
+    app.controller('Task2Ctrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService',
+        function($scope, $state, $stateParams, EnvService, ProjectService) {
+
+            console.log('state', $state);
+        // init
+        $scope.env = {};
+        $scope.envs = [];
+        $scope.load = { is: true };
+        $scope.focus = { is: true };
+
+        // load envs
+        EnvService.getAuth(function(data) {
+            if (data == null || data.length == 0) {
+                return;
+            }
+            $scope.envs = data;
+
+            if (angular.isUndefined($state.params.eid)) { // 第一次访问任务页面
+                $scope.activeEnv($scope.envs[0]);
+            } else {                                             // F5刷新保持当前URL
+                var e = ck_env_in_array($scope.envs, $state.params.eid);
+                $scope.activeEnv(e);
+            }
+
+        });
+
+        // util
+        function ck_env_in_array(envs, eid) {
+            var find = false;
+            var r = envs[0];
+            angular.forEach(envs, function(e) {
+                if (!find && e.id == eid) {
+                    r = e;
+                    find = true;
+                }
+            });
+            return r;
+        }
+
+        $scope.activeEnv = function(e) {
+            $scope.env = e;
+            if (angular.isDefined($state.params.pid)) {
+                $state.go('task2.list.info', { eid: e.id, pid: $state.params.pid});
+            } else {
+                $state.go('task2.list', { eid: e.id });
+            }
+            // load projects
+            $scope.load.is = true;
+            ProjectService.getAuth(e.id, function(data) {
+                $scope.projects = data;
+                $scope.load.is = false;
+            });
+        };
+
+    }]);
+
+    app.controller('Task2InfoCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
+        $scope.load.is = true;
+        ProjectService.get($stateParams.pid, function (data) {
+            $scope.project = data;
+            $scope.load.is = false;
+        });
+
+    }]);
+
     app.controller('TaskCtrl', ['$scope', 'TaskService','EnvService','ProjectService', 'VersionService', 'AreaService', 'RelationService',
         '$state', '$stateParams', '$interval', 'Auth', '$modal', 'growl', '$http',
         function($scope, TaskService, EnvService, ProjectService, VersionService, AreaService, RelationService,

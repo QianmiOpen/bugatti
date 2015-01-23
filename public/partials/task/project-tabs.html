@@ -15,18 +15,18 @@
         <project-balance ng-if="isSet(1)"></project-balance>
 
         <!-- Project Item -->
-        <project-item ng-if="isSet(2)"></project-item>
+        <project-item ng-if="isSet(2)" active-tab="tab" expander-env="env" expander-project="project"></project-item>
 
         <!-- Project Conf -->
-        <project-conf ng-if="isSet(3)"></project-conf>
+        <project-conf ng-if="isSet(3)" active-tab="tab" expander-env="env" expander-envs="envs" expander-project="project"></project-conf>
 
         <!-- Project dependency -->
-        <project-dependency ng-if="isSet(4)"></project-dependency>
+        <project-dependency ng-if="isSet(4)" active-tab="tab" expander-project="project"></project-dependency>
 
         <!-- project member -->
-        <project-member ng-if="isSet(5)"></project-member>
+        <project-member ng-if="isSet(5)" active-tab="tab" expander-project="project"></project-member>
 
         <!-- history tasks -->
-        <project-history ng-if="isSet(6)"></project-history>
+        <project-history ng-if="isSet(6)" active-tab="tab" expander-env="env" expander-project="project"></project-history>
     </div>
 </div>

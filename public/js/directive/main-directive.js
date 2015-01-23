@@ -81,6 +81,25 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    app.directive("scroll", ['$state', '$window', function ($state, $window) {
+        return function($scope, element, attrs) {
+
+            if (angular.isDefined($state.params.top)) {
+                element.animate({scrollTop: $state.params.top}, "slow");
+            }
+
+            element.bind("scroll", function() {
+                var h= $state.href($state.current, { top: this.scrollTop });
+                $window.history.replaceState(null, "test", '/' + h);
+                //$scope.$apply();
+            });
+
+
+
+
+        };
+    }]);
+
     /* input enter */
     app.directive('ngEnter', function () {
         return function (scope, element, attrs) {
@@ -392,9 +411,6 @@ define(['angular'], function(angular) {
                 $scope.setTab = function(activeTab) {
                     $scope.tab = activeTab;
                 };
-                //this.getTab = function(){
-                //    return $scope.tab;
-                //}
             }
         };
     });
@@ -1056,26 +1072,30 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                project: "=expanderProject"
+            },
             templateUrl: 'partials/task/project-dependency.html',
             controller: ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
                 function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
                     $scope.showDependencies = function(){
-                        DependencyService.get($scope.pro.id, function(data){
+                        DependencyService.get($scope.project.id, function(data){
                             $scope.groups = data
                         })
-                    }
+                    };
                     $scope.delayLoadDependency = function(){
-                        ProjectService.getExceptSelf($scope.pro.id, function(data){
+                        ProjectService.getExceptSelf($scope.project.id, function(data){
                             $scope.projects = data ;
                             $scope.showDependencies() ;
                         })
-                    }
+                    };
 
                     $scope.removeDependency = function(parent,child){
                         DependencyService.removeDependency(parent.id, child.id, function(data){
                             $scope.showDependencies()
                         })
-                    }
+                    };
 
                     $scope.addDependency = function(parent,child){
                         DependencyService.addDependency(parent, child, function(data){
@@ -1084,11 +1104,11 @@ define(['angular'], function(angular) {
                             }
                             $scope.showDependencies()
                         })
-                    }
+                    };
 
                     $scope.templateFilter = function(dep){
                         return function(p){return p.templateId == dep.templateId};
-                    }
+                    };
 
                     $scope.getTemplateProject = function(dep){
                         var subTemplateProjects = $scope.projects.map(
@@ -1101,7 +1121,7 @@ define(['angular'], function(angular) {
                         if(subTemplateProjects.length > 0){
                             return subTemplateProjects[0];
                         }
-                    }
+                    };
 
                     $scope.changeTemplateProject = function(parentId, oldId, newId){
                         if(newId != undefined){
@@ -1133,9 +1153,13 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                project: "=expanderProject"
+            },
             templateUrl: 'partials/task/project-member.html',
-            controller: ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
-                function($scope, $stateParams, $modal, ProjectService, EnvService) {
+            controller: ['$scope', '$stateParams', '$modal', 'ProjectService',
+                function($scope, $stateParams, $modal, ProjectService) {
                     // ---------------------------------------------
                     // 项目成员管理
                     // ---------------------------------------------
@@ -1143,7 +1167,7 @@ define(['angular'], function(angular) {
                         ProjectService.members($scope.project.id, function(data) {
                             $scope.members = data;
                         });
-                    }
+                    };
 
                     $scope.addMember = function(jobNo) {
                         $scope.jobNo$error = '';
@@ -1175,7 +1199,7 @@ define(['angular'], function(angular) {
                                 });
                             }
                         });
-                    }
+                    };
 
                     $scope.memberUp = function(mid, msg) {
                         if (confirm(msg)) {
@@ -1222,22 +1246,32 @@ define(['angular'], function(angular) {
         return{
             restrict: 'E',
             require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                env: "=expanderEnv",
+                project: "=expanderProject"
+            },
             templateUrl: 'partials/task/task-history.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
-                    $scope.hisTasks = []
-                    $scope.delayLoadHistory = function(){
-                        TaskService.findHisTasks($scope.activeEnv, $scope.pro.id, function(data){
+                    $scope.hisTasks = [];
+                    $scope.delayLoadHistory = function() {
+
+                        // todo 下面2个方法在task-controller依赖, 要求传递或者单独实现
+                        // 1. function explainTaskStatus()
+                        // 2. function isObjEmpty()
+
+                        TaskService.findHisTasks($scope.env.id, $scope.project.id, function(data){
                             $scope.hisTasks = data.map($scope.addStatusTipHistory).map($scope.addShowFlag)
                         });
-                    }
+                    };
 
                     $scope.addShowFlag = function(data){
                         if(!$scope.isObjEmpty(data)){
                             $scope.isHisLogShow.push(false)
                         }
                         return data ;
-                    }
+                    };
 
                     $scope.addStatusTipHistory = function(data){
                         if(!$scope.isObjEmpty(data)){
@@ -1253,7 +1287,7 @@ define(['angular'], function(angular) {
                             data.statusTip = "N/A"
                         }
                         return data
-                    }
+                    };
 
                     $scope.stab = 1 ;
                     $scope.s_index = -1;

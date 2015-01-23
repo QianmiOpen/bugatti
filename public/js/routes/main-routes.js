@@ -57,6 +57,13 @@ define(['angular',
             data: { access: 'task' }
         });
 
+        $stateProvider.state('task2', {
+            url: "/task2",
+            templateUrl: "partials/task/task2.html",
+            controller: "Task2Ctrl",
+            data: { access: 'task' }
+        });
+
         $stateProvider.state('api', {
             url: "/api",
             templateUrl: "partials/api.html",

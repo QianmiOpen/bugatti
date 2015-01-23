@@ -1,0 +1,35 @@
+<div class="col-md-offset-0 main" >
+
+    <div class="tabs">
+        <ul class="nav nav-tabs" ng-if="env">
+            <li ng-class="{active: env.id === e.id}" ng-click="activeEnv(e)" ng-repeat="e in envs" ng-if="e['level'] === 'unsafe'">
+                <a href="">{{e.name}}</a>
+            </li>
+            <li ng-class="{active: env.id === e.id}" ng-click="activeEnv(e)" ng-repeat="e in envs" ng-if="e['level'] === 'safe'">
+                <a href=""><span class="label label-danger">{{e.name}}</span></a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="form-group pull-left col-xs-6 mt15" >
+        <input type="text" ng-model="_search" focus-if="focus.is" class="form-control" placeholder="快速检索项目"/>
+        <img ng-show="load.is" src="../../img/ajax-loader.gif" style="position: absolute;"/>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row" resizable ng-init="ignore_h=258" ng-style="{height: windowHeight}">
+        <div class="col-xs-2" scroll banner-height style=" width: 20%;  overflow-x: hidden; overflow-y: auto;">
+
+            <ul class="nav nav-pills nav-stacked" ng-if="env" bindonce ng-repeat="project in projects | filter:_search">
+                <li ng-class="{active: $state.params.pid == project.id}">
+                    <a class="btn-link" ui-sref="task2.list.info({eid: env.id, pid: project.id})" bo-bind="project.name"></a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-10" style="width: 80%; height: 100%; min-height: 100%; overflow-x: hidden; overflow-y: auto;">
+            <div ui-view="task-info"></div>
+        </div>
+    </div>
+
+</div>
