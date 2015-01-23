@@ -127,7 +127,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         case seq: Seq[Conf] if !seq.isEmpty =>
           seq
       }
-      val baseDir = s"${ConfHelp.confPath}/${taskId}"
+      val baseDir = s"${ConfHelp.confPath}/${envId}/${projectId}/${taskId}"
       val baseFilesPath = new File(s"${baseDir}/files")
 
       if (!baseFilesPath.exists()) {

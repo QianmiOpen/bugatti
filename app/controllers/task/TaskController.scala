@@ -188,14 +188,14 @@ object TaskController extends BaseController {
     Json.toJson(result)
   }
 
-  def logReader(taskId: Int) = Action{
-    val (logHeader, logContent) = TaskLog.readLog(taskId)
+  def logReader(envId: Int, proId: Int, taskId: Int) = Action{
+    val (logHeader, logContent) = TaskLog.readLog(envId, proId, taskId)
     val result = Json.obj("logHeader" -> logHeader, "logContent" -> logContent)
     Ok(result)
   }
 
-  def logHeaderContent(taskId: Int, byteSize: Int) = Action {
-    Ok(TaskLog.readHeader(taskId, byteSize))
+  def logHeaderContent(envId: Int, proId: Int, taskId: Int, byteSize: Int) = Action {
+    Ok(TaskLog.readHeader(envId, proId, taskId, byteSize))
   }
 
   def forceTerminate(envId: Int, projectId: Int, clusterName: Option[String]) = Action {

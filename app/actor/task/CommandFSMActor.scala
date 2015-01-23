@@ -44,16 +44,16 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       Escalate
   }
 
-//  var _taskId = 0
   var _taskInfo = TaskInfo(0, 0, 0, None, None)
   val _baseLogPath = ConfHelp.logPath
+  var _baseDir = ""
 
   startWith(Init, CommandStatus(Seq.empty[TaskCommand], Seq.empty[String], Seq.empty[String], 0, null, "", null, null, null, TaskEnum.TaskProcess))
 
   when(Init, stateTimeout = 10 second){
     case Event(insert: Insert, data: CommandStatus) =>
-//      _taskId = insert.taskId
       _taskInfo = TaskInfo(insert.taskId, insert.envId, insert.projectId, insert.versionId, insert.cluster)
+      _baseDir = s"${`_baseLogPath`}/${_taskInfo.envId}/${_taskInfo.projectId}/${_taskInfo.taskId}"
       val engine = new ScriptEngineUtil(insert.taskObj, _taskInfo.clusterName)
       val taskObj = engine.setCHost
       val commandStatus = data.copy(commands = insert.commandList, taskDoif = insert.taskDoif, taskObj = taskObj, taskInfo = _taskInfo, json = insert.json, engine = engine)
@@ -63,11 +63,6 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       }else {
         goto(Executing) using commandStatus
       }
-
-//    case Event(st: StopTask, data: CommandStatus) => {
-//      commandOver(_taskInfo.taskId, s"用户选择停止任务${_taskInfo.taskId}, envId:${_taskInfo.envId}, proId:${_taskInfo.projectId}")
-//      goto(Stopping) using data
-//    }
 
     case Event(StateTimeout, data: CommandStatus) =>
       commandOver(_taskInfo.taskId, s"任务号:${_taskInfo.taskId} Init执行超时 actor is ${self}")
@@ -149,8 +144,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
           val funType = (jResult \ "result" \ "fun").asOpt[String]
           funType match {
             case Some(fun) => {
-              val baseDir = s"${`_baseLogPath`}/${data.taskInfo.taskId}"
-              val resultLogPath = s"${baseDir}/result.log"
+              val resultLogPath = s"${_baseDir}/result.log"
               val file = new File(resultLogPath)
               val exec_command = s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
               Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.APPEND, StandardOpenOption.SYNC):_*)
@@ -292,9 +286,8 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
   }
 
   def insertResultLog(taskId: Int, message: String) = {
-    val baseDir = s"${_baseLogPath}/${taskId}"
-    val resultLogPath = s"${baseDir}/result.log"
-    val logDir = new File(baseDir)
+    val resultLogPath = s"${_baseDir}/result.log"
+    val logDir = new File(_baseDir)
     if (!logDir.exists) {
       logDir.mkdirs()
     }
@@ -304,9 +297,8 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
   def commandOver(taskId: Int, msg: String) = {
     if(taskId != 0){
-      val baseDir = s"${_baseLogPath}/${taskId}"
-      val resultLogPath = s"${baseDir}/result.log"
-      val logDir = new File(baseDir)
+      val resultLogPath = s"${_baseDir}/result.log"
+      val logDir = new File(_baseDir)
       if (!logDir.exists) {
         logDir.mkdirs()
       }
@@ -331,10 +323,9 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
   }
 
   def executeSalt(taskId: Int, command: TaskCommand, envId: Int, projectId: Int, versionId: Option[Int], order: Int, returnJson: JsObject, taskObj: ProjectTask_v) = {
-    val baseDir = s"${_baseLogPath}/${taskId}"
-    val resultLogPath = s"${baseDir}/result.log"
+    val resultLogPath = s"${_baseDir}/result.log"
 
-    val logDir = new File(baseDir)
+    val logDir = new File(_baseDir)
     if (!logDir.exists) {
       logDir.mkdirs()
     }

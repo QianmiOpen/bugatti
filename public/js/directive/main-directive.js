@@ -1017,7 +1017,7 @@ define(['angular'], function(angular) {
                 function($scope,TaskService,$state,$stateParams){
                 $scope.delayLoadLog = function(){
                     if($scope.taskId != undefined){
-                        TaskService.LogReader($scope.taskId, function(data){
+                        TaskService.LogReader($scope.activeEnv, $scope.pro.id, $scope.taskId, function(data){
                             console.log(data)
                             $scope.logHeader = data.logHeader
                             $scope.logContent = data.logContent
@@ -1025,12 +1025,12 @@ define(['angular'], function(angular) {
                     }
                 }
 
-                $scope.logHeaderHidden = false
+                $scope.logHeaderShow = true
 
                 $scope.showHiddenMessage = function(){
                     var len = parseInt($scope.logHeader.split(" ")[0])
-                    TaskService.readHeader($scope.taskId, len, function(data){
-                        $scope.logHeaderHidden = true
+                    TaskService.readHeader($scope.activeEnv, $scope.pro.id, $scope.taskId, len, function(data){
+                        $scope.logHeaderShow = false
                         $scope.logContent = data + $scope.logContent
                     })
                 }

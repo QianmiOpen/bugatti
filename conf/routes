@@ -147,8 +147,8 @@ GET           /task/history                                       controllers.ta
 GET           /task/catalinaWS                                    controllers.task.TaskController.findCatalinaWSUrl(envId: Int)
 # Task Log
 #GET           /task/log/:taskId                                   controllers.task.TaskController.taskLog(taskId: Int)
-GET           /task/logHeaderContent                              controllers.task.TaskController.logHeaderContent(taskId: Int, byteSize: Int)
-GET           /task/LogReader                                     controllers.task.TaskController.logReader(taskId: Int)
+GET           /task/logHeaderContent                              controllers.task.TaskController.logHeaderContent(envId: Int, proId: Int, taskId: Int, byteSize: Int)
+GET           /task/LogReader                                     controllers.task.TaskController.logReader(envId: Int, proId: Int, taskId: Int)
 
 # Logs(user action)
 POST          /logs                                               controllers.logs.LogsController.search(page: Int ?=0, pageSize: Int ?=10)

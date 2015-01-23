@@ -15,21 +15,21 @@ import scala.language.postfixOps
 object TaskLog{
   implicit val timeout = Timeout(2 seconds)
 
-  val baseLogPath = ConfHelp.logPath
+  val _baseLogPath = ConfHelp.logPath
 
-  def fileGen(taskId: Int): File = {
-    val filePath = s"${TaskLog.baseLogPath}/${taskId}/result.log"
+  def fileGen(envId: Int, proId: Int, taskId: Int): File = {
+    val filePath = s"${_baseLogPath}/${envId}/${proId}/${taskId}/result.log"
     new File(filePath)
   }
 
-  def readHeader(taskId: Int, byteSize: Int): String = {
-    val file = fileGen(taskId)
+  def readHeader(envId: Int, proId: Int, taskId: Int, byteSize: Int): String = {
+    val file = fileGen(envId, proId, taskId)
     val reader = new Reader()
     reader.reader(file, 0L, byteSize.toLong)._1
   }
 
-  def readLog(taskId: Int): (String, String) = {
-    val file = fileGen(taskId)
+  def readLog(envId: Int, proId: Int, taskId: Int): (String, String) = {
+    val file = fileGen(envId, proId, taskId)
     if(file.exists()){
       val (from, fromMsg) = (file.length() - 1024L) match {
         case len if len > 0L =>
