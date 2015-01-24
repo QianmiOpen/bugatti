@@ -212,8 +212,20 @@ class MyActor extends Actor with ActorLogging {
   }
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
-    log.info(s"mergeStatus key ${key}, ${js}")
-    Json.obj(key -> (MyActor.statusMap \ key).as[JsObject].deepMerge(js))
+    try{
+      (MyActor.statusMap \ key).asOpt[JsObject] match {
+        case Some(obj) =>
+          log.info(s"statusMap ${key} is ${obj}")
+          Json.obj(key -> obj.deepMerge(js))
+        case _ => {
+          Json.obj()
+        }
+      }
+    } catch {
+      case e: Exception =>
+        log.error(s"mergerStatus catch ${e.getMessage} ${e.getStackTraceString}")
+        Json.obj()
+    }
   }
 
   def incQueueNum(key: String, num: Int) = {
