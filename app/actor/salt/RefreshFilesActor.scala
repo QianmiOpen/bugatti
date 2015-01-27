@@ -40,7 +40,7 @@ class RefreshFilesActor(spiritId: Int, realSender: ActorRef) extends Actor with 
       self ! Run
     }
 
-    case SaltTimeOut() => {
+    case SaltTimeOut => {
       realSender ! Error
 
       context.stop(self)

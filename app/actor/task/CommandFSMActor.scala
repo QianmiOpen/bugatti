@@ -187,7 +187,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         }
       }
     }
-    case Event(saltTimeOut: SaltTimeOut, data: CommandStatus) => {
+    case Event(SaltTimeOut, data: CommandStatus) => {
       commandOver(data.taskInfo.taskId, "远程任务执行超时!")
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
     }
@@ -221,7 +221,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
     }
 
-    case Event(saltTimeOut: SaltTimeOut, data: CommandStatus) => {
+    case Event(SaltTimeOut, data: CommandStatus) => {
       commandOver(data.taskInfo.taskId, s"远程任务执行超时! 当前状态${stateName}")
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
     }
