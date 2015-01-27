@@ -16,7 +16,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-remote" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-    "com.qianmi.bugatti" % "spirit_2.10" % "1.4.4",
+    "com.qianmi.bugatti" % "spirit_2.10" % "1.4.6",
     "mysql" % "mysql-connector-java" % "5.1.34",
     "com.typesafe.slick" %% "slick" % "2.1.0",
     "org.slf4j" % "slf4j-nop" % "1.6.4",
