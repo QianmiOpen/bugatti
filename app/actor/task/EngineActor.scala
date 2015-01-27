@@ -150,7 +150,8 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       } else {
         sender ! ErrorReplaceConf(str)
       }
-//      context.stop(self)
+      //防止在成功的时候也触发超时定时器
+      context.stop(self)
     }
 
     case SaltTimeOut => {
