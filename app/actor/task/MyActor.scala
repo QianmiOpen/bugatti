@@ -1,24 +1,20 @@
 package actor.task
 
 import actor.ActorUtils
-import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
 import enums.TaskEnum
 import enums.TaskEnum.TaskStatus
-import models.conf.{AreaHelper, HostHelper}
-import models.task.{TemplateActionHelper, TaskCommand, TaskQueueHelper, TaskQueue}
+import models.task.{TaskQueue, TaskQueueHelper, TemplateActionHelper}
 import org.joda.time.DateTime
-import play.api.Logger
-import play.api.libs.concurrent.Akka
-import play.api.libs.iteratee.{Input, Done, Enumerator, Iteratee}
-import play.api.libs.json.{JsString, JsObject, Json, JsValue}
-import scala.collection.mutable
-import scala.concurrent.duration._
-import play.api.libs.concurrent.Execution.Implicits._
 import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.iteratee.{Done, Enumerator, Input, Iteratee}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+
+import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**
