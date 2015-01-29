@@ -2,6 +2,7 @@ package actor.task
 
 import actor.ActorUtils
 import akka.actor._
+import akka.event.LoggingReceive
 import akka.pattern.ask
 import akka.util.Timeout
 import enums.TaskEnum
@@ -46,7 +47,6 @@ object MyActor {
 
   def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
 
-//    val js: JsValue = MyActor.statusMap
     (socketActor ? JoinProcess()).map{
       case ConnectedSocket(out) => {
         val in = Iteratee.foreach[JsValue]{ event =>
@@ -89,122 +89,128 @@ class MyActor extends Actor with ActorLogging {
 //  }
 
   import context._
-  def receive = {
-    case CreateNewTaskActor(envId, projectId, cluster) => {
-      // 增加任务队列数量
-      val key = taskKey(envId, projectId, cluster)
-      incQueueNum(key, 1)
-      self ! NextTaskQueue(envId, projectId, cluster)
-      self ! PushTaskStatus
-    }
-    case NextTaskQueue(envId, projectId, cluster) => {
-      val key = s"${envId}_${projectId}"
-      val tKey = taskKey(envId, projectId, cluster)
-      val clusterName = genClusterName(cluster)
-      if(isTaskAvailable(key, clusterName)){
-        addKeyStatus(key, clusterName)
-        context.child(s"taskExecute_${tKey}").getOrElse(
-          actorOf(Props[TaskExecute], s"taskExecute_${tKey}")
-        ) ! NextTaskQueue(envId, projectId, cluster)
-      }else {
-        self ! ChangeQueues(envId, projectId, cluster)
+  def receive = try{
+    LoggingReceive{
+      case CreateNewTaskActor(envId, projectId, cluster) => {
+        // 增加任务队列数量
+        val key = taskKey(envId, projectId, cluster)
+        incQueueNum(key, 1)
+        self ! NextTaskQueue(envId, projectId, cluster)
+        self ! PushTaskStatus
       }
-    }
-
-    case cq: ChangeQueues => {
-      val tKey = taskKey(cq.envId, cq.projectId, cq.clusterName)
-      //修改队列
-      val queues = TaskQueueHelper.findQueues(cq.envId, cq.projectId, cq.clusterName)
-      val _queuesJson = queues.map{
-        x =>
-          var json = Json.toJson(x)
-          //增加模板名称
-          json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TemplateActionHelper.findById(x.taskTemplateId).name)
-          json.as[JsObject]
+      case NextTaskQueue(envId, projectId, cluster) => {
+        val key = s"${envId}_${projectId}"
+        val tKey = taskKey(envId, projectId, cluster)
+        val clusterName = genClusterName(cluster)
+        if(isTaskAvailable(key, clusterName)){
+          addKeyStatus(key, clusterName)
+          context.child(s"taskExecute_${tKey}").getOrElse(
+            actorOf(Props[TaskExecute], s"taskExecute_${tKey}")
+          ) ! NextTaskQueue(envId, projectId, cluster)
+        }else {
+          self ! ChangeQueues(envId, projectId, cluster)
+        }
       }
-      changeStatus(mergerStatus(tKey, Json.obj("queues" -> _queuesJson)))
-      val size = _queuesJson.size
-      changeStatus(mergerStatus(tKey, Json.obj("queueNum" -> (if(size - 1 > 0){size - 1}else{0}) )))
 
-      self ! PushTaskStatus
+      case cq: ChangeQueues => {
+        val tKey = taskKey(cq.envId, cq.projectId, cq.clusterName)
+        //修改队列
+        val queues = TaskQueueHelper.findQueues(cq.envId, cq.projectId, cq.clusterName)
+        val _queuesJson = queues.map{
+          x =>
+            var json = Json.toJson(x)
+            //增加模板名称
+            json = json.as[JsObject] ++ Json.obj("taskTemplateName" -> TemplateActionHelper.findById(x.taskTemplateId).name)
+            json.as[JsObject]
+        }
+        changeStatus(mergerStatus(tKey, Json.obj("queues" -> _queuesJson)))
+        val size = _queuesJson.size
+        changeStatus(mergerStatus(tKey, Json.obj("queueNum" -> (if(size - 1 > 0){size - 1}else{0}) )))
+
+        self ! PushTaskStatus
+      }
+
+      case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum, cluster) => {
+        //      val key = s"${tq.envId}_${tq.projectId}"
+        val key = taskKey(tq.envId, tq.projectId, cluster)
+        //1、修改queueNum
+        changeStatus(mergerStatus(key, Json.obj("queueNum" -> queuesJson.size)))
+        incQueueNum(key, -1)
+        //2、更新queueList
+        changeStatus(mergerStatus(key, Json.obj("queues" -> queuesJson)))
+        //3、task状态 -> 正在执行
+        changeStatus(mergerStatus(key, Json.obj("status" -> Json.toJson(TaskEnum.TaskProcess))))
+        //4、totalNum
+        changeStatus(mergerStatus(key, Json.obj("totalNum" -> totalNum)))
+        //5、currentNum
+        changeStatus(mergerStatus(key, Json.obj("currentNum" -> currentNum)))
+        //6、taskName
+        changeStatus(mergerStatus(key, Json.obj("taskName" -> taskName)))
+
+        self ! PushTaskStatus
+      }
+      case ChangeCommandStatus(envId, projectId, order, sls, machine, cluster) => {
+        //      val key = s"${envId}_${projectId}"
+        val key = taskKey(envId, projectId, cluster)
+        //1、currentNum
+        changeStatus(mergerStatus(key, Json.obj("currentNum" -> order)))
+        //2、command.commandName
+        //3、comamnd.machine
+        val json = Json.obj("command" -> Json.obj("sls" -> sls, "machine" -> machine))
+        changeStatus(mergerStatus(key, json))
+
+        self ! PushTaskStatus
+      }
+      case ChangeOverStatus(envId, projectId, status, endTime, version, cluster) => {
+        //      val key = s"${envId}_${projectId}"
+        val key = taskKey(envId, projectId, cluster)
+        //1、taskStatus
+        changeStatus(mergerStatus(key, Json.obj("taskStatus" -> Json.toJson(status))))
+        //2、endTime
+        changeStatus(mergerStatus(key, Json.obj("endTime" -> Json.toJson(endTime))))
+        //3、version
+        changeStatus(mergerStatus(key, Json.obj("version" -> version)))
+
+        // 删除所有queues的状态
+        changeStatus(mergerStatus(key, Json.obj("queues" -> Seq.empty[JsObject])))
+
+        //TODO NextTaskQueue
+        //复用taskExecute
+        //      val taskExecute = actorSelection(s"/user/mySystem/superviseActor/taskExecute_${key}")
+        //      val taskExecute = actorSelection(s"/user/superviseActor/taskExecute_${key}")
+        //      val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
+
+        context.child(s"taskExecute_${key}").getOrElse(
+          actorOf(Props[TaskExecute], s"taskExecute_${key}")
+        ) ! RemoveTaskQueue(envId, projectId, cluster)
+
+        self ! PushTaskStatus
+
+      }
+
+      case ForceTerminate(envId, projectId, clusterName) => {
+        val key = taskKey(envId, projectId, clusterName)
+        //      context.child(s"taskExecute_${key}").getOrElse(
+        //        actorOf(Props[TaskExecute], s"taskExecute_${key}")
+        //      ) ! TerminateCommands(TaskEnum.TaskFailed, envId, projectId, clusterName)
+
+        context.child(s"taskExecute_${key}").getOrElse(
+          actorOf(Props[TaskExecute], s"taskExecute_${key}")
+        ) ! StopTask(envId, projectId, clusterName)
+      }
+
+      case RemoveStatus(envId, projectId, cluster) => {
+        removeStatus(envId, projectId, cluster)
+        self ! PushTaskStatus
+      }
+
+      case PushTaskStatus =>
+        MyActor.socketActor ! AllTaskStatus(MyActor.statusMap)
     }
-
-    case ChangeTaskStatus(tq, taskName, queuesJson, currentNum, totalNum, cluster) => {
-//      val key = s"${tq.envId}_${tq.projectId}"
-      val key = taskKey(tq.envId, tq.projectId, cluster)
-      //1、修改queueNum
-      changeStatus(mergerStatus(key, Json.obj("queueNum" -> queuesJson.size)))
-      incQueueNum(key, -1)
-      //2、更新queueList
-      changeStatus(mergerStatus(key, Json.obj("queues" -> queuesJson)))
-      //3、task状态 -> 正在执行
-      changeStatus(mergerStatus(key, Json.obj("status" -> Json.toJson(TaskEnum.TaskProcess))))
-      //4、totalNum
-      changeStatus(mergerStatus(key, Json.obj("totalNum" -> totalNum)))
-      //5、currentNum
-      changeStatus(mergerStatus(key, Json.obj("currentNum" -> currentNum)))
-      //6、taskName
-      changeStatus(mergerStatus(key, Json.obj("taskName" -> taskName)))
-
-      self ! PushTaskStatus
+  } catch {
+    case e: Exception => {
+      LoggingReceive{case _ => log.error(s"myActor catch Exception:${e.getMessage} ${e.getStackTraceString}")}
     }
-    case ChangeCommandStatus(envId, projectId, order, sls, machine, cluster) => {
-//      val key = s"${envId}_${projectId}"
-      val key = taskKey(envId, projectId, cluster)
-      //1、currentNum
-      changeStatus(mergerStatus(key, Json.obj("currentNum" -> order)))
-      //2、command.commandName
-      //3、comamnd.machine
-      val json = Json.obj("command" -> Json.obj("sls" -> sls, "machine" -> machine))
-      changeStatus(mergerStatus(key, json))
-
-      self ! PushTaskStatus
-    }
-    case ChangeOverStatus(envId, projectId, status, endTime, version, cluster) => {
-//      val key = s"${envId}_${projectId}"
-      val key = taskKey(envId, projectId, cluster)
-      //1、taskStatus
-      changeStatus(mergerStatus(key, Json.obj("taskStatus" -> Json.toJson(status))))
-      //2、endTime
-      changeStatus(mergerStatus(key, Json.obj("endTime" -> Json.toJson(endTime))))
-      //3、version
-      changeStatus(mergerStatus(key, Json.obj("version" -> version)))
-
-      // 删除所有queues的状态
-      changeStatus(mergerStatus(key, Json.obj("queues" -> Seq.empty[JsObject])))
-
-      //TODO NextTaskQueue
-      //复用taskExecute
-      //      val taskExecute = actorSelection(s"/user/mySystem/superviseActor/taskExecute_${key}")
-//      val taskExecute = actorSelection(s"/user/superviseActor/taskExecute_${key}")
-      //      val taskExecute = actorOf(Props[TaskExecute], s"taskExecute_${key}")
-
-      context.child(s"taskExecute_${key}").getOrElse(
-        actorOf(Props[TaskExecute], s"taskExecute_${key}")
-      ) ! RemoveTaskQueue(envId, projectId, cluster)
-
-      self ! PushTaskStatus
-
-    }
-
-    case ForceTerminate(envId, projectId, clusterName) => {
-      val key = taskKey(envId, projectId, clusterName)
-//      context.child(s"taskExecute_${key}").getOrElse(
-//        actorOf(Props[TaskExecute], s"taskExecute_${key}")
-//      ) ! TerminateCommands(TaskEnum.TaskFailed, envId, projectId, clusterName)
-
-      context.child(s"taskExecute_${key}").getOrElse(
-        actorOf(Props[TaskExecute], s"taskExecute_${key}")
-      ) ! StopTask(envId, projectId, clusterName)
-    }
-
-    case RemoveStatus(envId, projectId, cluster) => {
-      removeStatus(envId, projectId, cluster)
-      self ! PushTaskStatus
-    }
-
-    case PushTaskStatus =>
-      MyActor.socketActor ! AllTaskStatus(MyActor.statusMap)
   }
 
   def mergerStatus(key: String, js: JsObject): JsObject = {
@@ -246,27 +252,28 @@ class MyActor extends Actor with ActorLogging {
     val key = s"${envId}_${projectId}"
     val tKey = taskKey(envId, projectId, clusterName)
     val cName = genClusterName(clusterName)
-    val queueNum = (MyActor.statusMap \ tKey \ "queueNum").asOpt[Int]
-
-    queueNum match {
-      case Some(qm) => {
-        if(qm == 0){
-          MyActor.statusMap = MyActor.statusMap - tKey
-          MyActor.socketActor ! FindLastStatus(tKey)
+    (MyActor.statusMap \ tKey).asOpt[JsObject] match {
+      case Some(tKeyObj) =>
+        (tKeyObj \ "queueNum").asOpt[Int] match {
+          case Some(qm) => {
+            if(qm == 0){
+              MyActor.statusMap = MyActor.statusMap - tKey
+              MyActor.socketActor ! FindLastStatus(tKey)
+            }
+            else {
+              MyActor.statusMap = MyActor.statusMap - tKey
+              changeStatus(Json.obj(tKey -> Json.obj("queueNum" -> qm)))
+            }
+            removeKeyStatus(key, cName)
+            self ! NextTaskQueue(envId, projectId, clusterName)
+          }
+          case _ => {
+            MyActor.statusMap = MyActor.statusMap - tKey
+            removeKeyStatus(key, cName)
+          }
         }
-        else {
-          MyActor.statusMap = MyActor.statusMap - tKey
-          changeStatus(Json.obj(tKey -> Json.obj("queueNum" -> queueNum)))
-        }
-//        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
-        removeKeyStatus(key, cName)
-        self ! NextTaskQueue(envId, projectId, clusterName)
-      }
-      case _ => {
-        MyActor.statusMap = MyActor.statusMap - tKey
-//        MyActor.envId_projectIdStatus = MyActor.envId_projectIdStatus - key
-        removeKeyStatus(key, cName)
-      }
+      case _ =>
+        log.error(s"${tKey} isnot in statusMap")
     }
   }
 
