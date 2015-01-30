@@ -180,22 +180,22 @@ class TaskExecute extends Actor with ActorLogging {
       ) ! Insert(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName, _taskDoifList)
     }
 
-    case removeTaskQueue: RemoveTaskQueue => {
+    case rtq: RemoveTaskQueue => {
 
-      val key = taskKey(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName)
+      val key = taskKey(rtq.envId, rtq.projectId, rtq.clusterName)
       context.child(s"commandActor_${key}") match {
         case Some(actor) => {
           context.stop(actor)
         }
         case _ =>
       }
-      TaskQueueHelper.findExecuteTask(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName) match {
+      TaskQueueHelper.findExecuteTask(rtq.envId, rtq.projectId, rtq.clusterName) match {
         case Some(tq) =>
           TaskQueueHelper.deleteById(tq.id.get)
         case _ =>
       }
 
-      self ! NextTaskQueue(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName)
+      self ! NextTaskQueue(rtq.envId, rtq.projectId, rtq.clusterName)
     }
 
     case tc: TerminateCommands => {

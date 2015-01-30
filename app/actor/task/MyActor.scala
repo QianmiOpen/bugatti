@@ -265,7 +265,7 @@ class MyActor extends Actor with ActorLogging {
               changeStatus(Json.obj(tKey -> Json.obj("queueNum" -> qm)))
             }
             removeKeyStatus(key, cName)
-            self ! NextTaskQueue(envId, projectId, clusterName)
+//            self ! NextTaskQueue(envId, projectId, clusterName)
           }
           case _ => {
             MyActor.statusMap = MyActor.statusMap - tKey
