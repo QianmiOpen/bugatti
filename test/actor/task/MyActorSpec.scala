@@ -1,11 +1,9 @@
 package actor.task
 
-import enums.TaskEnum
-import models.task.TaskQueue
-import org.joda.time.DateTime
 import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
+import play.api.libs.json.{JsObject, Json}
 import play.api.test._
 
 /**
@@ -15,7 +13,13 @@ import play.api.test._
 class MyActorSpec extends Specification {
 
   "Actors should run like this" should {
-    "actor begin" in new WithApplication {
+    "actor begin" in  {
+      val statusMap = Json.obj()
+      val key = "test_1"
+      (statusMap \ key).asOpt[JsObject] match {
+        case Some(obj) => println(obj)
+        case _ => println("nothing")
+      }
 //      val seq = Seq(
 //      TaskQueue(Option(1), 1, 1, Option(1), 2, TaskEnum.TaskWait, new DateTime(), None, None, 1),
 //      TaskQueue(Option(2), 2, 1, Option(1), 2, TaskEnum.TaskWait, new DateTime(), None, None, 1),

@@ -174,7 +174,6 @@ class TaskExecute extends Actor with ActorLogging {
     }
 
     case sc: SendCommandActor => {
-//      val key = s"${_envId}_${_projectId}"
       val key = taskKey(sc.tq.envId, sc.tq.projectId, sc.tq.clusterName)
       context.child(s"commandActor_${key}").getOrElse(
         actorOf(Props[CommandFSMActor], s"commandActor_${key}")
@@ -196,9 +195,7 @@ class TaskExecute extends Actor with ActorLogging {
         case _ =>
       }
 
-
-      //没有任务，删除MyActor中的缓存
-      MyActor.superviseTaskActor ! RemoveStatus(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName)
+      self ! NextTaskQueue(removeTaskQueue.envId, removeTaskQueue.projectId, removeTaskQueue.clusterName)
     }
 
     case tc: TerminateCommands => {

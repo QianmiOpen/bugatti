@@ -265,14 +265,13 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       insertResultLog(taskId, s"[error] ${nextStateData.json \ "error"}")
       TaskHelper.changeStatus(taskId, TaskEnum.TaskFailed)
       val (task, version) = getTask_VS(taskId)
-      MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, TaskEnum.TaskFailed, task.endTime.get, version, taskInfo.clusterName)
+      context.parent ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, TaskEnum.TaskFailed, task.endTime.get, version, taskInfo.clusterName)
     }
 
     case (Init | Executing | Stopping) -> Finish => {
       val taskInfo = _taskInfo
       TaskHelper.changeStatus(taskInfo.taskId, nextStateData.status)
       val (task, version) = getTask_VS(taskInfo.taskId)
-//      MyActor.superviseTaskActor ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, nextStateData.status, task.endTime.get, version, taskInfo.clusterName)
       context.parent ! ChangeOverStatus(taskInfo.envId, taskInfo.projectId, nextStateData.status, task.endTime.get, version, taskInfo.clusterName)
     }
 

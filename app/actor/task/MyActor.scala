@@ -233,7 +233,7 @@ class MyActor extends Actor with ActorLogging {
   def incQueueNum(key: String, num: Int) = {
     (MyActor.statusMap \ key).asOpt[JsObject] match {
       case Some(m) => {
-        val queueNum = (m \ "queueNum").as[Int] + num
+        val queueNum = (m \ "queueNum").asOpt[Int].getOrElse(0) + num
         changeStatus(Json.obj(key -> m.deepMerge(Json.obj("queueNum" -> queueNum))))
       }
       case _ => {
@@ -274,6 +274,8 @@ class MyActor extends Actor with ActorLogging {
         }
       case _ =>
         log.error(s"${tKey} isnot in statusMap")
+        MyActor.statusMap = MyActor.statusMap - tKey
+        removeKeyStatus(key, cName)
     }
   }
 
