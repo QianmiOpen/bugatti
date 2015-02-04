@@ -957,79 +957,98 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             scope:{
-                c: "="
+                c: "=",
+                env: "=",
+                project: "="
             },
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
+//                    $scope.delayLoadLog = function(){
+//                        console.log($scope.c.task.id)
+//                        if($scope.c.task.id != undefined){
+//                            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+//                            var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.c.task.id).webSocketURL()
+//                            console.log(path);
+//                            $scope.logSocket = new WS(path)
+//                            $scope.logSocket.onmessage = $scope.receiveEvent
+//
+//                            $scope.logHeader = ""
+//                        }
+//                    }
+//
+//                    $scope.message = ""
+//                    $scope.data = ""
+//                    $scope.logFirst = ""
+//                    $scope.logHeader = ""
+//
+//                    $scope.receiveEvent = function(event){
+//                        $scope.data = JSON.parse(event.data)
+////                        console.log($scope.data);
+//                        if(event.data.error){
+//                            console.log("there is errors:"+event.data.error)
+//                        }else{
+//                            $scope.$apply(function () {
+//                                var data = $scope.data
+//                                console.log(data)
+//                                if(data.taskId == $scope.c.task.id){
+//                                    if(data.kind == "logFirst"){
+//                                        $scope.logFirstHidden = false
+//                                        $scope.logFirst = data.message
+//                                    }else if(data.kind == "logHeader"){
+//                                        $scope.logFirstHidden = true
+//                                        if($scope.logHeader.length == 0){
+//                                            $scope.logHeader = data.message
+//                                            $scope.message = $scope.logHeader + $scope.message
+//                                        }
+//                                    }else{
+//                                        $scope.message = data.message
+//                                    }
+//                                }
+//                            });
+//                        }
+//                    }
+//
+//                    $scope.closeWs = function(){
+//                        $scope.logSocket.close()
+//                    }
+//
+//                    $scope.logFirstHidden = false
+//
+//                    $scope.showHiddenMessage = function(){
+//                        var len = parseInt($scope.logFirst.split(" ")[0])
+//                        TaskService.readHeader($scope.taskId, len, function(){})
+//                    }
+//
+//                    $scope.TransferString = function(content)
+//                    {
+//                        var string = content;
+//                        try{
+//                            string=string.replace(/\r\n/gi,"<br>");
+//                            string=string.replace(/\n/gi,"<br>");
+//                        }catch(e) {
+//                            console.log(e.message);
+//                        }
+//                        return string;
+//                    }
                     $scope.delayLoadLog = function(){
-                        console.log($scope.c.task.id)
                         if($scope.c.task.id != undefined){
-                            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-                            var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.c.task.id).webSocketURL()
-                            console.log(path);
-                            $scope.logSocket = new WS(path)
-                            $scope.logSocket.onmessage = $scope.receiveEvent
-
-                            $scope.logHeader = ""
-                        }
-                    }
-
-                    $scope.message = ""
-                    $scope.data = ""
-                    $scope.logFirst = ""
-                    $scope.logHeader = ""
-
-                    $scope.receiveEvent = function(event){
-                        $scope.data = JSON.parse(event.data)
-//                        console.log($scope.data);
-                        if(event.data.error){
-                            console.log("there is errors:"+event.data.error)
-                        }else{
-                            $scope.$apply(function () {
-                                var data = $scope.data
+                            TaskService.LogReader($scope.env.id, $scope.project.id, $scope.c.task.id, function(data){
                                 console.log(data)
-                                if(data.taskId == $scope.c.task.id){
-                                    if(data.kind == "logFirst"){
-                                        $scope.logFirstHidden = false
-                                        $scope.logFirst = data.message
-                                    }else if(data.kind == "logHeader"){
-                                        $scope.logFirstHidden = true
-                                        if($scope.logHeader.length == 0){
-                                            $scope.logHeader = data.message
-                                            $scope.message = $scope.logHeader + $scope.message
-                                        }
-                                    }else{
-                                        $scope.message = data.message
-                                    }
-                                }
-                            });
+                                $scope.logHeader = data.logHeader
+                                $scope.logContent = data.logContent
+                                $scope.logHeaderShow = true
+                            })
                         }
                     }
-
-                    $scope.closeWs = function(){
-                        $scope.logSocket.close()
-                    }
-
-                    $scope.logFirstHidden = false
 
                     $scope.showHiddenMessage = function(){
-                        var len = parseInt($scope.logFirst.split(" ")[0])
-                        TaskService.readHeader($scope.taskId, len, function(){})
+                        var len = parseInt($scope.logHeader.split(" ")[0])
+                        TaskService.readHeader($scope.env.id, $scope.project.id, $scope.c.task.id, len, function(data){
+                            $scope.logHeaderShow = false
+                            $scope.logContent = data + $scope.logContent
+                        })
                     }
-
-                    $scope.TransferString = function(content)
-                    {
-                        var string = content;
-                        try{
-                            string=string.replace(/\r\n/gi,"<br>");
-                            string=string.replace(/\n/gi,"<br>");
-                        }catch(e) {
-                            console.log(e.message);
-                        }
-                        return string;
-                    }
-
                     $scope.delayLoadLog();
                 }]
 //            ,
