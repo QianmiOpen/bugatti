@@ -5,6 +5,21 @@ define(['angular'], function(angular) {
     var app = angular.module('bugattiApp.route.task.taskModule', []);
 
     app.config(['$stateProvider', function($stateProvider) {
+
+        $stateProvider.state('task2.list',{
+            url: "/list/:eid?txt&top"
+        });
+
+        $stateProvider.state('task2.list.info',{
+            url: "/info/:pid",
+            views:{
+                "task-info@task2":{
+                    templateUrl: "partials/task/task2-info.html",
+                    controller: "Task2InfoCtrl"
+                }
+            }
+        });
+
         //task create
         $stateProvider.state('task.create',{
             url: "/create",

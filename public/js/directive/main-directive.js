@@ -8,7 +8,7 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.directives', []);
 
-    /* 返回上一页(浏览器历史) */
+    // 返回上一页(浏览器历史)
     app.directive('backButton', [function() {
         return {
             restrict: 'A',
@@ -19,6 +19,113 @@ define(['angular'], function(angular) {
             }
         }
     }]);
+
+    // 获取元素焦点
+    app.directive('focusIf', ['$timeout', function($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+                scope.$watch(attr.focusIf, function (v) {
+                    if (v) {
+                        $timeout(function() {
+                            element[0].focus();
+                        });
+                    }
+                });
+            }
+        };
+    }]);
+
+    // 动态获取页面窗体高度和宽度
+    app.directive('resizable', function($window) {
+        return {
+            restrict: 'A',
+            controller: function($scope) {
+                $scope.ignore_h = angular.isUndefined($scope.ignore_h)? 0 : $scope.ignore_h;
+            },
+            link:function($scope, element, attrs) {
+            // On window resize => resize the app
+            $scope.initializeWindowSize = function() {
+                $scope.windowHeight = $window.innerHeight - $scope.ignore_h;
+                $scope.windowWidth = $window.innerWidth;
+            };
+
+            angular.element($window).bind('resize', function() {
+                $scope.initializeWindowSize();
+                $scope.$apply();
+            });
+
+            // Initiate the resize function default values
+            $scope.initializeWindowSize();
+
+            $scope.theStyle = function() {
+                return {
+                    'width': $scope.windowWidth+'px',
+                    'height': $scope.windowHeight+'px',
+                    'background-color': 'violet'
+                };
+            };
+        }}
+    });
+
+    // 动态设置页面元素高度
+    app.directive('bannerHeight', [function() {
+        return {
+            restrict: 'A',
+            require: '^resizable',
+            link: function ($scope, element, attrs) {
+                $scope.$watch("windowHeight", function(value) {
+                    element.height(value);
+                });
+            }
+        }
+    }]);
+
+    app.directive("scroll", ['$state', '$window', '$interval', function ($state, $window, $interval) {
+        return function($scope, element, attrs) {
+
+            if (angular.isDefined($state.params.top)) {
+                element.animate({scrollTop: $state.params.top}, "slow");
+            }
+
+            element.bind("scroll", function() {
+                $scope.top = this.scrollTop;
+                //var h= $state.href($state.current, { top: this.scrollTop });
+                //$window.history.replaceState(null, "test", '/' + h);
+                $scope.$apply();
+            });
+
+            //var stopTime = $interval(function() {
+            //    console.log('interval');
+            //    if ($scope.top != $state.params.top) {
+            //        var h= $state.href($state.current, { top: $scope.top });
+            //        console.log('h='+h);
+            //        //console.log('$window',$window.history)
+            //        $window.history.pushState(null, "test", '/' + h);
+            //    }
+            //}, 5000);
+
+            //element.on('$destroy', function() {
+            //    $interval.cancel(stopTime);
+            //});
+
+        };
+    }]);
+
+    /* input enter */
+    app.directive('ngEnter', function () {
+        return function (scope, element, attrs) {
+            element.bind("keydown keypress", function (event) {
+                if(event.which === 13) {
+                    scope.$apply(function (){
+                        scope.$eval(attrs.ngEnter);
+                    });
+
+                    event.preventDefault();
+                }
+            });
+        };
+    });
 
     /**
      * A generic confirmation for risky actions.
@@ -38,7 +145,7 @@ define(['angular'], function(angular) {
         }
     }]);
 
-    /* 用户权限列表展示 */
+    // 用户权限列表展示
     app.directive('permission', ['UserService', function(UserService) {
         return {
             restrict: 'E',
@@ -311,7 +418,7 @@ define(['angular'], function(angular) {
             controller: function($scope) {
                 $scope.tab = 1;
                 $scope.isSet = function(checkTab) {
-                    return $scope.tab === checkTab;
+                    return $scope.tab == checkTab;
                 };
                 $scope.setTab = function(activeTab) {
                     $scope.tab = activeTab;
@@ -320,460 +427,279 @@ define(['angular'], function(angular) {
         };
     });
 
+    /**
+     * ------------ 项目负载 ------------
+     */
     app.directive('projectBalance', function () {
         return {
             restrict: 'E',
+            scope: {
+                tab: "=activeTab",
+                env: "=",
+                project: "=",
+                templates: "=",
+                tsData: "=",
+                c: "="
+            },
             templateUrl: 'partials/task/project-balance.html',
-            controller: ['$scope',
-                function($scope){
-                    $scope.ctab = 1 ;
-                    $scope.c_index = -1;
-                    $scope.setCTab =function(ctab){
-                        $scope.ctab = ctab ;
-                    }
-                    $scope.setCIndex =function(cIndex){
-                        $scope.c_index = cIndex ;
-                    }
-                    $scope.setHostName = function(hostName){
-                        $scope.hostName = hostName;
-                    }
-                    $scope.showQueues = function(index, ctab, taskId, hostName){
-                        var clusterFlag = true;
-                        if($scope.isQueueShow[index] && $scope.ctab == ctab){
-                            clusterFlag = false;
-                        }
-                        //隐藏其他的index
-                        $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+            controller: ['$scope', 'RelationService', 'TaskService', 'AreaService', 'Auth', 'growl', 'VersionService',
+                function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService){
+                    $scope.cTab = -1 ;
+//                    $scope.c_index = -1;
+//                    $scope.setCTab =function(ctab){
+//                        $scope.ctab = ctab ;
+//                    }
+//                    $scope.setCIndex =function(cIndex){
+//                        $scope.c_index = cIndex ;
+//                    }
+//                    $scope.setHostName = function(hostName){
+//                        $scope.hostName = hostName;
+//                    }
+//                    $scope.showQueues = function(index, ctab, taskId, hostName){
+//                        var clusterFlag = true;
+//                        if($scope.isQueueShow[index] && $scope.ctab == ctab){
+//                            clusterFlag = false;
+//                        }
+//                        //隐藏其他的index
+//                        $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+////                            $scope.catalina_ctab = !$scope.catalina_ctab ;
+//                            return false ;
+//                        })
+//                        if(clusterFlag){
+//                            $scope.ctabFlag = !$scope.ctabFlag;
+//                            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
+//                        }
+//                        $scope.taskId = taskId
+//                        $scope.setCTab(ctab);
+//                        $scope.setCIndex(index);
+//                        $scope.setHostName(hostName);
+//
+//                        //增加重加载
+//                        if(ctab == 4){
 //                            $scope.catalina_ctab = !$scope.catalina_ctab ;
-                            return false ;
-                        })
-                        if(clusterFlag){
-                            $scope.ctabFlag = !$scope.ctabFlag;
-                            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
-                        }
-                        $scope.taskId = taskId
-                        $scope.setCTab(ctab);
-                        $scope.setCIndex(index);
-                        $scope.setHostName(hostName);
+//                        }
+//                    }
+                    $scope.count = 0;
 
-                        //增加重加载
-                        if(ctab == 4){
-                            $scope.catalina_ctab = !$scope.catalina_ctab ;
-                        }
-                    }
-                }
-            ]
-        }
-    });
-
-    app.directive('projectItem', function () {
-        return {
-            restrict: 'E',
-            require: '^projectTabs',
-            templateUrl: 'partials/task/project-item.html',
-            controller: ['$scope', '$filter', 'growl', 'ProjectService', 'TemplateService',
-                function($scope, $filter, growl, ProjectService, TemplateService) {
-                // project variable
-                $scope.vars = [];
-                $scope.addVar = function(v) {
-                    $scope.varForm.varName.$error.unique = false;
-                    $scope.varForm.varName.$error.required = false;
-                    $scope.varForm.varValue.$error.required = false;
-
-                    if (angular.isUndefined($scope.activeEnv )) {
-                        return;
-                    }
-                    v.envId = $scope.activeEnv;   // bind env
-
-                    if (findInVars($scope.vars, v) != -1) {
-                        $scope.varForm.varName.$invalid = true;
-                        $scope.varForm.varName.$error.unique = true;
-                        return;
-                    };
-                    if (v.name.trim().length < 1 && v.value.trim().length < 1) {
-                        $scope.varForm.varName.$invalid = true;
-                        $scope.varForm.varValue.$invalid = true;
-                        $scope.varForm.varName.$error.required = true;
-                        $scope.varForm.varValue.$error.required = true;
-                        return;
-                    }
-                    if (v.name.trim().length < 1 ) {
-                        $scope.varForm.varName.$invalid = true;
-                        $scope.varForm.varName.$error.required = true;
-                        return;
-                    }
-                    if (v.value.trim().length < 1) {
-                        $scope.varForm.varValue.$invalid = true;
-                        $scope.varForm.varValue.$error.required = true;
-                        return;
-                    }
-
-                    $scope.vars.push(angular.copy(v));
-                    v.name = "", v.value = ""; // clear input value
-                };
-
-                function findInVars(vars, v) {
-                    var find = -1;
-                    angular.forEach(vars, function(_v, index) {
-                        if (_v.name == v.name && _v.envId == v.envId) {
-                            find = index;
-                            return;
-                        }
-                    });
-                    return find;
-                };
-
-                $scope.editVar = function(repeat$scope) {
-                    repeat$scope.mode = 'edit';
-                };
-
-                $scope.deleteVar = function(v) {
-                    var index = findInVars($scope.vars, v)
-                    if (index != -1) {
-                        $scope.vars.splice(index, 1);
-                    }
-                };
-
-                $scope.initItemData = function() {
-                    // attrs
-                    TemplateService.itemAttrs($scope.pro.templateId, $scope.scriptVersion, function(data) {
-                        $scope.items = data;
-                        ProjectService.atts($scope.pro.id, function(project_attrs) {
-                            angular.forEach($scope.items, function(item) {
-                                angular.forEach(project_attrs, function(att) {
-                                    if (att.name == item.itemName) {
-                                        item.value = att.value;
-                                        item.id = att.id;
-                                        return;
-                                    }
-                                });
-                            });
+                    $scope.initHosts = function() {
+                        var areaId = $scope.useArea.id;
+                        RelationService.hosts($scope.env.id, areaId, function(data) {
+                            $scope.hosts = data;
                         });
-                    });
-
-                    // variables
-                    TemplateService.itemVars($scope.pro.templateId, $scope.scriptVersion, function(item_vars) {
-                        var _vars = angular.copy($scope.vars);
-                        angular.forEach(_vars, function(v, index) {
-                            if (v.name.indexOf('t_') === 0) {
-                                delete _vars[index]; // delete object is null
-                            }
-                        });
-                        _vars = _vars.filter(function(e){return e}); // clear null
-
-                        // load init variable
-                        ProjectService.vars($scope.pro.id, $scope.activeEnv, function(project_vars) {
-                            if (project_vars.length < 1) {
-                                angular.forEach(item_vars, function(iv) {
-                                    _vars.push({name: iv.itemName, value: '', envId: $scope.activeEnv});  // first add
-                                });
-                            }
-                            else if (item_vars.length < 1) {
-                                angular.forEach(project_vars, function(pv) {
-                                    _vars.push({name: pv.name, value: pv.value, envId: $scope.activeEnv});  // first add
-                                });
-                            }
-                            else {
-                                angular.forEach(item_vars, function(iv) {
-                                    var replaceFlag = false;
-                                    project_vars.map(function(pv){
-                                        if(pv.name == iv.itemName && pv.envId == $scope.activeEnv){
-                                            replaceFlag = true;
-                                            _vars.unshift({name: pv.name, value: pv.value, envId: $scope.activeEnv});
-                                        }
-                                    })
-                                    if(!replaceFlag){
-                                        _vars.push({name: iv.itemName, value: '', envId: $scope.activeEnv});
-                                    }
-                                });
-                            }
-                        });
-                        $scope.vars = _vars;
-                    });
-
-                    // update
-                    $scope.saveOrUpdate = function(project) {
-                        project.items = [];
-                        project.variables = angular.copy($scope.vars);
-                        angular.forEach($scope.items, function(item) {
-                            project.items.push({name: item.itemName, value: item.value, id: item.id})
-                        });
-
-                        project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd HH:mm:ss")
-                        ProjectService.update($scope.pro.id, $scope.activeEnv, angular.toJson(project), function(data) {
-                            if (data.r === 'exist') {
-                                $scope.form.name.$invalid = true;
-                                $scope.form.name.$error.exists = true;
-                            } else {
-                                growl.addSuccessMessage("成功");
-                            }
-                        });
-
                     };
 
-                }
-            }],
-            link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('tab', function () {
-                    if (scope.tab === 2) {
-                        scope.initItemData();
-                    }
-                });
-            }
-        }
-    });
-
-    app.directive('projectConf', function () {
-        return {
-            restrict: 'E',
-            require: '^projectTabs',
-            templateUrl: 'partials/task/project-conf.html',
-            controller: ['$scope', '$filter', 'ConfService', 'VersionService', '$modal', 'growl',
-            function($scope, $filter, ConfService, VersionService, $modal, growl) {
-                $scope.initVersions = function() {
-                    VersionService.getVersions($scope.pro.id, $scope.activeEnv, function(data) {
-                        $scope.versions = data;
-                        $scope.versions.unshift({id: 0, projectId: $scope.pro.id, updated: 1417228773000, vs: 'default'});
-
-                    });
-                };
-
-                $scope.changeVersion = function(vid) {
-                    $scope.setAction('list');
-                    if (vid == null) {
-                        $scope.confs = [];
-                    } else {
-                        ConfService.getAll($scope.activeEnv, $scope.pro.id, vid, function(data) {
-                            $scope.confs = data;
-                        });
-                    }
-                };
-
-                $scope.action = 'list';
-                $scope.isAction = function(checkTab) {
-                    return $scope.action === checkTab;
-                };
-                $scope.setAction = function(activeTab, conf_id) {
-                    $scope.action = activeTab;
-                    $scope.conf_id = conf_id;
-                };
-
-                // ace editor
-                $scope.wordList = [];
-                var langTools = ace.require("ace/ext/language_tools");
-                $scope.aceLoaded = function(_editor) {
-
-                    _editor.setOptions({
-                        enableBasicAutocompletion: true
-                    });
-                    _editor.getSession().setMode("ace/mode/properties");
-                    _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
-                    _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
-
-                    var codeCompleter = {
-                        getCompletions: function(editor, session, pos, prefix, callback) {
-                            if (prefix.length === 0) { callback(null, []); return }
-                            callback(null, $scope.wordList.map(function(ea) {
-                                return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
-                            }));
-                        }
-                    };
-                    langTools.addCompleter(codeCompleter);
-                };
-
-                // 生成模板
-                $scope.genTemplateConf = function() {
-                    var copyParam = {projectId: $scope.pro.id, target_eid: $scope.activeEnv, target_vid: $scope.versionId, envId: $scope.activeEnv, versionId: 0, ovr: true, copy: false};
-                    var modalInstance = $modal.open({
-                        templateUrl: "partials/modal-message.html",
-                        controller: function($scope, $modalInstance){
-                            $scope.message = "把当前环境所有配置文件生成模板?";
-                            $scope.ok = function() {
-                                ConfService.copy(angular.toJson(copyParam), function(data) {
-                                    $modalInstance.close(data);
-                                });
-                            };
-                            $scope.cancel = function() {
-                                $modalInstance.dismiss("cancel");
-                            }
+                    // 加载环境对应可用区域
+                    AreaService.list($scope.env.id, function(data) {
+                        $scope.preAreas = data;
+                        if ($scope.preAreas.length > 0) {
+                            $scope.useArea = { id :$scope.preAreas[0].id }
+                            $scope.initHosts()
                         }
                     });
-
-                    modalInstance.result.then(function(data) {
-                        if (data.r === 'ok') {
-                            growl.addSuccessMessage("成功");
-                        } else if (data.r === 'exist') {
-                            growl.addWarnMessage("内容已存在");
-                        }
-                    });
-                }
-
-            }],
-            link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('tab', function () {
-                    if (scope.tab === 3) {
-                        scope.initVersions();
-                    }
-                });
-            }
-        }
-    });
-
-    app.directive('projectDependency', function(){
-        return {
-            restrict: 'E',
-            require: '^projectTabs',
-            templateUrl: 'partials/task/project-dependency.html',
-            controller: ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
-                function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
-                    $scope.showDependencies = function(){
-                        DependencyService.get($scope.pro.id, function(data){
-                            $scope.groups = data
-                        })
-                    }
-                    $scope.delayLoadDependency = function(){
-                        ProjectService.getExceptSelf($scope.pro.id, function(data){
-                            $scope.projects = data ;
-                            $scope.showDependencies() ;
-                        })
-                    }
-
-                    $scope.removeDependency = function(parent,child){
-                        DependencyService.removeDependency(parent.id, child.id, function(data){
-                            $scope.showDependencies()
-                        })
-                    }
-
-                    $scope.addDependency = function(parent,child){
-                        DependencyService.addDependency(parent, child, function(data){
-                            if(data.r == 0){
-                                growl.addWarnMessage("添加失败");
-                            }
-                            $scope.showDependencies()
-                        })
-                    }
-
-                    $scope.templateFilter = function(dep){
-                        return function(p){return p.templateId == dep.templateId};
-                    }
-
-                    $scope.getTemplateProject = function(dep){
-                        var subTemplateProjects = $scope.projects.map(
-                            function(p){
-                                if(p.name == dep.name) {
-                                    return p;
+                    //解析每个负载的最后一次任务
+                    $scope.changeLastDataCluster = function(cluster){
+                        console.log(cluster)
+                        console.table($scope.lastTasks)
+                        if($scope.lastTasks.length > 0){
+                            for(var cIndex in $scope.lastTasks){
+                                var c = $scope.lastTasks[cIndex]
+                                if(c.clusterName == cluster.name){
+                                    cluster.task = c
+                                    cluster.task.queueNum = 0
+                                    cluster.task.statusTip = $scope.explainTaskStatus(cluster.task.status)
                                 }
                             }
-                        ).filter(function(e){return e})
-                        if(subTemplateProjects.length > 0){
-                            return subTemplateProjects[0];
+                        }
+                        return cluster
+                    }
+
+                    $scope.addQueueStatusTip = function(data){
+                        //只返回等待执行的任务
+                        if(data.status != 0){
+                            return null
+                        }
+                        if(!$scope.isObjEmpty(data)){
+                            data.statusName = $scope.explainQueueStatus(data.status)
+                        } else {
+                            data.status.statusTip = "N/A"
+                        }
+                        return data
+                    }
+
+                    //解析task status
+                    $scope.explainTaskStatus = function(status){
+                        switch(status){
+                            //未查询到历史任务
+                            case 0 : return "未查询到历史任务"
+                            //执行成功
+                            case 1 : return "执行成功"
+                            //执行失败
+                            case 2 : return "执行失败"
+                            //正在执行
+                            case 3 : return "正在执行"
                         }
                     }
 
-                    $scope.changeTemplateProject = function(parentId, oldId, newId){
-                        if(newId != undefined){
-                            DependencyService.changeTemplateProject(parentId, oldId, newId, function(data){
-                                if(data.r == 0){
-                                    growl.addWarnMessage("修改失败");
-                                } else if(data.r == 1){
-                                    growl.addSuccessMessage("修改成功");
-                                }
+                    $scope.addQueueStatusTip = function(data){
+                        //只返回等待执行的任务
+                        if(data.status != 0){
+                            return null
+                        }
+                        if(!$scope.isObjEmpty(data)){
+                            data.statusName = $scope.explainQueueStatus(data.status)
+                        } else {
+                            data.status.statusTip = "N/A"
+                        }
+                        return data
+                    }
+
+                    $scope.explainQueueStatus = function(status){
+                        switch(status){
+                            //等待执行
+                            case 0 : return "等待执行"
+                            //执行成功
+                            case 1 : return "执行成功"
+                            //执行失败
+                            case 2 : return "执行失败"
+                            //正在执行
+                            case 3 : return "正在执行"
+                        }
+                    }
+
+                    //查询绑定负载
+                    $scope.showVm = function(proId) {
+                        // 根据项目proId & envId 获取关联机器
+                        TaskService.findClusters($scope.env.id, proId, function(data){
+                            $scope.project.clusters = data
+                            $scope.vms = data
+                            var clusterNames = $scope.vms.map(function(c){return c.name}).join(',')
+                            TaskService.findLastStatus($scope.env.id, proId, clusterNames, function(data){
+                                $scope.lastTasks = data
+                                $scope.project.clusters.map($scope.changeLastDataCluster)
                             })
+                        })
+                        //-------操作按钮展示---------
+                        console.table($scope.templates)
+                        $scope.project.templates = $scope.templates[$scope.project.templateId]
+                        console.log($scope.project.templates)
+                    }
+
+                    $scope.showVm($scope.project.id);
+//--------------------------------------- 操作按钮逻辑 -----------------------------------------
+
+                    $scope.showVersion = function(pid){
+                        $scope.versions = []
+                        VersionService.getVersions(pid, $scope.env.id, function(data){
+                            console.log(data)
+                            $scope.versions = data
+                        })
+                    }
+
+                    $scope.showMenu = function(versionMenu, projectId, clusterName, templateId){
+                        if(!versionMenu){
+                            $scope.deploy(projectId, null, clusterName, templateId)
+                        } else {//部署
+                            $scope.choosedTemplateId = templateId
+                            $scope.showVersion(projectId)
                         }
                     }
+
+                    $scope.deploy = function(projectId, versionId, clusterName, templateId){
+                        $scope.taskQueue = {}
+                        $scope.taskQueue.envId = $scope.env.id
+                        $scope.taskQueue.projectId = projectId
+                        $scope.taskQueue.versionId = versionId
+                        $scope.taskQueue.clusterName = clusterName
+                        $scope.taskQueue.templateId = templateId
+                        $scope.taskQueue.operatorId = Auth.user.username
+                        TaskService.createNewTaskQueue($scope.taskQueue, function(data){
+                            if(data == -1){
+                                growl.addErrorMessage("模板已更新，请刷新页面");
+                            }
+                        })
+                    }
+//-------------------------------------- 任务状态 ---------------------------------------------
+                    //根据任务状态判断是否需要显示超链接
+                    $scope.showTaskHref = function(status){
+                        if(status === 3 || status == 0) {
+                            return false
+                        } else {
+                            return true
+                        }
+                    }
+                    //未查询到任何历史任务
+                    $scope.showTaskText = function(status){
+                        if(status == 0){
+                            return true
+                        }else {
+                            return false
+                        }
+                    }
+                    //根据任务状态判断是否需要显示进度条
+                    $scope.showTaskProgress = function(status){
+                        if(status === 3){
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                    //--------------- 正在进行的任务 --------------------
+                    //获取envId_projectId最后一个任务状态
+                    $scope.findLastStatus = function(vmName, vmIndex){
+                        TaskService.findLastStatus($scope.env.id, $scope.project.id, vmName, function(data){
+                            $scope.lastTasks = data
+                            $scope.project.clusters.map($scope.changeLastDataCluster)
+                        })
+                    }
+
+                    $scope.refreshStatus = function(){
+                        var tsData = $scope.tsData;
+                        console.log(tsData)
+                        var clusters = $scope.project.clusters;
+                        console.log(clusters)
+                        console.log($scope.env.id, $scope.project.id)
+                        for(var vmIndex in clusters){
+                            var vmName = clusters[vmIndex].name;
+                            var key = $scope.env.id + "_" + $scope.project.id + "_" + vmName;
+                            var key_last = key + "_last";
+                            var projectObj = tsData[key]
+                            console.log(projectObj)
+                            var projectObj_last = tsData[key_last]
+                            console.log(projectObj_last)
+
+                            if(projectObj != undefined){
+                                $scope.project.clusters[vmIndex].task = projectObj;
+                                //队列
+                                if(projectObj.queues != undefined){
+                                    $scope.project.clusters[vmIndex].taskQueues = projectObj.queues.filter($scope.addQueueStatusTip)
+                                }
+                            }
+                            if(projectObj_last != undefined){
+                                $scope.findLastStatus(vmName, vmIndex)
+                            }
+                        }
+                    }
+
+//=================================== cluster tab ===============================
+                    $scope.isTrShow = function(cIndex){
+                        return $scope.chooseIndex == cIndex;
+                    }
+
+                    $scope.chooseClusterTab = function(cTab, chooseIndex, taskId){
+                        console.log(cTab, chooseIndex, taskId);
+                        $scope.cTab = cTab;
+                        $scope.chooseIndex = chooseIndex;
+                        $scope.taskId = taskId;
+                    }
+
+
+                    //======
                 }
             ],
             link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('tab', function () {
-                    if (scope.tab === 4) {
-                        scope.delayLoadDependency();
-                    }
-                });
-            }
-        }
-    });
-
-    app.directive('projectMember', function(){
-        return {
-            restrict: 'E',
-            require: '^projectTabs',
-            templateUrl: 'partials/task/project-member.html',
-            controller: ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
-                function($scope, $stateParams, $modal, ProjectService, EnvService) {
-                // ---------------------------------------------
-                // 项目成员管理
-                // ---------------------------------------------
-                $scope.delayLoadMember = function(){
-                    ProjectService.members($scope.pro.id, function(data) {
-                        $scope.members = data;
-                    });
-                }
-
-                $scope.addMember = function(jobNo) {
-                    $scope.jobNo$error = '';
-                    if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
-                        $scope.jobNo$error = '工号格式错误';
-                        return;
-                    }
-                    var exist = false;
-                    angular.forEach($scope.members, function(m) {
-                        if (m.jobNo === jobNo) {
-                            exist = true;
-                        }
-                    });
-                    if (exist) {
-                        $scope.jobNo$error = '已存在';
-                        return;
-                    }
-
-                    ProjectService.saveMember($scope.pro.id, jobNo, function(data) {
-                        if (data.r === 'none') {
-                            $scope.jobNo$error = '用户不存在';
-                        }
-                        else if (data.r === 'exist') {
-                            $scope.jobNo$error = '已存在用户';
-                        } else if (data > 0) {
-                            ProjectService.members($scope.pro.id, function(data) {
-                                $scope.members = data;
-                                $scope.jobNo$error = '';
-                            });
-                        }
-                    });
-                }
-
-                $scope.memberUp = function(mid, msg) {
-                    if (confirm(msg)) {
-                        ProjectService.updateMember(mid, "up", function(data) {
-                            ProjectService.members($scope.pro.id, function(data) {
-                                $scope.members = data;
-                            });
-                        });
-                    }
-                };
-                $scope.memberDown = function(mid, msg) {
-                    if (confirm(msg)) {
-                        ProjectService.updateMember(mid, "down", function(data) {
-                            ProjectService.members($scope.pro.id, function(data) {
-                                $scope.members = data;
-                            });
-                        });
-                    }
-                };
-                $scope.memberRemove = function(mid, msg) {
-                    if (confirm(msg)) {
-                        ProjectService.updateMember(mid, "remove", function(data) {
-                            ProjectService.members($scope.pro.id, function(data) {
-                                $scope.members = data;
-                            });
-                        });
-                    }
-                };
-            }],
-            link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('tab', function () {
-                    if (scope.tab === 5) {
-                        scope.delayLoadMember();
-                    }
+                scope.$watch('tsData', function () {
+                    console.log("count is ", scope.count + 1)
+                    scope.refreshStatus();
                 });
             }
         }
@@ -782,10 +708,20 @@ define(['angular'], function(angular) {
     app.directive('clusterTabs', function(){
         return {
             restrict: 'E',
+            require: 'projectBalance',
+            scope: {
+                cTab: "=",
+                cIndex: "=",
+                c: "=",
+                project: "=",
+                env: "=",
+                chooseIndex: "="
+            },
             templateUrl: 'partials/task/cluster-tabs.html',
             controller: function($scope){
-                $scope.isClusterShow = function(ctab, c_index){
-                    return ($scope.ctab == ctab && $scope.c_index == c_index);
+                $scope.isClusterTabShow = function(ctab, c_index){
+//                    console.log($scope.cTab, ctab, $scope.chooseIndex, c_index, ($scope.cTab == ctab && $scope.chooseIndex == c_index))
+                    return ($scope.cTab == ctab && $scope.chooseIndex == c_index);
                 }
             }
         }
@@ -822,89 +758,98 @@ define(['angular'], function(angular) {
     app.directive('taskQueue', function(){
         return {
             restrict: 'E',
-            require: '^clusterTabs',
+            scope: {
+                c: "="
+            },
             templateUrl: 'partials/task/task-queue.html',
             controller: ['$scope', 'TaskService',
-            function($scope, TaskService){
-                $scope.removeQueue = function(qid){
-                    TaskService.removeTaskQueue(qid, function(data){
-                        //如果删除的任务在一瞬间刚好变为正在执行，应告知
-                    })
-                }
-            }]
+                function($scope, TaskService){
+                    $scope.removeQueue = function(qid){
+                        TaskService.removeTaskQueue(qid, function(data){
+                            //TODO 如果删除的任务在一瞬间刚好变为正在执行，应告知
+                        })
+                    }
+                }]
         }
     });
 
     app.directive('clusterProperties', function(){
-       return {
-           restrict: 'E',
-           require: '^clusterTabs',
-           templateUrl: 'partials/task/cluster-properties.html',
-           controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
-           function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
-               $scope.delayLoadProperties = function(){
-                   RelationService.get($scope.c.id, function(data) {
-                       $scope.relation = data;
-                       if ($scope.relation) {
-                           if (angular.isUndefined($scope.pro.id) || angular.isUndefined($scope.activeEnv) ) {
-                               return;
-                           }
-                           ProjectService.vars($scope.pro.id, $scope.activeEnv, function(project_vars) {
-                               $scope.vars = project_vars;
-                               angular.forEach($scope.vars, function(pv) {
-                                   pv.meta = pv.value;
-                                   var defVar = findInVars($scope.relation.globalVariable, pv);
-                                   if (defVar !== '') {
-                                       pv.meta = defVar;
-                                       pv.value = defVar;
-                                   } else {
-                                       pv.value = '';
-                                   }
-                               });
-                           });
-                       }
-                   });
-               }
+        return {
+            restrict: 'E',
+            scope: {
+                project: "=",
+                env: "=",
+                c: "="
+            },
+            templateUrl: 'partials/task/cluster-properties.html',
+            controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
+                function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
+                    $scope.delayLoadProperties = function(){
+                        console.log($scope.c, $scope.project, $scope.env)
+                        RelationService.get($scope.c.id, function(data) {
+                            $scope.relation = data;
+                            if ($scope.relation) {
+                                if (angular.isUndefined($scope.project.id) || angular.isUndefined($scope.env.id) ) {
+                                    return;
+                                }
+                                ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
+                                    $scope.vars = project_vars;
+                                    angular.forEach($scope.vars, function(pv) {
+                                        pv.meta = pv.value;
+                                        var defVar = findInVars($scope.relation.globalVariable, pv);
+                                        if (defVar !== '') {
+                                            pv.meta = defVar;
+                                            pv.value = defVar;
+                                        } else {
+                                            pv.value = '';
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    };
 
-               function findInVars(vars, v) {
-                   var find = '';
-                   angular.forEach(vars, function(_v, index) {
-                       if (_v.name == v.name) {
-                           find = _v.value;
-                           return;
-                       }
-                   });
-                   return find;
-               };
+                    function findInVars(vars, v) {
+                        var find = '';
+                        angular.forEach(vars, function(_v, index) {
+                            if (_v.name == v.name) {
+                                find = _v.value;
+                                return;
+                            }
+                        });
+                        return find;
+                    }
 
-               $scope.saveOrUpdateProperties = function(vars) {
-                   $scope.relation.globalVariable = [];
-                   angular.forEach(vars, function(v) {
-                       $scope.relation.globalVariable.push({name: v.name, value: v.value})
-                   });
-                   RelationService.update($scope.c.id, $scope.relation, function(data) {
-                       if(data == 1){
-                           growl.addSuccessMessage("修改成功")
-                       }else {
-                           growl.addErrorMessage("修改失败");
-                       }
-                   });
-               };
-           }],
-           link: function postLink(scope, iElement, iAttrs) {
-               scope.$watch('c_index', function () {
-                   if (scope.ctab == 1 && scope.c_index == scope.$index) {
-                       scope.delayLoadProperties();
-                   }
-               });
-           }
-       }
+                    $scope.saveOrUpdateProperties = function(vars) {
+                        $scope.relation.globalVariable = [];
+                        angular.forEach(vars, function(v) {
+                            $scope.relation.globalVariable.push({name: v.name, value: v.value})
+                        });
+                        RelationService.update($scope.c.id, $scope.relation, function(data) {
+                            if(data == 1){
+                                growl.addSuccessMessage("修改成功")
+                            }else {
+                                growl.addErrorMessage("修改失败");
+                            }
+                        });
+                    };
+                    $scope.delayLoadProperties();
+                }]
+//            ,
+//            link: function postLink(scope, iElement, iAttrs) {
+//                scope.$watch('cIndex', function () {
+//                    if (scope.cTab == 1 && scope.cIndex == scope.$index) {
+//                        scope.delayLoadProperties();
+//                    }
+//                });
+//            }
+        }
     });
 
     app.directive('catalinaLog', function(){
         return {
             restrict: 'E',
-            require: '^projectBalance',
+//            require: '^projectBalance',
             templateUrl: 'partials/task/catalina-log.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
@@ -951,12 +896,12 @@ define(['angular'], function(angular) {
                     $scope.receiveCatalina = function(event){
                         var messageJson = angular.fromJson(event.data)
                         $scope.catalinaMessage = $scope.catalinaMessage +
-                            messageJson["@timestamp"] +
-                            " [" + messageJson.thread_name + "] " +
-                            messageJson.level +
-                            " " +
-                            $scope.getLog(messageJson) +
-                            "\n"
+                        messageJson["@timestamp"] +
+                        " [" + messageJson.thread_name + "] " +
+                        messageJson.level +
+                        " " +
+                        $scope.getLog(messageJson) +
+                        "\n"
                     }
 
                     $scope.getLog = function(messageJson){
@@ -975,9 +920,9 @@ define(['angular'], function(angular) {
                                 messageJson["message"] + " - "
                         } else if($scope.logType == "applog"){
                             return messageJson["source"] + " - " +
-                                   messageJson["caller_class_name"] + " - " +
-                                   "line " + messageJson["caller_line_number"] + " - " +
-                                   messageJson["message"] + " - "
+                                messageJson["caller_class_name"] + " - " +
+                                "line " + messageJson["caller_line_number"] + " - " +
+                                messageJson["message"] + " - "
                         } else {
                             return ""
                         }
@@ -1011,81 +956,591 @@ define(['angular'], function(angular) {
     app.directive('taskLog', function(){
         return {
             restrict: 'E',
-            require: '^projectTabs',
+            scope:{
+                c: "="
+            },
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
-                $scope.delayLoadLog = function(){
-                    if($scope.taskId != undefined){
-                        TaskService.LogReader($scope.activeEnv, $scope.pro.id, $scope.taskId, function(data){
-                            console.log(data)
-                            $scope.logHeader = data.logHeader
-                            $scope.logContent = data.logContent
-                            $scope.logHeaderShow = true
-                        })
+                    $scope.delayLoadLog = function(){
+                        console.log($scope.c.task.id)
+                        if($scope.c.task.id != undefined){
+                            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+                            var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.c.task.id).webSocketURL()
+                            console.log(path);
+                            $scope.logSocket = new WS(path)
+                            $scope.logSocket.onmessage = $scope.receiveEvent
+
+                            $scope.logHeader = ""
+                        }
                     }
-                }
 
-                $scope.showHiddenMessage = function(){
-                    var len = parseInt($scope.logHeader.split(" ")[0])
-                    TaskService.readHeader($scope.activeEnv, $scope.pro.id, $scope.taskId, len, function(data){
-                        $scope.logHeaderShow = false
-                        $scope.logContent = data + $scope.logContent
-                    })
-                }
+                    $scope.message = ""
+                    $scope.data = ""
+                    $scope.logFirst = ""
+                    $scope.logHeader = ""
 
-            }],
+                    $scope.receiveEvent = function(event){
+                        $scope.data = JSON.parse(event.data)
+//                        console.log($scope.data);
+                        if(event.data.error){
+                            console.log("there is errors:"+event.data.error)
+                        }else{
+                            $scope.$apply(function () {
+                                var data = $scope.data
+                                console.log(data)
+                                if(data.taskId == $scope.c.task.id){
+                                    if(data.kind == "logFirst"){
+                                        $scope.logFirstHidden = false
+                                        $scope.logFirst = data.message
+                                    }else if(data.kind == "logHeader"){
+                                        $scope.logFirstHidden = true
+                                        if($scope.logHeader.length == 0){
+                                            $scope.logHeader = data.message
+                                            $scope.message = $scope.logHeader + $scope.message
+                                        }
+                                    }else{
+                                        $scope.message = data.message
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    $scope.closeWs = function(){
+                        $scope.logSocket.close()
+                    }
+
+                    $scope.logFirstHidden = false
+
+                    $scope.showHiddenMessage = function(){
+                        var len = parseInt($scope.logFirst.split(" ")[0])
+                        TaskService.readHeader($scope.taskId, len, function(){})
+                    }
+
+                    $scope.TransferString = function(content)
+                    {
+                        var string = content;
+                        try{
+                            string=string.replace(/\r\n/gi,"<br>");
+                            string=string.replace(/\n/gi,"<br>");
+                        }catch(e) {
+                            console.log(e.message);
+                        }
+                        return string;
+                    }
+
+                    $scope.delayLoadLog();
+                }]
+//            ,
+//            link: function postLink(scope, iElement, iAttrs) {
+//                scope.$watch('c_index', function () {
+//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                scope.$watch('ctab', function () {
+//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                scope.$watch('ctabFlag', function () {
+//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                //历史任务查看
+//                scope.$watch('s_index', function () {
+//                    if (scope.stab == 1 && scope.s_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                scope.$watch('stabFlag', function () {
+//                    if (scope.stab == 1 && scope.s_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//            }
+        }
+    });
+
+    /**
+     * ------------ 项目属性 ------------
+     */
+    app.directive('projectItem', function () {
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                env: "=expanderEnv",
+                project: "=expanderProject"
+            },
+            templateUrl: 'partials/task/project-item.html',
+            controller: ['$scope', '$filter', 'growl', 'ProjectService', 'TemplateService',
+                function($scope, $filter, growl, ProjectService, TemplateService) {
+                    // project variable
+                    $scope.vars = [];
+                    $scope.addVar = function(v) {
+                        $scope.varForm.varName.$error.unique = false;
+                        $scope.varForm.varName.$error.required = false;
+                        $scope.varForm.varValue.$error.required = false;
+
+                        if (angular.isUndefined($scope.env.id)) {
+                            return;
+                        }
+                        v.envId = $scope.env.id;   // bind env
+
+                        if (findInVars($scope.vars, v) != -1) {
+                            $scope.varForm.varName.$invalid = true;
+                            $scope.varForm.varName.$error.unique = true;
+                            return;
+                        }
+                        if (v.name.trim().length < 1 && v.value.trim().length < 1) {
+                            $scope.varForm.varName.$invalid = true;
+                            $scope.varForm.varValue.$invalid = true;
+                            $scope.varForm.varName.$error.required = true;
+                            $scope.varForm.varValue.$error.required = true;
+                            return;
+                        }
+                        if (v.name.trim().length < 1 ) {
+                            $scope.varForm.varName.$invalid = true;
+                            $scope.varForm.varName.$error.required = true;
+                            return;
+                        }
+                        if (v.value.trim().length < 1) {
+                            $scope.varForm.varValue.$invalid = true;
+                            $scope.varForm.varValue.$error.required = true;
+                            return;
+                        }
+
+                        $scope.vars.push(angular.copy(v));
+                        v.name = "", v.value = ""; // clear input value
+                    };
+
+                    function findInVars(vars, v) {
+                        var find = -1;
+                        angular.forEach(vars, function(_v, index) {
+                            if (_v.name == v.name && _v.envId == v.envId) {
+                                find = index;
+                                return;
+                            }
+                        });
+                        return find;
+                    }
+
+                    $scope.editVar = function(repeat$scope) {
+                        repeat$scope.mode = 'edit';
+                    };
+
+                    $scope.deleteVar = function(v) {
+                        var index = findInVars($scope.vars, v)
+                        if (index != -1) {
+                            $scope.vars.splice(index, 1);
+                        }
+                    };
+
+                    $scope.initItemData = function() {
+                        // attrs
+                        TemplateService.itemAttrs($scope.project.templateId, $scope.env.scriptVersion, function(data) {
+                            $scope.items = data;
+                            ProjectService.atts($scope.project.id, function(project_attrs) {
+                                angular.forEach($scope.items, function(item) {
+                                    angular.forEach(project_attrs, function(att) {
+                                        if (att.name == item.itemName) {
+                                            item.value = att.value;
+                                            item.id = att.id;
+                                            return;
+                                        }
+                                    });
+                                });
+                            });
+                        });
+
+                        // variables
+                        TemplateService.itemVars($scope.project.templateId, $scope.env.scriptVersion, function(item_vars) {
+                            var _vars = angular.copy($scope.vars);
+                            angular.forEach(_vars, function(v, index) {
+                                if (v.name.indexOf('t_') === 0) {
+                                    delete _vars[index]; // delete object is null
+                                }
+                            });
+                            _vars = _vars.filter(function(e){return e}); // clear null
+
+                            // load init variable
+                            ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
+                                if (project_vars.length < 1) {
+                                    angular.forEach(item_vars, function(iv) {
+                                        _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                                    });
+                                }
+                                else if (item_vars.length < 1) {
+                                    angular.forEach(project_vars, function(pv) {
+                                        _vars.push({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                    });
+                                }
+                                else {
+                                    angular.forEach(item_vars, function(iv) {
+                                        var replaceFlag = false;
+                                        project_vars.map(function(pv){
+                                            if(pv.name == iv.itemName && pv.envId == $scope.env.id){
+                                                replaceFlag = true;
+                                                _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});
+                                            }
+                                        })
+                                        if(!replaceFlag){
+                                            _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});
+                                        }
+                                    });
+                                }
+                            });
+                            $scope.vars = _vars;
+                        });
+
+                        // update
+                        $scope.saveOrUpdate = function(project) {
+                            project.items = [];
+                            project.variables = angular.copy($scope.vars);
+                            angular.forEach($scope.items, function(item) {
+                                project.items.push({name: item.itemName, value: item.value, id: item.id})
+                            });
+
+                            project.lastUpdated = $filter('date')(project.lastUpdated, "yyyy-MM-dd HH:mm:ss")
+                            ProjectService.update($scope.project.id, $scope.env.id, angular.toJson(project), function(data) {
+                                if (data.r === 'exist') {
+                                    $scope.form.name.$invalid = true;
+                                    $scope.form.name.$error.exists = true;
+                                } else {
+                                    growl.addSuccessMessage("成功");
+                                }
+                            });
+
+                        };
+
+                    }
+                }],
             link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('c_index', function () {
-                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                scope.$watch('ctab', function () {
-                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                scope.$watch('ctabFlag', function () {
-                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                //历史任务查看
-                scope.$watch('s_index', function () {
-                    if (scope.stab == 1 && scope.s_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                scope.$watch('stabFlag', function () {
-                    if (scope.stab == 1 && scope.s_index == scope.$index) {
-                        scope.delayLoadLog();
+                scope.$watch('tab', function () {
+                    if (scope.tab === 2) {
+                        scope.initItemData();
                     }
                 });
             }
         }
     });
 
+    /**
+     * ------------ 项目配置 ------------
+     */
+    app.directive('projectConf', function () {
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                env: "=expanderEnv",
+                envs: "=expanderEnvs",
+                project: "=expanderProject"
+            },
+            templateUrl: 'partials/task/project-conf.html',
+            controller: ['$scope', '$filter', 'ConfService', 'VersionService', '$modal', 'growl',
+                function($scope, $filter, ConfService, VersionService, $modal, growl) {
+                    $scope.initVersions = function() {
+                        VersionService.getVersions($scope.project.id, $scope.env.id, function(data) {
+                            $scope.versions = data;
+                            $scope.versions.unshift({id: 0, projectId: $scope.project.id, updated: 1417228773000, vs: 'default'});
+
+                        });
+                    };
+
+                    $scope.changeVersion = function(vid) {
+                        $scope.setAction('list');
+                        if (vid == null) {
+                            $scope.confs = [];
+                        } else {
+                            ConfService.getAll($scope.env.id, $scope.project.id, vid, function(data) {
+                                $scope.confs = data;
+                            });
+                        }
+                    };
+
+                    $scope.action = 'list';
+                    $scope.isAction = function(checkTab) {
+                        return $scope.action === checkTab;
+                    };
+                    $scope.setAction = function(_tab, conf_id) {
+                        $scope.action = _tab;
+                        $scope.conf_id = conf_id;
+                    };
+
+                    // ace editor
+                    $scope.wordList = [];
+                    var langTools = ace.require("ace/ext/language_tools");
+                    $scope.aceLoaded = function(_editor) {
+
+                        _editor.setOptions({
+                            enableBasicAutocompletion: true
+                        });
+                        _editor.getSession().setMode("ace/mode/properties");
+                        _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
+                        _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
+
+                        var codeCompleter = {
+                            getCompletions: function(editor, session, pos, prefix, callback) {
+                                if (prefix.length === 0) { callback(null, []); return }
+                                callback(null, $scope.wordList.map(function(ea) {
+                                    return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
+                                }));
+                            }
+                        };
+                        langTools.addCompleter(codeCompleter);
+                    };
+
+                    // 生成模板
+                    $scope.genTemplateConf = function() {
+                        var copyParam = {projectId: $scope.project.id, target_eid: $scope.env.id, target_vid: $scope.versionId, envId: $scope.env.id, versionId: 0, ovr: true, copy: false};
+                        var modalInstance = $modal.open({
+                            templateUrl: "partials/modal-message.html",
+                            controller: function($scope, $modalInstance){
+                                $scope.message = "把当前环境所有配置文件生成模板?";
+                                $scope.ok = function() {
+                                    ConfService.copy(angular.toJson(copyParam), function(data) {
+                                        $modalInstance.close(data);
+                                    });
+                                };
+                                $scope.cancel = function() {
+                                    $modalInstance.dismiss("cancel");
+                                }
+                            }
+                        });
+
+                        modalInstance.result.then(function(data) {
+                            if (data.r === 'ok') {
+                                growl.addSuccessMessage("成功");
+                            } else if (data.r === 'exist') {
+                                growl.addWarnMessage("内容已存在");
+                            }
+                        });
+                    }
+
+                }],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('tab', function () {
+                    if (scope.tab === 3) {
+                        scope.initVersions();
+                    }
+                });
+            }
+        }
+    });
+
+    /**
+     * ------------ 项目依赖 ------------
+     */
+    app.directive('projectDependency', function(){
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                project: "=expanderProject"
+            },
+            templateUrl: 'partials/task/project-dependency.html',
+            controller: ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
+                function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
+                    $scope.showDependencies = function(){
+                        DependencyService.get($scope.project.id, function(data){
+                            $scope.groups = data
+                        })
+                    };
+                    $scope.delayLoadDependency = function(){
+                        ProjectService.getExceptSelf($scope.project.id, function(data){
+                            $scope.projects = data ;
+                            $scope.showDependencies() ;
+                        })
+                    };
+
+                    $scope.removeDependency = function(parent,child){
+                        DependencyService.removeDependency(parent.id, child.id, function(data){
+                            $scope.showDependencies()
+                        })
+                    };
+
+                    $scope.addDependency = function(parent,child){
+                        DependencyService.addDependency(parent, child, function(data){
+                            if(data.r == 0){
+                                growl.addWarnMessage("添加失败");
+                            }
+                            $scope.showDependencies()
+                        })
+                    };
+
+                    $scope.templateFilter = function(dep){
+                        return function(p){return p.templateId == dep.templateId};
+                    };
+
+                    $scope.getTemplateProject = function(dep){
+                        var subTemplateProjects = $scope.projects.map(
+                            function(p){
+                                if(p.name == dep.name) {
+                                    return p;
+                                }
+                            }
+                        ).filter(function(e){return e})
+                        if(subTemplateProjects.length > 0){
+                            return subTemplateProjects[0];
+                        }
+                    };
+
+                    $scope.changeTemplateProject = function(parentId, oldId, newId){
+                        if(newId != undefined){
+                            DependencyService.changeTemplateProject(parentId, oldId, newId, function(data){
+                                if(data.r == 0){
+                                    growl.addWarnMessage("修改失败");
+                                } else if(data.r == 1){
+                                    growl.addSuccessMessage("修改成功");
+                                }
+                            })
+                        }
+                    }
+                }
+            ],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('tab', function () {
+                    if (scope.tab === 4) {
+                        scope.delayLoadDependency();
+                    }
+                });
+            }
+        }
+    });
+
+    /**
+     * ------------ 项目成员 ------------
+     */
+    app.directive('projectMember', function(){
+        return {
+            restrict: 'E',
+            require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                project: "=expanderProject"
+            },
+            templateUrl: 'partials/task/project-member.html',
+            controller: ['$scope', '$stateParams', '$modal', 'ProjectService',
+                function($scope, $stateParams, $modal, ProjectService) {
+                    // ---------------------------------------------
+                    // 项目成员管理
+                    // ---------------------------------------------
+                    $scope.delayLoadMember = function(){
+                        ProjectService.members($scope.project.id, function(data) {
+                            $scope.members = data;
+                        });
+                    };
+
+                    $scope.addMember = function(jobNo) {
+                        $scope.jobNo$error = '';
+                        if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
+                            $scope.jobNo$error = '工号格式错误';
+                            return;
+                        }
+                        var exist = false;
+                        angular.forEach($scope.members, function(m) {
+                            if (m.jobNo === jobNo) {
+                                exist = true;
+                            }
+                        });
+                        if (exist) {
+                            $scope.jobNo$error = '已存在';
+                            return;
+                        }
+
+                        ProjectService.saveMember($scope.project.id, jobNo, function(data) {
+                            if (data.r === 'none') {
+                                $scope.jobNo$error = '用户不存在';
+                            }
+                            else if (data.r === 'exist') {
+                                $scope.jobNo$error = '已存在用户';
+                            } else if (data > 0) {
+                                ProjectService.members($scope.project.id, function(data) {
+                                    $scope.members = data;
+                                    $scope.jobNo$error = '';
+                                });
+                            }
+                        });
+                    };
+
+                    $scope.memberUp = function(mid, msg) {
+                        if (confirm(msg)) {
+                            ProjectService.updateMember(mid, "up", function(data) {
+                                ProjectService.members($scope.project.id, function(data) {
+                                    $scope.members = data;
+                                });
+                            });
+                        }
+                    };
+                    $scope.memberDown = function(mid, msg) {
+                        if (confirm(msg)) {
+                            ProjectService.updateMember(mid, "down", function(data) {
+                                ProjectService.members($scope.project.id, function(data) {
+                                    $scope.members = data;
+                                });
+                            });
+                        }
+                    };
+                    $scope.memberRemove = function(mid, msg) {
+                        if (confirm(msg)) {
+                            ProjectService.updateMember(mid, "remove", function(data) {
+                                ProjectService.members($scope.project.id, function(data) {
+                                    $scope.members = data;
+                                });
+                            });
+                        }
+                    };
+                }],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('tab', function () {
+                    if (scope.tab === 5) {
+                        scope.delayLoadMember();
+                    }
+                });
+            }
+        }
+    });
+
+    /**
+     * ------------ 项目历史任务 ------------
+     */
     app.directive('projectHistory', function(){
         return{
             restrict: 'E',
             require: '^projectTabs',
+            scope: {
+                tab: "=activeTab",
+                env: "=expanderEnv",
+                project: "=expanderProject"
+            },
             templateUrl: 'partials/task/task-history.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
-                    $scope.hisTasks = []
-                    $scope.delayLoadHistory = function(){
-                        TaskService.findHisTasks($scope.activeEnv, $scope.pro.id, function(data){
+                    $scope.hisTasks = [];
+                    $scope.delayLoadHistory = function() {
+
+                        // todo 下面2个方法在task-controller依赖, 要求传递或者单独实现
+                        // 1. function explainTaskStatus()
+                        // 2. function isObjEmpty()
+
+                        TaskService.findHisTasks($scope.env.id, $scope.project.id, function(data){
                             $scope.hisTasks = data.map($scope.addStatusTipHistory).map($scope.addShowFlag)
                         });
-                    }
+                    };
 
                     $scope.addShowFlag = function(data){
                         if(!$scope.isObjEmpty(data)){
                             $scope.isHisLogShow.push(false)
                         }
                         return data ;
-                    }
+                    };
 
                     $scope.addStatusTipHistory = function(data){
                         if(!$scope.isObjEmpty(data)){
@@ -1101,7 +1556,7 @@ define(['angular'], function(angular) {
                             data.statusTip = "N/A"
                         }
                         return data
-                    }
+                    };
 
                     $scope.stab = 1 ;
                     $scope.s_index = -1;
@@ -1140,6 +1595,10 @@ define(['angular'], function(angular) {
         }
     });
 
+    /**
+     * ------------ 项目配置 ------------
+     * 文件列表
+     */
     app.directive('confList', function() {
         return {
             restrict: 'E',
@@ -1159,6 +1618,10 @@ define(['angular'], function(angular) {
         }
     });
 
+    /**
+     * ------------ 项目配置 ------------
+     * 文件详情
+     */
     app.directive('confDetail', function() {
         return {
             restrict: 'E',
@@ -1216,7 +1679,10 @@ define(['angular'], function(angular) {
         }
     });
 
-
+    /**
+     * ------------ 项目配置 ------------
+     * 文件修改
+     */
     app.directive('confEdit', function() {
         return {
             restrict: 'E',
@@ -1262,7 +1728,10 @@ define(['angular'], function(angular) {
         }
     });
 
-
+    /**
+     * ------------ 项目配置 ------------
+     * 文件创建
+     */
     app.directive('confCreate', function() {
         return {
             restrict: 'E',
@@ -1270,7 +1739,7 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/conf/project/uiview/conf-new.html',
             controller: ['$scope', '$filter', 'ConfService', function($scope, $filter, ConfService) {
                 $scope.initCreate = function() {
-                    $scope.conf = {envId: $scope.activeEnv, projectId: $scope.pro.id, versionId: $scope.versionId};
+                    $scope.conf = {envId: $scope.env.id, projectId: $scope.project.id, versionId: $scope.versionId};
 
                     this.save = function() {
                         $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
@@ -1304,6 +1773,7 @@ define(['angular'], function(angular) {
     });
 
     /**
+     * ------------ 项目配置 ------------
      * 一键拷贝
      */
     app.directive('confCopy', function() {
@@ -1316,12 +1786,12 @@ define(['angular'], function(angular) {
                     $scope.copyEnvs = angular.copy($scope.envs);
                     //$scope.copyEnvs.unshift({"id": 0, "name": '模板配置', "nfServer": '', "ipRange": '', "level": 'safe', "scriptVersion": '', "jobNo": '', "remark": ''})
 
-                    $scope.copyParam = {projectId: $scope.pro.id, target_eid: $scope.activeEnv, target_vid: null, envId: $scope.activeEnv, versionId: $scope.versionId, ovr: false};
+                    $scope.copyParam = {projectId: $scope.project.id, target_eid: $scope.env.id, target_vid: null, envId: $scope.env.id, versionId: $scope.versionId, ovr: false};
 
-                    VersionService.top($scope.pro.id, function(data) {
+                    VersionService.top($scope.project.id, function(data) {
                         $scope.versions = data;
                         // 模板
-                        $scope.versions.unshift({id: 0, projectId: $scope.pro.id, updated: 1417228773000, vs: 'default'});
+                        $scope.versions.unshift({id: 0, projectId: $scope.project.id, updated: 1417228773000, vs: 'default'});
 
                         // default current version
                         var find = false;
@@ -1336,7 +1806,7 @@ define(['angular'], function(angular) {
 
                     this.ok = function (param) {
                         //if (param.target_vid == 0) { // 模板
-                        //    param.target_eid = $scope.activeEnv;
+                        //    param.target_eid = $scope.env.id;
                         //}
                         ConfService.copy(angular.toJson(param), function(data) {
                             if (data.r === 'ok') {
@@ -1357,7 +1827,10 @@ define(['angular'], function(angular) {
             }
         }
     });
-
+    /**
+     * ------------ 项目配置 ------------
+     * 文件上传
+     */
     app.directive('confUpload', function() {
         return {
             restrict: 'E',
@@ -1366,9 +1839,9 @@ define(['angular'], function(angular) {
             controller: ['$scope', '$timeout', '$upload', function($scope, $timeout, $upload) {
                 $scope.initUploadConf = function() {
                     $scope.filePath = "";
-                    var pid = $scope.pro.id;
+                    var pid = $scope.project.id;
                     var vid = $scope.versionId;
-                    var eid = $scope.activeEnv;
+                    var eid = $scope.env.id;
 
                     $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
                     $scope.uploadRightAway = true;
@@ -1472,7 +1945,6 @@ define(['angular'], function(angular) {
             }
         }
     });
-
 
 
 });

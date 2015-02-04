@@ -11,6 +11,112 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
+    app.controller('Task2Ctrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
+        function($scope, $state, $stateParams, EnvService, ProjectService, AreaService, TaskService) {
+
+        // init
+        $scope.env = {};
+        $scope.envs = [];
+        $scope.load = { is: true };
+        $scope.focus = { is: true };
+
+        // load envs
+        EnvService.getAuth(function(data) {
+            if (data == null || data.length == 0) {
+                return;
+            }
+            $scope.envs = data;
+
+            if (angular.isUndefined($state.params.eid)) { // 第一次访问任务页面
+                $scope.activeEnv($scope.envs[0]);
+            } else {                                             // F5刷新保持当前URL
+                var e = ck_env_in_array($scope.envs, $state.params.eid);
+                $scope.activeEnv(e);
+            }
+
+        });
+
+        // util
+        function ck_env_in_array(envs, eid) {
+            var find = false;
+            var r = envs[0];
+            angular.forEach(envs, function(e) {
+                if (!find && e.id == eid) {
+                    r = e;
+                    find = true;
+                }
+            });
+            return r;
+        }
+
+
+
+        $scope.activeEnv = function(e) {
+            $scope.env = e;
+            if (angular.isDefined($state.params.pid)) {
+                $state.go('task2.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
+            } else {
+                $state.go('task2.list', { eid: e.id });
+            }
+            // load projects
+            $scope.load.is = true;
+            $scope.projects = []
+            ProjectService.getAuth(e.id, function(data) {
+                $scope.projects = data;
+                $scope.load.is = false;
+            });
+
+            $scope.scriptVersion = e.scriptVersion
+            $scope.getTemplates();
+        };
+
+        $scope.getTemplates = function(){
+            //查询项目模板（操作按钮）
+            TaskService.getTemplates($scope.scriptVersion, function(data){
+                $scope.templates = data;
+            })
+        }
+
+
+
+
+    }]);
+
+    app.controller('Task2InfoCtrl', ['$scope', '$stateParams', 'ProjectService', 'VersionService', 'AreaService', 'RelationService',
+        '$state', '$interval', 'Auth', '$modal', 'growl',
+        function($scope, $stateParams, ProjectService, VersionService, AreaService, RelationService, $state, $interval, Auth, $modal, growl) {
+            $scope.load.is = true;
+            ProjectService.get($stateParams.pid, function (data) {
+                $scope.project = data;
+                $scope.load.is = false;
+                console.log($scope.project)
+            });
+            $scope.randomKey = function(min, max) {
+                var num = Math.floor(Math.random() * (max - min + 1)) + min;
+                return num
+            }
+
+            $scope.receiveEvent = function(event){
+                console.log(event.data)
+                if(event.data.error){
+                    console.log("there is errors:" + event.data.error)
+                }else{
+                    $scope.tsData = JSON.parse(event.data)
+                }
+            }
+
+            $scope.wsInvoke = function(){
+                $scope.tsData = 123;
+                var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+                var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.randomKey(1,10000)).webSocketURL()
+                $scope.taskSocket = new WS(path)
+                $scope.taskSocket.onmessage = $scope.receiveEvent
+            }
+
+            $scope.wsInvoke();
+
+    }]);
+
     app.controller('TaskCtrl', ['$scope', 'TaskService','EnvService','ProjectService', 'VersionService', 'AreaService', 'RelationService',
         '$state', '$stateParams', '$interval', 'Auth', '$modal', 'growl', '$http',
         function($scope, TaskService, EnvService, ProjectService, VersionService, AreaService, RelationService,
