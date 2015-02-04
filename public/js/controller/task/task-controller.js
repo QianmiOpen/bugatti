@@ -11,8 +11,8 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('Task2Ctrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService',
-        function($scope, $state, $stateParams, EnvService, ProjectService) {
+    app.controller('Task2Ctrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
+        function($scope, $state, $stateParams, EnvService, ProjectService, AreaService, TaskService) {
 
         // init
         $scope.env = {};
@@ -49,6 +49,8 @@ define(['angular'], function(angular) {
             return r;
         }
 
+
+
         $scope.activeEnv = function(e) {
             $scope.env = e;
             if (angular.isDefined($state.params.pid)) {
@@ -58,20 +60,60 @@ define(['angular'], function(angular) {
             }
             // load projects
             $scope.load.is = true;
+            $scope.projects = []
             ProjectService.getAuth(e.id, function(data) {
                 $scope.projects = data;
                 $scope.load.is = false;
             });
+
+            $scope.scriptVersion = e.scriptVersion
+            $scope.getTemplates();
         };
+
+        $scope.getTemplates = function(){
+            //查询项目模板（操作按钮）
+            TaskService.getTemplates($scope.scriptVersion, function(data){
+                $scope.templates = data;
+            })
+        }
+
+
+
 
     }]);
 
-    app.controller('Task2InfoCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
-        $scope.load.is = true;
-        ProjectService.get($stateParams.pid, function (data) {
-            $scope.project = data;
-            $scope.load.is = false;
-        });
+    app.controller('Task2InfoCtrl', ['$scope', '$stateParams', 'ProjectService', 'VersionService', 'AreaService', 'RelationService',
+        '$state', '$interval', 'Auth', '$modal', 'growl',
+        function($scope, $stateParams, ProjectService, VersionService, AreaService, RelationService, $state, $interval, Auth, $modal, growl) {
+            $scope.load.is = true;
+            ProjectService.get($stateParams.pid, function (data) {
+                $scope.project = data;
+                $scope.load.is = false;
+                console.log($scope.project)
+            });
+            $scope.randomKey = function(min, max) {
+                var num = Math.floor(Math.random() * (max - min + 1)) + min;
+                return num
+            }
+
+            $scope.receiveEvent = function(event){
+                console.log(event.data)
+                if(event.data.error){
+                    console.log("there is errors:" + event.data.error)
+                }else{
+                    $scope.tsData = JSON.parse(event.data)
+                }
+            }
+
+            $scope.wsInvoke = function(){
+                $scope.tsData = 123;
+                var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+                var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.randomKey(1,10000)).webSocketURL()
+                $scope.taskSocket = new WS(path)
+                $scope.taskSocket.onmessage = $scope.receiveEvent
+            }
+
+            $scope.wsInvoke();
 
     }]);
 

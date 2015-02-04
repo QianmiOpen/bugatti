@@ -10,9 +10,9 @@
         </ul>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive" ng-if="env && project">
         <!-- Project Balance -->
-        <project-balance ng-if="isSet(1)"></project-balance>
+        <project-balance ng-if="isSet(1)" active-tab="tab" env="env" project="project" templates="templates" ts-data="tsData"></project-balance>
 
         <!-- Project Item -->
         <project-item ng-if="isSet(2)" active-tab="tab" expander-env="env" expander-project="project"></project-item>

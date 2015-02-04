@@ -418,7 +418,7 @@ define(['angular'], function(angular) {
             controller: function($scope) {
                 $scope.tab = 1;
                 $scope.isSet = function(checkTab) {
-                    return $scope.tab === checkTab;
+                    return $scope.tab == checkTab;
                 };
                 $scope.setTab = function(activeTab) {
                     $scope.tab = activeTab;
@@ -433,56 +433,295 @@ define(['angular'], function(angular) {
     app.directive('projectBalance', function () {
         return {
             restrict: 'E',
+            scope: {
+                tab: "=activeTab",
+                env: "=",
+                project: "=",
+                templates: "=",
+                tsData: "=",
+                c: "="
+            },
             templateUrl: 'partials/task/project-balance.html',
-            controller: ['$scope',
-                function($scope){
-                    $scope.ctab = 1 ;
-                    $scope.c_index = -1;
-                    $scope.setCTab =function(ctab){
-                        $scope.ctab = ctab ;
-                    }
-                    $scope.setCIndex =function(cIndex){
-                        $scope.c_index = cIndex ;
-                    }
-                    $scope.setHostName = function(hostName){
-                        $scope.hostName = hostName;
-                    }
-                    $scope.showQueues = function(index, ctab, taskId, hostName){
-                        var clusterFlag = true;
-                        if($scope.isQueueShow[index] && $scope.ctab == ctab){
-                            clusterFlag = false;
-                        }
-                        //隐藏其他的index
-                        $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+            controller: ['$scope', 'RelationService', 'TaskService', 'AreaService', 'Auth', 'growl', 'VersionService',
+                function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService){
+                    $scope.cTab = -1 ;
+//                    $scope.c_index = -1;
+//                    $scope.setCTab =function(ctab){
+//                        $scope.ctab = ctab ;
+//                    }
+//                    $scope.setCIndex =function(cIndex){
+//                        $scope.c_index = cIndex ;
+//                    }
+//                    $scope.setHostName = function(hostName){
+//                        $scope.hostName = hostName;
+//                    }
+//                    $scope.showQueues = function(index, ctab, taskId, hostName){
+//                        var clusterFlag = true;
+//                        if($scope.isQueueShow[index] && $scope.ctab == ctab){
+//                            clusterFlag = false;
+//                        }
+//                        //隐藏其他的index
+//                        $scope.isQueueShow = $scope.isQueueShow.map(function(q){
+////                            $scope.catalina_ctab = !$scope.catalina_ctab ;
+//                            return false ;
+//                        })
+//                        if(clusterFlag){
+//                            $scope.ctabFlag = !$scope.ctabFlag;
+//                            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
+//                        }
+//                        $scope.taskId = taskId
+//                        $scope.setCTab(ctab);
+//                        $scope.setCIndex(index);
+//                        $scope.setHostName(hostName);
+//
+//                        //增加重加载
+//                        if(ctab == 4){
 //                            $scope.catalina_ctab = !$scope.catalina_ctab ;
-                            return false ;
-                        })
-                        if(clusterFlag){
-                            $scope.ctabFlag = !$scope.ctabFlag;
-                            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
-                        }
-                        $scope.taskId = taskId
-                        $scope.setCTab(ctab);
-                        $scope.setCIndex(index);
-                        $scope.setHostName(hostName);
+//                        }
+//                    }
+                    $scope.count = 0;
 
-                        //增加重加载
-                        if(ctab == 4){
-                            $scope.catalina_ctab = !$scope.catalina_ctab ;
+                    $scope.initHosts = function() {
+                        var areaId = $scope.useArea.id;
+                        RelationService.hosts($scope.env.id, areaId, function(data) {
+                            $scope.hosts = data;
+                        });
+                    };
+
+                    // 加载环境对应可用区域
+                    AreaService.list($scope.env.id, function(data) {
+                        $scope.preAreas = data;
+                        if ($scope.preAreas.length > 0) {
+                            $scope.useArea = { id :$scope.preAreas[0].id }
+                            $scope.initHosts()
+                        }
+                    });
+                    //解析每个负载的最后一次任务
+                    $scope.changeLastDataCluster = function(cluster){
+                        console.log(cluster)
+                        console.table($scope.lastTasks)
+                        if($scope.lastTasks.length > 0){
+                            for(var cIndex in $scope.lastTasks){
+                                var c = $scope.lastTasks[cIndex]
+                                if(c.clusterName == cluster.name){
+                                    cluster.task = c
+                                    cluster.task.queueNum = 0
+                                    cluster.task.statusTip = $scope.explainTaskStatus(cluster.task.status)
+                                }
+                            }
+                        }
+                        return cluster
+                    }
+
+                    $scope.addQueueStatusTip = function(data){
+                        //只返回等待执行的任务
+                        if(data.status != 0){
+                            return null
+                        }
+                        if(!$scope.isObjEmpty(data)){
+                            data.statusName = $scope.explainQueueStatus(data.status)
+                        } else {
+                            data.status.statusTip = "N/A"
+                        }
+                        return data
+                    }
+
+                    //解析task status
+                    $scope.explainTaskStatus = function(status){
+                        switch(status){
+                            //未查询到历史任务
+                            case 0 : return "未查询到历史任务"
+                            //执行成功
+                            case 1 : return "执行成功"
+                            //执行失败
+                            case 2 : return "执行失败"
+                            //正在执行
+                            case 3 : return "正在执行"
                         }
                     }
+
+                    $scope.addQueueStatusTip = function(data){
+                        //只返回等待执行的任务
+                        if(data.status != 0){
+                            return null
+                        }
+                        if(!$scope.isObjEmpty(data)){
+                            data.statusName = $scope.explainQueueStatus(data.status)
+                        } else {
+                            data.status.statusTip = "N/A"
+                        }
+                        return data
+                    }
+
+                    $scope.explainQueueStatus = function(status){
+                        switch(status){
+                            //等待执行
+                            case 0 : return "等待执行"
+                            //执行成功
+                            case 1 : return "执行成功"
+                            //执行失败
+                            case 2 : return "执行失败"
+                            //正在执行
+                            case 3 : return "正在执行"
+                        }
+                    }
+
+                    //查询绑定负载
+                    $scope.showVm = function(proId) {
+                        // 根据项目proId & envId 获取关联机器
+                        TaskService.findClusters($scope.env.id, proId, function(data){
+                            $scope.project.clusters = data
+                            $scope.vms = data
+                            var clusterNames = $scope.vms.map(function(c){return c.name}).join(',')
+                            TaskService.findLastStatus($scope.env.id, proId, clusterNames, function(data){
+                                $scope.lastTasks = data
+                                $scope.project.clusters.map($scope.changeLastDataCluster)
+                            })
+                        })
+                        //-------操作按钮展示---------
+                        console.table($scope.templates)
+                        $scope.project.templates = $scope.templates[$scope.project.templateId]
+                        console.log($scope.project.templates)
+                    }
+
+                    $scope.showVm($scope.project.id);
+//--------------------------------------- 操作按钮逻辑 -----------------------------------------
+
+                    $scope.showVersion = function(pid){
+                        $scope.versions = []
+                        VersionService.getVersions(pid, $scope.env.id, function(data){
+                            console.log(data)
+                            $scope.versions = data
+                        })
+                    }
+
+                    $scope.showMenu = function(versionMenu, projectId, clusterName, templateId){
+                        if(!versionMenu){
+                            $scope.deploy(projectId, null, clusterName, templateId)
+                        } else {//部署
+                            $scope.choosedTemplateId = templateId
+                            $scope.showVersion(projectId)
+                        }
+                    }
+
+                    $scope.deploy = function(projectId, versionId, clusterName, templateId){
+                        $scope.taskQueue = {}
+                        $scope.taskQueue.envId = $scope.env.id
+                        $scope.taskQueue.projectId = projectId
+                        $scope.taskQueue.versionId = versionId
+                        $scope.taskQueue.clusterName = clusterName
+                        $scope.taskQueue.templateId = templateId
+                        $scope.taskQueue.operatorId = Auth.user.username
+                        TaskService.createNewTaskQueue($scope.taskQueue, function(data){
+                            if(data == -1){
+                                growl.addErrorMessage("模板已更新，请刷新页面");
+                            }
+                        })
+                    }
+//-------------------------------------- 任务状态 ---------------------------------------------
+                    //根据任务状态判断是否需要显示超链接
+                    $scope.showTaskHref = function(status){
+                        if(status === 3 || status == 0) {
+                            return false
+                        } else {
+                            return true
+                        }
+                    }
+                    //未查询到任何历史任务
+                    $scope.showTaskText = function(status){
+                        if(status == 0){
+                            return true
+                        }else {
+                            return false
+                        }
+                    }
+                    //根据任务状态判断是否需要显示进度条
+                    $scope.showTaskProgress = function(status){
+                        if(status === 3){
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                    //--------------- 正在进行的任务 --------------------
+                    //获取envId_projectId最后一个任务状态
+                    $scope.findLastStatus = function(vmName, vmIndex){
+                        TaskService.findLastStatus($scope.env.id, $scope.project.id, vmName, function(data){
+                            $scope.lastTasks = data
+                            $scope.project.clusters.map($scope.changeLastDataCluster)
+                        })
+                    }
+
+                    $scope.refreshStatus = function(){
+                        var tsData = $scope.tsData;
+                        console.log(tsData)
+                        var clusters = $scope.project.clusters;
+                        console.log(clusters)
+                        console.log($scope.env.id, $scope.project.id)
+                        for(var vmIndex in clusters){
+                            var vmName = clusters[vmIndex].name;
+                            var key = $scope.env.id + "_" + $scope.project.id + "_" + vmName;
+                            var key_last = key + "_last";
+                            var projectObj = tsData[key]
+                            console.log(projectObj)
+                            var projectObj_last = tsData[key_last]
+                            console.log(projectObj_last)
+
+                            if(projectObj != undefined){
+                                $scope.project.clusters[vmIndex].task = projectObj;
+                                //队列
+                                if(projectObj.queues != undefined){
+                                    $scope.project.clusters[vmIndex].taskQueues = projectObj.queues.filter($scope.addQueueStatusTip)
+                                }
+                            }
+                            if(projectObj_last != undefined){
+                                $scope.findLastStatus(vmName, vmIndex)
+                            }
+                        }
+                    }
+
+//=================================== cluster tab ===============================
+                    $scope.isTrShow = function(cIndex){
+                        return $scope.chooseIndex == cIndex;
+                    }
+
+                    $scope.chooseClusterTab = function(cTab, chooseIndex, taskId){
+                        console.log(cTab, chooseIndex, taskId);
+                        $scope.cTab = cTab;
+                        $scope.chooseIndex = chooseIndex;
+                        $scope.taskId = taskId;
+                    }
+
+
+                    //======
                 }
-            ]
+            ],
+            link: function postLink(scope, iElement, iAttrs) {
+                scope.$watch('tsData', function () {
+                    console.log("count is ", scope.count + 1)
+                    scope.refreshStatus();
+                });
+            }
         }
     });
 
     app.directive('clusterTabs', function(){
         return {
             restrict: 'E',
+            require: 'projectBalance',
+            scope: {
+                cTab: "=",
+                cIndex: "=",
+                c: "=",
+                project: "=",
+                env: "=",
+                chooseIndex: "="
+            },
             templateUrl: 'partials/task/cluster-tabs.html',
             controller: function($scope){
-                $scope.isClusterShow = function(ctab, c_index){
-                    return ($scope.ctab == ctab && $scope.c_index == c_index);
+                $scope.isClusterTabShow = function(ctab, c_index){
+//                    console.log($scope.cTab, ctab, $scope.chooseIndex, c_index, ($scope.cTab == ctab && $scope.chooseIndex == c_index))
+                    return ($scope.cTab == ctab && $scope.chooseIndex == c_index);
                 }
             }
         }
@@ -519,13 +758,15 @@ define(['angular'], function(angular) {
     app.directive('taskQueue', function(){
         return {
             restrict: 'E',
-            require: '^clusterTabs',
+            scope: {
+                c: "="
+            },
             templateUrl: 'partials/task/task-queue.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.removeQueue = function(qid){
                         TaskService.removeTaskQueue(qid, function(data){
-                            //如果删除的任务在一瞬间刚好变为正在执行，应告知
+                            //TODO 如果删除的任务在一瞬间刚好变为正在执行，应告知
                         })
                     }
                 }]
@@ -535,18 +776,23 @@ define(['angular'], function(angular) {
     app.directive('clusterProperties', function(){
         return {
             restrict: 'E',
-            require: '^clusterTabs',
+            scope: {
+                project: "=",
+                env: "=",
+                c: "="
+            },
             templateUrl: 'partials/task/cluster-properties.html',
             controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
                 function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
                     $scope.delayLoadProperties = function(){
+                        console.log($scope.c, $scope.project, $scope.env)
                         RelationService.get($scope.c.id, function(data) {
                             $scope.relation = data;
                             if ($scope.relation) {
-                                if (angular.isUndefined($scope.pro.id) || angular.isUndefined($scope.activeEnv) ) {
+                                if (angular.isUndefined($scope.project.id) || angular.isUndefined($scope.env.id) ) {
                                     return;
                                 }
-                                ProjectService.vars($scope.pro.id, $scope.activeEnv, function(project_vars) {
+                                ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
                                     $scope.vars = project_vars;
                                     angular.forEach($scope.vars, function(pv) {
                                         pv.meta = pv.value;
@@ -587,21 +833,23 @@ define(['angular'], function(angular) {
                             }
                         });
                     };
-                }],
-            link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('c_index', function () {
-                    if (scope.ctab == 1 && scope.c_index == scope.$index) {
-                        scope.delayLoadProperties();
-                    }
-                });
-            }
+                    $scope.delayLoadProperties();
+                }]
+//            ,
+//            link: function postLink(scope, iElement, iAttrs) {
+//                scope.$watch('cIndex', function () {
+//                    if (scope.cTab == 1 && scope.cIndex == scope.$index) {
+//                        scope.delayLoadProperties();
+//                    }
+//                });
+//            }
         }
     });
 
     app.directive('catalinaLog', function(){
         return {
             restrict: 'E',
-            require: '^projectBalance',
+//            require: '^projectBalance',
             templateUrl: 'partials/task/catalina-log.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
@@ -708,14 +956,18 @@ define(['angular'], function(angular) {
     app.directive('taskLog', function(){
         return {
             restrict: 'E',
-            require: '^projectTabs',
+            scope:{
+                c: "="
+            },
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
                     $scope.delayLoadLog = function(){
-                        if($scope.taskId != undefined){
+                        console.log($scope.c.task.id)
+                        if($scope.c.task.id != undefined){
                             var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-                            var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.taskId).webSocketURL()
+                            var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.c.task.id).webSocketURL()
+                            console.log(path);
                             $scope.logSocket = new WS(path)
                             $scope.logSocket.onmessage = $scope.receiveEvent
 
@@ -730,12 +982,14 @@ define(['angular'], function(angular) {
 
                     $scope.receiveEvent = function(event){
                         $scope.data = JSON.parse(event.data)
+//                        console.log($scope.data);
                         if(event.data.error){
                             console.log("there is errors:"+event.data.error)
                         }else{
                             $scope.$apply(function () {
                                 var data = $scope.data
-                                if(data.taskId == $scope.taskId){
+                                console.log(data)
+                                if(data.taskId == $scope.c.task.id){
                                     if(data.kind == "logFirst"){
                                         $scope.logFirstHidden = false
                                         $scope.logFirst = data.message
@@ -775,35 +1029,38 @@ define(['angular'], function(angular) {
                         }
                         return string;
                     }
-                }],
-            link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('c_index', function () {
-                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                scope.$watch('ctab', function () {
-                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                scope.$watch('ctabFlag', function () {
-                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                //历史任务查看
-                scope.$watch('s_index', function () {
-                    if (scope.stab == 1 && scope.s_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-                scope.$watch('stabFlag', function () {
-                    if (scope.stab == 1 && scope.s_index == scope.$index) {
-                        scope.delayLoadLog();
-                    }
-                });
-            }
+
+                    $scope.delayLoadLog();
+                }]
+//            ,
+//            link: function postLink(scope, iElement, iAttrs) {
+//                scope.$watch('c_index', function () {
+//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                scope.$watch('ctab', function () {
+//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                scope.$watch('ctabFlag', function () {
+//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                //历史任务查看
+//                scope.$watch('s_index', function () {
+//                    if (scope.stab == 1 && scope.s_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//                scope.$watch('stabFlag', function () {
+//                    if (scope.stab == 1 && scope.s_index == scope.$index) {
+//                        scope.delayLoadLog();
+//                    }
+//                });
+//            }
         }
     });
 
