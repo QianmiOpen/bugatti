@@ -53,7 +53,12 @@ libraryDependencies ++= {
   )
 }
 
-//play.Project.playScalaSettings
+resolvers ++= Seq(
+  "Nexus repository" at "http://nexus.dev.ofpay.com/nexus/content/groups/public/",
+  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+  "JBoss repository" at "https://repository.jboss.org/nexus/content/repositories/",
+  "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
+)
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

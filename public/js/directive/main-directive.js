@@ -81,7 +81,7 @@ define(['angular'], function(angular) {
         }
     }]);
 
-    app.directive("scroll", ['$state', '$window', '$interval', function ($state, $window, $interval) {
+    app.directive("scroll", ['$state', function ($state) {
         return function($scope, element, attrs) {
 
             if (angular.isDefined($state.params.top)) {
