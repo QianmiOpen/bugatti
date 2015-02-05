@@ -426,10 +426,61 @@ define(['angular'], function(angular) {
                 c: "="
             },
             templateUrl: 'partials/task/project-balance.html',
-            controller: ['$scope', 'RelationService', 'TaskService', 'AreaService', 'Auth', 'growl', 'VersionService',
-                function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService){
+            controller: ['$scope', 'RelationService', 'TaskService', 'AreaService', 'Auth', 'growl', 'VersionService', '$modal', 'ProjectService',
+                function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService, $modal, ProjectService){
                     $scope.cTab = -1 ;
                     $scope.count = 0;
+                    //------------------- 绑定 / 解绑 -------------------------
+                    $scope.addCluster = function(pid, envId, _ip) {
+                        _ip = typeof _ip === 'object' ? _ip.ip : _ip; // fix bug
+
+                        var areaId = $scope.useArea.id;
+
+                        var rel = {projectId: pid, envId: envId, areaId: areaId, ip: _ip}
+                        ProjectService.addCluster(angular.toJson(rel), function(data) {
+                            if (data.r == 'ok') {
+                                $scope.showVm(pid)
+                                growl.addSuccessMessage("绑定成功")
+                            }
+                            else if (data.r == 'none' && data.u == 'host') {
+                                growl.addErrorMessage("添加失败,没有互斥主机，请手动添加")
+                            }
+                            else if (data.r == 'none') {
+                                growl.addErrorMessage("添加失败,没有空闲机器")
+                            }
+                            else if (data.r == 'exist') {
+                                growl.addErrorMessage("添加失败,该ip已经被使用")
+                            }
+                            else {
+                                growl.addErrorMessage("添加失败,无效的ip")
+                            }
+                        })
+                    };
+
+                    $scope.removeCluster = function(pid, cid) {
+                        var modalInstance = $modal.open({
+                            templateUrl: "partials/modal-message.html",
+                            controller: function ($scope, $modalInstance) {
+                                $scope.message = "您确认要取消绑定?"
+                                $scope.ok = function() {
+                                    ProjectService.removeCluster(cid, function(data){
+                                        $modalInstance.close(data);
+                                    })
+                                };
+                                $scope.cancel = function() {
+                                    $modalInstance.dismiss("cancel")
+                                };
+                            }
+                        });
+                        modalInstance.result.then(function(data) {
+                            if(data.r == 1) {
+                                $scope.showVm(pid)
+                                growl.addSuccessMessage("解绑成功")
+                            }else {
+                                growl.addErrorMessage("解绑失败");
+                            }
+                        });
+                    }
 
                     $scope.initHosts = function() {
                         var areaId = $scope.useArea.id;
@@ -446,6 +497,7 @@ define(['angular'], function(angular) {
                             $scope.initHosts()
                         }
                     });
+                    //-------------------- 任务状态解析 -----------------------
                     //解析每个负载的最后一次任务
                     $scope.changeLastDataCluster = function(cluster){
                         if($scope.lastTasks.length > 0){
