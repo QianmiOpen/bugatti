@@ -592,6 +592,12 @@ define(['angular'], function(angular) {
                     }
 
                     $scope.showVm($scope.project.id);
+
+                    //------------------- 手动终止正在执行的任务 --------------------------------
+                    $scope.forceTerminate = function(pid, clusterName){
+                        TaskService.forceTerminate($scope.env.id, pid, clusterName, function(data){})
+                    }
+
 //--------------------------------------- 操作按钮逻辑 -----------------------------------------
 
                     $scope.showVersion = function(pid){
