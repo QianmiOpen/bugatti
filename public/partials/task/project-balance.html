@@ -70,7 +70,7 @@
                     <a ng-if="t['versionMenu']" class="dropdown-toggle" dropdown-toggle href ng-click="showMenu(t.versionMenu, project.id, c.name, t.id)" title="{{t.name}}">
                         <span class="{{t.css}}"></span>
                     </a>
-                    <a ng-if="!t['versionMenu']" href ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="showMenu(t.versionMenu, pro.id, c.name, t.id)" title="{{t.name}}">
+                    <a ng-if="!t['versionMenu']" href ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="showMenu(t.versionMenu, project.id, c.name, t.id)" title="{{t.name}}">
                         <span class="{{t.css}}"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -97,7 +97,7 @@
                     <a ng-if="t['versionMenu']" class="dropdown-toggle" dropdown-toggle href ng-click="showMenu(t.versionMenu, project.id, c.name, t.id)" title="{{t.name}}">
                         <span class="{{t.css}}"></span>
                     </a>
-                    <a ng-if="!t['versionMenu']" href ng-really-click="showMenu(t.versionMenu, pro.id, c.name, t.id)" title="{{t.name}}">
+                    <a ng-if="!t['versionMenu']" href ng-click="showMenu(t.versionMenu, project.id, c.name, t.id)" title="{{t.name}}">
                         <span class="{{t.css}}"></span>
                     </a>
                     <ul class="dropdown-menu">

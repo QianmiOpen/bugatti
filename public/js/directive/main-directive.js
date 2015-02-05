@@ -660,23 +660,25 @@ define(['angular'], function(angular) {
 
                     $scope.refreshStatus = function(){
                         var tsData = $scope.tsData;
-                        var clusters = $scope.project.clusters;
-                        for(var vmIndex in clusters){
-                            var vmName = clusters[vmIndex].name;
-                            var key = $scope.env.id + "_" + $scope.project.id + "_" + vmName;
-                            var key_last = key + "_last";
-                            var projectObj = tsData[key]
-                            var projectObj_last = tsData[key_last]
+                        if($scope.tsData != undefined){
+                            var clusters = $scope.project.clusters;
+                            for(var vmIndex in clusters){
+                                var vmName = clusters[vmIndex].name;
+                                var key = $scope.env.id + "_" + $scope.project.id + "_" + vmName;
+                                var key_last = key + "_last";
+                                var projectObj = tsData[key]
+                                var projectObj_last = tsData[key_last]
 
-                            if(projectObj != undefined){
-                                $scope.project.clusters[vmIndex].task = projectObj;
-                                //队列
-                                if(projectObj.queues != undefined){
-                                    $scope.project.clusters[vmIndex].taskQueues = projectObj.queues.filter($scope.addQueueStatusTip)
+                                if(projectObj != undefined){
+                                    $scope.project.clusters[vmIndex].task = projectObj;
+                                    //队列
+                                    if(projectObj.queues != undefined){
+                                        $scope.project.clusters[vmIndex].taskQueues = projectObj.queues.filter($scope.addQueueStatusTip)
+                                    }
                                 }
-                            }
-                            if(projectObj_last != undefined){
-                                $scope.findLastStatus(vmName, vmIndex)
+                                if(projectObj_last != undefined){
+                                    $scope.findLastStatus(vmName, vmIndex)
+                                }
                             }
                         }
                     }
