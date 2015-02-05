@@ -1,43 +1,35 @@
-<div class="col-md-offset-0 main">
-    <div class="page-header clearfix">
-        <div class="form-group pull-left col-xs-6 p0">
-            <input type="text" ng-model="searchText.name" class="form-control" placeholder="在这里输入项目名称，可快速检索">
-        </div>
-        <!--<button class="btn btn-primary pull-right" ng-click="changeProjects()">{{projectListName}}</button>-->
-    </div>
+<div class="col-md-offset-0 main" >
 
     <div class="tabs">
-        <ul class="nav nav-tabs">
-            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env)" ng-repeat="env in envs" ng-if="env['level'] === 'unsafe'">
-                <a href="">{{env.name}}</a>
+        <ul class="nav nav-tabs" ng-if="env">
+            <li ng-class="{active: env.id === e.id}" ng-click="activeEnv(e)" ng-repeat="e in envs" ng-if="e['level'] === 'unsafe'">
+                <a href="">{{e.name}}</a>
             </li>
-            <li ng-class="activeTab(env.id)" ng-click="chooseEnv(env)" ng-repeat="env in envs" ng-if="env['level'] === 'safe'">
-                <a href=""><span class="label label-danger">{{env.name}}</span></a>
+            <li ng-class="{active: env.id === e.id}" ng-click="activeEnv(e)" ng-repeat="e in envs" ng-if="e['level'] === 'safe'">
+                <a href=""><span class="label label-danger">{{e.name}}</span></a>
             </li>
         </ul>
     </div>
-    <br/>
-    <style >
-        .panel-group .panel {
-            overflow: visible;
-        }
-    </style>
-    <accordion close-others="true">
-        <accordion-group ng-repeat="pro in projectStatus|filter:searchText" is-open="pro.isOpen">
-            <accordion-heading>
-                    <table class="table table-hover table-fixed" style="margin-bottom: 0px;">
-                        <tbody style="border-top: 0px;">
-                            <tr class="hand" ng-click="showVm(pro.id, useArea)">
-                                <td style="border-top: 0px; padding-top: 0px; padding-bottom: 0px;" width="20%">{{pro.name}}</td>
-                                <td style="border-top: 0px; padding-top: 0px; padding-bottom: 0px;" width="80%">{{pro.description}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-            </accordion-heading>
-            <!-- Project Tabs -->
-            <div ng-if="projectTabFlag">
-                <project-tabs></project-tabs>
-            </div>
-        </accordion-group>
-    </accordion>
+
+    <div class="form-group pull-left col-xs-6 mt15" >
+        <input type="text" ng-model="_search" focus-if="focus.is" class="form-control" placeholder="快速检索项目"/>
+        <img ng-show="load.is" src="../../img/ajax-loader.gif" style="position: absolute;"/>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row" resizable ng-init="ignore_h=258" ng-style="{height: windowHeight}">
+        <div class="col-xs-2" scroll banner-height style=" width: 20%; overflow-x: hidden; overflow-y: auto;">
+
+            <ul class="nav nav-pills nav-stacked" ng-if="env" bindonce ng-repeat="project in projects | filter:_search">
+                <li ng-class="{active: $state.params.pid == project.id}">
+                    <a class="btn-link" ui-sref="task.list.info({eid: env.id, pid: project.id, top: top})" bo-bind="project.name"></a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-10" style="width: 80%; height: 100%; min-height: 100%; overflow-x: hidden; overflow-y: auto;"  ng-if="env">
+            <div ui-view="task-info"></div>
+        </div>
+    </div>
+
 </div>

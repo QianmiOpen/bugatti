@@ -11,7 +11,7 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('Task2Ctrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
+    app.controller('TaskCtrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
         function($scope, $state, $stateParams, EnvService, ProjectService, AreaService, TaskService) {
 
         // init
@@ -54,9 +54,9 @@ define(['angular'], function(angular) {
         $scope.activeEnv = function(e) {
             $scope.env = e;
             if (angular.isDefined($state.params.pid)) {
-                $state.go('task2.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
+                $state.go('task.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
             } else {
-                $state.go('task2.list', { eid: e.id });
+                $state.go('task.list', { eid: e.id });
             }
             // load projects
             $scope.load.is = true;
@@ -82,7 +82,7 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('Task2InfoCtrl', ['$scope', '$stateParams', 'ProjectService', 'VersionService', 'AreaService', 'RelationService',
+    app.controller('TaskInfoCtrl', ['$scope', '$stateParams', 'ProjectService', 'VersionService', 'AreaService', 'RelationService',
         '$state', '$interval', 'Auth', '$modal', 'growl',
         function($scope, $stateParams, ProjectService, VersionService, AreaService, RelationService, $state, $interval, Auth, $modal, growl) {
             $scope.load.is = true;
@@ -117,7 +117,7 @@ define(['angular'], function(angular) {
             });
     }]);
 
-    app.controller('TaskCtrl', ['$scope', 'TaskService','EnvService','ProjectService', 'VersionService', 'AreaService', 'RelationService',
+    app.controller('Task3Ctrl', ['$scope', 'TaskService','EnvService','ProjectService', 'VersionService', 'AreaService', 'RelationService',
         '$state', '$stateParams', '$interval', 'Auth', '$modal', 'growl', '$http',
         function($scope, TaskService, EnvService, ProjectService, VersionService, AreaService, RelationService,
                  $state, $stateParams, $interval, Auth, $modal, growl, $http) {
@@ -743,7 +743,7 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('TaskInfoCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
+    app.controller('Task3InfoCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
         $scope.taskId = $stateParams.taskId
 
         $scope.envId_search = $stateParams.envId
