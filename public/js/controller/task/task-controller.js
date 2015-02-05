@@ -20,6 +20,11 @@ define(['angular'], function(angular) {
         $scope.load = { is: true };
         $scope.focus = { is: true };
 
+        // keep search value
+        if (angular.isDefined($state.params.txt)) {
+            $scope._search = {name: $state.params.txt};
+        }
+
         // load envs
         EnvService.getAuth(function(data) {
             if (data == null || data.length == 0) {
@@ -49,8 +54,6 @@ define(['angular'], function(angular) {
             return r;
         }
 
-
-
         $scope.activeEnv = function(e) {
             $scope.env = e;
             if (angular.isDefined($state.params.pid)) {
@@ -76,9 +79,6 @@ define(['angular'], function(angular) {
                 $scope.templates = data;
             })
         }
-
-
-
 
     }]);
 
