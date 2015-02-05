@@ -27,9 +27,9 @@
                 </td>
                 <td>{{t.operatorId}}</td>
             </tr>
-            <tr ng-class="isHisLogShow[$index]? 'disp-row' : 'disp-hid'">
+            <tr ng-if="isHisLogShow($index)">
                 <td colspan="6">
-                    <his-tabs></his-tabs>
+                    <his-tabs c="c" project="project" env="env" s-tab="sTab" his-tab-status="hisTabStatus" choose-index="chooseIndex" s-index="$index"></his-tabs>
                 </td>
             </tr>
         </tbody>

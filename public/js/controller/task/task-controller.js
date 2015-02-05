@@ -86,11 +86,7 @@ define(['angular'], function(angular) {
         '$state', '$interval', 'Auth', '$modal', 'growl',
         function($scope, $stateParams, ProjectService, VersionService, AreaService, RelationService, $state, $interval, Auth, $modal, growl) {
             $scope.load.is = true;
-            ProjectService.get($stateParams.pid, function (data) {
-                $scope.project = data;
-                $scope.load.is = false;
-                console.log($scope.project)
-            });
+
             $scope.randomKey = function(min, max) {
                 var num = Math.floor(Math.random() * (max - min + 1)) + min;
                 return num
@@ -101,20 +97,24 @@ define(['angular'], function(angular) {
                 if(event.data.error){
                     console.log("there is errors:" + event.data.error)
                 }else{
-                    $scope.tsData = JSON.parse(event.data)
+                    $scope.$apply(function(){
+                        $scope.tsData = JSON.parse(event.data)
+                    })
                 }
             }
 
             $scope.wsInvoke = function(){
-                $scope.tsData = 123;
                 var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-                var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.randomKey(1,10000)).webSocketURL()
+                var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.env.id, $scope.project.id).webSocketURL()
                 $scope.taskSocket = new WS(path)
                 $scope.taskSocket.onmessage = $scope.receiveEvent
             }
 
-            $scope.wsInvoke();
-
+            ProjectService.get($stateParams.pid, function (data) {
+                $scope.project = data;
+                $scope.load.is = false;
+                $scope.wsInvoke();
+            });
     }]);
 
     app.controller('TaskCtrl', ['$scope', 'TaskService','EnvService','ProjectService', 'VersionService', 'AreaService', 'RelationService',

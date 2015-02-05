@@ -1,4 +1,4 @@
-<div ng-if="pro.id == projectIdSelected">
+<div>
     <div class="tabs">
         <ul class="nav nav-tabs">
             <li ng-class="{ active:isSet(1) }"><a href ng-click="setTab(1)">负载</a></li>
@@ -10,7 +10,7 @@
         </ul>
     </div>
 
-    <div class="table-responsive" ng-if="env && project">
+    <div class="table-responsive" ng-if="env && project && templates">
         <!-- Project Balance -->
         <project-balance ng-if="isSet(1)" active-tab="tab" env="env" project="project" templates="templates" ts-data="tsData"></project-balance>
 

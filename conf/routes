@@ -137,7 +137,7 @@ DELETE        /relation/:id                                       controllers.co
 # Task
 POST          /task/lastStatus                                    controllers.task.TaskController.findLastTaskStatus
 GET           /task/lastStatusSpecify                             controllers.task.TaskController.findLastStatus(envId: Int, projectId: Int, clusters: String)
-GET           /task/joinProcess/:taskId                           controllers.task.TaskController.joinProcess(taskId: Int)
+GET           /task/joinProcess/:envId/:projectId                 controllers.task.TaskController.joinProcess(envId: Int, projectId: Int)
 POST          /task/newTaskQueue                                  controllers.task.TaskController.createNewTaskQueue
 POST          /task/removeTaskQueue                               controllers.task.TaskController.removeTaskQueue(qid: Int)
 GET           /task/templates                                     controllers.task.TaskController.getTemplates(scriptVersion: String)

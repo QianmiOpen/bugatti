@@ -90,24 +90,8 @@ define(['angular'], function(angular) {
 
             element.bind("scroll", function() {
                 $scope.top = this.scrollTop;
-                //var h= $state.href($state.current, { top: this.scrollTop });
-                //$window.history.replaceState(null, "test", '/' + h);
                 $scope.$apply();
             });
-
-            //var stopTime = $interval(function() {
-            //    console.log('interval');
-            //    if ($scope.top != $state.params.top) {
-            //        var h= $state.href($state.current, { top: $scope.top });
-            //        console.log('h='+h);
-            //        //console.log('$window',$window.history)
-            //        $window.history.pushState(null, "test", '/' + h);
-            //    }
-            //}, 5000);
-
-            //element.on('$destroy', function() {
-            //    $interval.cancel(stopTime);
-            //});
 
         };
     }]);
@@ -445,40 +429,6 @@ define(['angular'], function(angular) {
             controller: ['$scope', 'RelationService', 'TaskService', 'AreaService', 'Auth', 'growl', 'VersionService',
                 function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService){
                     $scope.cTab = -1 ;
-//                    $scope.c_index = -1;
-//                    $scope.setCTab =function(ctab){
-//                        $scope.ctab = ctab ;
-//                    }
-//                    $scope.setCIndex =function(cIndex){
-//                        $scope.c_index = cIndex ;
-//                    }
-//                    $scope.setHostName = function(hostName){
-//                        $scope.hostName = hostName;
-//                    }
-//                    $scope.showQueues = function(index, ctab, taskId, hostName){
-//                        var clusterFlag = true;
-//                        if($scope.isQueueShow[index] && $scope.ctab == ctab){
-//                            clusterFlag = false;
-//                        }
-//                        //隐藏其他的index
-//                        $scope.isQueueShow = $scope.isQueueShow.map(function(q){
-////                            $scope.catalina_ctab = !$scope.catalina_ctab ;
-//                            return false ;
-//                        })
-//                        if(clusterFlag){
-//                            $scope.ctabFlag = !$scope.ctabFlag;
-//                            $scope.isQueueShow[index] = !$scope.isQueueShow[index];
-//                        }
-//                        $scope.taskId = taskId
-//                        $scope.setCTab(ctab);
-//                        $scope.setCIndex(index);
-//                        $scope.setHostName(hostName);
-//
-//                        //增加重加载
-//                        if(ctab == 4){
-//                            $scope.catalina_ctab = !$scope.catalina_ctab ;
-//                        }
-//                    }
                     $scope.count = 0;
 
                     $scope.initHosts = function() {
@@ -498,8 +448,6 @@ define(['angular'], function(angular) {
                     });
                     //解析每个负载的最后一次任务
                     $scope.changeLastDataCluster = function(cluster){
-                        console.log(cluster)
-                        console.table($scope.lastTasks)
                         if($scope.lastTasks.length > 0){
                             for(var cIndex in $scope.lastTasks){
                                 var c = $scope.lastTasks[cIndex]
@@ -566,6 +514,15 @@ define(['angular'], function(angular) {
                         }
                     }
 
+                    //判断对象是否为空
+                    $scope.isObjEmpty = function(obj){
+                        for (var name in obj)
+                        {
+                            return false
+                        }
+                        return true
+                    }
+
                     //查询绑定负载
                     $scope.showVm = function(proId) {
                         // 根据项目proId & envId 获取关联机器
@@ -579,9 +536,7 @@ define(['angular'], function(angular) {
                             })
                         })
                         //-------操作按钮展示---------
-                        console.table($scope.templates)
                         $scope.project.templates = $scope.templates[$scope.project.templateId]
-                        console.log($scope.project.templates)
                     }
 
                     $scope.showVm($scope.project.id);
@@ -590,7 +545,6 @@ define(['angular'], function(angular) {
                     $scope.showVersion = function(pid){
                         $scope.versions = []
                         VersionService.getVersions(pid, $scope.env.id, function(data){
-                            console.log(data)
                             $scope.versions = data
                         })
                     }
@@ -654,18 +608,13 @@ define(['angular'], function(angular) {
 
                     $scope.refreshStatus = function(){
                         var tsData = $scope.tsData;
-                        console.log(tsData)
                         var clusters = $scope.project.clusters;
-                        console.log(clusters)
-                        console.log($scope.env.id, $scope.project.id)
                         for(var vmIndex in clusters){
                             var vmName = clusters[vmIndex].name;
                             var key = $scope.env.id + "_" + $scope.project.id + "_" + vmName;
                             var key_last = key + "_last";
                             var projectObj = tsData[key]
-                            console.log(projectObj)
                             var projectObj_last = tsData[key_last]
-                            console.log(projectObj_last)
 
                             if(projectObj != undefined){
                                 $scope.project.clusters[vmIndex].task = projectObj;
@@ -682,14 +631,16 @@ define(['angular'], function(angular) {
 
 //=================================== cluster tab ===============================
                     $scope.isTrShow = function(cIndex){
-                        return $scope.chooseIndex == cIndex;
+                        return $scope.chooseIndex == cIndex && $scope.clusterTabStatus[$scope.chooseIndex + "_" + $scope.cTab];
                     }
 
+                    $scope.clusterTabStatus = {}
+
                     $scope.chooseClusterTab = function(cTab, chooseIndex, taskId){
-                        console.log(cTab, chooseIndex, taskId);
                         $scope.cTab = cTab;
                         $scope.chooseIndex = chooseIndex;
                         $scope.taskId = taskId;
+                        $scope.clusterTabStatus[chooseIndex + "_" + cTab] = !$scope.clusterTabStatus[chooseIndex + "_" + cTab]
                     }
 
 
@@ -698,7 +649,6 @@ define(['angular'], function(angular) {
             ],
             link: function postLink(scope, iElement, iAttrs) {
                 scope.$watch('tsData', function () {
-                    console.log("count is ", scope.count + 1)
                     scope.refreshStatus();
                 });
             }
@@ -715,13 +665,13 @@ define(['angular'], function(angular) {
                 c: "=",
                 project: "=",
                 env: "=",
+                clusterTabStatus: "=",
                 chooseIndex: "="
             },
             templateUrl: 'partials/task/cluster-tabs.html',
             controller: function($scope){
                 $scope.isClusterTabShow = function(ctab, c_index){
-//                    console.log($scope.cTab, ctab, $scope.chooseIndex, c_index, ($scope.cTab == ctab && $scope.chooseIndex == c_index))
-                    return ($scope.cTab == ctab && $scope.chooseIndex == c_index);
+                    return $scope.cTab == ctab && $scope.chooseIndex == c_index && $scope.clusterTabStatus[$scope.chooseIndex + "_" + $scope.cTab];
                 }
             }
         }
@@ -746,10 +696,20 @@ define(['angular'], function(angular) {
     app.directive('hisTabs', function(){
         return {
             restrict: 'E',
+            scope: {
+                project: "=",
+                env: "=",
+                c:"=",
+                sTab: "=",
+                sIndex: "=",
+                hisTabStatus: "=",
+                chooseIndex: "="
+            },
             templateUrl: 'partials/task/his-tabs.html',
             controller: function($scope){
-                $scope.isHisShow = function(stab, s_index){
-                    return ($scope.stab == stab && $scope.s_index == s_index);
+                $scope.isHisShow = function(sTab, sIndex){
+                    console.log($scope.sTab, sTab, $scope.chooseIndex, sIndex)
+                    return $scope.sTab == sTab && $scope.chooseIndex == sIndex && $scope.hisTabStatus[$scope.chooseIndex + "_" + $scope.sTab];
                 }
             }
         }
@@ -759,7 +719,8 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             scope: {
-                c: "="
+                c: "=",
+                project: "="
             },
             templateUrl: 'partials/task/task-queue.html',
             controller: ['$scope', 'TaskService',
@@ -785,7 +746,6 @@ define(['angular'], function(angular) {
             controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
                 function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
                     $scope.delayLoadProperties = function(){
-                        console.log($scope.c, $scope.project, $scope.env)
                         RelationService.get($scope.c.id, function(data) {
                             $scope.relation = data;
                             if ($scope.relation) {
@@ -964,77 +924,9 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/task/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
-//                    $scope.delayLoadLog = function(){
-//                        console.log($scope.c.task.id)
-//                        if($scope.c.task.id != undefined){
-//                            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-//                            var path = PlayRoutes.controllers.task.TaskController.taskLog($scope.c.task.id).webSocketURL()
-//                            console.log(path);
-//                            $scope.logSocket = new WS(path)
-//                            $scope.logSocket.onmessage = $scope.receiveEvent
-//
-//                            $scope.logHeader = ""
-//                        }
-//                    }
-//
-//                    $scope.message = ""
-//                    $scope.data = ""
-//                    $scope.logFirst = ""
-//                    $scope.logHeader = ""
-//
-//                    $scope.receiveEvent = function(event){
-//                        $scope.data = JSON.parse(event.data)
-////                        console.log($scope.data);
-//                        if(event.data.error){
-//                            console.log("there is errors:"+event.data.error)
-//                        }else{
-//                            $scope.$apply(function () {
-//                                var data = $scope.data
-//                                console.log(data)
-//                                if(data.taskId == $scope.c.task.id){
-//                                    if(data.kind == "logFirst"){
-//                                        $scope.logFirstHidden = false
-//                                        $scope.logFirst = data.message
-//                                    }else if(data.kind == "logHeader"){
-//                                        $scope.logFirstHidden = true
-//                                        if($scope.logHeader.length == 0){
-//                                            $scope.logHeader = data.message
-//                                            $scope.message = $scope.logHeader + $scope.message
-//                                        }
-//                                    }else{
-//                                        $scope.message = data.message
-//                                    }
-//                                }
-//                            });
-//                        }
-//                    }
-//
-//                    $scope.closeWs = function(){
-//                        $scope.logSocket.close()
-//                    }
-//
-//                    $scope.logFirstHidden = false
-//
-//                    $scope.showHiddenMessage = function(){
-//                        var len = parseInt($scope.logFirst.split(" ")[0])
-//                        TaskService.readHeader($scope.taskId, len, function(){})
-//                    }
-//
-//                    $scope.TransferString = function(content)
-//                    {
-//                        var string = content;
-//                        try{
-//                            string=string.replace(/\r\n/gi,"<br>");
-//                            string=string.replace(/\n/gi,"<br>");
-//                        }catch(e) {
-//                            console.log(e.message);
-//                        }
-//                        return string;
-//                    }
                     $scope.delayLoadLog = function(){
                         if($scope.c.task.id != undefined){
                             TaskService.LogReader($scope.env.id, $scope.project.id, $scope.c.task.id, function(data){
-                                console.log(data)
                                 $scope.logHeader = data.logHeader
                                 $scope.logContent = data.logContent
                                 $scope.logHeaderShow = true
@@ -1051,35 +943,6 @@ define(['angular'], function(angular) {
                     }
                     $scope.delayLoadLog();
                 }]
-//            ,
-//            link: function postLink(scope, iElement, iAttrs) {
-//                scope.$watch('c_index', function () {
-//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-//                        scope.delayLoadLog();
-//                    }
-//                });
-//                scope.$watch('ctab', function () {
-//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-//                        scope.delayLoadLog();
-//                    }
-//                });
-//                scope.$watch('ctabFlag', function () {
-//                    if (scope.ctab == 3 && scope.c_index == scope.$index) {
-//                        scope.delayLoadLog();
-//                    }
-//                });
-//                //历史任务查看
-//                scope.$watch('s_index', function () {
-//                    if (scope.stab == 1 && scope.s_index == scope.$index) {
-//                        scope.delayLoadLog();
-//                    }
-//                });
-//                scope.$watch('stabFlag', function () {
-//                    if (scope.stab == 1 && scope.s_index == scope.$index) {
-//                        scope.delayLoadLog();
-//                    }
-//                });
-//            }
         }
     });
 
@@ -1543,22 +1406,34 @@ define(['angular'], function(angular) {
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.hisTasks = [];
-                    $scope.delayLoadHistory = function() {
+                    $scope.isHisLogShow = [];
 
-                        // todo 下面2个方法在task-controller依赖, 要求传递或者单独实现
-                        // 1. function explainTaskStatus()
-                        // 2. function isObjEmpty()
-
-                        TaskService.findHisTasks($scope.env.id, $scope.project.id, function(data){
-                            $scope.hisTasks = data.map($scope.addStatusTipHistory).map($scope.addShowFlag)
-                        });
-                    };
-
-                    $scope.addShowFlag = function(data){
-                        if(!$scope.isObjEmpty(data)){
-                            $scope.isHisLogShow.push(false)
+                    //解析task status
+                    $scope.explainTaskStatus = function(status){
+                        switch(status){
+                            //未查询到历史任务
+                            case 0 : return "未查询到历史任务"
+                            //执行成功
+                            case 1 : return "执行成功"
+                            //执行失败
+                            case 2 : return "执行失败"
+                            //正在执行
+                            case 3 : return "正在执行"
                         }
-                        return data ;
+                    }
+
+                    //判断对象是否为空
+                    $scope.isObjEmpty = function(obj){
+                        for (var name in obj)
+                        {
+                            return false
+                        }
+                        return true
+                    }
+                    $scope.delayLoadHistory = function() {
+                        TaskService.findHisTasks($scope.env.id, $scope.project.id, function(data){
+                            $scope.hisTasks = data.map($scope.addStatusTipHistory)
+                        });
                     };
 
                     $scope.addStatusTipHistory = function(data){
@@ -1577,40 +1452,23 @@ define(['angular'], function(angular) {
                         return data
                     };
 
-                    $scope.stab = 1 ;
-                    $scope.s_index = -1;
-                    $scope.setSTab =function(stab){
-                        $scope.stab = stab ;
+//------------------------------ log tabs ---------------------------
+                    $scope.hisTabStatus = {}
+
+                    $scope.isHisLogShow = function(sIndex){
+                        return $scope.chooseIndex == sIndex && $scope.hisTabStatus[$scope.chooseIndex + "_" + $scope.sTab];
                     }
-                    $scope.setSIndex =function(sIndex){
-                        $scope.s_index = sIndex ;
+
+                    $scope.showHisLog = function(chooseIndex, sTab, taskId){
+                        $scope.chooseIndex = chooseIndex;
+                        $scope.sTab = sTab;
+                        $scope.hisTabStatus[chooseIndex + "_" + sTab] = !$scope.hisTabStatus[chooseIndex + "_" + sTab];
+                        $scope.c= {task: {id: taskId}};
                     }
-                    $scope.showHisLog = function(index, stab, taskId){
-                        var clusterFlag2 = true;
-                        if($scope.isHisLogShow[index] && $scope.stab == stab){
-                            clusterFlag2 = false;
-                        }
-                        //隐藏其他的index
-                        $scope.isHisLogShow = $scope.isHisLogShow.map(function(q){
-                            return false ;
-                        })
-                        if(clusterFlag2){
-                            $scope.stabFlag = !$scope.stabFlag;
-                            $scope.isHisLogShow[index] = !$scope.isHisLogShow[index];
-                        }
-                        $scope.taskId = taskId
-                        $scope.setSTab(stab);
-                        $scope.setSIndex(index);
-                    }
+
+                    $scope.delayLoadHistory();
                 }
-            ],
-            link: function postLink(scope, iElement, iAttrs){
-                scope.$watch('tab', function () {
-                    if (scope.tab == 6) {
-                        scope.delayLoadHistory();
-                    }
-                });
-            }
+            ]
         }
     });
 

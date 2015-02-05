@@ -2,7 +2,7 @@
 <cluster-properties ng-if="isClusterTabShow(1, cIndex)" project="project" env="env" c="c"></cluster-properties>
 
 <!-- 任务队列 -->
-<task-queue ng-if="isClusterTabShow(2, cIndex)" c="c"></task-queue>
+<task-queue ng-if="isClusterTabShow(2, cIndex)" project="project" c="c"></task-queue>
 
 <!-- 任务日志 -->
 <task-log ng-if="isClusterTabShow(3, cIndex)" c="c" project="project" env="env"></task-log>

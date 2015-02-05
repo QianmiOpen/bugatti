@@ -98,8 +98,12 @@ object TaskController extends BaseController {
     Ok(Json.toJson(result))
   }
 
-  def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
-    MyActor.join()
+//  def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
+//    MyActor.join()
+//  }
+
+  def joinProcess(envId: Int, projectId: Int) = WebSocket.async[JsValue] { request =>
+    MyActor.join(envId, projectId)
   }
 
   def createNewTaskQueue = Action(parse.json) {implicit request =>

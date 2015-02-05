@@ -45,9 +45,9 @@ object MyActor {
     superviseTaskActor ! CreateNewTaskActor(envId, projectId, clusterName)
   }
 
-  def join(): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
+  def join(envId: Int, projectId: Int): scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
 
-    (socketActor ? JoinProcess()).map{
+    (socketActor ? JoinProcess(envId, projectId)).map{
       case ConnectedSocket(out) => {
         val in = Iteratee.foreach[JsValue]{ event =>
           //这个是为了client主动调用
