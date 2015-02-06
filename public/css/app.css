@@ -97,10 +97,6 @@ span.header-version {
     letter-spacing: 0;
     margin: 1px;
 }
-.dropdown-menu {
-    max-height: 300px;
-    overflow: auto;
-}
 
 .progress-mb{
     margin-bottom: 0;
@@ -240,6 +236,46 @@ button {
     margin: 0 3px;
 }
 
+.dropdown-menu {
+    min-width: 180px;
+    max-height: 300px;
+    overflow: auto;
+}
+li.item {
+    position: relative;
+    display: block;
+    padding: 5px;
+    /*margin-bottom: -1px;*/
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+li.item:last-child {
+    border-bottom: 0;
+}
+li.item:hover,
+li.item:focus {
+    text-decoration: none;
+    background-color: #f5f5f5;
+}
+li.item > .badge {
+    background-color: #fff;
+    float: right;
+}
+li.item > .badge + .badge {
+    margin-right: 5px;
+}
+li.item > a {
+    display: inline;
+    padding: 3px;
+    color: #428bca;
+}
+li.item > a:hover,
+li.item > a:focus {
+    color: #428bca;
+    text-decoration: underline;
+    background-color: transparent;
+    background-image:none;
+}
 
 .sub {
     font-size: smaller;

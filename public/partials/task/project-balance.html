@@ -28,8 +28,8 @@
     </tr>
 
     </thead>
-    <tbody ng-repeat="c in project.clusters">
-    <tr>
+    <tbody>
+    <tr ng-repeat="c in project.clusters">
         <td width="10%">
             <a ad="{{env.level}}" class="glyphicon glyphicon-minus-sign" href ng-click="removeCluster(project.id, c.id)"></a>
 
@@ -74,20 +74,9 @@
                         <span class="{{t.css}}"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li ng-repeat="vs in versions">
-                            <!--<a href="" class="dropdown-toggle" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>-->
-                            <table class="table table-striped table-hover" style="margin-bottom: 0px;">
-                                <tbody>
-                                <tr>
-                                    <td width="90%">
-                                        <a href="" class="" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>
-                                    </td>
-                                    <td width="10%">
-                                        <a href="" class="glyphicon glyphicon-exclamation-sign" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)"></a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <li class="item" ng-repeat="vs in versions">
+                            <span class="badge"><a href class="glyphicon glyphicon-exclamation-sign" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)"></a></span>
+                            <a href ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>
                         </li>
                     </ul>
                 </span>
@@ -101,19 +90,9 @@
                         <span class="{{t.css}}"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li ng-repeat="vs in versions">
-                            <table class="table table-striped table-hover" style="margin-bottom: 0px;">
-                                <tbody>
-                                <tr>
-                                    <td width="90%">
-                                        <a href="" class="" ng-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>
-                                    </td>
-                                    <td width="10%">
-                                        <a href="" class="glyphicon glyphicon-exclamation-sign" ng-click="deploy(project.id, vs.id, c.name, t.id)"></a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <li class="item" ng-repeat="vs in versions">
+                            <span class="badge"><a href class="glyphicon glyphicon-exclamation-sign" ng-click="deploy(project.id, vs.id, c.name, t.id)"></a></span>
+                            <a href ng-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>
                         </li>
                     </ul>
                 </span>
