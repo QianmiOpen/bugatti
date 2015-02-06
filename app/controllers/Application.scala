@@ -63,7 +63,6 @@ object Application extends ScalaController with Security {
           UserHelper.create(user, permission)
           Logger.info(s"init new user, jobNo: ${user.jobNo}.")
           Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
-//          NotFound(html.template.ldap_callback_none.render(siteDomain))
       }
     }
   }

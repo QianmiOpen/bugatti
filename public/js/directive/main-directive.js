@@ -855,14 +855,6 @@ define(['angular'], function(angular) {
                     };
                     $scope.delayLoadProperties();
                 }]
-//            ,
-//            link: function postLink(scope, iElement, iAttrs) {
-//                scope.$watch('cIndex', function () {
-//                    if (scope.cTab == 1 && scope.cIndex == scope.$index) {
-//                        scope.delayLoadProperties();
-//                    }
-//                });
-//            }
         }
     });
 

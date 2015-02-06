@@ -198,15 +198,12 @@ object AppTestData {
       Version(None, 1, "1.6.1-RELEASE", new DateTime(2014, 6, 26, 7, 31))
     ).foreach(VersionHelper.create)
 
-    var seq = Seq(
+    val seq = Seq(
       Environment(None, "pytest", None, Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
       Environment(None, "dev", None, Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
       Environment(None, "test", None, Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
       Environment(None, "内测", None, Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master)
     )
-    //    for (i <- 5 to 55) {
-    //      seq = seq :+ Environment(None, s"内测$i", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe)
-    //    }
     seq.foreach(EnvironmentHelper.create)
 
     // 初始化环境关系表
@@ -257,11 +254,6 @@ object AutoUpdate {
         }
       }
 
-//      Play.resourceAsStream(sqlPath).map { in =>
-//        val sql = scala.io.Source.fromInputStream(in, "UTF-8").mkString
-//        Logger.debug(sqlPath + "=" + sql)
-//        session.createStatement().executeUpdate(sql)
-//      }
     }
 
     /**

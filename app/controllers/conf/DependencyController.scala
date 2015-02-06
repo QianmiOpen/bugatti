@@ -1,10 +1,7 @@
 package controllers.conf
 
-import actor.conf.ConfigureActor
 import controllers.BaseController
-import controllers.task.TaskController._
 import models.conf._
-import play.api.Logger
 import play.api.libs.json.{JsValue, JsObject, Json}
 import play.api.mvc.Action
 
@@ -28,7 +25,6 @@ object DependencyController extends BaseController{
     val result = Seq(
       DependencyNest(id, project.name, false, "", project.templateId, dependencyNests)
     )
-// TODO   Logger.info(s"${Json.prettyPrint(Json.toJson(result))}")
     Ok(Json.toJson(result))
   }
 
@@ -46,8 +42,6 @@ object DependencyController extends BaseController{
   }
   def add(fields: Seq[(String, JsValue)]): Int = {
     val fieldsJson = Json.toJson(fields.toMap)
-//    0
-//    TODO
     val p = (fieldsJson \ "parent").as[DependencyNest]
     val c = (fieldsJson \ "child").as[Project]
     try{
