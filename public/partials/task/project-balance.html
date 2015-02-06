@@ -28,8 +28,8 @@
     </tr>
 
     </thead>
-    <tbody>
-    <tr ng-repeat="c in project.clusters">
+    <tbody >
+    <tr ng-repeat-start="c in project.clusters">
         <td width="10%">
             <a ad="{{env.level}}" class="glyphicon glyphicon-minus-sign" href ng-click="removeCluster(project.id, c.id)"></a>
 
@@ -100,7 +100,7 @@
         </td>
     </tr>
 
-    <tr ng-if="isTrShow($index)">
+    <tr ng-repeat-end ng-if="isTrShow($index)">
         <td colspan="6">
             <cluster-tabs c-tab="cTab" c-index="$index" choose-index="chooseIndex" c="c" project="project" env="env" cluster-tab-status="clusterTabStatus"></cluster-tabs>
         </td>
