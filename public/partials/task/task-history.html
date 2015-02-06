@@ -11,7 +11,7 @@
         </tr>
         </thead>
         <tbody ng-if="hisTasks.length > 0">
-            <tr ng-repeat="t in hisTasks">
+            <tr ng-repeat-start="t in hisTasks">
                 <td>{{t.id}}</td>
                 <td>{{t.startTime}}</td>
                 <td>{{t.clusterName}}</td>
@@ -27,7 +27,7 @@
                 </td>
                 <td>{{t.operatorId}}</td>
             </tr>
-            <tr ng-if="isHisLogShow($index)">
+            <tr ng-repeat-end ng-if="isHisLogShow($index)">
                 <td colspan="6">
                     <his-tabs c="c" project="project" env="env" s-tab="sTab" his-tab-status="hisTabStatus" choose-index="chooseIndex" s-index="$index"></his-tabs>
                 </td>
