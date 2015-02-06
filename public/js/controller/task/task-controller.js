@@ -82,7 +82,7 @@ define(['angular'], function(angular) {
 
     }]);
 
-    app.controller('TaskInfoCtrl', ['$scope', '$stateParams', function($scope, $stateParams, ProjectService) {
+    app.controller('TaskInfoCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
             $scope.load.is = true;
 
             $scope.randomKey = function(min, max) {
