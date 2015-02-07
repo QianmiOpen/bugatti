@@ -40,14 +40,20 @@ define(['angular'], function(angular) {
     app.directive('resizable', function($window) {
         return {
             restrict: 'A',
+            scope: {
+                ih:'@ignoreHeight'
+            },
             controller: function($scope) {
-                $scope.ignore_h = angular.isUndefined($scope.ignore_h)? 0 : $scope.ignore_h;
+                this.getwindowHeight = function() {
+                    return $scope.windowHeight;
+                }
             },
             link:function($scope, element, attrs) {
             // On window resize => resize the app
             $scope.initializeWindowSize = function() {
-                $scope.windowHeight = $window.innerHeight - $scope.ignore_h;
+                $scope.windowHeight = $window.innerHeight - $scope.ih;
                 $scope.windowWidth = $window.innerWidth;
+                updateCSS();
             };
 
             angular.element($window).bind('resize', function() {
@@ -58,13 +64,10 @@ define(['angular'], function(angular) {
             // Initiate the resize function default values
             $scope.initializeWindowSize();
 
-            $scope.theStyle = function() {
-                return {
-                    'width': $scope.windowWidth+'px',
-                    'height': $scope.windowHeight+'px',
-                    'background-color': 'violet'
-                };
-            };
+            function updateCSS() {
+                element.css('height', $scope.windowHeight+'px');
+            }
+
         }}
     });
 
@@ -73,10 +76,15 @@ define(['angular'], function(angular) {
         return {
             restrict: 'A',
             require: '^resizable',
-            link: function ($scope, element, attrs) {
-                $scope.$watch("windowHeight", function(value) {
-                    element.height(value);
-                });
+            link: function ($scope, element, attrs, parentCtrl) {
+                $scope.$watch(
+                    function() {
+                        return parentCtrl.getwindowHeight();
+                    },
+                    function(value) {
+                        element.height(value);
+                    }
+                );
             }
         }
     }]);

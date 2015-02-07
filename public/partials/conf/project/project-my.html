@@ -27,33 +27,20 @@
         </thead>
         <tbody>
         <tr ng-repeat="project in projects">
-            <td><a ui-sref="conf.project.version({id: project.id})">{{project.id}}</a></td>
+            <td>{{project.id}}</td>
             <td><a tooltip="{{project.name}}" ui-sref="conf.project.detail({id: project.id})">{{project.name}}</a></td>
             <td>
                 <template-show tid="{{project.templateId}}"></template-show>
             </td>
-            <td class="show">
-                <a tooltip="{{project.lastVersion}}" ui-sref="conf.project.version.conf.list({id: project.id, vid: project.lastVid, eid: envId})" class="a-underline">{{project.lastVersion}}</a>
-                &nbsp;
-                <div class="btn-group" dropdown ng-if="project.subTotal > 0">
-                    <button class="btn btn-default btn-xs dropdown-toggle" type="button" ng-click="vs_all(project.id)">
-                        All ({{project.subTotal}}) <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li ng-repeat="version in versions"><a ui-sref="conf.project.version.conf.list({id: project.id, vid: version.id, eid: envId})">{{version.vs}}</a></li>
-                    </ul>
-                </div>
+            <td >{{project.lastVersion}}
+                <a ng-if="project.lastVersion" ui-sref="conf.project.version({id: project.id})">all({{project.subTotal}})</a>
             </td>
             <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-if="user.role == 'admin'">
-                <a  ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
-                <a  ui-sref="conf.project.dependency({id: project.id})" title="依赖"><span class="glyphicon glyphicon-link"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
             <td ng-if="user.role != 'admin'">
                 <div ng-if="project.id" has-project-safe="{{project.id}}">
-                    <a ng-show="hasProjectSafe_" ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a ng-show="hasProjectSafe_" ui-sref="conf.project.dependency({id: project.id})" title="依赖"><span class="glyphicon glyphicon-link"></span></a>
                     <a ng-show="hasProjectSafe_" ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
             </td>
