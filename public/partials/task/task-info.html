@@ -2,7 +2,10 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
-            <span class="glyphicon glyphicon-home"></span>
+            <a href ng-click="toggleHps()">
+                <i ng-show="model.hps" class="glyphicon glyphicon-resize-full blue"></i>
+                <i ng-hide="model.hps" class="glyphicon glyphicon-resize-small blue"></i>
+            </a>
             <span>{{project.name}}</span>
             <span ng-if="project.description">（{{project.description}}）</span>
         </h3>

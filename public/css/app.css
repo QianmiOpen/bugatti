@@ -57,6 +57,7 @@ code {
 .mt-16 {
     margin-top: -16px;
 }
+.blue { color: #428bca}
 span.header-version {
     font-size: small;
 }
@@ -115,6 +116,7 @@ span.header-version {
 }
 .word-list-item {
     word-break:break-all;
+    position: static;
 }
 
 /* growl*/
