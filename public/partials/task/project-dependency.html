@@ -4,10 +4,9 @@
         <tr>
             <td colspan="3">
                 <form class="form-inline" role="form">
-                    &nbsp;&nbsp;&nbsp;
                     <div class="form-group">
                         <select style="width:300px;" chosen search-contains="true" class="form-control" ng-model="pro" ng-options="p.name + ' -- ' + p.description for p in projects">
-                            <option value="">-- 选择项目 --</option>
+                            <option value="">---------------- 选择项目 ----------------</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-default" ng-click="addDependency(group, pro)">添加</button>
