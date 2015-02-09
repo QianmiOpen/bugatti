@@ -19,6 +19,7 @@ define(['angular'], function(angular) {
         $scope.envs = [];
         $scope.load = { is: true };
         $scope.focus = { is: true };
+        $scope.model = {hps : false};
 
         // keep search value
         if (angular.isDefined($state.params.txt)) {
@@ -83,34 +84,40 @@ define(['angular'], function(angular) {
     }]);
 
     app.controller('TaskInfoCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
-            $scope.load.is = true;
 
-            $scope.randomKey = function(min, max) {
-                return Math.floor(Math.random() * (max - min + 1)) + min;
+        $scope.toggleHps = function() {
+            $scope.model.hps = $scope.model.hps === false ? true: false;
+            //$scope.$parent.$parent.hps= $scope.hps === false ? true: false;
+        };
+
+        $scope.load.is = true;
+
+        $scope.randomKey = function(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        $scope.receiveEvent = function(event){
+            if(event.data.error){
+                console.log("there is errors:" + event.data.error)
+            }else{
+                $scope.$apply(function(){
+                    $scope.tsData = JSON.parse(event.data)
+                })
             }
+        }
 
-            $scope.receiveEvent = function(event){
-                if(event.data.error){
-                    console.log("there is errors:" + event.data.error)
-                }else{
-                    $scope.$apply(function(){
-                        $scope.tsData = JSON.parse(event.data)
-                    })
-                }
-            }
+        $scope.wsInvoke = function(){
+            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+            var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.env.id, $scope.project.id).webSocketURL()
+            $scope.taskSocket = new WS(path)
+            $scope.taskSocket.onmessage = $scope.receiveEvent
+        }
 
-            $scope.wsInvoke = function(){
-                var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-                var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.env.id, $scope.project.id).webSocketURL()
-                $scope.taskSocket = new WS(path)
-                $scope.taskSocket.onmessage = $scope.receiveEvent
-            }
-
-            ProjectService.get($stateParams.pid, function (data) {
-                $scope.project = data;
-                $scope.load.is = false;
-                $scope.wsInvoke();
-            });
+        ProjectService.get($stateParams.pid, function (data) {
+            $scope.project = data;
+            $scope.load.is = false;
+            $scope.wsInvoke();
+        });
     }]);
 
     app.controller('TaskLogCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
