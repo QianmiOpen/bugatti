@@ -1593,6 +1593,9 @@ define(['angular'], function(angular) {
                     };
 
                     $scope.aceLoaded = function(_editor) {
+                        _editor.setOptions({
+                            maxLines: Infinity
+                        });
                         // Editor part
                         var _session = _editor.getSession();
                         var fileName = $scope.conf ? $scope.conf.name : undefined;

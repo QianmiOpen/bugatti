@@ -1,4 +1,4 @@
-<div class="col-sm-8 p0" style="color:#666; font-weight: bold;"><span style="color: #999">~/</span>{{conf.path}}</div>
+<div class="col-sm-8 p0" style="color:#666; font-weight: bold;"><span class="mod">~/</span>{{conf.path}}</div>
 
 <div ng-if="!action" class="navbar-right btn-group btn-group-xs" has-project="{{$stateParams.id}}">
     <button ng-if="confContent.octet == false && hasProject_" ui-sref="conf.project.version.conf.edit({id: $stateParams.id, vid: $stateParams.vid, cid:conf.id})" type="button" class="btn btn-default">编辑</button>
@@ -14,7 +14,7 @@
 
 <div class="clearfix"></div>
 
-<div ng-if="confContent.octet == false" class="col-sm-10 mt15 p0" ng-if="conf.name">
+<div ng-if="conf.name && confContent.octet == false" class="col-sm-9 mt15 p0">
     <div ui-ace="{
           useWrapMode : true,
           showGutter: true,
@@ -23,16 +23,16 @@
         }" ng-model="confContent.content" readonly="true"></div>
 </div>
 
-<div ng-if="confContent.octet == true" class="col-sm-10 mt15 alert alert-warning">二进制文件</div>
+<div ng-if="conf.name && confContent.octet == true" class="col-sm-9 mt15 alert alert-warning">二进制文件</div>
 
-<div class="clearfix"></div>
+<div class="col-sm-3">
+    <div class="mt15">
+        备注：<br/>
+        <pre>{{conf.remark}}</pre>
+    </div>
 
-<div class="mt15 col-sm-10 p0">
-    备注：<br/>
-    <pre>{{conf.remark}}</pre>
-</div>
-
-<div class="mt15 col-sm-10 p0">
-    操作人：<br/>
-    {{conf.jobNo}}
+    <div class="mt15">
+        操作人：<br/>
+        {{conf.jobNo}}
+    </div>
 </div>
