@@ -20,10 +20,11 @@ define(['angular'], function(angular) {
         $scope.load = { is: true };
         $scope.focus = { is: true };
         $scope.model = {hps : false};
+        $scope._search = {name: ''};
 
         // keep search value
         if (angular.isDefined($state.params.txt)) {
-            $scope._search = {name: $state.params.txt};
+            $scope._search.name = $state.params.txt;
         }
 
         // load envs

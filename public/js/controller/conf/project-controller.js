@@ -42,13 +42,6 @@ define(['angular'], function(angular) {
             });
         };
 
-        $scope.vs_all = function(pid) {
-            $scope.versions = [];
-            VersionService.top(pid, function(data) {
-                $scope.versions = data;
-            })
-        };
-
         // remove
         $scope.delete = function(id, index) {
             var modalInstance = $modal.open({

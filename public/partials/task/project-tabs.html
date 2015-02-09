@@ -1,32 +1,30 @@
-<div>
-    <div class="tabs">
-        <ul class="nav nav-tabs">
-            <li ng-class="{ active:isSet(1) }"><a href ng-click="setTab(1)">负载</a></li>
-            <li ng-class="{ active:isSet(2) }"><a href ng-click="setTab(2)">属性</a></li>
-            <li ng-class="{ active:isSet(3) }"><a href ng-click="setTab(3)">配置</a></li>
-            <li ng-class="{ active:isSet(4) }"><a href ng-click="setTab(4)">依赖</a></li>
-            <li ng-class="{ active:isSet(5) }"><a href ng-click="setTab(5)">委员</a></li>
-            <li ng-class="{ active:isSet(6) }"><a href ng-click="setTab(6)">历史任务</a></li>
-        </ul>
-    </div>
+<div class="tabs">
+    <ul class="nav nav-tabs">
+        <li ng-class="{ active:isSet(1) }"><a href ng-click="setTab(1)">负载</a></li>
+        <li ng-class="{ active:isSet(2) }"><a href ng-click="setTab(2)">属性</a></li>
+        <li ng-class="{ active:isSet(3) }"><a href ng-click="setTab(3)">配置</a></li>
+        <li ng-class="{ active:isSet(4) }"><a href ng-click="setTab(4)">依赖</a></li>
+        <li ng-class="{ active:isSet(5) }"><a href ng-click="setTab(5)">委员</a></li>
+        <li ng-class="{ active:isSet(6) }"><a href ng-click="setTab(6)">历史任务</a></li>
+    </ul>
+</div>
 
-    <div class="table-responsive" ng-if="env && project && templates">
-        <!-- Project Balance -->
-        <project-balance ng-if="isSet(1)" active-tab="tab" env="env" project="project" templates="templates" ts-data="tsData"></project-balance>
+<div class="table-responsive" ng-if="env && project && templates">
+    <!-- Project Balance -->
+    <project-balance ng-if="isSet(1)" active-tab="tab" env="env" project="project" templates="templates" ts-data="tsData"></project-balance>
 
-        <!-- Project Item -->
-        <project-item ng-if="isSet(2)" active-tab="tab" expander-env="env" expander-project="project"></project-item>
+    <!-- Project Item -->
+    <project-item ng-if="isSet(2)" active-tab="tab" expander-env="env" expander-project="project"></project-item>
 
-        <!-- Project Conf -->
-        <project-conf ng-if="isSet(3)" active-tab="tab" expander-env="env" expander-envs="envs" expander-project="project"></project-conf>
+    <!-- Project Conf -->
+    <project-conf ng-if="isSet(3)" active-tab="tab" expander-env="env" expander-envs="envs" expander-project="project"></project-conf>
 
-        <!-- Project dependency -->
-        <project-dependency ng-if="isSet(4)" active-tab="tab" expander-project="project"></project-dependency>
+    <!-- Project dependency -->
+    <project-dependency ng-if="isSet(4)" active-tab="tab" expander-project="project"></project-dependency>
 
-        <!-- project member -->
-        <project-member ng-if="isSet(5)" active-tab="tab" expander-project="project"></project-member>
+    <!-- project member -->
+    <project-member ng-if="isSet(5)" active-tab="tab" expander-project="project"></project-member>
 
-        <!-- history tasks -->
-        <project-history ng-if="isSet(6)" active-tab="tab" expander-env="env" expander-project="project"></project-history>
-    </div>
+    <!-- history tasks -->
+    <project-history ng-if="isSet(6)" active-tab="tab" expander-env="env" expander-project="project"></project-history>
 </div>

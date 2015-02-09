@@ -57,6 +57,7 @@ code {
 .mt-16 {
     margin-top: -16px;
 }
+.mod { color: #999}
 .blue { color: #428bca}
 span.header-version {
     font-size: small;
@@ -110,7 +111,6 @@ span.header-version {
 }
 
 .word-list {
-    max-height: 550px;
     overflow: auto;
 
 }

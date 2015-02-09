@@ -1,30 +1,19 @@
 <form name="newForm" class="form-horizontal" novalidate>
     <table class="table table-striped border-less">
         <tr>
-            <td class="col-sm-9" style="vertical-align: middle">
-                <span style="color: #999">~/</span>
-                <input ng-model="conf.path" class="form-control" style="width:70%; display:inline;" name="path" id="path" required maxlength="200" ng-pattern="/^.+[^\/]$/" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
+            <td class="col-sm-9">
+                <span class="mod">~/</span>
+                <input ng-model="conf.path" class="form-control" style="width:50%; display:inline;" name="path" id="path" required maxlength="200" ng-pattern="/^.+[^\/]$/" placeholder="文件的完整路径及名称，例如：tomcat/conf/jdbc.properties"/>
+
                 <span class="has-error" ng-show="newForm.path.$dirty && newForm.path.$invalid">
                     <span ng-show="newForm.path.$error.required" class="control-label">请输入文件（路径）名称</span>
                     <span ng-show="newForm.path.$error.pattern" class="control-label">无效的（路径）名称</span>
                     <span ng-show="newForm.path.$error.exists" class="control-label">文件冲突</span>
                 </span>
-            </td>
-            <td rowspan="4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">系统属性
-                        <a href="" tooltip-placement="left" tooltip="编辑器快捷键:   F1 或 ⌘&#9166;">?</a>
-                        <input type="text" ng-model="s_word">
-                    </div>
-                    <ul class="list-group word-list">
-                        <li class="list-group-item word-list-item" ng-repeat="w in wordList | filter:s_word">{{w.word + ':' + w.meta}}</li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div ui-ace="{
+
+                <div class="clearfix mt15"></div>
+
+                <div resizable ignore-height="420" ui-ace="{
                 useWrapMode : true,
                 showGutter: true,
                 theme:'twilight',
@@ -32,22 +21,25 @@
                 onChange: aceChanged
                 }" ng-model="conf.content"></div>
             </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="col-sm-2 control-label">描述：</label>
-                <div class="col-sm-10">
+
+            <td class="col-sm-3">
+                <div class="m0">
+                    <input class="form-control" type="text" ng-model="s_word" placeholder="检索系统属性">
+                    <ul class="list-group word-list m0" resizable ignore-height="550">
+                        <li class="list-group-item word-list-item" ng-repeat="w in wordList | filter:s_word">{{w.word + ':' + w.meta}}</li>
+                    </ul>
+                </div>
+                <div class="mt15">
+                    <label class="control-label">备注：</label>
                     <textarea ng-model="conf.remark" class="form-control" rows="3" placeholder="对文件的备注内容，选填。" maxlength="500"></textarea>
                 </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="text-right">
-                    <button class="btn btn-success col-sm-2 navbar-right" ng-click="save()" ng-disabled="newForm.$invalid"> 添加新文件 </button>
+                <div class="mt15">
+                    <button class="btn btn-success" ng-click="save()" ng-disabled="newForm.$invalid"> 添加新文件 </button>
                 </div>
             </td>
+
         </tr>
+
     </table>
 
 </form>
