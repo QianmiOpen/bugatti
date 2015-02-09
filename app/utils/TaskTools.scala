@@ -128,7 +128,20 @@ object TaskTools {
 
     val project = findProject(envId, projectId, env.realVersion)
     val d = findDependencies_v(envId, projectId, env.realVersion)
-    new ProjectTask_v(project, d, env, s"$taskId", version, s"${getFileName()}", None, ConfHelp.system)
+
+    val saltComponent = ScriptVersionHelper.findByName(env.realVersion) match {
+      case Some(sv) =>
+        var json = Json.obj()
+        ComponentMd5sumHelper.findByScriptVersionId(sv.id.get).foreach {
+          t =>
+            json ++= Json.obj(t.componentName -> t.md5sum)
+        }
+        json
+      case _ =>
+        Logger.error(s"${env.realVersion} 找不到相应的版本")
+        Json.parse("{}").as[JsObject]
+    }
+    new ProjectTask_v(project, d, env, s"$taskId", version, s"${getFileName()}", None, ConfHelp.system, saltComponent = saltComponent)
   }
 
   def generateCurrent(machine: String, task: ProjectTask_v): Host_v = {
@@ -162,6 +175,8 @@ object ConfHelp {
 
   lazy val confPath: String = app.configuration.getString("salt.file.pkgs").getOrElse("target/pkgs")
 
+  lazy val componentIgnore: Seq[String] = app.configuration.getStringSeq("git.formulas.componentIgnore").getOrElse(Seq.empty[String])
+
   lazy val system: Map[String, String] = {
     app.configuration.keys.filter(_.startsWith("bugatti.system.")).map { key =>
       key.replace("bugatti.system.", "") -> app.configuration.getString(key).getOrElse("")
@@ -185,14 +200,16 @@ case class ProjectTask_v(id: String, templateId: String, name: String, hosts: Se
                          dependence: Map[String, Project_v], env: Environment_v,
                          taskId: String, version: Option[Version_v], confFileName: String,
                          cHost: Option[Host_v], system: Map[String, String],
-                         taskName: String, grains: JsObject = Json.parse("{}").as[JsObject]) {
+                         taskName: String,
+                         grains: JsObject = Json.parse("{}").as[JsObject],
+                         saltComponent: JsObject =Json.parse("{}").as[JsObject]) {
   def this(project: Project_v, dependence: Map[String, Project_v], env: Environment_v,
            taskId: String, version: Option[Version_v], confFileName: String,
-           cHost: Option[Host_v], system: Map[String, String]) =
+           cHost: Option[Host_v], system: Map[String, String], saltComponent: JsObject) =
     this(project.id, project.templateId, project.name, project.hosts,
       project.attrs, project.alias,
       project.leaders, project.members,
       dependence, env,
       taskId, version, confFileName,
-      cHost, system, "", Json.parse("{}").as[JsObject])
+      cHost, system, "", Json.parse("{}").as[JsObject], saltComponent)
 }

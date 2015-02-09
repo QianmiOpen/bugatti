@@ -33,6 +33,10 @@ object ScriptVersionHelper {
     qScriptVersion.list
   }
 
+  def findByName(name: String): Option[ScriptVersion] = db withSession {implicit session =>
+    qScriptVersion.filter(_.name === name).firstOption
+  }
+
   def allName(): Seq[String] = db withSession { implicit session =>
     all().map(_.name)
   }

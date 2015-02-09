@@ -263,6 +263,7 @@ object AutoUpdate {
   }
 
   val versions = Seq(
+    Version(1, 12),
     Version(1, 11),
     Version(1, 10),
     Version(1, 9),
