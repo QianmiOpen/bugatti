@@ -80,7 +80,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         log.info(s"doif is $doif")
         val (flag, result) = engine.eval(doif)
         if(doif == "" || (flag && result == "true")){
-          commandOver(taskInfo.taskId, s"命令(${command.sls}):${command.command}")
+          commandOver(taskInfo.taskId, s"命令(${command.sls}):${command.command}  doIf: ${doif}")
           MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
           executeSalt(taskInfo.taskId, command, taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
         } else {
@@ -95,6 +95,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         goto(Finish) using data.copy(status = TaskEnum.TaskSuccess)
       }
     case Event(ssr: SaltStatusResult, data: CommandStatus) => {
+
       if(!ssr.canPing){
         commandOver(data.taskInfo.taskId, "远程ip ping不通!")
         goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
@@ -108,7 +109,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
           commandOver(data.taskInfo.taskId, "grains为空")
           goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
         }else {
-          val taskObj = data.taskObj.copy(grains = Json.parse(ssr.mmInfo).as[JsObject])
+          val taskObj = data.taskObj.copy(grains = (Json.parse(ssr.mmInfo).as[JsObject] \ "result" \ "return").as[JsObject])
           log.info(Json.prettyPrint(taskObj.grains))
           commandOver(taskInfo.taskId, Json.prettyPrint(taskObj.grains))
           self ! Execute()

@@ -16,8 +16,11 @@ import org.eclipse.jgit.api.ListBranchCommand.ListMode
 import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import play.api.Logger
+import utils.ConfHelp
 
 import scala.collection.JavaConverters._
+import sys.process._
+import scala.language.postfixOps
 
 /**
  * Created by mind on 7/24/14.
@@ -79,6 +82,11 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
           if (!ScriptVersionHelper.isSameBranch(branchName, branchId)){
             _loadTemplateFromDir(branchName)
             ScriptVersionHelper.updateVersionByName(ScriptVersion(None, branchName, message = Some(branchId)))
+
+            //TODO 更新分支下的组件MD5
+            val seq = ScriptVersionHelper.all()
+            _loadComponentMd5(branchName, seq)
+
           }
         }
       }
@@ -104,6 +112,24 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
       log.debug(s"Load file: ${file}")
       _initFromYaml(file, branchName)
     }
+  }
+
+  def _loadComponentMd5(branchName: String, seq: Seq[ScriptVersion]) {
+    log.debug(s"Load branch component: ${branchName}")
+    val scriptDir = new File(s"${gitFormulasDir.getAbsolutePath}")
+    scriptDir.listFiles(new FileFilter {
+      override def accept(pathname: File): Boolean = !_checkComponentIgnore(pathname.getName)
+    }).foreach { file =>
+      log.debug(s"Load file md5sum: ${file}")
+      val md5sum = (s"find ${file.getAbsolutePath} -type f -exec md5sum {} +" #| "sort" #| "md5sum" !!)
+      log.debug(s"Load file : ${file}, md5sum: ${md5sum}")
+      val scriptVersionId = seq.filter(_.name == branchName).head.id
+      ComponentMd5sumHelper.update(ComponentMd5sum(None, 0, scriptVersionId.getOrElse(0), file.getName(), md5sum))
+    }
+  }
+
+  def _checkComponentIgnore(pathName: String): Boolean ={
+    ConfHelp.componentIgnore.contains(pathName)
   }
 
   def _getProjectIdFromProjectName(typeName: String, projectName: String): Int = {

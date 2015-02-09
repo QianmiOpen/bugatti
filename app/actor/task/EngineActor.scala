@@ -20,6 +20,48 @@ import scala.language.postfixOps
 /**
  * Created by jinwei on 21/8/14.
  */
+
+object EngineActor{
+  def getContentKeys(content: String): Seq[String] = {
+    var retSeq = Seq.empty[String]
+    var num = 0
+    var key = ""
+    var bAppend = false
+    var lastLeft= false
+    var stopNum = 0
+    content.foreach { c =>
+      if (c == '{') {
+        num += 1
+        if (lastLeft) {
+          bAppend = true
+          stopNum = num
+        }
+        lastLeft = true
+      } else {
+        lastLeft = false
+        if(!bAppend){
+          num = 0
+          stopNum = 0
+        }
+      }
+
+      if (c == '}' && num > 0) {
+        num -= 1
+        if (num == stopNum - 1) {
+          bAppend = false
+          retSeq = retSeq :+ key.drop(1)
+          key = ""
+        }
+      }
+
+      if (bAppend) {
+        key = s"$key$c"
+      }
+    }
+//    log.info(s"config keys ==> ${retSeq.toSet}")
+    retSeq.toSet.toSeq
+  }
+}
 class EngineActor(timeout: Int) extends Actor with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
@@ -69,7 +111,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       replaceCommand.templateStep.foreach { templateStep =>
         //命令
         var command = templateStep.sls
-        getContentKeys(command).foreach { key =>
+        EngineActor.getContentKeys(command).foreach { key =>
           _lastReplaceKey = key
           val (ret, value) = engine.eval(key)
           if (ret) {
@@ -80,25 +122,26 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
           }
         }
         //doif
-        var doif = ""
-        templateStep.doIf match {
-          case Some(d) =>
-            doif = d
-            getContentKeys(doif).foreach { key =>
-              _lastReplaceKey = key
-              val (ret, value) = engine.eval(key)
-              if (ret) {
-                doif = doif.replaceAll(Pattern.quote(s"{{${key}}}"), value)
-              } else {
-                errors += s"${key}: ${value}"
-                log.error(value)
-              }
-            }
-          case _ =>
-            doif = ""
-        }
-
-        taskDoif = taskDoif :+ doif
+//        var doif = ""
+//        templateStep.doIf match {
+//          case Some(d) =>
+//            doif = d
+//            getContentKeys(doif).foreach { key =>
+//              _lastReplaceKey = key
+//              val (ret, value) = engine.eval(key)
+//              if (ret) {
+//                doif = doif.replaceAll(Pattern.quote(s"{{${key}}}"), value)
+//              } else {
+//                errors += s"${key}: ${value}"
+//                log.error(value)
+//              }
+//            }
+//          case _ =>
+//            doif = ""
+//        }
+//
+//        taskDoif = taskDoif :+ doif
+        taskDoif = taskDoif :+ templateStep.doIf.getOrElse("")
         taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, command, hostname, templateStep.name, TaskEnum.TaskWait, templateStep.orderNum)
       }
 
@@ -198,7 +241,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     var errors = Set.empty[String]
     if (!conf.octet) {
       var content = new String(conf.content, "UTF8")
-      getContentKeys(content).foreach {
+      EngineActor.getContentKeys(content).foreach {
         key =>
           _lastReplaceKey = key
           val (ret, value) = engine.eval(key)
@@ -217,46 +260,6 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
     } else {
       return (true, "")
     }
-  }
-
-  def getContentKeys(content: String): Seq[String] = {
-    var retSeq = Seq.empty[String]
-    var num = 0
-    var key = ""
-    var bAppend = false
-    var lastLeft= false
-    var stopNum = 0
-    content.foreach { c =>
-      if (c == '{') {
-        num += 1
-        if (lastLeft) {
-          bAppend = true
-          stopNum = num
-        }
-        lastLeft = true
-      } else {
-        lastLeft = false
-        if(!bAppend){
-          num = 0
-          stopNum = 0
-        }
-      }
-
-      if (c == '}' && num > 0) {
-        num -= 1
-        if (num == stopNum - 1) {
-          bAppend = false
-          retSeq = retSeq :+ key.drop(1)
-          key = ""
-        }
-      }
-
-      if (bAppend) {
-        key = s"$key$c"
-      }
-    }
-    log.info(s"config keys ==> ${retSeq.toSet}")
-    retSeq.toSet.toSeq
   }
 }
 
