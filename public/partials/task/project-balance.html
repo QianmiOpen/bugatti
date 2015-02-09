@@ -54,8 +54,8 @@
             </a>
         </td>
         <td style="padding:10px 0px 0px 0px;">
-            <a ng-show="showTaskHref(c.task.status)" ng-click="chooseClusterTab(3, $index, c.task.id)" href="">{{c.task.endTime}}  {{c.task.statusTip}}!   <span ng-show="showVersionTitle(c.task.version)">版本号：</span>{{c.task.version}}   <span ng-show="showTaskNameTitle(c.task.taskName)">任务:</span> {{c.task.taskName}}</a>
-            <span ng-show="showTaskText(c.task.status)">{{c.task.endTime}}  {{c.task.statusTip}}!   <span ng-show="showVersionTitle(c.task.version)">版本号：</span>{{c.task.version}}   <span ng-show="showTaskNameTitle(c.task.taskName)">任务:</span> {{c.task.taskName}}</span>
+            <a ng-show="showTaskHref(c.task.status)" ng-click="chooseClusterTab(3, $index, c.task.id)" href="">{{c.task.endTime}}  {{c.task.statusTip}}!  {{c.task.version}}    {{c.task.taskName}}</a>
+            <span ng-show="showTaskText(c.task.status)">{{c.task.endTime}}  {{c.task.statusTip}}! {{c.task.version}}   <span ng-show="showTaskNameTitle(c.task.taskName)">任务:</span> {{c.task.taskName}}</span>
             <div>
                 <span ng-show="showTaskProgress(c.task.status)" >机器 {{c.task.command.machine}}  {{c.task.statusTip}} : {{c.task.command.sls}} </span>
             </div>
@@ -65,7 +65,7 @@
             </div>
         </td>
         <td>
-            <a title="catalina日志" href="" ng-click="chooseClusterTab(4, $index, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
+            <a ng-show="false" title="catalina日志" href="" ng-click="chooseClusterTab(4, $index, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
             <a ng-show="showTaskProgress(c.task.status)" title="终止本次任务" href="" ng-click="forceTerminate(project.id, c.name)"><span class="glyphicon glyphicon-remove"></span></a>
         </td>
         <td class="show">

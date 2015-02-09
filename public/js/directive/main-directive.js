@@ -430,6 +430,7 @@ define(['angular'], function(angular) {
                 function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService, $modal, ProjectService){
                     $scope.cTab = -1 ;
                     $scope.count = 0;
+
                     //------------------- 绑定 / 解绑 -------------------------
                     $scope.addCluster = function(pid, envId, _ip) {
                         _ip = typeof _ip === 'object' ? _ip.ip : _ip; // fix bug
@@ -589,6 +590,9 @@ define(['angular'], function(angular) {
                         })
                         //-------操作按钮展示---------
                         $scope.project.templates = $scope.templates[$scope.project.templateId]
+                        VersionService.getVersions($scope.project.id, $scope.env.id, function(data){
+                            $scope.versions = data
+                        })
                     }
 
                     $scope.showVm($scope.project.id);
@@ -600,19 +604,19 @@ define(['angular'], function(angular) {
 
 //--------------------------------------- 操作按钮逻辑 -----------------------------------------
 
-                    $scope.showVersion = function(pid){
-                        $scope.versions = []
-                        VersionService.getVersions(pid, $scope.env.id, function(data){
-                            $scope.versions = data
-                        })
-                    }
+//                    $scope.showVersion = function(pid){
+//                        $scope.versions = []
+//                        VersionService.getVersions(pid, $scope.env.id, function(data){
+//                            $scope.versions = data
+//                        })
+//                    }
 
                     $scope.showMenu = function(versionMenu, projectId, clusterName, templateId){
                         if(!versionMenu){
                             $scope.deploy(projectId, null, clusterName, templateId)
                         } else {//部署
                             $scope.choosedTemplateId = templateId
-                            $scope.showVersion(projectId)
+//                            $scope.showVersion(projectId)
                         }
                     }
 
