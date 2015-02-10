@@ -82,6 +82,34 @@ define(['angular'], function(angular) {
             })
         }
 
+        $scope.closeWS = function(){
+            console.log("[in TaskInfoCtrl] $scope.closeWS is invoked")
+            console.log($scope.taskSocket)
+            if($scope.taskSocket){
+                console.log("[in TaskInfoCtrl] $scope.taskSocket is closing")
+                $scope.taskSocket.close();
+            }
+        }
+
+        $scope.receiveEvent = function(event){
+            if(event.data.error){
+                console.log("there is errors:" + event.data.error)
+            }else{
+                $scope.$apply(function(){
+                    $scope.tsData = JSON.parse(event.data)
+                })
+            }
+        }
+
+        $scope.wsInvoke = function(){
+            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
+            var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.env.id, $state.params.pid).webSocketURL();
+
+            $scope.closeWS();
+            $scope.taskSocket = new WS(path);
+            $scope.taskSocket.onmessage = $scope.receiveEvent;
+        }
+
     }]);
 
     app.controller('TaskInfoCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
@@ -97,213 +125,10 @@ define(['angular'], function(angular) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        $scope.receiveEvent = function(event){
-            if(event.data.error){
-                console.log("there is errors:" + event.data.error)
-            }else{
-                $scope.$apply(function(){
-                    $scope.tsData = JSON.parse(event.data)
-                })
-            }
-        }
-
-        $scope.wsInvoke = function(){
-            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-            var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.env.id, $scope.project.id).webSocketURL()
-            $scope.taskSocket = new WS(path)
-            $scope.taskSocket.onmessage = $scope.receiveEvent
-        }
-
         ProjectService.get($stateParams.pid, function (data) {
             $scope.project = data;
             $scope.load.is = false;
             $scope.wsInvoke();
         });
-    }]);
-
-    app.controller('TaskLogCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
-        var taskId = $stateParams.taskId
-
-        $scope.envId_search = $stateParams.envId
-        $scope.envName_search = $stateParams.envName
-
-        $scope.proId_search = $stateParams.proId
-        $scope.proName_search = $stateParams.proName
-
-
-        var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-        var path = PlayRoutes.controllers.task.TaskController.taskLog(taskId).webSocketURL()
-        var logSocket = new WS(path)
-
-        $scope.message = ""
-        $scope.data = ""
-        $scope.logFirst = ""
-        $scope.logHeader = ""
-
-        $scope.receiveEvent = function(event){
-            $scope.data = JSON.parse(event.data)
-            if(event.data.error){
-                console.log("there is errors:"+event.data.error)
-            }else{
-                $scope.$apply(function () {
-                    var data = $scope.data
-                    if(data.taskId == taskId){
-                        if(data.kind == "logFirst"){
-                            if(!$scope.logFirstHidden && data.message.split(" ")[0] == 0){
-                                $scope.logFirstHidden = true
-                            }
-                            if($scope.logFirst.length == 0){
-                                $scope.logFirst = data.message
-                            }
-                        }else if(data.kind == "logHeader"){
-                            $scope.logFirstHidden = true
-                            if($scope.logHeader.length == 0){
-                                $scope.logHeader = data.message
-                                $scope.message = $scope.logHeader + $scope.message
-                            }
-                        }else{
-                            if($scope.message.length == 0){
-                                $scope.message = data.message
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        logSocket.onmessage = $scope.receiveEvent
-
-        $scope.closeWs = function(){
-            logSocket.close()
-            $scope.returnList()
-        }
-
-        $scope.logFirstHidden = false
-
-        $scope.showHiddenMessage = function(){
-            var len = parseInt($scope.logFirst.split(" ")[0])
-            TaskService.readHeader(taskId, len, function(){})
-        }
-
-        $scope.TransferString = function(content)
-        {
-            var string = content;
-            try{
-                string=string.replace(/\r\n/gi,"<br>");
-                string=string.replace(/\n/gi,"<br>");
-            }catch(e) {
-                console.log(e.message);
-            }
-            return string;
-        }
-
-        $scope.returnList = function(){
-            $state.go('^.^.task',{'envId': $scope.envId_search, 'proId': $scope.proId_search, 'envName': $scope.envName_search, 'proName': $scope.proName_search})
-        }
-
-    }]);
-
-    app.controller('Task3InfoCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
-        $scope.taskId = $stateParams.taskId
-
-        $scope.envId_search = $stateParams.envId
-        $scope.envName_search = $stateParams.envName
-
-        $scope.proId_search = $stateParams.proId
-        $scope.proName_search = $stateParams.proName
-
-        TaskService.find($scope.taskId, function(data){
-            $scope.operateName = data.taskOperate.name
-            $scope.environmentName = data.environment.name
-            $scope.projectName = data.project.name
-            $scope.version = data.task.version
-            $scope.machines = data.taskMachine
-        })
-
-        $scope.returnList = function(){
-            $state.go('^.^.task',{'envId': $scope.envId_search, 'proId': $scope.proId_search, 'envName': $scope.envName_search, 'proName': $scope.proName_search})
-        }
-
-    }]);
-
-
-    app.controller('TaskQueueCtrl',['$scope', 'TaskService','$state','$stateParams',function($scope,TaskService,$state,$stateParams){
-        $scope.taskQueues = []
-
-        $scope.envId_search = $stateParams.envId
-        $scope.projectId_search = $stateParams.projectId
-
-        $scope.randomKey = function(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        $scope.wsInvoke = function(){
-            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-            var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.randomKey(1,10000)).webSocketURL()
-            $scope.taskSocket = new WS(path)
-            $scope.taskSocket.onmessage = $scope.receiveEvent
-        }
-
-        $scope.receiveEvent = function(event){
-            $scope.taskQueues = []
-            $scope.tsData = JSON.parse(event.data)
-            if(event.data.error){
-                console.log("there is errors:"+event.data.error)
-            }else{
-                $scope.$apply(function(){
-                    var tsData = $scope.tsData
-
-                    var key = $scope.envId_search + "_" + $scope.projectId_search
-                    var taskQueues = tsData[key]
-
-                    $scope.taskQueues = taskQueues.queues.map($scope.addStatusTip)
-                })
-            }
-        }
-
-        //1、创建socket连接
-        $scope.wsInvoke()
-
-        $scope.removeQueue = function(qid){
-            TaskService.removeTaskQueue(qid, function(data){
-                //如果删除的任务在一瞬间刚好变为正在执行，应告知
-            })
-        }
-
-        $scope.addStatusTip = function(data){
-            if(!$scope.isObjEmpty(data)){
-                data.statusName = $scope.explainStatus(data.status)
-            } else {
-                data.status.statusTip = "N/A"
-            }
-            return data
-        }
-
-        $scope.explainStatus = function(status){
-            switch(status){
-                //等待执行
-                case 0 : return "等待执行"
-                //执行成功
-                case 1 : return "执行成功"
-                //执行失败
-                case 2 : return "执行失败"
-                //正在执行
-                case 3 : return "正在执行"
-            }
-        }
-
-        //判断对象是否为空
-        $scope.isObjEmpty = function(obj){
-            for (var name in obj)
-            {
-                return false
-            }
-            return true
-        }
-
-        $scope.returnList = function(){
-            $state.go('^.^.task',{'envId': $scope.envId_search})
-        }
-
     }]);
 });
