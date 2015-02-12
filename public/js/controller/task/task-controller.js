@@ -11,8 +11,10 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('TaskCtrl', ['$scope', '$state', '$stateParams', 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
-        function($scope, $state, $stateParams, EnvService, ProjectService, AreaService, TaskService) {
+    app.controller('TaskCtrl', ['$scope', '$state', '$stateParams', "$interval", "Auth", 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
+        function($scope, $state, $stateParams, $interval, Auth, EnvService, ProjectService, AreaService, TaskService) {
+
+        keepSession($scope, $interval, Auth);
 
         // init
         $scope.env = {};
