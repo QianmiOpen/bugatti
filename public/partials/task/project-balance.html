@@ -79,8 +79,8 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li class="item" ng-repeat="vs in versions">
-                            <span class="badge"><a href class="glyphicon glyphicon-exclamation-sign" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)"></a></span>
-                            <a href ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>
+                            <span class="badge"><a href class="glyphicon glyphicon-exclamation-sign" ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id, 1)"></a></span>
+                            <a href ng-really-message="【警告】安全环境，你确定这么做？" ng-really-click="deploy(project.id, vs.id, c.name, t.id, 0)">{{vs.vs}}</a>
                         </li>
                     </ul>
                 </span>
@@ -95,8 +95,8 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li class="item" ng-repeat="vs in versions">
-                            <span class="badge"><a href class="glyphicon glyphicon-exclamation-sign" ng-click="deploy(project.id, vs.id, c.name, t.id)"></a></span>
-                            <a href ng-click="deploy(project.id, vs.id, c.name, t.id)">{{vs.vs}}</a>
+                            <span class="badge"><a href class="glyphicon glyphicon-exclamation-sign" ng-click="deploy(project.id, vs.id, c.name, t.id, 1)"></a></span>
+                            <a href ng-click="deploy(project.id, vs.id, c.name, t.id, 0)">{{vs.vs}}</a>
                         </li>
                     </ul>
                 </span>

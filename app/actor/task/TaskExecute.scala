@@ -160,6 +160,7 @@ class TaskExecute extends Actor with ActorLogging {
       _commandList = _commandList ++ successReplace.commandList
       _taskDoifList = _taskDoifList ++ successReplace.taskDoif
       log.info(s"successReplace ==> ${_commandList}")
+      log.info(s"_taskDoifList ==> ${_taskDoifList}")
       self ! GenerateCommands(successReplace.tq, successReplace.templateStep, successReplace.hosts, successReplace.hostsIndex, successReplace.taskObj)
     }
 
@@ -179,7 +180,7 @@ class TaskExecute extends Actor with ActorLogging {
       val key = taskKey(sc.tq.envId, sc.tq.projectId, sc.tq.clusterName)
       context.child(s"commandActor_${key}").getOrElse(
         actorOf(Props[CommandFSMActor], s"commandActor_${key}")
-      ) ! Insert(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName, _taskDoifList)
+      ) ! Insert(sc.taskObj.taskId.toInt, sc.tq.envId, sc.tq.projectId, sc.tq.versionId, _commandList, _json, sc.taskObj, sc.tq.clusterName, _taskDoifList, sc.tq.force)
     }
 
     case rtq: RemoveTaskQueue => {

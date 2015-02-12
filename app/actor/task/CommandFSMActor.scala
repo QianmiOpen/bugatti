@@ -10,12 +10,13 @@ import akka.actor.SupervisorStrategy.Escalate
 import akka.actor._
 import actor.task.CommandFSMActor._
 import com.qianmi.bugatti.actors._
-import enums.TaskEnum
+import enums.TaskExeEnum.TaskExeWay
+import enums.{TaskExeEnum, TaskEnum}
 import enums.TaskEnum._
 import models.conf.VersionHelper
 import models.task.{Task, TaskHelper, TaskCommand}
 import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
-import utils.{ScriptEngineUtil, ConfHelp, ProjectTask_v}
+import utils.{Md5sum, ScriptEngineUtil, ConfHelp, ProjectTask_v}
 import scala.sys.process._
 import scala.language.postfixOps
 import scala.concurrent.duration._
@@ -33,7 +34,7 @@ object CommandFSMActor{
 }
 
 case class TaskInfo(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], clusterName: Option[String])
-case class CommandStatus(commands: Seq[TaskCommand], taskDoif: Seq[String], commandSeq: Seq[String], order: Int, taskObj: ProjectTask_v, jid: String, taskInfo: TaskInfo, json: JsObject, engine: ScriptEngineUtil, status: TaskStatus)
+case class CommandStatus(commands: Seq[TaskCommand], taskDoif: Seq[String], commandSeq: Seq[String], order: Int, taskObj: ProjectTask_v, jid: String, taskInfo: TaskInfo, json: JsObject, engine: ScriptEngineUtil, status: TaskStatus, force: TaskExeWay)
 
 class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
 
@@ -48,7 +49,10 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
   val _baseLogPath = ConfHelp.logPath
   var _baseDir = ""
 
-  startWith(Init, CommandStatus(Seq.empty[TaskCommand], Seq.empty[String], Seq.empty[String], 0, null, "", null, null, null, TaskEnum.TaskProcess))
+  val SALT_COMPONENT = "saltComponent."
+  val GRAINS_SALT_COMPONENT = "grains."
+
+  startWith(Init, CommandStatus(Seq.empty[TaskCommand], Seq.empty[String], Seq.empty[String], 0, null, "", null, null, null, TaskEnum.TaskProcess, TaskExeEnum.TaskExeJudge))
 
   when(Init, stateTimeout = 10 second){
     case Event(insert: Insert, data: CommandStatus) =>
@@ -56,7 +60,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       _baseDir = s"${`_baseLogPath`}/${_taskInfo.envId}/${_taskInfo.projectId}/${_taskInfo.taskId}"
       val engine = new ScriptEngineUtil(insert.taskObj, _taskInfo.clusterName)
       val taskObj = engine.setCHost
-      val commandStatus = data.copy(commands = insert.commandList, taskDoif = insert.taskDoif, taskObj = taskObj, taskInfo = _taskInfo, json = insert.json, engine = engine)
+      val commandStatus = data.copy(commands = insert.commandList, taskDoif = insert.taskDoif, taskObj = taskObj, taskInfo = _taskInfo, json = insert.json, engine = engine, force = insert.force)
 
       if (commandStatus.commands.isEmpty) {
         goto(Failure) using commandStatus.copy(status = TaskEnum.TaskFailed)
@@ -78,18 +82,50 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         val command = data.commands(data.order)
         val doif = data.taskDoif(data.order)
         log.info(s"doif is $doif")
-        val (flag, result) = engine.eval(doif)
-        if(doif == "" || (flag && result == "true")){
-          commandOver(taskInfo.taskId, s"命令(${command.sls}):${command.command}  doIf: ${doif}")
-          MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
-          executeSalt(taskInfo.taskId, command, taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
-        } else {
-          commandOver(taskInfo.taskId, s"${command}跳过执行,原因:${doif}")
-          //更新taskCommand状态
-          context.parent ! UpdateCommandStatus(taskInfo.taskId, data.order, TaskEnum.TaskPass)
-          //执行下一个任务
-          self ! Execute()
+        log.info(s"data.force is ${data.force}")
+        data.force match {
+          case TaskExeEnum.TaskExeJudge =>
+            doif match {
+              case d: String if !d.isEmpty  =>
+                val (flagComponent, result) = engine.eval(s"${SALT_COMPONENT}${doif.substring(0, doif.lastIndexOf(".")).replaceAll(".md5sum", "")}")
+                val (flagGrains, resultGrains) = engine.eval(s"${GRAINS_SALT_COMPONENT}${doif}")
+                log.info(s"egine eval :${flagComponent} $result")
+                log.info(s"egine2 eval :${resultGrains} $resultGrains")
+                //重新计算md5sum (scriptVersion + component.md5 + sls)
+                var md5sum4Compare = ""
+                if(flagComponent){
+                  md5sum4Compare = Md5sum.bytes2hex(Md5sum.md5(s"${data.taskObj.env.scriptVersion}${result}${command.command}"))
+                }else {
+                  commandOver(taskInfo.taskId, s"${SALT_COMPONENT}${doif} component md5 eval failed!")
+                  goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
+                }
+                //grains不管是否获取到值都要比较
+                if(md5sum4Compare != resultGrains){//比较MD5
+                  val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", md5sum4Compare)
+                  commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+                  MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+                  executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
+                }else {
+                  commandOver(taskInfo.taskId, s"${command}跳过执行,原因:${SALT_COMPONENT}${doif} = ${md5sum4Compare} = ${GRAINS_SALT_COMPONENT}${doif}")
+                  commandOver(taskInfo.taskId, "=====================================华丽分割线=====================================")
+                  //更新taskCommand状态
+                  context.parent ! UpdateCommandStatus(taskInfo.taskId, data.order, TaskEnum.TaskPass)
+                  //执行下一个任务
+                  self ! Execute()
+                }
+              case "" =>
+                val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
+                commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+                MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+                executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
+            }
+          case TaskExeEnum.TaskExeForce =>
+            val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
+            commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+            MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+            executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
         }
+
         stay using data.copy(order = data.order + 1, jid = "")
       }else {
         goto(Finish) using data.copy(status = TaskEnum.TaskSuccess)
@@ -112,8 +148,9 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
           val taskObj = data.taskObj.copy(grains = (Json.parse(ssr.mmInfo).as[JsObject] \ "result" \ "return").as[JsObject])
           log.info(Json.prettyPrint(taskObj.grains))
           commandOver(taskInfo.taskId, Json.prettyPrint(taskObj.grains))
+          val engine = new ScriptEngineUtil(taskObj, _taskInfo.clusterName)
           self ! Execute()
-          stay using data.copy(taskObj = taskObj)
+          stay using data.copy(taskObj = taskObj, engine = engine)
         }
       }
     }
@@ -356,5 +393,5 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
   initialize()
 }
 
-case class Insert(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v, cluster: Option[String], taskDoif: Seq[String])
+case class Insert(taskId: Int, envId: Int, projectId: Int, versionId: Option[Int], commandList: Seq[TaskCommand], json: JsObject, taskObj: ProjectTask_v, cluster: Option[String], taskDoif: Seq[String], force: TaskExeWay)
 case class Execute()

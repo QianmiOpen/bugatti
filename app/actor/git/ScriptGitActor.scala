@@ -261,7 +261,7 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
           val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
           steps.zipWithIndex.foreach { case (step, index) =>
             val seconds = step.get("seconds").asInstanceOf[Int]
-            TemplateActionStepHelper.create(TemplateActionStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1, Option(step.get("doIf"))))
+            TemplateActionStepHelper.create(TemplateActionStep(None, taskId, step.get("name"), step.get("sls"), if (seconds <= 0) 3 else seconds, index + 1, Option(step.get("md5Check"))))
           }
       }
     }

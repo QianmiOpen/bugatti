@@ -2,7 +2,8 @@ package controllers.task
 
 import actor.task.{ChangeQueues, TaskLog, MyActor}
 import controllers.BaseController
-import enums.TaskEnum
+import enums.{TaskExeEnum, TaskEnum}
+import enums.TaskExeEnum.TaskExeWay
 import org.joda.time.DateTime
 import play.api.mvc.Action
 import models.task._
@@ -126,6 +127,11 @@ object TaskController extends BaseController {
 
     val templateId = (tq \ "templateId").as[Int]
     val jobNo = (tq \ "operatorId").as[String]
+    val force = (tq \ "force").as[Int] match {
+      case 0 => TaskExeEnum.TaskExeJudge
+      case 1 => TaskExeEnum.TaskExeForce
+      case _ => TaskExeEnum.TaskExeForce
+    }
 
     //check the templateId is real
     val esv = EnvironmentHelper.findById(envId).get.scriptVersion
@@ -133,7 +139,7 @@ object TaskController extends BaseController {
     if(esv != csv){
       -1
     }else {
-      val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, jobNo)
+      val taskQueue = TaskQueue(None, envId, projectId, clusterName, versionId, templateId, TaskEnum.TaskWait, new DateTime, None, None, jobNo, force)
       val taskQueueId = TaskQueueHelper.create(taskQueue)
       MyActor.createNewTask(envId, projectId, clusterName)
       taskQueueId

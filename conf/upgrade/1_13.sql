@@ -1,0 +1,1 @@
+ALTER TABLE `task_queue` ADD COLUMN `force` int(11) COMMENT '是否强制执行[0:判断执行 1:强制执行]' AFTER `operator_id`;

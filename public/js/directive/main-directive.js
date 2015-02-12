@@ -628,7 +628,7 @@ define(['angular'], function(angular) {
                         }
                     }
 
-                    $scope.deploy = function(projectId, versionId, clusterName, templateId){
+                    $scope.deploy = function(projectId, versionId, clusterName, templateId, force){
                         $scope.taskQueue = {}
                         $scope.taskQueue.envId = $scope.env.id
                         $scope.taskQueue.projectId = projectId
@@ -636,6 +636,7 @@ define(['angular'], function(angular) {
                         $scope.taskQueue.clusterName = clusterName
                         $scope.taskQueue.templateId = templateId
                         $scope.taskQueue.operatorId = Auth.user.username
+                        $scope.taskQueue.force = force
                         TaskService.createNewTaskQueue($scope.taskQueue, function(data){
                             if(data == -1){
                                 growl.addErrorMessage("模板已更新，请刷新页面");
