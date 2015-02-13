@@ -38,19 +38,7 @@ define(['angular'], function(angular) {
                 $scope.env = e;
             };
 
-            // 生成模板
-            $scope.gen = function() {
-                $scope.copyParam = {projectId: $stateParams.id, target_eid: $stateParams.eid, target_vid: $stateParams.vid, envId: 0, versionId: $stateParams.vid, ovr: true, copy: false};
-                if (confirm('把当前环境所有配置文件生成模板？')) {
-                    ConfService.copy(angular.toJson($scope.copyParam), function(data) {
-                        if (data.r === 'ok') {
-                            growl.addSuccessMessage("成功");
-                        } else if (data.r === 'exist') {
-                            growl.addWarnMessage("内容已存在");
-                        }
-                    });
-                }
-            }
+
     }]);
 
     app.controller('ConfListCtrl', ['$scope', '$state', '$stateParams', '$modal',
@@ -61,56 +49,6 @@ define(['angular'], function(angular) {
                     $scope.confs = data;
                 });
             }
-    }]);
-
-    app.controller('ConfCreateCtrl', ['$scope', '$filter', '$state', '$stateParams', '$modal', 'ConfService',
-        function($scope, $filter, $state, $stateParams, $modal, ConfService) {
-            $scope.conf = {envId: $stateParams.eid, projectId: $stateParams.id, versionId: $stateParams.vid};
-
-            $scope.cancel = function() {
-                $state.go('conf.project.version.conf.list', {eid: $scope.conf.envId})
-            };
-
-            $scope.save = function() {
-                $scope.conf.updated = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss")
-                ConfService.save(angular.toJson($scope.conf), function(data) {
-                    if (data.r === 'exist') {
-                        $scope.newForm.path.$invalid = true;
-                        $scope.newForm.path.$error.exists = true;
-                    } else {
-                        $state.go('conf.project.version.conf.list', {eid: $scope.conf.envId})
-                    }
-                });
-            };
-
-            $scope.wordList = [];
-            $scope.completers = ConfService.completer($scope.conf.envId, $scope.conf.projectId, $scope.conf.versionId, function(data) {
-                var obj = eval(data);
-                for (var prop in obj) {
-                    $scope.wordList.push({'word': prop, 'score': 0, meta: obj[prop]});
-                }
-            });
-
-            var langTools = ace.require("ace/ext/language_tools");
-            $scope.aceLoaded = function(_editor) {
-                _editor.setOptions({
-                    enableBasicAutocompletion: true
-                });
-                _editor.getSession().setMode("ace/mode/properties");
-                _editor.commands.bindKey("Ctrl-Space|Ctrl-Shift-Space|Alt-Space", null); // do nothing on ctrl-space
-                _editor.commands.bindKey("F1|Command-Enter", "startAutocomplete");
-
-                var codeCompleter = {
-                    getCompletions: function(editor, session, pos, prefix, callback) {
-                        if (prefix.length === 0) { callback(null, []); return }
-                        callback(null, $scope.wordList.map(function(ea) {
-                            return {name: ea.word, value: ea.word, score: ea.score, meta: ea.meta}
-                        }));
-                    }
-                };
-                langTools.addCompleter(codeCompleter);
-            };
-
     }]);
 
     app.controller('ConfShowCtrl', ['$scope', '$state', '$stateParams', '$modal',
@@ -219,38 +157,6 @@ define(['angular'], function(angular) {
             };
     }]);
 
-    // ----------------------------------------------------
-    // 一键拷贝
-    // ----------------------------------------------------
-    app.controller('ConfCopyCtrl', ['$scope', '$state', 'growl', '$filter', '$stateParams', 'ConfService', 'VersionService',
-        function($scope, $state, growl, $filter, $stateParams, ConfService, VersionService) {
-            $scope.copyEnvs = angular.copy($scope.envs);
-            $scope.copyParam = {projectId: $stateParams.id, target_eid: null, target_vid: null, envId: $stateParams.eid, versionId: $stateParams.vid, ovr: false};
-
-            VersionService.top($stateParams.id, function(data) {
-                $scope.versions = data;
-
-                // default current version
-                var find = false;
-                angular.forEach($scope.versions, function(v) {
-                    if (!find && v.id == $scope.copyParam.versionId) {
-                        $scope.copyParam.target_vid = v.id;
-                        find = true;
-                        return;
-                    }
-                });
-            });
-
-            $scope.ok = function (param) {
-                ConfService.copy(angular.toJson(param), function(data) {
-                    if (data.r === 'ok') {
-                        $state.go('conf.project.version.conf.list', {eid: param.envId}, {reload: true})
-                    } else if (data.r === 'exist') {
-                        growl.addWarnMessage("内容已存在");
-                    }
-                });
-            };
-    }]);
 
     // ------------------------------------------------------
     // 配置文件历史记录
@@ -293,105 +199,5 @@ define(['angular'], function(angular) {
 
         }]);
 
-    app.controller('ConfUploadCtrl', ['$scope', '$state', '$stateParams', '$timeout', '$http', '$upload',
-        function($scope, $state, $stateParams, $timeout, $http, $upload) {
-            $scope.filePath = "";
-            var pid = $stateParams.id;
-            var vid = $stateParams.vid;
-            var eid = $stateParams.eid;
-
-            $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
-            $scope.uploadRightAway = true;
-            $scope.hasUploader = function(index) {
-                return $scope.upload[index] != null;
-            };
-            $scope.abort = function(index) {
-                $scope.upload[index].abort();
-                $scope.upload[index] = null;
-            };
-            $scope.onFileSelect = function($files) {
-                $scope.selectedFiles = [];
-                $scope.progress = [];
-                if ($scope.upload && $scope.upload.length > 0) {
-                    for (var i = 0; i < $scope.upload.length; i++) {
-                        if ($scope.upload[i] != null) {
-                            $scope.upload[i].abort();
-                        }
-                    }
-                }
-                $scope.upload = [];
-                $scope.uploadResult = [];
-                $scope.selectedFiles = $files;
-                $scope.dataUrls = [];
-                for ( var i = 0; i < $files.length; i++) {
-                    var $file = $files[i];
-                    if ($scope.fileReaderSupported && $file.type.indexOf('image') > -1) {
-                        var fileReader = new FileReader();
-                        fileReader.readAsDataURL($files[i]);
-                        var loadFile = function(fileReader, index) {
-                            fileReader.onload = function(e) {
-                                $timeout(function() {
-                                    $scope.dataUrls[index] = e.target.result;
-                                });
-                            }
-                        }(fileReader, i);
-                    }
-                    $scope.progress[i] = -1;
-                    if ($scope.uploadRightAway) {
-                        $scope.start(i);
-                    }
-                }
-            };
-
-            var uploadUrl = '/conf/upload';
-            $scope.start = function(index) {
-                $scope.progress[index] = 0;
-                $scope.errorMsg = null;
-                $scope.upload[index] = $upload.upload({
-                    url: uploadUrl,
-                    method: 'post',
-                    headers: {'my-header': 'my-header-value'},
-                    data : {
-                        envId: eid,
-                        projectId: pid,
-                        versionId: vid,
-                        path: '/' + ($scope.filePath?$scope.filePath:'') + ($scope.selectedFiles[index].relativePath || '')
-                    },
-                    file: $scope.selectedFiles[index],
-                    fileFormDataName: 'myFile'
-                });
-                $scope.upload[index].then(function(response) {
-                    $timeout(function() {
-                        $scope.uploadResult.push(response.data);
-                    });
-                }, function(response) {
-                    if (response.status > 0) $scope.errorMsg = response.status + ': ' + response.data;
-                }, function(evt) {
-                    $scope.progress[index] = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-                });
-                $scope.upload[index].xhr(function(xhr){
-//				xhr.upload.addEventListener('abort', function() {console.log('abort complete')}, false);
-                });
-
-            };
-
-            $scope.dragOverClass = function($event) {
-                var items = $event.dataTransfer.items;
-                var hasFile = false;
-                if (items != null) {
-                    for (var i = 0 ; i < items.length; i++) {
-                        if (items[i].kind == 'file') {
-                            hasFile = true;
-                            break;
-                        }
-                    }
-                } else {
-                    hasFile = true;
-                }
-                return hasFile ? "dragover" : "dragover-err";
-            };
-
-
-    }]);
 
 });

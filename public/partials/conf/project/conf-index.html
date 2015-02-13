@@ -1,8 +1,14 @@
 <div class="page-header clearfix">
-    <h1 class="pull-left m0">配置文件</h1>
+    <h1 class="pull-left m0">
+        版本
+        {{version.vs}}
+        配置文件
+        <sub>
+            <a class="small" href="" ui-sref="conf.project.version({id: project.id})">返回{{project.name}}</a>
+        </sub>
+    </h1>
 </div>
 
-<h3 class="text-muted">{{project.name}} : {{version.vs}}</h3>
 <ul class="nav nav-tabs" role="tablist" >
     <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs">
         <a ng-if="e.level == 'unsafe'" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}</a>
@@ -12,19 +18,6 @@
     </li>
 </ul>
 
-<div class="btn-group mtb15" ng-if="project.id && $stateParams.eid > 0" has-project="{{project.id}}">
-    <button ng-if="hasProject_" ui-sref="conf.project.version.conf.upload({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default" ng-disabled='$state.current.url == "/upload"'>
-        <i class="glyphicon glyphicon-upload"></i>上传
-    </button>
-    <button ng-if="hasProject_" ui-sref="conf.project.version.conf.create({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default" ng-disabled='$state.current.url == "/create"'>
-        <i class="glyphicon glyphicon-plus"></i>
-        新建
-    </button>
-    <button ng-if="hasProject_" ui-sref="conf.project.version.conf.copy({id: $stateParams.id, vid: $stateParams.vid})" type="button" class="btn btn-default" ng-disabled='$state.current.url == "/copy"'>一键拷贝</button>
-    <button ng-if="hasProject_" ng-click="gen()" type="button" class="btn btn-default">生成模板</button>
-    <a ng-if="!$state.includes('conf.project.version.conf.list')" ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
-</div>
-
-<div class="clearfix"></div>
+<a ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
 
 <div ui-view="conf-info"></div>  <!-- include -->

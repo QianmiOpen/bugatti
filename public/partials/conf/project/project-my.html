@@ -7,7 +7,7 @@
 
 <form class="form-inline" role="form" ng-submit="searchForm(s_projectName)" >
     <div class="form-group">
-        项目名称：<input type="text" ng-model="s_projectName" class="form-control" placeholder="项目名称">
+        <input type="text" ng-model="s_projectName" class="form-control" placeholder="项目名称">
     </div>
 
     <button type="submit" class="btn btn-default">搜索</button>
@@ -33,14 +33,17 @@
                 <template-show tid="{{project.templateId}}"></template-show>
             </td>
             <td >{{project.lastVersion}}
-                <a ng-if="project.lastVersion" ui-sref="conf.project.version({id: project.id})">all({{project.subTotal}})</a>
+                <a ui-sref="conf.project.version({id: project.id})">all
+                    <span ng-if="project.subTotal != 0 ">({{project.subTotal}})</span></a>
             </td>
             <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-if="user.role == 'admin'">
+                <a  ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
             <td ng-if="user.role != 'admin'">
                 <div ng-if="project.id" has-project-safe="{{project.id}}">
+                    <a ng-show="hasProjectSafe_" ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                     <a ng-show="hasProjectSafe_" ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
             </td>

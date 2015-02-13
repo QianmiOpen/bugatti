@@ -34,10 +34,12 @@
                 <template-show tid="{{project.templateId}}"></template-show>
             </td>
             <td >{{project.lastVersion}}
-                <a ng-if="project.lastVersion" ui-sref="conf.project.version({id: project.id})">all({{project.subTotal}})</a>
+                <a ui-sref="conf.project.version({id: project.id})">all
+                    <span ng-if="project.subTotal != 0 ">({{project.subTotal}})</span></a>
             </td>
             <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-show="user.role == 'admin'">
+                <a ui-sref="conf.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>
