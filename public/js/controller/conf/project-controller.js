@@ -486,19 +486,23 @@ define(['angular'], function(angular) {
             $scope.currentPage = 1;
             $scope.pageSize = 10;
 
-            // count
-            VersionService.count($stateParams.id, function(data) {
-                $scope.totalItems = data;
-            });
+            $scope.searchForm = function(vs) {
+                // count
+                VersionService.count(vs, $stateParams.id, function(data) {
+                    $scope.totalItems = data;
+                });
 
-            // list
-            VersionService.getPage($stateParams.id, 0, $scope.pageSize, function(data) {
-                $scope.versions = data;
-            });
+                // list
+                VersionService.getPage(vs, $stateParams.id, 0, $scope.pageSize, function(data) {
+                    $scope.versions = data;
+                });
+            };
+            // default list
+            $scope.searchForm($scope.s_name);
 
-            // page
+            // set page
             $scope.setPage = function (pageNo) {
-                VersionService.getPage($stateParams.id, pageNo - 1, $scope.pageSize, function(data) {
+                VersionService.getPage($scope.s_name, $stateParams.id, pageNo - 1, $scope.pageSize, function(data) {
                     $scope.versions = data;
                 });
             };
@@ -527,6 +531,48 @@ define(['angular'], function(angular) {
                             $scope.totalItems = num;
                         });
                     }
+                });
+            };
+
+            // checked all
+            $scope.$watch('master', function(checked) {
+                if (!checked) { $scope.ids = {}; return }
+                angular.forEach($scope.versions, function(version) {
+                    $scope.ids[version.id] = true;
+                });
+            });
+            $scope.isEmpty = function (obj) {
+                return angular.equals({}, obj);
+            };
+            $scope.checked = function(id, value) {
+                if (!value) delete $scope.ids[id];
+            };
+            $scope.deleteBatch = function() {
+                var modalInstance = $modal.open({
+                    templateUrl: 'partials/modal.html',
+                    controller: function ($scope, $modalInstance) {
+                        $scope.ok = function () {
+                            $modalInstance.close();
+                        };
+                        $scope.cancel = function () {
+                            $modalInstance.dismiss('cancel');
+                        };
+                    }
+                });
+                modalInstance.result.then(function() {
+                    angular.forEach($scope.ids, function(value, key) {
+                        angular.forEach($scope.versions, function(user, i) {
+                            if (user.id == key) {
+                                $scope.versions.splice(i, 1);
+                            }
+                        });
+                        VersionService.remove(key, function(data) {});
+                    });
+
+                    // refresh
+                    $scope.master = null;
+                    $scope.searchForm($scope.s_name);
+
                 });
             };
     }]);

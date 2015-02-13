@@ -67,7 +67,7 @@ object ProjectHelper extends PlayCache {
           p <- qProject
           m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
-        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"${projectName.get}%").query
+        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"%${projectName.get}%").query
         query.length.run
       case None => qProject.filteredBy(projectName)(_.name like s"${projectName.get}%").query.length.run
     }
@@ -81,10 +81,10 @@ object ProjectHelper extends PlayCache {
           p <- qProject
           m <- qMember if p.id === m.projectId
         } yield (p, m)).filter(_._2.jobNo === jobNo)
-        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"${projectName.get}%").query
+        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"%${projectName.get}%").query
         query.drop(offset).take(pageSize).list
       case None =>
-        val query = qProject.filteredBy(projectName)(_.name like s"${projectName.get}%").query
+        val query = qProject.filteredBy(projectName)(_.name like s"%${projectName.get}%").query
         query.drop(offset).take(pageSize).list
     }
   }

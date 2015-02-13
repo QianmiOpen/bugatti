@@ -57,12 +57,12 @@ object VersionController extends BaseController {
     Ok(Json.toJson(VersionHelper.findById(id)))
   }
 
-  def index(projectId: Int, page: Int, pageSize: Int) = Action {
-    Ok(Json.toJson(VersionHelper.all(projectId, page, pageSize)))
+  def index(vs: Option[String], projectId: Int, page: Int, pageSize: Int) = Action {
+    Ok(Json.toJson(VersionHelper.all(vs, projectId, page, pageSize)))
   }
 
-  def count(projectId: Int) = Action {
-    Ok(Json.toJson(VersionHelper.count(projectId)))
+  def count(vs: Option[String], projectId: Int) = Action {
+    Ok(Json.toJson(VersionHelper.count(vs, projectId)))
   }
 
   def all(projectId: Int, top: Int) = Action {

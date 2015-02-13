@@ -4,12 +4,12 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.LevelEnum
 import exceptions.UniqueNameException
-import models.PlayCache
+import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
 import play.api.Play.current
 
-import scala.language.postfixOps
 import scala.slick.driver.MySQLDriver.simple._
+import scala.language.{implicitConversions, postfixOps}
 
 /**
  * 子项目
@@ -28,7 +28,7 @@ class VersionTable(tag: Tag) extends Table[Version](tag, "version"){
   def idx_vs = index("idx_pid_vs", (projectId, vs), unique = true)
 }
 object VersionHelper extends PlayCache {
-
+  implicit def maybeFilterConversor[X,Y](q:Query[X,Y,Seq]) = new MaybeFilter(q)
   import models.AppDB._
 
   val qVersion = TableQuery[VersionTable]
@@ -58,13 +58,15 @@ object VersionHelper extends PlayCache {
     }
   }
 
-  def count(projectId: Int) = db withSession { implicit session =>
-    qVersion.filter(_.projectId === projectId).length.run
+  def count(vs: Option[String], projectId: Int) = db withSession { implicit session =>
+    val query = qVersion.filteredBy(vs)(_.vs like s"%${vs.get}%").query
+    query.filter(_.projectId === projectId).length.run
   }
 
-  def all(projectId: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
+  def all(vs: Option[String], projectId: Int, page: Int, pageSize: Int): Seq[Version] = db withSession { implicit session =>
     val offset = pageSize * page
-    qVersion.filter(_.projectId === projectId).sortBy(_.updated desc).drop(offset).take(pageSize).list
+    val query = qVersion.filteredBy(vs)(_.vs like s"%${vs.get}%").query
+    query.filter(_.projectId === projectId).sortBy(_.updated desc).drop(offset).take(pageSize).list
   }
 
   def all(projectId: Int, top: Int): Seq[Version] = db withSession { implicit session =>

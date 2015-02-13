@@ -92,8 +92,8 @@ PUT           /template/:id                                       controllers.co
 # Project Version
 GET           /project/:projectId/version                         controllers.conf.VersionController.getVersions(projectId: Int, envId: Int)
 GET           /project/:projectId/nexusVersion                    controllers.conf.VersionController.nexusVersions(projectId: Int)
-GET           /project/:projectId/top                             controllers.conf.VersionController.index(projectId: Int, page: Int ?=0, pageSize: Int ?=10)
-GET           /project/:projectId/versoin/total                   controllers.conf.VersionController.count(projectId: Int)
+GET           /project/:projectId/top                             controllers.conf.VersionController.index(vs: Option[String], projectId: Int, page: Int ?=0, pageSize: Int ?=10)
+GET           /project/:projectId/versoin/total                   controllers.conf.VersionController.count(vs: Option[String], projectId: Int)
 GET           /project/version/all                                controllers.conf.VersionController.all(pid: Int, top: Int ?=30)
 GET           /project/version/:id                                controllers.conf.VersionController.show(id: Int)
 DELETE        /project/version/:id                                controllers.conf.VersionController.delete(id: Int)
