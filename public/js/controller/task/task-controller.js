@@ -60,17 +60,18 @@ define(['angular'], function(angular) {
 
         $scope.activeEnv = function(e) {
             $scope.env = e;
-            if (angular.isDefined($state.params.pid)) {
-                $state.go('task.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
-            } else {
-                $state.go('task.list', { eid: e.id });
-            }
             // load projects
             $scope.load.is = true;
             $scope.projects = []
             ProjectService.getAuth(e.id, function(data) {
                 $scope.projects = data;
                 $scope.load.is = false;
+                console.log($state.params.pid in $scope.projects)
+                if (angular.isDefined($state.params.pid) && $state.params.pid in $scope.projects) {
+                    $state.go('task.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
+                } else {
+                    $state.go('task.list', { eid: e.id });
+                }
             });
 
             $scope.scriptVersion = e.scriptVersion
@@ -128,6 +129,7 @@ define(['angular'], function(angular) {
         }
 
         ProjectService.get($stateParams.pid, function (data) {
+            console.log($scope.projects)
             $scope.project = data;
             $scope.load.is = false;
             $scope.wsInvoke();
