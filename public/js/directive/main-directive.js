@@ -621,7 +621,7 @@ define(['angular'], function(angular) {
 
                     $scope.showMenu = function(versionMenu, projectId, clusterName, templateId){
                         if(!versionMenu){
-                            $scope.deploy(projectId, null, clusterName, templateId)
+                            $scope.deploy(projectId, null, clusterName, templateId, 1)
                         } else {//部署
                             $scope.choosedTemplateId = templateId
 //                            $scope.showVersion(projectId)
