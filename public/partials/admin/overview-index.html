@@ -3,23 +3,23 @@
 <div class="row placeholders">
     <div class="col-xs-6 col-sm-4 placeholder">
         <h4>项目</h4>
-        <a ui-sref="admin.project"><h1 class="font48">11</h1></a>
+        <a ui-sref="admin.project"><h1 class="font48" ng-bind="projectCount"></h1></a>
         <hr>
-        <a class="btn btn-info" ui-sref="admin.project.create">New Project</a>
+        <a class="btn btn-primary" ui-sref="admin.project.create">新建项目</a>
     </div>
 
     <div class="col-xs-6 col-sm-4 placeholder">
         <h4>环境</h4>
-        <a ui-sref="admin.env"><h1 class="font48">11</h1></a>
+        <a ui-sref="admin.env"><h1 class="font48" ng-bind="envCount"></h1></a>
         <hr>
-        <a class="btn btn-info" ui-sref="admin.env.create">New Env</a>
+        <a class="btn btn-primary" ui-sref="admin.env.create">新建环境</a>
     </div>
 
     <div class="col-xs-6 col-sm-4 placeholder">
         <h4>用户</h4>
-        <a ui-sref="admin.user"><h1 class="font48">11</h1></a>
+        <a ui-sref="admin.user"><h1 class="font48" ng-bind="userCount"></h1></a>
         <hr>
-        <a class="btn btn-info" ui-sref="admin.user.create">New User</a>
+        <a class="btn btn-primary" ui-sref="admin.user.create">新建用户</a>
     </div>
 
 </div>
