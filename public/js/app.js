@@ -66,14 +66,14 @@ require(['jquery', 'angular', 'chosen', './controller/main-controller', './direc
                         }
                         if (!Auth.authorize(toState.data.access)) {
                             event.preventDefault();
-                            $state.go('home');
+                            $state.go('login');
                         }
                     }, function() {
                         if (toState.data.access === 'anon') {
                             return
                         }
                         event.preventDefault();
-                        $state.go('home');
+                        $state.go('login');
                         $rootScope.error = "Unauthorized";
                     });
                 });
@@ -91,13 +91,15 @@ require(['jquery', 'angular', 'chosen', './controller/main-controller', './direc
                         },
                         function(response) { // error
                             if (response.status == 400) {
-                                growl.addWarnMessage("参数错误");
+                                growl.addWarnMessage("校验错误");
                             } else if (response.status == 403) {
                                 growl.addWarnMessage("没有权限");
                             } else if (response.status == 404) {
-                                growl.addWarnMessage("内容不存在");
+                                growl.addWarnMessage("资源不存在");
                             } else if (response.status == 409) {
-                                growl.addWarnMessage("内容已存在");
+                                growl.addWarnMessage("资源已存在");
+                            }  else if (response.status == 423) {
+                                growl.addWarnMessage("资源已锁定");
                             } else if (response.status == 500) {
                                 growl.addErrorMessage("内部错误");
                             }

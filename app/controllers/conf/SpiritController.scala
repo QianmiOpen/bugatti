@@ -3,13 +3,12 @@ package controllers.conf
 import actor.ActorUtils
 import actor.salt._
 import controllers.BaseController
-import enums.{FuncEnum, ModEnum}
+import enums.ModEnum
 import exceptions.UniqueNameException
 import models.conf.{Spirit, SpiritHelper}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json.Json
-import play.api.mvc.Action
 
 /**
  * Created by mind on 1/12/15.
@@ -29,15 +28,15 @@ object SpiritController extends BaseController {
     )(Spirit.apply)(Spirit.unapply)
   )
 
-  def all = AuthAction(FuncEnum.spirit) {
+  def all = AuthAction() {
     Ok(Json.toJson(SpiritHelper.all))
   }
 
-  def get(id: Int) = AuthAction(FuncEnum.spirit) {
+  def get(id: Int) = AuthAction() {
     Ok(Json.toJson(SpiritHelper.findById(id)))
   }
 
-  def add = AuthAction(FuncEnum.spirit) { implicit request =>
+  def add = AuthAction() { implicit request =>
     spiritForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       spirit =>
@@ -54,7 +53,7 @@ object SpiritController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.spirit) { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     spiritForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       spirit =>
@@ -72,7 +71,7 @@ object SpiritController extends BaseController {
     )
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.spirit) { implicit request =>
+  def delete(id: Int) = AuthAction() { implicit request =>
     SpiritHelper.findById(id) match {
       case Some(spirit) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除网关", spirit))
@@ -83,7 +82,7 @@ object SpiritController extends BaseController {
     }
   }
 
-  def refresh(id: Int) = AuthAction(FuncEnum.spirit) { implicit request =>
+  def refresh(id: Int) = AuthAction() { implicit request =>
     ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshHosts(id)
     Ok
   }

@@ -1,0 +1,17 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ui-sref="admin.user.create" ng-if="loginUser.role == 'admin'">新增</button></td>
+    <h1 class="pull-left m0">用户管理</h1>
+</div>
+
+
+<form class="form-inline" role="form" ng-submit="searchForm(s_jobNo)" >
+    <div class="form-group">
+        <input type="text" ng-model="s_jobNo" class="form-control" placeholder="工号">
+    </div>
+
+    <button type="submit" class="btn btn-default">搜索</button>
+</form>
+
+<div class="table-responsive">
+    <ng-include src="'partials/admin/user/user-list.html'"></ng-include>
+</div>

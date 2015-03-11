@@ -7,19 +7,14 @@ GET           /webjars/*file                                      controllers.We
 
 # Home page
 GET           /                                                   controllers.Application.index
-GET           /login                                              controllers.Application.login
+POST          /login                                              controllers.Application.login
 GET           /ping                                               controllers.Application.ping
 POST          /logout                                             controllers.Application.logout
-
-# CAS callback And logout
-GET           /callback                                           org.pac4j.play.CallbackController.callback
-GET           /logout                                             org.pac4j.play.CallbackController.logoutAndRedirect
 
 # User
 GET           /user                                               controllers.conf.UserController.index(jobNo: Option[String], page: Int ?=0, pageSize: Int ?=10)
 GET           /user/total                                         controllers.conf.UserController.count(jobNo: Option[String])
 GET           /user/:jobNo                                        controllers.conf.UserController.show(jobNo: String)
-GET           /user/:jobNo/permissions                            controllers.conf.UserController.permissions(jobNo: String)
 DELETE        /user/:jobNo                                        controllers.conf.UserController.delete(jobNo: String)
 POST          /user                                               controllers.conf.UserController.save
 POST          /user/:jobNo/upload                                 controllers.conf.UserController.upload(jobNo: String)

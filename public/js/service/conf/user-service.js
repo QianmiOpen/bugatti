@@ -15,9 +15,6 @@ define(['angular'], function(angular) {
             count: function(jobNo, callback) {
                 $http(PlayRoutes.controllers.conf.UserController.count(jobNo)).success(callback);
             },
-            permissions: function(jobNo, callback) {
-                $http(PlayRoutes.controllers.conf.UserController.permissions(jobNo)).success(callback);
-            },
             save: function(user, callback) {
                 $http.post(PlayRoutes.controllers.conf.UserController.save().url, user).success(callback)
             },

@@ -1,6 +1,6 @@
 package controllers.conf
 
-import enums.{ModEnum, FuncEnum, LevelEnum}
+import enums.{ModEnum, LevelEnum, RoleEnum}
 import exceptions.UniqueNameException
 import models.conf._
 import play.api.mvc._
@@ -52,12 +52,12 @@ object EnvController extends BaseController {
   }
 
   // 根据权限加载环境列表
-  def showAuth = AuthAction(FuncEnum.task) { implicit request =>
+  def showAuth = AuthAction() { implicit request =>
     val user = request.user
     // 管理员 & 委员长 显示所有环境
     val countSafe = ProjectMemberHelper.count(request.user.jobNo, LevelEnum.safe)
     val seq =
-      if (UserHelper.superAdmin_?(request.user) || countSafe > 0) {
+      if (UserHelper.admin_?(request.user) || countSafe > 0) {
         EnvironmentHelper.all()
       }
       else {
@@ -71,7 +71,7 @@ object EnvController extends BaseController {
     Ok(Json.toJson(seq))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.env) { implicit request =>
+  def delete(id: Int) = AuthAction() { implicit request =>
     EnvironmentHelper.findById(id) match {
       case Some(env) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除环境", env))
@@ -80,11 +80,11 @@ object EnvController extends BaseController {
     }
   }
 
-  def allScriptVersion = AuthAction(FuncEnum.env) { implicit request =>
+  def allScriptVersion = AuthAction() { implicit request =>
     Ok(Json.toJson(ScriptVersionHelper.allName))
   }
 
-  def save = AuthAction(FuncEnum.env) { implicit request =>
+  def save = AuthAction() { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
@@ -97,7 +97,7 @@ object EnvController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.env) { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
@@ -116,17 +116,17 @@ object EnvController extends BaseController {
   implicit val memberWrites = Json.writes[EnvironmentMember]
 
   def member(envId: Int, jobNo: String) = Action {
-    Ok(Json.toJson(EnvironmentMemberHelper.findEnvId_JobNo(envId, jobNo.toLowerCase)))
+    Ok(Json.toJson(EnvironmentMemberHelper.findByEnvId_JobNo(envId, jobNo.toLowerCase)))
   }
 
-  def members(envId: Int) = AuthAction(FuncEnum.env) {
+  def members(envId: Int) = AuthAction() {
     Ok(Json.toJson(EnvironmentMemberHelper.findByEnvId(envId)))
   }
 
-  def saveMember(envId: Int, jobNo: String) = AuthAction(FuncEnum.env) { implicit request =>
+  def saveMember(envId: Int, jobNo: String) = AuthAction() { implicit request =>
     if (UserHelper.findByJobNo(jobNo) == None) Ok(_None)
     else EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.superAdmin_?(request.user) =>
+      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.admin_?(request.user) =>
         try {
           val member = EnvironmentMember(None, envId, jobNo.toLowerCase)
           Ok(Json.toJson(EnvironmentMemberHelper.create(member)))
@@ -138,9 +138,9 @@ object EnvController extends BaseController {
     }
   }
 
-  def deleteMember(envId: Int, memberId: Int) = AuthAction(FuncEnum.env) { implicit request =>
+  def deleteMember(envId: Int, memberId: Int) = AuthAction() { implicit request =>
     EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.superAdmin_?(request.user) =>
+      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.admin_?(request.user) =>
         Ok(Json.toJson(EnvironmentMemberHelper.delete(memberId)))
       case Some(env) if env.jobNo != Some(request.user.jobNo) => Forbidden
       case _ => NotFound

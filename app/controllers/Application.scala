@@ -2,26 +2,26 @@ package controllers
 
 import java.io.File
 
-import enums.{FuncEnum, RoleEnum}
 import models.conf._
 import org.joda.time.DateTime
 import play.api._
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.mvc._
 import play.api.cache._
 import play.api.libs.json._
-import org.pac4j.play.scala.ScalaController
-import utils.{ConfHelp}
+import service.SystemSettingsService
+import utils.ConfHelp
 
 import views._
 
-object Application extends ScalaController with Security {
+/**
+ * of546
+ */
+object Application extends Controller with Security with SystemSettingsService {
 
   lazy val siteDomain = app.configuration.getString("site.domain").getOrElse("ofpay.com")
   lazy val appVersion = app.configuration.getString("app.version").getOrElse("1.0")
-
-  def index = Action { implicit request =>
-    Ok(html.index(siteDomain, appVersion))
-  }
 
   lazy val CacheExpiration = app.configuration.getInt("cache.expiration").getOrElse(60 /* seconds */ * 15 /* minutes */)
 
@@ -38,33 +38,31 @@ object Application extends ScalaController with Security {
     }
   }
 
-  def login = RequiresAuthentication("CasClient") { profile =>
-    Logger.debug(s"CasClient login back, profile:$profile")
-    def makeToken = java.util.UUID.randomUUID().toString
-    Action { implicit request =>
-      UserHelper.findByJobNo(profile.getId) match {
-        case Some(user) if user.locked =>
-          Locked(html.template.ldap_callback_locked.render(siteDomain))
-        case Some(user) if user.role == RoleEnum.admin =>
-          UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
-          Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
-        case Some(user) if user.role == RoleEnum.user =>
-          PermissionHelper.findByJobNo(user.jobNo) match {
-            case Some(p) =>
-              UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
-              Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
-            case None =>
-              Forbidden(html.template.ldap_callback_forbidden.render(siteDomain))
-          }
-        case _ =>
-          val user = User(jobNo = profile.getId.toLowerCase, name = profile.getAttributes.get("displayName").toString,
-            RoleEnum.user, superAdmin = false, locked = false, lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now), None)
-          val permission = Permission(jobNo = user.jobNo, List(FuncEnum.user, FuncEnum.project, FuncEnum.task))
-          UserHelper.create(user, permission)
-          Logger.info(s"init new user, jobNo: ${user.jobNo}.")
-          Ok(html.template.ldap_callback.render(siteDomain)).withToken(makeToken -> user.jobNo)
+  case class LoginForm(userName: String, password: String)
+  val loginForm = Form(
+    mapping(
+    "userName" -> nonEmptyText,
+    "password" -> nonEmptyText
+    )(LoginForm.apply)(LoginForm.unapply)
+  )
+
+  def index = Action { implicit request =>
+    Ok(html.index(siteDomain, appVersion))
+  }
+
+  def login = Action { implicit request =>
+    loginForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
+      form => {
+        UserHelper.authenticate(loadSystemSettings(), form.userName, form.password) match {
+          case Some(user) if user.locked => Locked
+          case Some(user) =>
+            UserHelper.update(user.jobNo, user.copy(lastIp = Some(request.remoteAddress), lastVisit = Some(DateTime.now)))
+            Ok(Json.obj("jobNo" -> user.jobNo, "role" -> user.role)).withToken(java.util.UUID.randomUUID().toString -> user.jobNo)
+          case _ => Forbidden
+        }
       }
-    }
+    )
   }
 
   def logout = Action { implicit request =>
@@ -75,11 +73,7 @@ object Application extends ScalaController with Security {
 
   def ping = HasToken() { token => jobNo => implicit request =>
     UserHelper.findByJobNo(jobNo) map { user =>
-      val ps = PermissionHelper.findByJobNo(jobNo) match {
-        case Some(p) => p.functions
-        case None => Seq.empty
-      }
-      Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role, "sa" -> user.superAdmin, "permissions" -> ps)).withToken(token -> jobNo)
+      Ok(Json.obj("jobNo" -> jobNo, "role" -> user.role)).withToken(token -> jobNo)
     } getOrElse NotFound("User Not Found")
   }
 
@@ -103,7 +97,6 @@ object Application extends ScalaController with Security {
         conf.routes.javascript.UserController.index,
         conf.routes.javascript.UserController.count,
         conf.routes.javascript.UserController.show,
-        conf.routes.javascript.UserController.permissions,
         conf.routes.javascript.UserController.save,
         conf.routes.javascript.UserController.update,
         conf.routes.javascript.UserController.delete,

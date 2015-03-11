@@ -36,7 +36,7 @@ object EnvironmentMemberHelper extends PlayCache {
     qMember.filter(_.envId === envId).list
   }
 
-  def findEnvId_JobNo(envId: Int, jobNo: String): Option[EnvironmentMember] = db withSession { implicit session =>
+  def findByEnvId_JobNo(envId: Int, jobNo: String): Option[EnvironmentMember] = db withSession { implicit session =>
     qMember.filter(m => m.envId === envId && m.jobNo === jobNo).firstOption
   }
 

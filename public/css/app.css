@@ -45,6 +45,7 @@ code {
 .disp-hid {
     display: none;
 }
+.lead{margin-bottom:18px;font-size:14px;font-weight:200;line-height:1.4}
 .p0 {padding: 0}
 .pl8{padding-left: 8px;}
 .m0 {
@@ -53,8 +54,10 @@ code {
 .b0 { border: none}
 .m15 { margin: 15px;}
 .mt15{ margin-top: 15px;}
+.mt20{ margin-top: 20px;}
 .mb20{margin-bottom: 20px;}
 .mtb15{ margin: 15px 0}
+.font48 { font-size: 48px;}
 .mt-16 {
     margin-top: -16px;
 }
@@ -75,6 +78,9 @@ span.header-version {
 
 .table-fixed .show {
     overflow: visible;
+}
+.vshow {
+    visibility: visible;
 }
 
 .horizonal{
@@ -105,10 +111,37 @@ span.header-version {
 }
 .ace_editor { height: 400px; }
 
+.avatar {
+    float: left; 
+    margin-right: 12px;
+    width: 90px;
+    height: 90px;
+}
+.user-show-username {
+    font-size: 36px;
+    font-weight: 200;
+    color: #666;
+}
 
 .tooltip-inner {
     word-wrap:break-word;
     white-space:pre-wrap;
+}
+
+header .tooltip-inner {
+    word-wrap:normal;
+    white-space:nowrap;
+}
+
+header .title{border-left: 1px solid #575D67;position:relative;float:left;margin:0;padding-left:15px;color:#fff;font-size:16px;line-height:50px;font-weight:normal;display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:top;white-space:nowrap;max-width:37%}
+header .profile-pic{position:relative;top:-1px;padding-right:0px !important}
+header .profile-pic img{width:26px;height:26px;border-radius: 4px;}
+header .navbar-nav.navbar-right:last-child {
+    margin-right:0px;
+}
+header .navbar-nav>li>a {
+    padding: 0 10px 0 10px;
+    line-height: 50px;
 }
 
 .word-list {
@@ -420,13 +453,7 @@ table.tablesorter .headerSortUp:after {
 .sidebar {
     display: none;
 }
-.page-sum {
-    display: none;
-}
 @media (min-width: 768px) {
-    .page-sum {
-        display: block;
-    }
     .sidebar {
         position: fixed;
         top: 51px;
@@ -452,11 +479,9 @@ table.tablesorter .headerSortUp:after {
     padding-right: 20px;
     padding-left: 20px;
 }
-.nav-sidebar > .active > a {
-    color: #fff;
-    background-color: #428bca;
-}
-.nav-sidebar > .active > a:hover {
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
     color: #fff;
     background-color: #428bca;
 }
@@ -515,6 +540,14 @@ table.tablesorter .headerSortUp:after {
     padding: 6px 12px;line-height: 20px;
 }
 .msg,.errmsg{padding:3px 24px 3px;*padding:5px 24px 4px;color:#fff;height:20px;line-height:18px;border-radius:3px}.msg{background:#68af02;*border-bottom:2px solid #68af02;z-index:99}.errmsg{background:#ef8f00;*border-bottom:2px solid #ef8f00;z-index:99}.errmsg a{color:#FFF}.errmsg a:link,.errmsg a:visited,.errmsg a:active,.errmsg a:hover{color:#FFF}
+
+.brand-holder {border-right: 1px solid #EEE;}
+.footer-links a{margin-right:15px}
+.login-box .login-heading h3{font-weight:300;line-height:2}
+.login-box .form-control{background-color:#F5F5F5;font-size:16px;padding:14px 10px;width:100%;height:auto}
+.login-box .form-control.top{-webkit-border-radius:5px 5px 0 0;-moz-border-radius:5px 5px 0 0;-ms-border-radius:5px 5px 0 0;-o-border-radius:5px 5px 0 0;border-radius:5px 5px 0 0;margin-bottom:0px}
+.login-box .form-control.bottom{-webkit-border-radius:0 0 5px 5px;-moz-border-radius:0 0 5px 5px;-ms-border-radius:0 0 5px 5px;-o-border-radius:0 0 5px 5px;border-radius:0 0 5px 5px;border-top:0;margin-bottom:20px}
+.login-box .btn{padding:12px !important}
 
 /* Have to set height explicity on ui-view to prevent collapsing during animation
 .well[ui-view]{

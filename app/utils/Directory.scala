@@ -20,6 +20,11 @@ object Directory {
 
   val RepositoryHome = s"${BugattiHome}/repositories"
 
+  val BugattiConf = new File(BugattiHome, "bugatti.conf")
+
+  /**
+   * Substance directory of the repository.
+   */
   def getRepositoryDir(projectId: Int): File = new File(s"${RepositoryHome}/${projectId}/.git")
 
 }

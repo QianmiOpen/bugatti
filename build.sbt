@@ -25,8 +25,7 @@ libraryDependencies ++= {
     "com.github.tototoshi" %% "slick-joda-mapper" % "1.2.0",
     "commons-net" % "commons-net" % "3.3",
     "commons-io" % "commons-io" % "2.4",
-    "org.pac4j" % "play-pac4j_scala2.10" % "1.3.0",
-    "org.pac4j" % "pac4j-cas" % "1.6.0",
+    "com.novell.ldap" % "jldap" % "2009-10-07",
     // WebJars pull in client-side web libraries
     "org.webjars" %% "webjars-play" % "2.3.0-2",
     "org.webjars" % "bootstrap" % "3.1.1-2",
@@ -47,6 +46,7 @@ libraryDependencies ++= {
     "org.webjars" % "angular-growl" % "0.4.0",
     "org.webjars" % "bindonce" % "0.3.1",
     "org.webjars" % "angular-chosen" % "1.0.6",
+    "org.webjars" % "font-awesome" % "4.3.0",
     "org.eclipse.jgit" % "org.eclipse.jgit" % "3.4.1.201406201815-r",
     "org.yaml" % "snakeyaml" % "1.13",
     "org.scalatest" % "scalatest_2.10" % "2.2.1" % "test"

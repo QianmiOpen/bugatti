@@ -4,7 +4,7 @@ import actor.ActorUtils
 import actor.salt.RefreshSpiritsActor.RefreshHosts
 import actor.salt._
 import controllers.BaseController
-import enums.{ModEnum, FuncEnum}
+import enums.{ModEnum, RoleEnum}
 import exceptions.UniqueNameException
 import models.conf.{AreaEnvironmentRelHelper, AreaInfo, AreaHelper, Area}
 import play.api.mvc._
@@ -44,7 +44,7 @@ object AreaController extends BaseController {
     Ok(Json.toJson(AreaEnvironmentRelHelper.findAreasByEnvId(envId)))
   }
 
-  def save = AuthAction(FuncEnum.area) { implicit request =>
+  def save = AuthAction(RoleEnum.admin) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       area =>
@@ -59,7 +59,7 @@ object AreaController extends BaseController {
     )
   }
 
-  def update = AuthAction(FuncEnum.area) { implicit request =>
+  def update = AuthAction(RoleEnum.admin) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       area =>
@@ -72,7 +72,7 @@ object AreaController extends BaseController {
     )
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
+  def delete(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
     AreaHelper.findById(id) match {
       case Some(area) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除区域", area))
@@ -81,7 +81,7 @@ object AreaController extends BaseController {
     }
   }
 
-  def refresh(id: Int) = AuthAction(FuncEnum.area) { implicit request =>
+  def refresh(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
     AreaHelper.findById(id) match {
       case Some(area) => {
         ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshHosts(id)

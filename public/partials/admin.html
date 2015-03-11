@@ -1,0 +1,26 @@
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li ng-class="{active: $state.includes('admin.overview')}"><a ui-sref="admin.overview">综合概况</a></li>
+                <li ng-class="{active: $state.includes('admin.system')}"><a ui-sref="admin.system">系统配置</a></li>
+            </ul>
+
+            <ul class="nav nav-sidebar">
+                <li ng-class="{active: $state.includes('admin.user')}"><a ui-sref="admin.user">用户管理</a></li>
+                <li ng-class="{active: $state.includes('admin.area')}"><a ui-sref="admin.area">区域管理</a></li>
+                <li ng-class="{active: $state.includes('admin.env')}"><a ui-sref="admin.env">环境管理</a></li>
+                <li ng-class="{active: $state.includes('admin.spirit')}"><a ui-sref="admin.spirit">网关管理</a></li>
+                <li ng-class="{active: $state.includes('admin.project')}"><a ui-sref="admin.project.my">项目管理</a></li>
+                <li ng-class="{active: $state.includes('admin.relation')}"><a ui-sref="admin.relation">关系设置</a></li>
+                <li ng-class="{active: $state.includes('admin.script')}"><a ui-sref="admin.script">脚本设置</a></li>
+            </ul>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div ui-view autoscroll='false'></div>
+        </div>
+    </div>
+</div>

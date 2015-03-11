@@ -18,9 +18,6 @@ import models.AppDB
 import models.conf._
 import models.task._
 import org.joda.time.DateTime
-import org.pac4j.cas.client.CasClient
-import org.pac4j.core.client.Clients
-import org.pac4j.play.Config
 import play.api.Play.current
 import play.api._
 import utils.Directory._
@@ -40,29 +37,14 @@ object Global extends GlobalSettings {
   }
 
   override def beforeStart(app: Application) {
-    System.setProperty("javax.net.ssl.trustStore", app.configuration.getString("ssl.trustStore").getOrElse("conf/certificate.jks"))
-
     // Create BUGATTI_HOME directory if it does not exist
     val dir = new File(BugattiHome)
     if (!dir.exists) {
       dir.mkdir
     }
-
   }
 
   override def onStart(app: Application) {
-    // cas init
-    val casClient = new CasClient()
-
-    val loginUrl = app.configuration.getString("cas.login_url").getOrElse("https://oflogin.of-crm.com")
-    casClient.setCasLoginUrl(loginUrl)
-
-    val logoutUrl = app.configuration.getString("cas.logout_url").getOrElse("https://oflogin.of-crm.com")
-    Config.setDefaultLogoutUrl(logoutUrl)
-
-    val callbackUrl = app.configuration.getString("cas.callback_url").getOrElse("http://bugatti.dev.ofpay.com/callback")
-    Config.setClients(new Clients(callbackUrl, casClient))
-
     val _db = AppDB.db
 
     /**
@@ -93,7 +75,6 @@ object Global extends GlobalSettings {
           TableQuery[ConfContentTable] ::
           TableQuery[ConfTable] ::
           TableQuery[VersionTable] ::
-          TableQuery[PermissionTable] ::
           TableQuery[EnvironmentTable] ::
           TableQuery[ProjectMemberTable] ::
           TableQuery[ProjectTable] ::
@@ -158,10 +139,10 @@ object AppData {
   def initData = {
     // 初始化超级管理员
     Seq(
-      User("of546", "李允恒", RoleEnum.admin, true, false, None, None, None),
-      User("of557", "彭毅", RoleEnum.admin, true, false, None, None, None),
-      User("of729", "金卫", RoleEnum.admin, false, false, None, None, None),
-      User("of9999", "龚平", RoleEnum.admin, true, false, None, None, None)
+      User("of546", "李允恒", RoleEnum.admin, "",  false, None, None, None),
+      User("of557", "彭毅", RoleEnum.admin, "", false, None, None, None),
+      User("of729", "金卫", RoleEnum.admin, "", false, None, None, None),
+      User("of9999", "龚平", RoleEnum.admin, "", false, None, None, None)
     ).foreach(UserHelper.create)
   }
 }
@@ -263,6 +244,7 @@ object AutoUpdate {
   }
 
   val versions = Seq(
+    Version(1, 14),
     Version(1, 13),
     Version(1, 12),
     Version(1, 11),

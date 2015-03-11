@@ -62,12 +62,12 @@ object ProjectController extends BaseController {
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(projectName: Option[String], my: Boolean, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def index(projectName: Option[String], my: Boolean, page: Int, pageSize: Int) = AuthAction() { implicit request =>
     val jobNo = if (my) Some(request.user.jobNo) else None
     Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), jobNo, page, pageSize)))
   }
 
-  def count(projectName: Option[String], my: Boolean) = AuthAction(FuncEnum.project) { implicit request =>
+  def count(projectName: Option[String], my: Boolean) = AuthAction() { implicit request =>
     val jobNo = if (my) Some(request.user.jobNo) else None
     Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty), jobNo)))
   }
@@ -84,7 +84,7 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.allExceptSelf(id)))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def delete(id: Int) = AuthAction() { implicit request =>
     if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
     else
       ProjectHelper.findById(id) match {
@@ -101,7 +101,7 @@ object ProjectController extends BaseController {
     }
   }
 
-  def save = AuthAction(FuncEnum.project) { implicit request =>
+  def save = AuthAction() { implicit request =>
     def createRepository(projectId: Int) = {
       LockUtil.lock(s"${projectId}") {
         val gitDir = getRepositoryDir(projectId)
@@ -127,7 +127,7 @@ object ProjectController extends BaseController {
     )
   }
 
-  def update(projectId: Int, envId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
+  def update(projectId: Int, envId: Int) = AuthAction() { implicit request =>
     projectForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       projectForm => {
@@ -146,12 +146,12 @@ object ProjectController extends BaseController {
   }
 
   // 根据权限加载不同环境的项目列表
-  def showAuth(envId: Int) = AuthAction(FuncEnum.task) { implicit request =>
+  def showAuth(envId: Int) = AuthAction() { implicit request =>
     val user = request.user
-    if (UserHelper.superAdmin_?(user)) {
+    if (UserHelper.admin_?(user)) {
       Ok(Json.toJson(ProjectHelper.all()))
     } else {
-      val eMember = EnvironmentMemberHelper.findEnvId_JobNo(envId, user.jobNo)
+      val eMember = EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo)
       if (eMember.isDefined) {
         Ok(Json.toJson(ProjectHelper.all()))
       } else {
@@ -191,11 +191,11 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectMemberHelper.findByProjectId_JobNo(projectId, jobNo.toLowerCase)))
   }
 
-  def members(projectId: Int) = AuthAction(FuncEnum.project) {
+  def members(projectId: Int) = AuthAction() {
     Ok(Json.toJson(ProjectMemberHelper.findByProjectId(projectId)))
   }
 
-  def saveMember(projectId: Int, jobNo: String) = AuthAction(FuncEnum.project) { implicit request =>
+  def saveMember(projectId: Int, jobNo: String) = AuthAction() { implicit request =>
     if (UserHelper.findByJobNo(jobNo) == None) Ok(_None)
     else if (!UserHelper.hasProjectSafe(projectId, request.user)) Forbidden
     else {
@@ -210,7 +210,7 @@ object ProjectController extends BaseController {
     }
   }
 
-  def updateMember(memberId: Int, op: String) = AuthAction(FuncEnum.project) { implicit request =>
+  def updateMember(memberId: Int, op: String) = AuthAction() { implicit request =>
     ProjectMemberHelper.findById(memberId) match {
       case Some(member) =>
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
@@ -290,7 +290,7 @@ object ProjectController extends BaseController {
     )(RelForm.apply)(RelForm.unapply)
   )
 
-  def addCluster = AuthAction(FuncEnum.project) { implicit request =>
+  def addCluster = AuthAction() { implicit request =>
     relForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       rel => {
@@ -326,7 +326,7 @@ object ProjectController extends BaseController {
     )
   }
 
-  def removeCluster(clusterId: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def removeCluster(clusterId: Int) = AuthAction() { implicit request =>
     HostHelper.findById(clusterId) match {
       case Some(rel) => {
         val result = HostHelper.unbind(rel)

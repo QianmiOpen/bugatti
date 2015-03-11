@@ -6,12 +6,10 @@
         <title>布加迪 - 自动化部署系统</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("img/favicon.png")">
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap-theme.min.css"))">
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/font-awesome.min.css"))">
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("angular-ui-tree.min.css"))">
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("chosen.min.css"))">
-
         <link rel="stylesheet" href="@routes.Assets.at("css/app.css")?v=@appVersion">
-
         <script type="text/javascript">
         document.domain = "@siteDomain";
         var app_version = "@appVersion";
@@ -22,44 +20,31 @@
             }
         }
         </script>
-
         @Html(org.webjars.play.RequireJS.setup("js/app"))
     </head>
     <body>
         <div growl></div>
         <!-- Fixed navbar -->
-        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-controller="NavCtrl">
+        <header class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-controller="NavCtrl">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Bugatti <span class="header-version">@appVersion</span></a>
+                    <a class="navbar-brand" href="/#/">Bugatti <span class="header-version">@appVersion</span></a>
+                    <span class="separator"></span>
                 </div>
+                <h1 class="title" ng-bind="'Admin area'"></h1>
                 <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li ui-sref-active="active"><a ui-sref="home">首页</a></li>
-                        <li ng-class="{active: $state.includes('conf')}" ng-if="user.permissions.length > 0 && user.role == 'user'">
-                            <a ng-if="user.permissions[0] != 'task'" ui-sref="{{'conf.' + user.permissions[0]}}">配置</a>
-                        </li>
-                        <li ng-class="{active: $state.includes('conf')}" ng-if="user.role == 'admin'">
-                            <a ui-sref="conf.user">配置</a>
-                        </li>
-                        <li ng-class="{active: $state.includes('task')}" access-permission="task" ><a ui-sref="task">任务</a></li>
-                        <li ng-if="user.sa == true" ui-sref-active="active"><a ui-sref="logs">日志</a></li>
-                    </ul>
-
                     <ul class="nav navbar-nav navbar-right">
-                        <li ng-if="user.username != ''"><a>欢迎，<strong>{{user.username}}</strong></a></li>
-                        <li ng-hide="user.username != ''"><a href="" ng-click="login()">登录</a></li>
-                        <li ng-show="user.username != ''"><a href="" ng-click="logout()">退出</a></li>
+                        <li><a ui-sref="help" tooltip-placement="bottom" tooltip="help"><i ng-class="{'fa fa-question-circle': true}"></i></a></li>
+                        <li><a href="" tooltip-placement="bottom" tooltip="Explore"><i ng-class="{'fa fa-globe': true}"></i></a></li>
+                        <li ng-show="user.role == 'admin'"><a ui-sref="admin.overview" tooltip-placement="bottom" tooltip="Admin area"><i ng-class="{'fa fa-cogs': true}"></i></a></li>
+                        <li ng-show="user.username"><a ui-sref="profile.index" tooltip-placement="bottom" tooltip="Profile settings"><i ng-class="{'fa fa-user': true}"></i></a></li>
+                        <li ng-show="user.username"><a href="" tooltip-placement="bottom" tooltip="Logout" ng-click="logout()"><i ng-class="{'fa fa-sign-out': true}"></i></a></li>
+                        <li ng-hide="user.username"><a ui-sref="login" tooltip-placement="bottom" tooltip="Login" ><i ng-class="{'fa fa-sign-in': true}"></i></a></li>
+                        <li ng-show="user.username"><a ui-sref="u" tooltip-placement="bottom" tooltip="{{user.username}}" ng-class="{'profile-pic': true}"><img ng-src="/img/avatar.png"></a></li>
                     </ul>
                 </div>
             </div>
-        </div>
+        </header>
 
         <div ui-view autoscroll='false'></div>
 

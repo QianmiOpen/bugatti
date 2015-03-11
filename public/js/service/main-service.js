@@ -39,7 +39,7 @@ define(['angular',
 
     // Auth
     app.factory('Auth', ['$http', '$cookieStore', '$cookies', function ($http, $cookieStore, $cookies) {
-        var currentUser = {username: '', role: '', sa: false, permissions: []};
+        var currentUser = {username: '', role: ''};
 
         function changeUser(user) {
             angular.extend(currentUser, user)
@@ -48,28 +48,27 @@ define(['angular',
         return {
             authorize: function(access) {
                 if (currentUser.role === 'admin') return true;
-
-                var keepGoing = false;
-                angular.forEach(currentUser.permissions, function(p) {
-                    if (p == access) {
-                        keepGoing = true;
-                        return;
-                    }
-                });
-                return keepGoing;
+                else if (access === 'admin' && access != currentUser.role) return false;
+                return true;
             },
             ping: function(success, error) {
                 $http.get('/ping').success(function(r) {
-                    changeUser({username: r.jobNo, role: r.role, sa: r.sa, permissions: r.permissions});
+                    changeUser({username: r.jobNo, role: r.role});
                     success();
                 }).error(function(r) {
-                    changeUser({username: '', role: '', sa: false, permissions: []});
+                    changeUser({username: '', role: ''});
                     error();
                 });
             },
+            login: function(user, success, error) {
+                $http.post('/login', user).success(function(r) {
+                    changeUser({username: r.jobNo, role: r.role});
+                    success();
+                }).error(error);
+            },
             logout: function(success, error) {
                 $http.post('/logout').success(function() {
-                    changeUser({username: '', role: '', sa: false, permissions: []});
+                    changeUser({username: '', role: ''});
                     success();
                 }).error(error);
             },

@@ -1,0 +1,22 @@
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+
+            <ul class="nav nav-sidebar">
+                <li ng-class="{active: $state.includes('profile.index')}"><a ui-sref="profile.index">账号配置</a></li>
+                <li ng-class="{active: $state.includes('profile.keys')}"><a ui-sref="profile.keys">密钥设置</a></li>
+            </ul>
+
+            <ul class="nav nav-sidebar">
+                <li ng-class="{active: $state.includes('profile.env')}"><a ui-sref="profile.env">环境管理</a></li>
+                <li ng-class="{active: $state.includes('profile.project')}"><a ui-sref="profile.project">项目管理</a></li>
+            </ul>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div ui-view autoscroll='false'></div>
+        </div>
+    </div>
+</div>

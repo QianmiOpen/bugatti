@@ -5,12 +5,15 @@ import actor.git.{AddUser, DeleteUser}
 import com.github.tototoshi.slick.MySQLJodaSupport._
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import enums.RoleEnum.Role
-import enums.{FuncEnum, LevelEnum, RoleEnum}
+import enums.{LevelEnum, RoleEnum}
 import exceptions.UniqueNameException
 import models.{MaybeFilter, PlayCache}
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.Play.current
 import play.api.cache.Cache
+import service.SystemSettingsService._
+import utils.LDAPUtil
 
 import scala.language.implicitConversions
 import scala.slick.driver.MySQLDriver.simple._
@@ -21,22 +24,21 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class User(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String])
-case class UserForm(jobNo: String, name: String, role: Role, superAdmin: Boolean, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String], functions: String) {
-  def toUser = User(jobNo.toLowerCase, name, role, superAdmin, locked, lastIp, lastVisit, sshKey)
-  def toPermission = Permission(jobNo.toLowerCase, functions.split(",").filterNot(_.isEmpty).map(i => FuncEnum(i.toInt)).toList)
+case class User(jobNo: String, name: String, role: Role, password: String, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String])
+case class UserForm(jobNo: String, name: String, role: Role, password: Option[String], locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String]) {
+  def toUser = User(jobNo.toLowerCase, name, role, password.getOrElse(""), locked, lastIp, lastVisit, sshKey)
 }
 
 class UserTable(tag: Tag) extends Table[User](tag, "app_user") {
   def jobNo = column[String]("job_no", O.PrimaryKey, O.DBType("VARCHAR(16)"))
   def name = column[String]("name", O.DBType("VARCHAR(20)"))
   def role = column[Role]("role", O.Default(RoleEnum.user), O.DBType("ENUM('admin', 'user')")) // 用户角色
-  def superAdmin = column[Boolean]("super_admin", O.Default(false), O.DBType("ENUM('y', 'n')"))(MappedColumnType.base[Boolean, String](if(_) "y" else "n",  _ == "y")) // 超级管理员
+  def password = column[String]("password", O.DBType("VARCHAR(256)"), O.Default(""))
   def locked = column[Boolean]("locked", O.Default(false), O.DBType("ENUM('y', 'n')"))(MappedColumnType.base[Boolean, String](if(_) "y" else "n",  _ == "y")) // 账号锁定
   def lastIp = column[String]("last_ip", O.Nullable, O.DBType("VARCHAR(40)")) // 最近登录ip
   def lastVisit = column[DateTime]("last_visit", O.Nullable, O.Default(DateTime.now())) // 最近登录时间
   def sshKey = column[String]("ssh_key", O.Nullable, O.DBType("VARCHAR(1025)"))
-  override def * = (jobNo, name, role, superAdmin, locked, lastIp.?, lastVisit.?, sshKey.?) <> (User.tupled, User.unapply _)
+  override def * = (jobNo, name, role, password, locked, lastIp.?, lastVisit.?, sshKey.?) <> (User.tupled, User.unapply _)
 
   def idx = index("idx_job_no", jobNo)
 }
@@ -83,10 +85,6 @@ object UserHelper extends PlayCache {
     _create(user)
   }
 
-  def create(user: User, permission: Permission) = db withTransaction { implicit session =>
-    _create(user) + PermissionHelper._create(permission)
-  }
-
   @throws[UniqueNameException]
   def _create(user: User)(implicit session: JdbcBackend#Session) = {
     Cache.remove(_cacheNoKey(user.jobNo)) // clean cache
@@ -99,7 +97,7 @@ object UserHelper extends PlayCache {
   }
 
   def delete(jobNo: String) = db withSession { implicit session =>
-    _delete(jobNo) + PermissionHelper.delete(jobNo)
+    _delete(jobNo)
   }
 
   def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
@@ -112,15 +110,6 @@ object UserHelper extends PlayCache {
     _update(jobNo, user)
   }
 
-  def update(jobNo: String, user: User, permission: Permission) = db withTransaction { implicit session =>
-    _update(jobNo, user) + (PermissionHelper.findByJobNo(jobNo) match {
-      case Some(_) =>
-        PermissionHelper._update(jobNo, permission)
-      case None =>
-        PermissionHelper._create(permission)
-    })
-  }
-
   @throws[UniqueNameException]
   def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
     Cache.remove(_cacheNoKey(jobNo)) // clean cache
@@ -131,13 +120,52 @@ object UserHelper extends PlayCache {
     }
   }
 
-  // ---------------------------------------------------
-  // 项目和环境资源权限, todo add cache
-  // ---------------------------------------------------
+  def authenticate(settings: SystemSettings, userName: String, password: String): Option[User] = {
+    if (settings.ldapAuthentication) {
+      ldapAuthentication(settings, userName, password)
+    } else {
+      defaultAuthentication(userName, password)
+    }
+  }
+
+  private def defaultAuthentication(userName: String, password: String) = {
+    findByJobNo(userName).collect {
+      case user if user.password == play.api.libs.Codecs.sha1(password) => Some(user)
+    } getOrElse None
+  }
+
+  private def ldapAuthentication(settings: SystemSettings, userName: String, password: String): Option[User] = {
+    LDAPUtil.authenticate(settings.ldap.get, userName, password) match {
+      case Right(ldapUserInfo) => {
+        findByJobNo(ldapUserInfo.userName) match {
+          case Some(user) => {
+            if (settings.ldap.get.fullNameAttribute.getOrElse("").isEmpty) {
+              update(user.jobNo, user.copy(name = ldapUserInfo.fullName))
+            }
+          }
+          case None =>
+            val user = User(jobNo      = ldapUserInfo.userName,
+                            name       = ldapUserInfo.fullName,
+                            role       = RoleEnum.user,
+                            password   = "",
+                            locked     = false,
+                            lastIp     = None,
+                            lastVisit  = None,
+                            sshKey     = None)
+            create(user)
+        }
+        findByJobNo(ldapUserInfo.userName)
+      }
+      case Left(errorMessage) => {
+        Logger.info(s"LDAP Authentication Failed: ${errorMessage}")
+        defaultAuthentication(userName, password)
+      }
+    }
+  }
 
   /* 项目委员 */
   def hasProject(projectId: Int, user: User): Boolean = {
-    if (superAdmin_?(user)) true
+    if (admin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId => true
       case _ => false
@@ -146,7 +174,7 @@ object UserHelper extends PlayCache {
 
   /* 项目委员长 */
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
-    if (superAdmin_?(user)) true
+    if (admin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId && member.level == LevelEnum.safe => true
       case _ => false
@@ -155,7 +183,7 @@ object UserHelper extends PlayCache {
 
   /* 指定环境下，根据安全级别选择委员长或成员访问 */
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
-    if (superAdmin_?(user)) true
+    if (admin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
       case Some(member) if member.projectId == projectId =>
         if (member.level == LevelEnum.safe) true
@@ -170,11 +198,11 @@ object UserHelper extends PlayCache {
 
   /* 环境成员 */
   def hasEnv(envId: Int, user: User): Boolean = {
-    if (superAdmin_?(user)) true
+    if (admin_?(user)) true
     else EnvironmentHelper.findById(envId) match {
       case Some(env) if env.jobNo == Some(user.jobNo) => true
       case Some(env) if env.jobNo != Some(user.jobNo) =>
-        EnvironmentMemberHelper.findEnvId_JobNo(envId, user.jobNo) match {
+        EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo) match {
           case Some(_) => true
           case _ => false
         }
@@ -182,6 +210,6 @@ object UserHelper extends PlayCache {
     }
   }
 
-  def superAdmin_?(user: User): Boolean = if (user.role == RoleEnum.admin && user.superAdmin) true else false
+  def admin_?(user: User): Boolean = if (user.role == RoleEnum.admin) true else false
 
 }

@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{ModEnum, FuncEnum}
+import enums.ModEnum
 import exceptions.UniqueNameException
 import models.conf._
 import org.joda.time.DateTime
@@ -81,7 +81,7 @@ object VersionController extends BaseController {
     Ok(Json.toJson(list.reverse.drop(list.length - 30).reverse))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def delete(id: Int) = AuthAction() { implicit request =>
     VersionHelper.findById(id) match {
       case Some(version) =>
         if (!UserHelper.hasProjectSafe(version.projectId, request.user)) Forbidden
@@ -94,7 +94,7 @@ object VersionController extends BaseController {
     }
   }
 
-  def save = AuthAction(FuncEnum.project) { implicit request =>
+  def save = AuthAction() { implicit request =>
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       versionForm => {
@@ -111,7 +111,7 @@ object VersionController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.project) { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     versionForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       versionForm => {

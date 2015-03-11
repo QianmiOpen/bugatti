@@ -1,7 +1,7 @@
 package controllers.conf
 
 import controllers.BaseController
-import enums.{StateEnum, ContainerTypeEnum, FuncEnum, ModEnum}
+import enums.{StateEnum, ContainerTypeEnum, ModEnum}
 import models.conf._
 import play.api.data.Forms._
 import play.api.data._
@@ -54,22 +54,22 @@ object RelationController extends BaseController {
     Ok(Json.toJson(HostHelper.findById(id)))
   }
 
-  def index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction(FuncEnum.relation) {
+  def index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int, pageSize: Int) = AuthAction() {
     val result = HostHelper.all(
       ip.filterNot(_.isEmpty), envId, projectId, sort, direction, page, pageSize)
     Ok(Json.toJson(result))
   }
 
-  def count(ip: Option[String], envId: Option[Int], projectId: Option[Int]) = AuthAction(FuncEnum.relation) {
+  def count(ip: Option[String], envId: Option[Int], projectId: Option[Int]) = AuthAction() {
     val result = HostHelper.count(ip.filterNot(_.isEmpty), envId, projectId)
     Ok(Json.toJson(result))
   }
 
-  def ips(envId: Int) = AuthAction(FuncEnum.relation) {
+  def ips(envId: Int) = AuthAction() {
     Ok(Json.toJson(HostHelper.findIpsByEnvId(envId)))
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     varRelForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
@@ -80,7 +80,7 @@ object RelationController extends BaseController {
 
   implicit val relationFormWrites = Json.writes[EnvRelForm]
 
-  def bind = AuthAction(FuncEnum.relation) { implicit request =>
+  def bind = AuthAction() { implicit request =>
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
@@ -93,7 +93,7 @@ object RelationController extends BaseController {
     )
   }
 
-  def unbind(id: Int) = AuthAction(FuncEnum.relation) { implicit request =>
+  def unbind(id: Int) = AuthAction() { implicit request =>
     HostHelper.findById(id) match {
       case Some(relation) =>
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,

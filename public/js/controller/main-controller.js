@@ -3,41 +3,42 @@
 'use strict';
 
 define(['angular',
-    './conf/user-controller',
-    './conf/area-controller',
-    './conf/env-controller',
-    './conf/spirit-controller',
-    './conf/project-controller',
-    './conf/template-controller',
-    './conf/conf-controller',
-    './conf/relation-controller',
-    './conf/system-controller',
-    './task/task-controller',
-    './logs/logs-controller'
+    './admin/overview-controller',
+    './admin/user-controller',
+    './admin/area-controller',
+    './admin/env-controller',
+    './admin/spirit-controller',
+    './admin/project-controller',
+    './admin/template-controller',
+    './admin/conf-controller',
+    './admin/relation-controller',
+    './admin/system-controller',
+    './admin/script-controller',
+    './admin/logs-controller',
+    './home/task-controller'
 ], function(angular) {
 
     /* Controllers */
     var app = angular.module('bugattiApp.controllers', [
-        'bugattiApp.controller.conf.userModule',
-        'bugattiApp.controller.conf.areaModule',
-        'bugattiApp.controller.conf.envModule',
-        'bugattiApp.controller.conf.spiritModule',
-        'bugattiApp.controller.conf.projectModule',
-        'bugattiApp.controller.conf.templateModule',
-        'bugattiApp.controller.conf.confModule',
-        'bugattiApp.controller.conf.relationModule',
-        'bugattiApp.controller.conf.systemModule',
-        'bugattiApp.controller.task.taskModule',
-        'bugattiApp.controller.logs.logsModule'
+        'bugattiApp.controller.admin.overviewModule',
+        'bugattiApp.controller.admin.userModule',
+        'bugattiApp.controller.admin.areaModule',
+        'bugattiApp.controller.admin.envModule',
+        'bugattiApp.controller.admin.spiritModule',
+        'bugattiApp.controller.admin.projectModule',
+        'bugattiApp.controller.admin.templateModule',
+        'bugattiApp.controller.admin.confModule',
+        'bugattiApp.controller.admin.relationModule',
+        'bugattiApp.controller.admin.systemModule',
+        'bugattiApp.controller.admin.scriptModule',
+        'bugattiApp.controller.admin.logsModule',
+        'bugattiApp.controller.home.taskModule'
     ]);
 
     // Auth
-    app.controller('NavCtrl', ['$rootScope', '$scope', '$location', 'Auth', function($rootScope, $scope, $location, Auth) {
+    app.controller('NavCtrl', ['$rootScope', '$scope', '$location', 'Auth',
+        function($rootScope, $scope, $location, Auth) {
         $scope.user = Auth.user;
-
-        $scope.login = function() {
-            window.open('/login','千米LDAP登陆','location=yes,left=200,top=100,width=1020,height=568,resizable=no');
-        }
 
         $scope.logout = function() {
             Auth.logout(function() {
@@ -45,6 +46,14 @@ define(['angular',
             }, function() {
                 $rootScope.error = "Failed to logout";
             });
+        };
+    }]);
+
+    app.controller('LoginCtrl', ['$scope', '$location', 'Auth', function($scope, $location, Auth) {
+        $scope.login = function(user) {
+            Auth.login(user, function() {
+                $location.path('/');
+            },function(){});
         };
     }]);
 

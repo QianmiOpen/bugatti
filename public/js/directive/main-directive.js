@@ -82,7 +82,8 @@ define(['angular'], function(angular) {
                         return parentCtrl.getwindowHeight();
                     },
                     function(value) {
-                        element.height(value);
+                        element.css('height', value+'px');
+                        //element.height(value);
                     }
                 );
             }
@@ -132,37 +133,6 @@ define(['angular'], function(angular) {
                     if (message && confirm(message)) {
                         scope.$apply(attrs.ngReallyClick);
                     }
-                });
-            }
-        }
-    }]);
-
-    // 用户权限列表展示
-    app.directive('permission', ['UserService', function(UserService) {
-        return {
-            restrict: 'E',
-            scope: {
-                jobNo: '@'
-            },
-            template: '<ul class="horizonal list-group"><li class="list-group-item" ng-repeat="func in functions">{{func}}</li></ul>',
-            link: function($scope, element, attrs) {
-                $scope.functions = [];
-                UserService.permissions($scope.jobNo, function(data) {
-                    angular.forEach(data.functions, function(f) {
-                        if (f === 'user') {
-                            $scope.functions.push('用户管理');
-                        } else if (f === 'area') {
-                            $scope.functions.push('区域管理');
-                        } else if (f === 'env') {
-                            $scope.functions.push('环境管理');
-                        } else if (f === 'project') {
-                            $scope.functions.push('项目管理');
-                        } else if (f === 'relation') {
-                            $scope.functions.push('关系配置');
-                        } else if (f === 'task') {
-                            $scope.functions.push('任务管理');
-                        }
-                    });
                 });
             }
         }
@@ -233,7 +203,7 @@ define(['angular'], function(angular) {
     }]);
 
     // 页面权限
-    app.directive('accessPermission', ['Auth', function(Auth) {
+    app.directive('access', ['Auth', function(Auth) {
         return {
             restrict: 'A',
             link: function($scope, element, attrs) {
@@ -242,7 +212,7 @@ define(['angular'], function(angular) {
                 $scope.$watch('user', function(user) {
                     updateCSS();
                 }, true);
-                attrs.$observe('accessPermission', function(al) {
+                attrs.$observe('access', function(al) {
                     access = al;
                     updateCSS();
                 });
@@ -406,7 +376,7 @@ define(['angular'], function(angular) {
     app.directive('projectTabs', function () {
         return {
             restrict: 'E',
-            templateUrl: 'partials/task/project-tabs.html',
+            templateUrl: 'partials/home/project-tabs.html',
             controller: function($scope) {
                 $scope.tab = 1;
                 $scope.isSet = function(checkTab) {
@@ -433,7 +403,7 @@ define(['angular'], function(angular) {
                 tsData: "=",
                 c: "="
             },
-            templateUrl: 'partials/task/project-balance.html',
+            templateUrl: 'partials/home/project-balance.html',
             controller: ['$scope', 'RelationService', 'TaskService', 'AreaService', 'Auth', 'growl', 'VersionService', '$modal', 'ProjectService',
                 function($scope, RelationService, TaskService, AreaService, Auth, growl, VersionService, $modal, ProjectService){
                     $scope.cTab = -1 ;
@@ -741,7 +711,7 @@ define(['angular'], function(angular) {
                 clusterTabStatus: "=",
                 chooseIndex: "="
             },
-            templateUrl: 'partials/task/cluster-tabs.html',
+            templateUrl: 'partials/home/cluster-tabs.html',
             controller: function($scope){
                 $scope.isClusterTabShow = function(ctab, c_index){
                     return $scope.cTab == ctab && $scope.chooseIndex == c_index && $scope.clusterTabStatus[$scope.chooseIndex + "_" + $scope.cTab];
@@ -753,7 +723,7 @@ define(['angular'], function(angular) {
     app.directive('logsTabs', function(){
         return {
             restrict: 'E',
-            templateUrl: 'partials/task/logs-tabs.html',
+            templateUrl: 'partials/home/logs-tabs.html',
             controller: function($scope){
                 $scope.ltab = 1;
                 $scope.isLogSet = function(ltab){
@@ -778,7 +748,7 @@ define(['angular'], function(angular) {
                 hisTabStatus: "=",
                 chooseIndex: "="
             },
-            templateUrl: 'partials/task/his-tabs.html',
+            templateUrl: 'partials/home/his-tabs.html',
             controller: function($scope){
                 $scope.isHisShow = function(sTab, sIndex){
                     console.log($scope.sTab, sTab, $scope.chooseIndex, sIndex)
@@ -795,7 +765,7 @@ define(['angular'], function(angular) {
                 c: "=",
                 project: "="
             },
-            templateUrl: 'partials/task/task-queue.html',
+            templateUrl: 'partials/home/task-queue.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.removeQueue = function(qid){
@@ -815,7 +785,7 @@ define(['angular'], function(angular) {
                 env: "=",
                 c: "="
             },
-            templateUrl: 'partials/task/cluster-properties.html',
+            templateUrl: 'partials/home/cluster-properties.html',
             controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
                 function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
                     $scope.delayLoadProperties = function(){
@@ -875,7 +845,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
 //            require: '^projectBalance',
-            templateUrl: 'partials/task/catalina-log.html',
+            templateUrl: 'partials/home/catalina-log.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.delayLoadCatalinaLog = function(){
@@ -986,7 +956,7 @@ define(['angular'], function(angular) {
                 env: "=",
                 project: "="
             },
-            templateUrl: 'partials/task/task-log.html',
+            templateUrl: 'partials/home/task-log.html',
             controller:['$scope', 'TaskService','$state','$stateParams',
                 function($scope,TaskService,$state,$stateParams){
                     $scope.delayLoadLog = function(){
@@ -1023,7 +993,7 @@ define(['angular'], function(angular) {
                 env: "=expanderEnv",
                 project: "=expanderProject"
             },
-            templateUrl: 'partials/task/project-item.html',
+            templateUrl: 'partials/home/project-item.html',
             controller: ['$scope', '$filter', 'growl', 'ProjectService', 'TemplateService',
                 function($scope, $filter, growl, ProjectService, TemplateService) {
                     // project variable
@@ -1189,7 +1159,7 @@ define(['angular'], function(angular) {
                 envs: "=expanderEnvs",
                 project: "=expanderProject"
             },
-            templateUrl: 'partials/task/project-conf.html',
+            templateUrl: 'partials/home/project-conf.html',
             controller: ['$scope', '$filter', 'ConfService', 'VersionService', '$modal', 'growl',
                 function($scope, $filter, ConfService, VersionService, $modal, growl) {
                     $scope.initVersions = function() {
@@ -1292,7 +1262,7 @@ define(['angular'], function(angular) {
                 tab: "=activeTab",
                 project: "=expanderProject"
             },
-            templateUrl: 'partials/task/project-dependency.html',
+            templateUrl: 'partials/home/project-dependency.html',
             controller: ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
                 function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
                     $scope.showDependencies = function(){
@@ -1373,7 +1343,7 @@ define(['angular'], function(angular) {
                 tab: "=activeTab",
                 project: "=expanderProject"
             },
-            templateUrl: 'partials/task/project-member.html',
+            templateUrl: 'partials/home/project-member.html',
             controller: ['$scope', '$stateParams', '$modal', 'ProjectService',
                 function($scope, $stateParams, $modal, ProjectService) {
                     // ---------------------------------------------
@@ -1467,7 +1437,7 @@ define(['angular'], function(angular) {
                 env: "=expanderEnv",
                 project: "=expanderProject"
             },
-            templateUrl: 'partials/task/task-history.html',
+            templateUrl: 'partials/home/task-history.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
                     $scope.hisTasks = [];
@@ -1545,7 +1515,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectConf',
-            templateUrl: 'partials/conf/project/uiview/conf-list.html',
+            templateUrl: 'partials/admin/project/uiview/conf-list.html',
             controller: ['$scope', function($scope) {
                 // parent
             }],
@@ -1568,7 +1538,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectConf',
-            templateUrl: 'partials/conf/project/uiview/conf-show.html',
+            templateUrl: 'partials/admin/project/uiview/conf-show.html',
             controller: ['$scope', '$modal', 'ConfService', function($scope, $modal, ConfService) {
                 $scope.initConfData = function() {
 
@@ -1632,7 +1602,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectConf',
-            templateUrl: 'partials/conf/project/uiview/conf-edit.html',
+            templateUrl: 'partials/admin/project/uiview/conf-edit.html',
             controller: ['$scope', '$filter', 'ConfService', function($scope, $filter, ConfService) {
                 $scope.initEditConf = function() {
 
@@ -1681,7 +1651,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectConf',
-            templateUrl: 'partials/conf/project/uiview/conf-new.html',
+            templateUrl: 'partials/admin/project/uiview/conf-new.html',
             controller: ['$scope', '$filter', 'ConfService', function($scope, $filter, ConfService) {
                 $scope.initCreate = function() {
                     $scope.conf = {envId: $scope.env.id, projectId: $scope.project.id, versionId: $scope.versionId};
@@ -1725,7 +1695,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectConf',
-            templateUrl: 'partials/conf/project/uiview/conf-copy.html',
+            templateUrl: 'partials/admin/project/uiview/conf-copy.html',
             controller: ['$scope', 'growl', 'VersionService', 'ConfService', function($scope, growl, VersionService, ConfService) {
                 $scope.initCopyConf = function() {
                     $scope.copyEnvs = angular.copy($scope.envs);
@@ -1780,7 +1750,7 @@ define(['angular'], function(angular) {
         return {
             restrict: 'E',
             require: '^projectConf',
-            templateUrl: 'partials/conf/project/uiview/conf-upload.html',
+            templateUrl: 'partials/admin/project/uiview/conf-upload.html',
             controller: ['$scope', '$timeout', '$upload', function($scope, $timeout, $upload) {
                 $scope.initUploadConf = function() {
                     $scope.filePath = "";

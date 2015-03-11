@@ -1,15 +1,15 @@
 package controllers.conf
 
-import java.nio.file.{Paths, Files}
+import java.nio.file.Files
 
 import exceptions.UniqueNameException
-import play.api.mvc.Action
 import utils.{TaskTools, FileUtil}
 import utils.ControlUtil._
-import controllers.{BaseController}
-import enums.{ModEnum, FuncEnum}
+import enums.{ModEnum, RoleEnum}
 import models.conf._
 import org.joda.time.DateTime
+import controllers.{BaseController}
+import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.Files.TemporaryFile
@@ -35,9 +35,6 @@ object ConfController extends BaseController {
   def msg(user: String, ip: String, msg: String, data: Conf) =
     Json.obj("mod" -> ModEnum.conf.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
-  // error?
-//  implicit val func = FuncEnum.project
-
   val confForm = Form(
     mapping(
       "id" -> optional(number),
@@ -54,7 +51,7 @@ object ConfController extends BaseController {
     )(ConfForm.apply)(ConfForm.unapply)
   )
 
-  def show(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
+  def show(id: Int) = AuthAction() {
     ConfHelper.findById(id) match {
       case Some(conf) =>
         Ok(Json.obj("conf" -> Json.toJson(conf), "confContent" -> ConfContentHelper.findById(id)))
@@ -62,11 +59,11 @@ object ConfController extends BaseController {
     }
   }
 
-  def all(envId: Int, projectId: Int, versionId: Int) = AuthAction(FuncEnum.project, FuncEnum.task) {
+  def all(envId: Int, projectId: Int, versionId: Int) = AuthAction(RoleEnum.user) {
     Ok(Json.toJson(ConfHelper.findByEnvId_ProjectId_VersionId(envId, projectId, versionId)))
   }
 
-  def delete(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
+  def delete(id: Int) = AuthAction() { implicit request =>
     ConfHelper.findById(id) match {
       case Some(conf) =>
         if (UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) ||
@@ -79,7 +76,7 @@ object ConfController extends BaseController {
     }
   }
 
-  def save = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
+  def save = AuthAction() { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
@@ -97,7 +94,7 @@ object ConfController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
@@ -123,7 +120,7 @@ object ConfController extends BaseController {
     else octetFileType.exists(_ == FileUtil.getExtension(filename))
   }
 
-  def upload = AuthAction[TemporaryFile](FuncEnum.project, FuncEnum.task) { implicit request =>
+  def upload = AuthAction[TemporaryFile]() { implicit request =>
     val reqConfForm: Option[ConfForm] = confForm.bindFromRequest().fold(
       formWithErrors => None,
       _confForm => Some(_confForm)
@@ -167,11 +164,11 @@ object ConfController extends BaseController {
     }
   }
 
-  def logs(confId: Int, page: Int, pageSize: Int) = AuthAction(FuncEnum.project) {
+  def logs(confId: Int, page: Int, pageSize: Int) = AuthAction() {
     Ok(Json.toJson(ConfLogHelper.all(confId, page, pageSize)))
   }
 
-  def logsCount(confId: Int) = AuthAction(FuncEnum.project) {
+  def logsCount(confId: Int) = AuthAction() {
     Ok(Json.toJson(ConfLogHelper.count(confId)))
   }
 
@@ -180,7 +177,7 @@ object ConfController extends BaseController {
       Json.obj("log"-> logType._1,"logContent" -> logType._2)
     }
   }
-  def log(id: Int) = AuthAction(FuncEnum.project) {
+  def log(id: Int) = AuthAction() {
     val log = ConfLogHelper.findById(id)
     val logContent = ConfLogContentHelper.findById(id)
     Ok(Json.toJson(log, logContent))
@@ -203,7 +200,7 @@ object ConfController extends BaseController {
       "copy" -> default(boolean, true)
     )(CopyForm.apply)(CopyForm.unapply)
   )
-  def copy = AuthAction(FuncEnum.project, FuncEnum.task) { implicit request =>
+  def copy = AuthAction() { implicit request =>
     copyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       copyForm => {
