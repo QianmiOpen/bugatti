@@ -1,8 +1,8 @@
-package controllers.conf
+package controllers.admin
 
 import controllers.BaseController
 import models.conf._
-import play.api.libs.json.{JsValue, JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Action
 
 /**

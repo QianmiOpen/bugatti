@@ -4,6 +4,10 @@ import play.api.mvc._
 
 import play.api.cache._
 
+/**
+ * 登录token
+ * @author of546
+ */
 trait Security { self: Controller =>
   implicit val app: play.api.Application = play.api.Play.current
 

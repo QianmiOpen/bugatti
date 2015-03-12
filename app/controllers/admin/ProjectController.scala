@@ -1,4 +1,4 @@
-package controllers.conf
+package controllers.admin
 
 import controllers.BaseController
 import enums._
@@ -9,9 +9,8 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json._
 import play.api.mvc.Action
-
 import utils.Directory._
-import utils.{LockUtil, JGitUtil}
+import utils.{JGitUtil, LockUtil}
 
 /**
  * 项目管理

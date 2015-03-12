@@ -1,4 +1,4 @@
-package controllers.conf
+package controllers.admin
 
 import actor.ActorUtils
 import actor.salt._

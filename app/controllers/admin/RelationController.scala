@@ -1,7 +1,7 @@
-package controllers.conf
+package controllers.admin
 
 import controllers.BaseController
-import enums.{StateEnum, ContainerTypeEnum, ModEnum}
+import enums.{ContainerTypeEnum, ModEnum, StateEnum}
 import models.conf._
 import play.api.data.Forms._
 import play.api.data._
@@ -10,6 +10,7 @@ import play.api.mvc.Action
 
 /**
  * 项目于环境关系配置
+ *
  * @author of546
  */
 object RelationController extends BaseController {

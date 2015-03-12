@@ -1,16 +1,15 @@
-package controllers.conf
+package controllers.admin
 
 import actor.ActorUtils
-import actor.salt.RefreshSpiritsActor.RefreshHosts
 import actor.salt._
 import controllers.BaseController
 import enums.{ModEnum, RoleEnum}
 import exceptions.UniqueNameException
-import models.conf.{AreaEnvironmentRelHelper, AreaInfo, AreaHelper, Area}
-import play.api.mvc._
-import play.api.data._
+import models.conf.{Area, AreaEnvironmentRelHelper, AreaHelper, AreaInfo}
 import play.api.data.Forms._
+import play.api.data._
 import play.api.libs.json.Json
+import play.api.mvc._
 
 /**
  * 区域管理

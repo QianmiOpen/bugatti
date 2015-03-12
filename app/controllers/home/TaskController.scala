@@ -1,4 +1,4 @@
-package controllers.task
+package controllers.home
 
 import actor.task.{ChangeQueues, TaskLog, MyActor}
 import controllers.BaseController
@@ -18,6 +18,8 @@ import play.api.libs.json.JsObject
 
 /**
  * 任务管理
+ *
+ * @author 729
  */
 object TaskController extends BaseController {
 

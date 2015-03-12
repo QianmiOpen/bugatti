@@ -1,6 +1,7 @@
 package models.conf
 
-import controllers.conf.DependencyNest
+
+import controllers.admin.DependencyNest
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current

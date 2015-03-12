@@ -16,7 +16,8 @@ import utils.ConfHelp
 import views._
 
 /**
- * of546
+ * 网站入口
+ * @author of546
  */
 object Application extends Controller with Security with SystemSettingsService {
 
@@ -94,142 +95,144 @@ object Application extends Controller with Security with SystemSettingsService {
     Ok(
       Routes.javascriptRouter("PlayRoutes")(
         // user
-        conf.routes.javascript.UserController.index,
-        conf.routes.javascript.UserController.count,
-        conf.routes.javascript.UserController.show,
-        conf.routes.javascript.UserController.save,
-        conf.routes.javascript.UserController.update,
-        conf.routes.javascript.UserController.delete,
+        admin.routes.javascript.UserController.index,
+        admin.routes.javascript.UserController.count,
+        admin.routes.javascript.UserController.show,
+        admin.routes.javascript.UserController.save,
+        admin.routes.javascript.UserController.update,
+        admin.routes.javascript.UserController.delete,
 
         // area
-        conf.routes.javascript.AreaController.all,
-        conf.routes.javascript.AreaController.get,
-        conf.routes.javascript.AreaController.list,
-        conf.routes.javascript.AreaController.save,
-        conf.routes.javascript.AreaController.update,
-        conf.routes.javascript.AreaController.delete,
-        conf.routes.javascript.AreaController.refresh,
+        admin.routes.javascript.AreaController.all,
+        admin.routes.javascript.AreaController.get,
+        admin.routes.javascript.AreaController.list,
+        admin.routes.javascript.AreaController.save,
+        admin.routes.javascript.AreaController.update,
+        admin.routes.javascript.AreaController.delete,
+        admin.routes.javascript.AreaController.refresh,
 
         // env
-        conf.routes.javascript.EnvController.index,
-        conf.routes.javascript.EnvController.all,
-        conf.routes.javascript.EnvController.count,
-        conf.routes.javascript.EnvController.show,
-        conf.routes.javascript.EnvController.save,
-        conf.routes.javascript.EnvController.update,
-        conf.routes.javascript.EnvController.delete,
-        conf.routes.javascript.EnvController.showAuth,
-        conf.routes.javascript.EnvController.allScriptVersion,
+        admin.routes.javascript.EnvController.index,
+        admin.routes.javascript.EnvController.all,
+        admin.routes.javascript.EnvController.count,
+        admin.routes.javascript.EnvController.show,
+        admin.routes.javascript.EnvController.save,
+        admin.routes.javascript.EnvController.update,
+        admin.routes.javascript.EnvController.delete,
+        admin.routes.javascript.EnvController.showAuth,
+        admin.routes.javascript.EnvController.allScriptVersion,
+
         // env member
-        conf.routes.javascript.EnvController.member,
-        conf.routes.javascript.EnvController.members,
-        conf.routes.javascript.EnvController.saveMember,
-        conf.routes.javascript.EnvController.deleteMember,
+        admin.routes.javascript.EnvController.member,
+        admin.routes.javascript.EnvController.members,
+        admin.routes.javascript.EnvController.saveMember,
+        admin.routes.javascript.EnvController.deleteMember,
 
         // spirit
-        conf.routes.javascript.SpiritController.all,
-        conf.routes.javascript.SpiritController.get,
-        conf.routes.javascript.SpiritController.refresh,
-        conf.routes.javascript.SpiritController.add,
-        conf.routes.javascript.SpiritController.delete,
-        conf.routes.javascript.SpiritController.update,
+        admin.routes.javascript.SpiritController.all,
+        admin.routes.javascript.SpiritController.get,
+        admin.routes.javascript.SpiritController.refresh,
+        admin.routes.javascript.SpiritController.add,
+        admin.routes.javascript.SpiritController.delete,
+        admin.routes.javascript.SpiritController.update,
 
         // project
-        conf.routes.javascript.ProjectController.show,
-        conf.routes.javascript.ProjectController.all,
-        conf.routes.javascript.ProjectController.allExceptSelf,
-        conf.routes.javascript.ProjectController.save,
-        conf.routes.javascript.ProjectController.index,
-        conf.routes.javascript.ProjectController.count,
-        conf.routes.javascript.ProjectController.update,
-        conf.routes.javascript.ProjectController.delete,
+        admin.routes.javascript.ProjectController.show,
+        admin.routes.javascript.ProjectController.all,
+        admin.routes.javascript.ProjectController.allExceptSelf,
+        admin.routes.javascript.ProjectController.save,
+        admin.routes.javascript.ProjectController.index,
+        admin.routes.javascript.ProjectController.count,
+        admin.routes.javascript.ProjectController.update,
+        admin.routes.javascript.ProjectController.delete,
         // project attribute
-        conf.routes.javascript.ProjectController.atts,
+        admin.routes.javascript.ProjectController.atts,
         // project variable
-        conf.routes.javascript.ProjectController.vars,
-        conf.routes.javascript.ProjectController.showAuth,
+        admin.routes.javascript.ProjectController.vars,
+        admin.routes.javascript.ProjectController.showAuth,
         // project member
-        conf.routes.javascript.ProjectController.member,
-        conf.routes.javascript.ProjectController.members,
-        conf.routes.javascript.ProjectController.saveMember,
-        conf.routes.javascript.ProjectController.updateMember,
+        admin.routes.javascript.ProjectController.member,
+        admin.routes.javascript.ProjectController.members,
+        admin.routes.javascript.ProjectController.saveMember,
+        admin.routes.javascript.ProjectController.updateMember,
 
         //project cluster
-        conf.routes.javascript.ProjectController.addCluster,
-        conf.routes.javascript.ProjectController.removeCluster,
+        admin.routes.javascript.ProjectController.addCluster,
+        admin.routes.javascript.ProjectController.removeCluster,
 
         // template
-        conf.routes.javascript.TemplateController.all,
-        conf.routes.javascript.TemplateController.save,
-        conf.routes.javascript.TemplateController.delete,
-        conf.routes.javascript.TemplateController.show,
-        conf.routes.javascript.TemplateController.update,
+        admin.routes.javascript.TemplateController.all,
+        admin.routes.javascript.TemplateController.save,
+        admin.routes.javascript.TemplateController.delete,
+        admin.routes.javascript.TemplateController.show,
+        admin.routes.javascript.TemplateController.update,
         // template item
-        conf.routes.javascript.TemplateController.items,
-        conf.routes.javascript.TemplateController.itemAttrs,
-        conf.routes.javascript.TemplateController.itemVars,
+        admin.routes.javascript.TemplateController.items,
+        admin.routes.javascript.TemplateController.itemAttrs,
+        admin.routes.javascript.TemplateController.itemVars,
 
         // version
-        conf.routes.javascript.VersionController.nexusVersions,
-        conf.routes.javascript.VersionController.index,
-        conf.routes.javascript.VersionController.count,
-        conf.routes.javascript.VersionController.show,
-        conf.routes.javascript.VersionController.delete,
-        conf.routes.javascript.VersionController.save,
-        conf.routes.javascript.VersionController.update,
-        conf.routes.javascript.VersionController.all,
-        conf.routes.javascript.VersionController.getVersions,
+        admin.routes.javascript.VersionController.nexusVersions,
+        admin.routes.javascript.VersionController.index,
+        admin.routes.javascript.VersionController.count,
+        admin.routes.javascript.VersionController.show,
+        admin.routes.javascript.VersionController.delete,
+        admin.routes.javascript.VersionController.save,
+        admin.routes.javascript.VersionController.update,
+        admin.routes.javascript.VersionController.all,
+        admin.routes.javascript.VersionController.getVersions,
 
         // dependency
-        conf.routes.javascript.DependencyController.show,
-        conf.routes.javascript.DependencyController.removeDependency,
-        conf.routes.javascript.DependencyController.addDependency,
-        conf.routes.javascript.DependencyController.updateTemplateProject,
+        admin.routes.javascript.DependencyController.show,
+        admin.routes.javascript.DependencyController.removeDependency,
+        admin.routes.javascript.DependencyController.addDependency,
+        admin.routes.javascript.DependencyController.updateTemplateProject,
 
         // conf
-        conf.routes.javascript.ConfController.all,
-        conf.routes.javascript.ConfController.show,
-        conf.routes.javascript.ConfController.save,
-        conf.routes.javascript.ConfController.delete,
-        conf.routes.javascript.ConfController.update,
-        conf.routes.javascript.ConfController.copy,
-        conf.routes.javascript.ConfController.completer,
+        admin.routes.javascript.ConfController.all,
+        admin.routes.javascript.ConfController.show,
+        admin.routes.javascript.ConfController.save,
+        admin.routes.javascript.ConfController.delete,
+        admin.routes.javascript.ConfController.update,
+        admin.routes.javascript.ConfController.copy,
+        admin.routes.javascript.ConfController.completer,
 
-        // system
-        conf.routes.javascript.SystemController.refresh,
+        // script
+        admin.routes.javascript.ScriptController.refresh,
 
         // conf logs
-        conf.routes.javascript.ConfController.logs,
-        conf.routes.javascript.ConfController.logsCount,
-        conf.routes.javascript.ConfController.log,
+        admin.routes.javascript.ConfController.logs,
+        admin.routes.javascript.ConfController.logsCount,
+        admin.routes.javascript.ConfController.log,
 
         // relation
-        conf.routes.javascript.RelationController.show,
-        conf.routes.javascript.RelationController.index,
-        conf.routes.javascript.RelationController.hosts,
-        conf.routes.javascript.RelationController.count,
-        conf.routes.javascript.RelationController.ips,
-        conf.routes.javascript.RelationController.bind,
-        conf.routes.javascript.RelationController.unbind,
-        conf.routes.javascript.RelationController.update,
-
-        //task
-        task.routes.javascript.TaskController.findLastTaskStatus,
-        task.routes.javascript.TaskController.findLastStatus,
-        task.routes.javascript.TaskController.joinProcess,
-        task.routes.javascript.TaskController.createNewTaskQueue,
-        task.routes.javascript.TaskController.getTemplates,
-        task.routes.javascript.TaskController.logHeaderContent,
-        task.routes.javascript.TaskController.removeTaskQueue,
-        task.routes.javascript.TaskController.forceTerminate,
-        task.routes.javascript.TaskController.findClusterByEnv_Project,
-        task.routes.javascript.TaskController.findHisTasks,
-        task.routes.javascript.TaskController.findCatalinaWSUrl,
-        task.routes.javascript.TaskController.logReader,
+        admin.routes.javascript.RelationController.show,
+        admin.routes.javascript.RelationController.index,
+        admin.routes.javascript.RelationController.hosts,
+        admin.routes.javascript.RelationController.count,
+        admin.routes.javascript.RelationController.ips,
+        admin.routes.javascript.RelationController.bind,
+        admin.routes.javascript.RelationController.unbind,
+        admin.routes.javascript.RelationController.update,
 
         // logs
-        logs.routes.javascript.LogsController.search,
-        logs.routes.javascript.LogsController.count
+        admin.routes.javascript.LogsController.search,
+        admin.routes.javascript.LogsController.count,
+
+        //task
+        home.routes.javascript.TaskController.findLastTaskStatus,
+        home.routes.javascript.TaskController.findLastStatus,
+        home.routes.javascript.TaskController.joinProcess,
+        home.routes.javascript.TaskController.createNewTaskQueue,
+        home.routes.javascript.TaskController.getTemplates,
+        home.routes.javascript.TaskController.logHeaderContent,
+        home.routes.javascript.TaskController.removeTaskQueue,
+        home.routes.javascript.TaskController.forceTerminate,
+        home.routes.javascript.TaskController.findClusterByEnv_Project,
+        home.routes.javascript.TaskController.findHisTasks,
+        home.routes.javascript.TaskController.findCatalinaWSUrl,
+        home.routes.javascript.TaskController.logReader
+
       )
     ).as(JAVASCRIPT)
   }

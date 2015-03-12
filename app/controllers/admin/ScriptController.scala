@@ -1,4 +1,4 @@
-package controllers.conf
+package controllers.admin
 
 import actor.ActorUtils
 import actor.git.ScriptGitActor._
@@ -6,7 +6,6 @@ import actor.salt.{ConnectedSpirits, RefreshSpiritsActor}
 import akka.pattern.ask
 import akka.util.Timeout
 import controllers.BaseController
-import enums.ModEnum
 import play.api.libs.json.Json
 
 import scala.concurrent.Await
@@ -17,7 +16,7 @@ import scala.language.postfixOps
  * 区域管理
  * @author of557
  */
-object SystemController extends BaseController {
+object ScriptController extends BaseController {
 
   implicit val timeout = Timeout(30 seconds)
 

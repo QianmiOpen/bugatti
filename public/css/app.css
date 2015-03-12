@@ -58,11 +58,11 @@ code {
 .mb20{margin-bottom: 20px;}
 .mtb15{ margin: 15px 0}
 .font48 { font-size: 48px;}
-.mt-16 {
-    margin-top: -16px;
-}
+.mt-16 { margin-top: -16px; }
 .mod { color: #999}
 .blue { color: #428bca}
+.red {color: #ff0000}
+.fwn{ font-weight: normal;}
 span.header-version {
     font-size: small;
 }

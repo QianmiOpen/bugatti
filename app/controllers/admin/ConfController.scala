@@ -1,24 +1,25 @@
-package controllers.conf
+package controllers.admin
 
 import java.nio.file.Files
 
-import exceptions.UniqueNameException
-import utils.{TaskTools, FileUtil}
-import utils.ControlUtil._
+import controllers.BaseController
 import enums.{ModEnum, RoleEnum}
+import exceptions.UniqueNameException
 import models.conf._
 import org.joda.time.DateTime
-import controllers.{BaseController}
-import play.api.mvc.Action
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
+import play.api.mvc.Action
+import utils.ControlUtil._
+import utils.{FileUtil, TaskTools}
 
 import scala.io.Source
 
 /**
  * 配置文件
+ * @author of546
  */
 object ConfController extends BaseController {
 
@@ -183,10 +184,7 @@ object ConfController extends BaseController {
     Ok(Json.toJson(log, logContent))
   }
 
-  // ===========================================================================
-  // 一键拷贝, todo 无事务，后期改造为队列
-  // 从目标拷贝
-  // ===========================================================================
+  // 一键拷贝
   implicit val conFormWrites = Json.writes[CopyForm]
   case class CopyForm(target_eid: Int, target_vid: Int, envId: Int, versionId: Int, projectId: Int, ovr: Boolean, copy: Boolean)
   val copyForm = Form(

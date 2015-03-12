@@ -1,4 +1,4 @@
-package controllers.conf
+package controllers.admin
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -9,8 +9,8 @@ import controllers.BaseController
 import enums.{ModEnum, RoleEnum}
 import exceptions.UniqueNameException
 import models.conf._
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
 import utils.SecurityUtil

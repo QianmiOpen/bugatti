@@ -1,13 +1,13 @@
-package controllers.conf
+package controllers.admin
 
 import controllers.BaseController
 import enums.ItemTypeEnum
 import exceptions.UniqueNameException
 import models.conf._
-import play.api.data._
 import play.api.data.Forms._
-import play.api.mvc._
+import play.api.data._
 import play.api.libs.json._
+import play.api.mvc._
 
 /**
  * 项目模板类型

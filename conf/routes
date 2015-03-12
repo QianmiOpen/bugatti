@@ -12,145 +12,145 @@ GET           /ping                                               controllers.Ap
 POST          /logout                                             controllers.Application.logout
 
 # User
-GET           /user                                               controllers.conf.UserController.index(jobNo: Option[String], page: Int ?=0, pageSize: Int ?=10)
-GET           /user/total                                         controllers.conf.UserController.count(jobNo: Option[String])
-GET           /user/:jobNo                                        controllers.conf.UserController.show(jobNo: String)
-DELETE        /user/:jobNo                                        controllers.conf.UserController.delete(jobNo: String)
-POST          /user                                               controllers.conf.UserController.save
-POST          /user/:jobNo/upload                                 controllers.conf.UserController.upload(jobNo: String)
-PUT           /user/:jobNo                                        controllers.conf.UserController.update(jobNo: String)
+GET           /user                                               controllers.admin.UserController.index(jobNo: Option[String], page: Int ?=0, pageSize: Int ?=10)
+GET           /user/total                                         controllers.admin.UserController.count(jobNo: Option[String])
+GET           /user/:jobNo                                        controllers.admin.UserController.show(jobNo: String)
+DELETE        /user/:jobNo                                        controllers.admin.UserController.delete(jobNo: String)
+POST          /user                                               controllers.admin.UserController.save
+POST          /user/:jobNo/upload                                 controllers.admin.UserController.upload(jobNo: String)
+PUT           /user/:jobNo                                        controllers.admin.UserController.update(jobNo: String)
 
 # Area
-GET           /area                                               controllers.conf.AreaController.all
-GET           /area/list                                          controllers.conf.AreaController.list(envId: Int ?=0)
-GET           /area/:id                                           controllers.conf.AreaController.get(id: Int)
-GET           /area/:id/refresh                                   controllers.conf.AreaController.refresh(id: Int)
-POST          /area                                               controllers.conf.AreaController.save
-PUT           /area                                               controllers.conf.AreaController.update
-DELETE        /area/:id                                           controllers.conf.AreaController.delete(id: Int)
+GET           /area                                               controllers.admin.AreaController.all
+GET           /area/list                                          controllers.admin.AreaController.list(envId: Int ?=0)
+GET           /area/:id                                           controllers.admin.AreaController.get(id: Int)
+GET           /area/:id/refresh                                   controllers.admin.AreaController.refresh(id: Int)
+POST          /area                                               controllers.admin.AreaController.save
+PUT           /area                                               controllers.admin.AreaController.update
+DELETE        /area/:id                                           controllers.admin.AreaController.delete(id: Int)
 
 # Environment
-GET           /env                                                controllers.conf.EnvController.index(page: Int ?=0, pageSize: Int ?=10)
-GET           /env/total                                          controllers.conf.EnvController.count
-GET           /env/all                                            controllers.conf.EnvController.all
-GET           /env/allScriptVersion                               controllers.conf.EnvController.allScriptVersion
-GET           /env/:id                                            controllers.conf.EnvController.show(id: Int)
-DELETE        /env/:id                                            controllers.conf.EnvController.delete(id: Int)
-POST          /env                                                controllers.conf.EnvController.save
-PUT           /env/:id                                            controllers.conf.EnvController.update(id: Int)
-POST          /env/auth                                           controllers.conf.EnvController.showAuth
+GET           /env                                                controllers.admin.EnvController.index(page: Int ?=0, pageSize: Int ?=10)
+GET           /env/total                                          controllers.admin.EnvController.count
+GET           /env/all                                            controllers.admin.EnvController.all
+GET           /env/allScriptVersion                               controllers.admin.EnvController.allScriptVersion
+GET           /env/:id                                            controllers.admin.EnvController.show(id: Int)
+DELETE        /env/:id                                            controllers.admin.EnvController.delete(id: Int)
+POST          /env                                                controllers.admin.EnvController.save
+PUT           /env/:id                                            controllers.admin.EnvController.update(id: Int)
+POST          /env/auth                                           controllers.admin.EnvController.showAuth
 # Environment member
-GET           /env/:envId/members                                 controllers.conf.EnvController.members(envId: Int)
-GET           /env/:envId/member/:jobNo                           controllers.conf.EnvController.member(envId: Int, jobNo: String)
-POST          /env/:envId/member                                  controllers.conf.EnvController.saveMember(envId: Int, jobNo: String)
-DELETE        /env/member/:memberId                               controllers.conf.EnvController.deleteMember(envId: Int, memberId: Int)
+GET           /env/:envId/members                                 controllers.admin.EnvController.members(envId: Int)
+GET           /env/:envId/member/:jobNo                           controllers.admin.EnvController.member(envId: Int, jobNo: String)
+POST          /env/:envId/member                                  controllers.admin.EnvController.saveMember(envId: Int, jobNo: String)
+DELETE        /env/member/:memberId                               controllers.admin.EnvController.deleteMember(envId: Int, memberId: Int)
 
 # Spirit
-GET           /spirit                                             controllers.conf.SpiritController.all
-GET           /spirit/:id                                         controllers.conf.SpiritController.get(id: Int)
-GET           /spirit/refresh/:id                                 controllers.conf.SpiritController.refresh(id: Int)
-DELETE        /spirit/:id                                         controllers.conf.SpiritController.delete(id: Int)
-POST          /spirit                                             controllers.conf.SpiritController.add
-PUT           /spirit/:id                                         controllers.conf.SpiritController.update(id: Int)
+GET           /spirit                                             controllers.admin.SpiritController.all
+GET           /spirit/:id                                         controllers.admin.SpiritController.get(id: Int)
+GET           /spirit/refresh/:id                                 controllers.admin.SpiritController.refresh(id: Int)
+DELETE        /spirit/:id                                         controllers.admin.SpiritController.delete(id: Int)
+POST          /spirit                                             controllers.admin.SpiritController.add
+PUT           /spirit/:id                                         controllers.admin.SpiritController.update(id: Int)
 
 
 # Project
-GET           /project                                            controllers.conf.ProjectController.index(projectName: Option[String], my: Boolean ?=false, page: Int?=0, pageSize: Int ?=30)
-GET           /project/total                                      controllers.conf.ProjectController.count(projectName: Option[String], my: Boolean ?=false)
-GET           /project/all                                        controllers.conf.ProjectController.all
-GET           /project/allExceptSelf/:id                          controllers.conf.ProjectController.allExceptSelf(id: Int)
-GET           /project/atts                                       controllers.conf.ProjectController.atts(projectId: Int)
-GET           /project/vars                                       controllers.conf.ProjectController.vars(projectId: Int, envId: Int)
-GET           /project/:id                                        controllers.conf.ProjectController.show(id: Int)
-DELETE        /project/:id                                        controllers.conf.ProjectController.delete(id: Int)
-POST          /project                                            controllers.conf.ProjectController.save
-PUT           /project/:projectId                                 controllers.conf.ProjectController.update(projectId: Int, envId: Int)
-POST          /project/auth                                       controllers.conf.ProjectController.showAuth(envId: Int)
-POST          /project/addCluster                                 controllers.conf.ProjectController.addCluster
-DELETE        /project/removeCluster/:clusterId                   controllers.conf.ProjectController.removeCluster(clusterId: Int)
+GET           /project                                            controllers.admin.ProjectController.index(projectName: Option[String], my: Boolean ?=false, page: Int?=0, pageSize: Int ?=30)
+GET           /project/total                                      controllers.admin.ProjectController.count(projectName: Option[String], my: Boolean ?=false)
+GET           /project/all                                        controllers.admin.ProjectController.all
+GET           /project/allExceptSelf/:id                          controllers.admin.ProjectController.allExceptSelf(id: Int)
+GET           /project/atts                                       controllers.admin.ProjectController.atts(projectId: Int)
+GET           /project/vars                                       controllers.admin.ProjectController.vars(projectId: Int, envId: Int)
+GET           /project/:id                                        controllers.admin.ProjectController.show(id: Int)
+DELETE        /project/:id                                        controllers.admin.ProjectController.delete(id: Int)
+POST          /project                                            controllers.admin.ProjectController.save
+PUT           /project/:projectId                                 controllers.admin.ProjectController.update(projectId: Int, envId: Int)
+POST          /project/auth                                       controllers.admin.ProjectController.showAuth(envId: Int)
+POST          /project/addCluster                                 controllers.admin.ProjectController.addCluster
+DELETE        /project/removeCluster/:clusterId                   controllers.admin.ProjectController.removeCluster(clusterId: Int)
 # Project member
-GET           /project/:projectId/members                         controllers.conf.ProjectController.members(projectId: Int)
-GET           /project/:projectId/member/:jobNo                   controllers.conf.ProjectController.member(projectId: Int, jobNo: String)
-POST          /project/:projectId/member                          controllers.conf.ProjectController.saveMember(projectId: Int, jobNo: String)
-PUT           /project/member/:memberId                           controllers.conf.ProjectController.updateMember(memberId: Int, op: String)
+GET           /project/:projectId/members                         controllers.admin.ProjectController.members(projectId: Int)
+GET           /project/:projectId/member/:jobNo                   controllers.admin.ProjectController.member(projectId: Int, jobNo: String)
+POST          /project/:projectId/member                          controllers.admin.ProjectController.saveMember(projectId: Int, jobNo: String)
+PUT           /project/member/:memberId                           controllers.admin.ProjectController.updateMember(memberId: Int, op: String)
 
 # Template
-GET           /tempalte/all                                       controllers.conf.TemplateController.all
-GET           /tempalte/itemAttrs                                 controllers.conf.TemplateController.itemAttrs(templateId: Int, scriptVersion: String)
-GET           /tempalte/itemVars                                  controllers.conf.TemplateController.itemVars(templateId: Int, scriptVersion: String)
-GET           /tempalte/:templateId/items                         controllers.conf.TemplateController.items(templateId: Int)
-GET           /tempalte/:id                                       controllers.conf.TemplateController.show(id: Int)
-DELETE        /tempalte/:id                                       controllers.conf.TemplateController.delete(id: Int)
-POST          /template                                           controllers.conf.TemplateController.save
-PUT           /template/:id                                       controllers.conf.TemplateController.update(id: Int)
+GET           /tempalte/all                                       controllers.admin.TemplateController.all
+GET           /tempalte/itemAttrs                                 controllers.admin.TemplateController.itemAttrs(templateId: Int, scriptVersion: String)
+GET           /tempalte/itemVars                                  controllers.admin.TemplateController.itemVars(templateId: Int, scriptVersion: String)
+GET           /tempalte/:templateId/items                         controllers.admin.TemplateController.items(templateId: Int)
+GET           /tempalte/:id                                       controllers.admin.TemplateController.show(id: Int)
+DELETE        /tempalte/:id                                       controllers.admin.TemplateController.delete(id: Int)
+POST          /template                                           controllers.admin.TemplateController.save
+PUT           /template/:id                                       controllers.admin.TemplateController.update(id: Int)
 
 # Project Version
-GET           /project/:projectId/version                         controllers.conf.VersionController.getVersions(projectId: Int, envId: Int)
-GET           /project/:projectId/nexusVersion                    controllers.conf.VersionController.nexusVersions(projectId: Int)
-GET           /project/:projectId/top                             controllers.conf.VersionController.index(vs: Option[String], projectId: Int, page: Int ?=0, pageSize: Int ?=10)
-GET           /project/:projectId/versoin/total                   controllers.conf.VersionController.count(vs: Option[String], projectId: Int)
-GET           /project/version/all                                controllers.conf.VersionController.all(pid: Int, top: Int ?=30)
-GET           /project/version/:id                                controllers.conf.VersionController.show(id: Int)
-DELETE        /project/version/:id                                controllers.conf.VersionController.delete(id: Int)
-POST          /porject/version                                    controllers.conf.VersionController.save
-PUT           /project/version/:id                                controllers.conf.VersionController.update(id: Int)
+GET           /project/:projectId/version                         controllers.admin.VersionController.getVersions(projectId: Int, envId: Int)
+GET           /project/:projectId/nexusVersion                    controllers.admin.VersionController.nexusVersions(projectId: Int)
+GET           /project/:projectId/top                             controllers.admin.VersionController.index(vs: Option[String], projectId: Int, page: Int ?=0, pageSize: Int ?=10)
+GET           /project/:projectId/versoin/total                   controllers.admin.VersionController.count(vs: Option[String], projectId: Int)
+GET           /project/version/all                                controllers.admin.VersionController.all(pid: Int, top: Int ?=30)
+GET           /project/version/:id                                controllers.admin.VersionController.show(id: Int)
+DELETE        /project/version/:id                                controllers.admin.VersionController.delete(id: Int)
+POST          /porject/version                                    controllers.admin.VersionController.save
+PUT           /project/version/:id                                controllers.admin.VersionController.update(id: Int)
 
 # Project Dependency
-GET           /project/dependency/:id                             controllers.conf.DependencyController.show(id: Int)
-DELETE        /project/removeDependency/:parentId/:childId        controllers.conf.DependencyController.removeDependency(parentId: Int, childId: Int)
-POST          /project/addDependency                              controllers.conf.DependencyController.addDependency
-POST          /project/updateTemplateProject                      controllers.conf.DependencyController.updateTemplateProject
+GET           /project/dependency/:id                             controllers.admin.DependencyController.show(id: Int)
+DELETE        /project/removeDependency/:parentId/:childId        controllers.admin.DependencyController.removeDependency(parentId: Int, childId: Int)
+POST          /project/addDependency                              controllers.admin.DependencyController.addDependency
+POST          /project/updateTemplateProject                      controllers.admin.DependencyController.updateTemplateProject
 
 # Conf
-GET           /conf/all                                           controllers.conf.ConfController.all(eid: Int, pid: Int, vid: Int)
-GET           /conf/completer                                     controllers.conf.ConfController.completer(envId: Int, projectId: Int, versionId: Int)
-GET           /conf/:id                                           controllers.conf.ConfController.show(id: Int)
-DELETE        /conf/:id                                           controllers.conf.ConfController.delete(id: Int)
-POST          /conf                                               controllers.conf.ConfController.save
-POST          /conf/upload                                        controllers.conf.ConfController.upload
-POST          /conf/copy                                          controllers.conf.ConfController.copy
-PUT           /conf/:id                                           controllers.conf.ConfController.update(id: Int)
+GET           /conf/all                                           controllers.admin.ConfController.all(eid: Int, pid: Int, vid: Int)
+GET           /conf/completer                                     controllers.admin.ConfController.completer(envId: Int, projectId: Int, versionId: Int)
+GET           /conf/:id                                           controllers.admin.ConfController.show(id: Int)
+DELETE        /conf/:id                                           controllers.admin.ConfController.delete(id: Int)
+POST          /conf                                               controllers.admin.ConfController.save
+POST          /conf/upload                                        controllers.admin.ConfController.upload
+POST          /conf/copy                                          controllers.admin.ConfController.copy
+PUT           /conf/:id                                           controllers.admin.ConfController.update(id: Int)
 
-# System
-PUT           /system/refresh                                     controllers.conf.SystemController.refresh
+# Script
+PUT           /script/refresh                                     controllers.admin.ScriptController.refresh
 
 # Conf Log
-GET           /conf/:confId/logs                                  controllers.conf.ConfController.logs(confId: Int, page: Int ?=0, pageSize: Int ?=10)
-GET           /conf/:confId/logs/total                            controllers.conf.ConfController.logsCount(confId: Int)
-GET           /conf/log/:id                                       controllers.conf.ConfController.log(id: Int)
+GET           /conf/:confId/logs                                  controllers.admin.ConfController.logs(confId: Int, page: Int ?=0, pageSize: Int ?=10)
+GET           /conf/:confId/logs/total                            controllers.admin.ConfController.logsCount(confId: Int)
+GET           /conf/log/:id                                       controllers.admin.ConfController.log(id: Int)
 
 # Relation
-GET           /relation                                           controllers.conf.RelationController.index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int ?=0, pageSize: Int ?=10)
-GET           /relation/total                                     controllers.conf.RelationController.count(ip: Option[String], envId: Option[Int], projectId: Option[Int])
-GET           /relation/ips                                       controllers.conf.RelationController.ips(envId: Int)
-GET           /relation/hosts                                     controllers.conf.RelationController.hosts(envId: Int, areaId: Int)
-GET           /relation/:id                                       controllers.conf.RelationController.show(id: Int)
-POST          /relation                                           controllers.conf.RelationController.bind
-PUT           /relation/:id                                       controllers.conf.RelationController.update(id: Int)
-DELETE        /relation/:id                                       controllers.conf.RelationController.unbind(id: Int)
+GET           /relation                                           controllers.admin.RelationController.index(ip: Option[String], envId: Option[Int], projectId: Option[Int], sort: Option[String], direction: Option[String], page: Int ?=0, pageSize: Int ?=10)
+GET           /relation/total                                     controllers.admin.RelationController.count(ip: Option[String], envId: Option[Int], projectId: Option[Int])
+GET           /relation/ips                                       controllers.admin.RelationController.ips(envId: Int)
+GET           /relation/hosts                                     controllers.admin.RelationController.hosts(envId: Int, areaId: Int)
+GET           /relation/:id                                       controllers.admin.RelationController.show(id: Int)
+POST          /relation                                           controllers.admin.RelationController.bind
+PUT           /relation/:id                                       controllers.admin.RelationController.update(id: Int)
+DELETE        /relation/:id                                       controllers.admin.RelationController.unbind(id: Int)
 
 # Task
-POST          /task/lastStatus                                    controllers.task.TaskController.findLastTaskStatus
-GET           /task/lastStatusSpecify                             controllers.task.TaskController.findLastStatus(envId: Int, projectId: Int, clusters: String)
-GET           /task/joinProcess/:envId/:projectId                 controllers.task.TaskController.joinProcess(envId: Int, projectId: Int)
-POST          /task/newTaskQueue                                  controllers.task.TaskController.createNewTaskQueue
-POST          /task/removeTaskQueue                               controllers.task.TaskController.removeTaskQueue(qid: Int)
-GET           /task/templates                                     controllers.task.TaskController.getTemplates(scriptVersion: String)
-GET           /task/terminate                                     controllers.task.TaskController.forceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
-GET           /task/clusters                                      controllers.task.TaskController.findClusterByEnv_Project(envId: Int, projectId: Int)
-GET           /task/history                                       controllers.task.TaskController.findHisTasks(envId: Int, projectId: Int)
-GET           /task/catalinaWS                                    controllers.task.TaskController.findCatalinaWSUrl(envId: Int)
+POST          /task/lastStatus                                    controllers.home.TaskController.findLastTaskStatus
+GET           /task/lastStatusSpecify                             controllers.home.TaskController.findLastStatus(envId: Int, projectId: Int, clusters: String)
+GET           /task/joinProcess/:envId/:projectId                 controllers.home.TaskController.joinProcess(envId: Int, projectId: Int)
+POST          /task/newTaskQueue                                  controllers.home.TaskController.createNewTaskQueue
+POST          /task/removeTaskQueue                               controllers.home.TaskController.removeTaskQueue(qid: Int)
+GET           /task/templates                                     controllers.home.TaskController.getTemplates(scriptVersion: String)
+GET           /task/terminate                                     controllers.home.TaskController.forceTerminate(envId: Int, projectId: Int, clusterName: Option[String])
+GET           /task/clusters                                      controllers.home.TaskController.findClusterByEnv_Project(envId: Int, projectId: Int)
+GET           /task/history                                       controllers.home.TaskController.findHisTasks(envId: Int, projectId: Int)
+GET           /task/catalinaWS                                    controllers.home.TaskController.findCatalinaWSUrl(envId: Int)
 
 # Task Log
-GET           /task/logHeaderContent                              controllers.task.TaskController.logHeaderContent(envId: Int, proId: Int, taskId: Int, byteSize: Int)
-GET           /task/LogReader                                     controllers.task.TaskController.logReader(envId: Int, proId: Int, taskId: Int)
+GET           /task/logHeaderContent                              controllers.home.TaskController.logHeaderContent(envId: Int, proId: Int, taskId: Int, byteSize: Int)
+GET           /task/LogReader                                     controllers.home.TaskController.logReader(envId: Int, proId: Int, taskId: Int)
 
 # Logs(user action)
-POST          /logs                                               controllers.logs.LogsController.search(page: Int ?=0, pageSize: Int ?=10)
-POST          /logs/total                                         controllers.logs.LogsController.count
+POST          /logs                                               controllers.admin.LogsController.search(page: Int ?=0, pageSize: Int ?=10)
+POST          /logs/total                                         controllers.admin.LogsController.count
 
 # Open API
-POST          /v1/project/version                                 controllers.conf.ProjectController.addVersion
+POST          /v1/project/version                                 controllers.admin.ProjectController.addVersion
 
 
 GET           /javascriptRoutes                                   controllers.Application.javascriptRoutes

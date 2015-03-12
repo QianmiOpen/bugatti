@@ -3,17 +3,17 @@
 'use strict';
 
 define(['angular',
-    './conf/user-service',
-    './conf/area-service',
-    './conf/env-service',
-    './conf/spirit-service',
-    './conf/project-service',
-    './conf/template-service',
-    './conf/conf-service',
-    './conf/relation-service',
-    './conf/system-service',
-    './task/task-service',
-    './logs/logs-service'
+    './admin/user-service',
+    './admin/area-service',
+    './admin/env-service',
+    './admin/spirit-service',
+    './admin/project-service',
+    './admin/template-service',
+    './admin/conf-service',
+    './admin/relation-service',
+    './admin/script-service',
+    './admin/logs-service',
+    './home/task-service'
 ], function(angular) {
 
     /* Services */
@@ -21,17 +21,17 @@ define(['angular',
 // Demonstrate how to register services
 // In this case it is a simple value service.
     var app = angular.module('bugattiApp.services', [
-        'bugattiApp.service.conf.userModule',
-        'bugattiApp.service.conf.areaModule',
-        'bugattiApp.service.conf.envModule',
-        'bugattiApp.service.conf.spiritModule',
-        'bugattiApp.service.conf.projectModule',
-        'bugattiApp.service.conf.templateModule',
-        'bugattiApp.service.conf.confModule',
-        'bugattiApp.service.conf.relationModule',
-        'bugattiApp.service.conf.systemModule',
-        'bugattiApp.service.task.taskModule',
-        'bugattiApp.service.logs.logsModule'
+        'bugattiApp.service.admin.userModule',
+        'bugattiApp.service.admin.areaModule',
+        'bugattiApp.service.admin.envModule',
+        'bugattiApp.service.admin.spiritModule',
+        'bugattiApp.service.admin.projectModule',
+        'bugattiApp.service.admin.templateModule',
+        'bugattiApp.service.admin.confModule',
+        'bugattiApp.service.admin.relationModule',
+        'bugattiApp.service.admin.scriptModule',
+        'bugattiApp.service.admin.logsModule',
+        'bugattiApp.service.home.taskModule'
     ]);
 
     app.value('version', '0.1');

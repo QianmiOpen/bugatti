@@ -10,7 +10,9 @@ import enums.RoleEnum._
 case class RequestWithUser[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
 
 /**
- * of546
+ * 基础controller
+ *
+ * @author of546
  */
 trait BaseController extends Controller with Security {
 

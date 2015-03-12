@@ -105,7 +105,7 @@ define(['angular'], function(angular) {
 
         $scope.wsInvoke = function(){
             var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-            var path = PlayRoutes.controllers.task.TaskController.joinProcess($scope.env.id, $state.params.pid).webSocketURL();
+            var path = PlayRoutes.controllers.home.TaskController.joinProcess($scope.env.id, $state.params.pid).webSocketURL();
 
             $scope.closeWS();
             $scope.taskSocket = new WS(path);

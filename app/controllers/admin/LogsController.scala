@@ -1,11 +1,11 @@
-package controllers.logs
+package controllers.admin
 
 import controllers.BaseController
-import models.logs.{LogsHelper, Logs}
-import play.api.mvc._
-import play.api.data._
+import models.logs.{Logs, LogsHelper}
 import play.api.data.Forms._
+import play.api.data._
 import play.api.libs.json._
+import play.api.mvc._
 
 /**
  * log日志

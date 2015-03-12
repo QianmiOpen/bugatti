@@ -1,13 +1,13 @@
-package controllers.conf
+package controllers.admin
 
-import enums.{ModEnum, LevelEnum, RoleEnum}
+import controllers.BaseController
+import enums.{LevelEnum, ModEnum}
 import exceptions.UniqueNameException
 import models.conf._
-import play.api.mvc._
-import controllers.BaseController
-import play.api.libs.json._
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json._
+import play.api.mvc._
 
 /**
  * 环境管理

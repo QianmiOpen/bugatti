@@ -1,16 +1,16 @@
-package controllers.conf
+package controllers.admin
 
 import controllers.BaseController
 import enums.ModEnum
 import exceptions.UniqueNameException
 import models.conf._
 import org.joda.time.DateTime
-import utils.ControlUtil._
 import play.api.Logger
-import play.api.data._
 import play.api.data.Forms._
-import play.api.mvc._
+import play.api.data._
 import play.api.libs.json._
+import play.api.mvc._
+import utils.ControlUtil._
 
 import scala.collection.mutable
 import scala.io.Source
