@@ -219,6 +219,10 @@ object Application extends Controller with Security with SystemSettingsService {
         admin.routes.javascript.LogsController.search,
         admin.routes.javascript.LogsController.count,
 
+        // system
+        admin.routes.javascript.SystemController.index,
+        admin.routes.javascript.SystemController.update,
+
         //task
         home.routes.javascript.TaskController.findLastTaskStatus,
         home.routes.javascript.TaskController.findLastStatus,

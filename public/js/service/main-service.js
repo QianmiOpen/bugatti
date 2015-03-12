@@ -13,6 +13,7 @@ define(['angular',
     './admin/relation-service',
     './admin/script-service',
     './admin/logs-service',
+    './admin/system-service',
     './home/task-service'
 ], function(angular) {
 
@@ -31,6 +32,7 @@ define(['angular',
         'bugattiApp.service.admin.relationModule',
         'bugattiApp.service.admin.scriptModule',
         'bugattiApp.service.admin.logsModule',
+        'bugattiApp.service.admin.systemModule',
         'bugattiApp.service.home.taskModule'
     ]);
 

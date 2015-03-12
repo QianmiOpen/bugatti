@@ -129,6 +129,10 @@ POST          /relation                                           controllers.ad
 PUT           /relation/:id                                       controllers.admin.RelationController.update(id: Int)
 DELETE        /relation/:id                                       controllers.admin.RelationController.unbind(id: Int)
 
+# System
+GET           /system                                             controllers.admin.SystemController.index
+POST          /system                                             controllers.admin.SystemController.update
+
 # Task
 POST          /task/lastStatus                                    controllers.home.TaskController.findLastTaskStatus
 GET           /task/lastStatusSpecify                             controllers.home.TaskController.findLastStatus(envId: Int, projectId: Int, clusters: String)

@@ -75,8 +75,8 @@ object UserController extends BaseController {
   def save = AuthAction() { implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
-      userForm => {
-        val toUser = userForm.toUser
+      _userForm => {
+        val toUser = _userForm.toUser
         if (request.user.role == RoleEnum.user) Forbidden
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", toUser))
@@ -93,8 +93,8 @@ object UserController extends BaseController {
   def update(jobNo: String) = AuthAction() { implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
-      userForm => {
-        val toUser = userForm.toUser
+      _userForm => {
+        val toUser = _userForm.toUser
         if (request.user.role == RoleEnum.user) Forbidden
         else {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", toUser))
