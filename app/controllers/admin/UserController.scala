@@ -32,59 +32,61 @@ object UserController extends BaseController {
       "jobNo" -> nonEmptyText,
       "name" -> nonEmptyText,
       "role" -> enums.form.enum(RoleEnum),
-      "password" -> optional(text),
+      "password" -> optional(text(maxLength = 256)),
       "locked" -> boolean,
       "lastIp" -> optional(text),
       "lastVisit" -> optional(jodaDate("yyyy-MM-dd HH:mm:ss")),
       "sshKey" -> optional(text)
-    )(UserForm.apply)(UserForm.unapply)
+    )(User.apply)(User.unapply)
   )
 
   def show(jobNo: String) = AuthAction() { implicit request =>
-    Ok(Json.toJson(UserHelper.findByJobNo(jobNo)))
-  }
-
-  def index(jobNo: Option[String], page: Int, pageSize: Int) = AuthAction() { implicit request =>
-    if (request.user.role == RoleEnum.admin) {
-      Ok(Json.toJson(UserHelper.all(jobNo.filterNot(_.isEmpty), page, pageSize)))
+    val user = UserHelper.findByJobNo(jobNo)
+    if (UserHelper.admin_?(request.user) || request.user.jobNo == jobNo.toLowerCase) {
+      Ok(Json.toJson(user.collect {
+        case u =>
+          if (u.sshKey.nonEmpty)
+            u.copy(sshKey = Some(SecurityUtil.decryptUK(u.sshKey.get)))
+          else u
+      }))
     } else {
-      Ok(Json.toJson(UserHelper.all(Some(request.user.jobNo), page, pageSize)))
+      Ok(Json.toJson(user.collect { case u => u.copy(sshKey = None) }))
     }
   }
 
-  def count(jobNo: Option[String]) = AuthAction() { implicit request =>
-    if (request.user.role == RoleEnum.admin) {
-      Ok(Json.toJson(UserHelper.count(jobNo.filterNot(_.isEmpty))))
-    } else {
-      Ok(Json.toJson(UserHelper.count(Some(request.user.jobNo))))
-    }
+  def index(jobNo: Option[String], page: Int, pageSize: Int) = AuthAction(RoleEnum.admin) { implicit request =>
+    Ok(Json.toJson(UserHelper.all(jobNo.filterNot(_.isEmpty), page, pageSize)))
   }
 
-  def delete(jobNo: String) = AuthAction() { implicit request =>
+  def count(jobNo: Option[String]) = AuthAction(RoleEnum.admin) { implicit request =>
+    Ok(Json.toJson(UserHelper.count(jobNo.filterNot(_.isEmpty))))
+  }
+
+  def delete(jobNo: String) = AuthAction(RoleEnum.admin) { implicit request =>
     UserHelper.findByJobNo(jobNo.toLowerCase) match {
-      case Some(user) =>
-        if (request.user.role == RoleEnum.user) Forbidden
-        else {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
-          Ok(Json.toJson(UserHelper.delete(user.jobNo)))
-        }
+      case Some(user) => {
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除用户", user))
+        Ok(Json.toJson(UserHelper.delete(user.jobNo)))
+      }
       case None => NotFound
     }
   }
 
-  def save = AuthAction() { implicit request =>
+  def save = AuthAction(RoleEnum.admin) { implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       _userForm => {
-        val toUser = _userForm.toUser
-        if (request.user.role == RoleEnum.user) Forbidden
-        else {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", toUser))
-          try {
-            Ok(Json.toJson(UserHelper.create(toUser.copy(jobNo = toUser.jobNo.toLowerCase))))
-          } catch {
-            case un: UniqueNameException => Ok(_Exist)
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增用户", _userForm))
+        try {
+          val create2user = _userForm.sshKey match {
+            case Some(key) =>
+              ActorUtils.keyGit ! UpdateUser(_userForm.copy(sshKey = Some(key)))
+              _userForm.copy(sshKey = Some(SecurityUtil.encryptUK(key)))
+            case None => _userForm
           }
+          Ok(Json.toJson(UserHelper.create(create2user.copy(jobNo = _userForm.jobNo.toLowerCase))))
+        } catch {
+          case un: UniqueNameException => Ok(_Exist)
         }
       }
     )
@@ -94,36 +96,22 @@ object UserController extends BaseController {
     userForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       _userForm => {
-        val toUser = _userForm.toUser
-        if (request.user.role == RoleEnum.user) Forbidden
-        else {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", toUser))
+        if (UserHelper.admin_?(request.user) || request.user.jobNo == jobNo) {
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改用户", _userForm))
           try {
-            Ok(Json.toJson(UserHelper.update(jobNo.toLowerCase, toUser)))
+            val update2user = _userForm.sshKey match {
+              case Some(key) =>
+                ActorUtils.keyGit ! UpdateUser(_userForm.copy(sshKey = Some(key)))
+                _userForm.copy(sshKey = Some(SecurityUtil.encryptUK(key)))
+              case None => _userForm
+            }
+            Ok(Json.toJson(UserHelper.update(jobNo, update2user.copy(jobNo = _userForm.jobNo.toLowerCase))))
           } catch {
             case un: UniqueNameException => Ok(_Exist)
           }
-        }
+        } else Forbidden
       }
     )
-  }
-
-  def upload(jobNo: String) = AuthAction[TemporaryFile]() { implicit request =>
-    if (UserHelper.admin_?(request.user) || request.user.jobNo == jobNo) {
-      val result = request.body.asMultipartFormData.map { body =>
-        val fileContent = body.file("myFile").filter(f => f.ref.file.length() < 1 * 1024 * 1024).map { tempFile =>
-          new String(Files.readAllBytes(tempFile.ref.file.toPath), StandardCharsets.UTF_8)
-        }
-        (UserHelper.findByJobNo(jobNo), fileContent) match {
-          case (Some(user), Some(value)) =>
-            ActorUtils.keyGit ! UpdateUser(user.copy(sshKey = Some(value)))
-            val update2user = user.copy(sshKey = Some(SecurityUtil.encryptUK(value)))
-            UserHelper.update(jobNo, update2user)
-          case _ => 0
-        }
-      }
-      Ok(if (result == Some(1)) _Success else _Fail)
-    } else Forbidden
   }
 
 }

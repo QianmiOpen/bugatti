@@ -6,27 +6,35 @@
 <form name="form" class="form-horizontal" novalidate>
 
     <div class="form-group">
+        <label for="jobNo" class="col-sm-3 control-label">工号：</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" ng-model="user.jobNo" name="jobNo" id="jobNo" ng-maxlength="10" placeholder="必填，添加后不可修改" required >
+        </div>
+        <div ng-show="form.jobNo.$dirty && form.jobNo.$invalid" class="has-error">
+            <span ng-show="form.jobNo.$error.required" class="control-label">请输入工号</span>
+            <span ng-show="form.jobNo.$error.maxlength" class="control-label">超过长度</span>
+            <span ng-show="form.jobNo.$error.exists" class="control-label">该工号已存在，请换一个</span>
+        </div>
+    </div>
+
+    <div class="form-group">
         <label for="name" class="col-sm-3 control-label">姓名：</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="user.name" name="name" id="name" ng-maxlength="8" placeholder="必填，重复加序号" required>
+            <input type="text" class="form-control" ng-model="user.name" name="name" id="name" ng-maxlength="8" placeholder="必填" required>
         </div>
         <div ng-show="form.name.$dirty && form.name.$invalid" class="has-error">
             <span ng-show="form.name.$error.required" class="control-label">请输入姓名</span>
-            <span ng-show="form.name.$error.pattern" class="control-label">无效的名称</span>
             <span ng-show="form.name.$error.maxlength" class="control-label">超过长度</span>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="jobNo" class="col-sm-3 control-label">工号：</label>
+        <label for="password" class="col-sm-3 control-label">密码：</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="user.jobNo" name="jobNo" id="jobNo" ng-maxlength="10" placeholder="必填，以OF开头" required ng-pattern="/^of[0-9]{1,10}$/i">
+            <input type="password" class="form-control" ng-model="user.password" name="password" id="password" placeholder="非LDAP账号必填" ng-maxlength="256" >
         </div>
-        <div ng-show="form.jobNo.$dirty && form.jobNo.$invalid" class="has-error">
-            <span ng-show="form.jobNo.$error.required" class="control-label">请输入工号</span>
-            <span ng-show="form.jobNo.$error.pattern" class="control-label">无效的工号</span>
-            <span ng-show="form.jobNo.$error.maxlength" class="control-label">超过长度</span>
-            <span ng-show="form.jobNo.$error.exists" class="control-label">该工号已存在，请换一个</span>
+        <div ng-show="form.password.$dirty && form.password.$invalid" class="has-error">
+            <span ng-show="form.password.$error.maxlength" class="control-label">超过长度</span>
         </div>
     </div>
 
@@ -34,27 +42,30 @@
         <label class="col-sm-3 control-label">角色：</label>
         <div class="col-sm-5">
             <label class="radio-inline">
-                <input type="radio" name="role" id="role-user" ng-model="user.role" value="user" ng-click="user.superAdmin=false">
-                普通用户
+                <input type="radio" name="role" id="role-user" ng-model="user.role" value="user">
+                <i class="fa fa-user"></i> 用户
             </label>
-            <label class="radio-inline" ng-if="loginUser.sa">
+            <label class="radio-inline">
                 <input type="radio" name="role" id="role-admin" ng-model="user.role" value="admin">
-                管理员
-            </label>
-            <label class="checkbox-inline" ng-if="loginUser.sa">
-                <input type="checkbox" name="superAdmin" id="superAdmin" ng-disabled="user.role != 'admin'" ng-model="user.superAdmin" value="option3"> 超级管理员
-                <sup class="btn-info" href="" tooltip-placement="right" tooltip="当前用户必须为超级管理员!">?</sup>
+                <i class="fa fa-user-secret"></i> 管理员
             </label>
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-sm-3 control-label">状态：</label>
+        <label class="col-sm-3 control-label">状态<sup class="btn-info" href="" tooltip-placement="left" tooltip="锁定后账号不可登录!">?</sup>：</label>
         <div class="col-sm-5">
             <label class="checkbox-inline">
-                <input type="checkbox" name="locked" id="locked" ng-model="user.locked" value="true"> 锁定
-                <sup class="btn-info" href="" tooltip-placement="right" tooltip="锁定则不能登录!">?</sup>
+                <input type="checkbox" name="locked" id="locked" ng-model="user.locked" value="true">
+                <i class="fa fa-lock"></i> 锁定
             </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label">SSH Keys：</label>
+        <div class="col-sm-6">
+            <textarea class="form-control" name="sshKey" id="sshKey" cols="50" rows="8" ng-model="user.sshKey" placeholder="~/.ssh/id_rsa.pub 内容"></textarea>
         </div>
     </div>
 

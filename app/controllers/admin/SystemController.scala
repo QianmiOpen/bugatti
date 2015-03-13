@@ -39,7 +39,7 @@ object SystemController extends BaseController with SystemSettingsService {
     )(SystemSettings.apply)(SystemSettings.unapply)
   )
 
-  def index() = AuthAction(RoleEnum.admin) { implicit request =>
+  def index() = AuthAction(RoleEnum.admin) {
     Ok(Json.toJson(loadSystemSettings()))
   }
 

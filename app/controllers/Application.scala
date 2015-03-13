@@ -30,6 +30,7 @@ object Application extends Controller with Security with SystemSettingsService {
 
     def withToken(token: (String, String)): Result = {
       Cache.set(token._1, token._2, CacheExpiration)
+      // todo 安全问题,angular读取cookie信息必须关闭httpOnly(防止js读取冲突)
       result.withCookies(Cookie(AuthTokenCookieKey, token._1, None, domain = Some(siteDomain), httpOnly = false))
     }
 

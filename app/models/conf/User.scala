@@ -24,21 +24,18 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class User(jobNo: String, name: String, role: Role, password: String, locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String])
-case class UserForm(jobNo: String, name: String, role: Role, password: Option[String], locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String]) {
-  def toUser = User(jobNo.toLowerCase, name, role, password.getOrElse(""), locked, lastIp, lastVisit, sshKey)
-}
+case class User(jobNo: String, name: String, role: Role, password: Option[String], locked: Boolean, lastIp: Option[String], lastVisit: Option[DateTime], sshKey: Option[String])
 
 class UserTable(tag: Tag) extends Table[User](tag, "app_user") {
   def jobNo = column[String]("job_no", O.PrimaryKey, O.DBType("VARCHAR(16)"))
   def name = column[String]("name", O.DBType("VARCHAR(20)"))
   def role = column[Role]("role", O.Default(RoleEnum.user), O.DBType("ENUM('admin', 'user')")) // 用户角色
-  def password = column[String]("password", O.DBType("VARCHAR(256)"), O.Default(""))
+  def password = column[String]("password", O.Nullable, O.DBType("VARCHAR(256)"))
   def locked = column[Boolean]("locked", O.Default(false), O.DBType("ENUM('y', 'n')"))(MappedColumnType.base[Boolean, String](if(_) "y" else "n",  _ == "y")) // 账号锁定
-  def lastIp = column[String]("last_ip", O.Nullable, O.DBType("VARCHAR(40)")) // 最近登录ip
+  def lastIp = column[String]("last_ip", O.Nullable, O.DBType("VARCHAR(40)"))           // 最近登录ip
   def lastVisit = column[DateTime]("last_visit", O.Nullable, O.Default(DateTime.now())) // 最近登录时间
   def sshKey = column[String]("ssh_key", O.Nullable, O.DBType("VARCHAR(1025)"))
-  override def * = (jobNo, name, role, password, locked, lastIp.?, lastVisit.?, sshKey.?) <> (User.tupled, User.unapply _)
+  override def * = (jobNo, name, role, password.?, locked, lastIp.?, lastVisit.?, sshKey.?) <> (User.tupled, User.unapply _)
 
   def idx = index("idx_job_no", jobNo)
 }
@@ -53,12 +50,12 @@ object UserHelper extends PlayCache {
   def _cacheNoKey(jobNo: String) = s"user.$jobNo"
 
   def findByJobNo(jobNo: String): Option[User] = {
-    Cache.getAs[User](_cacheNoKey(jobNo)) match {
+    Cache.getAs[User](_cacheNoKey(jobNo.toLowerCase)) match {
       case Some(user) => Some(user)
       case None => db withSession { implicit session =>
-        qUser.filter(_.jobNo === jobNo).firstOption match {
+        qUser.filter(_.jobNo === jobNo.toLowerCase).firstOption match {
           case Some(user) =>
-            Cache.set(_cacheNoKey(jobNo), user)
+            Cache.set(_cacheNoKey(jobNo.toLowerCase), user)
             Some(user)
           case None => None
         }
@@ -87,10 +84,14 @@ object UserHelper extends PlayCache {
 
   @throws[UniqueNameException]
   def _create(user: User)(implicit session: JdbcBackend#Session) = {
-    Cache.remove(_cacheNoKey(user.jobNo)) // clean cache
+    Cache.remove(_cacheNoKey(user.jobNo.toLowerCase)) // clean cache
     try {
-      ActorUtils.keyGit ! AddUser(user)
-      qUser.insert(user)(session)
+      val create2user = user.password match {
+        case Some(pwd) => user.copy(password = Some(play.api.libs.Codecs.sha1(pwd)))
+        case None => user
+      }
+      ActorUtils.keyGit ! AddUser(create2user)
+      qUser.insert(create2user)(session)
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
@@ -101,9 +102,9 @@ object UserHelper extends PlayCache {
   }
 
   def _delete(jobNo: String)(implicit session: JdbcBackend#Session) = {
-    Cache.remove(_cacheNoKey(jobNo)) // clean cache
+    Cache.remove(_cacheNoKey(jobNo.toLowerCase)) // clean cache
     ActorUtils.keyGit ! DeleteUser(jobNo)
-    qUser.filter(_.jobNo === jobNo).delete(session)
+    qUser.filter(_.jobNo === jobNo.toLowerCase).delete(session)
   }
 
   def update(jobNo: String, user: User) = db withSession { implicit session =>
@@ -112,9 +113,15 @@ object UserHelper extends PlayCache {
 
   @throws[UniqueNameException]
   def _update(jobNo: String, user: User)(implicit session: JdbcBackend#Session) = {
-    Cache.remove(_cacheNoKey(jobNo)) // clean cache
+    val findUser = findByJobNo(jobNo.toLowerCase)
+    Cache.remove(_cacheNoKey(jobNo.toLowerCase)) // clean cache
     try {
-      qUser.filter(_.jobNo === jobNo).update(user)(session)
+      val update2user = user.password match {
+        case Some(pwd) if findUser.isDefined && user.password.nonEmpty && findUser.get.password != user.password =>
+          user.copy(password = Some(play.api.libs.Codecs.sha1(pwd)))
+        case _ => user
+      }
+      qUser.filter(_.jobNo === jobNo.toLowerCase).update(update2user)(session)
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
@@ -130,7 +137,7 @@ object UserHelper extends PlayCache {
 
   private def defaultAuthentication(userName: String, password: String) = {
     findByJobNo(userName).collect {
-      case user if user.password == play.api.libs.Codecs.sha1(password) => Some(user)
+      case user if user.password == Some(play.api.libs.Codecs.sha1(password)) => Some(user)
     } getOrElse None
   }
 
@@ -147,7 +154,7 @@ object UserHelper extends PlayCache {
             val user = User(jobNo      = ldapUserInfo.userName,
                             name       = ldapUserInfo.fullName,
                             role       = RoleEnum.user,
-                            password   = "",
+                            password   = None,
                             locked     = false,
                             lastIp     = None,
                             lastVisit  = None,

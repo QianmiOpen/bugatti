@@ -17,7 +17,6 @@ GET           /user/total                                         controllers.ad
 GET           /user/:jobNo                                        controllers.admin.UserController.show(jobNo: String)
 DELETE        /user/:jobNo                                        controllers.admin.UserController.delete(jobNo: String)
 POST          /user                                               controllers.admin.UserController.save
-POST          /user/:jobNo/upload                                 controllers.admin.UserController.upload(jobNo: String)
 PUT           /user/:jobNo                                        controllers.admin.UserController.update(jobNo: String)
 
 # Area

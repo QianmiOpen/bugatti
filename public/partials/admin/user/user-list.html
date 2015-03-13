@@ -1,29 +1,33 @@
 <table class="table table-striped table-hover table-fixed">
     <thead>
         <tr>
-            <th width="10%">姓名</th>
-            <th width="10%">工号</th>
+            <th width="15%">工号</th>
+            <th width="15%">姓名</th>
             <th >角色</th>
+            <th width="20%">最近访问IP</th>
+            <th width="20%">最近访问时间</th>
             <th >锁定</th>
-            <th >最近访问IP</th>
-            <th >最近访问时间</th>
+            <th >sshKey</th>
             <th>操作</th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="user in users">
+            <td>{{user.jobNo}}</td>
             <td><span tooltip="{{user.name}}">{{user.name}}</span></td>
-            <td><a tooltip="{{user.jobNo}}" ui-sref="admin.user.detail({id: user.jobNo})">{{user.jobNo}}</a></td>
-            <td><span tooltip="{{user.role | role}}{{user.superAdmin?'(超级)':''}}">
-                {{user.role | role}}
-                {{user.superAdmin?'(超级)':''}}</span>
+            <td>
+                <i tooltip="{{user.role | role}}" ng-if="user.role == 'user'" class="fa fa-user"></i>
+                <i tooltip="{{user.role | role}}" ng-if="user.role == 'admin'" class="fa fa-user-secret"></i>
             </td>
-            <td><span tooltip="{{user.locked | lock}}">{{user.locked | lock}}</span></td>
             <td><span tooltip="{{user.lastIp}}">{{user.lastIp}}</span></td>
             <td><span tooltip="{{user.lastVisit | date:'yyyy-MM-dd HH:mm:ss'}}">{{user.lastVisit | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td>
-                <div ng-if="(user.role == 'admin' && loginUser.sa == true)
-                || (user.role == 'user' && loginUser.role == 'admin')">
+                <i tooltip="锁定" ng-if="user.locked" class="fa fa-lock"></i>
+                <i tooltip="正常" ng-if="!user.locked" class="fa fa-unlock"></i>
+            </td>
+            <td><i ng-if="user.sshKey" class="fa fa-key"></i></td>
+            <td>
+                <div ng-if="loginUser.role == 'admin'">
                     <a ui-sref="admin.user.edit({id: user.jobNo})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                     <a ng-click="delete(user.jobNo, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
