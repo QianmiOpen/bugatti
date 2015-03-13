@@ -1,11 +1,11 @@
 <div class="page-header clearfix">
-    <button has-project-safe="{{$stateParams.id}}" ng-if="hasProjectSafe_" class="btn btn-primary pull-right" ui-sref="conf.project.version.create">新增</button>
+    <button has-project-safe="{{$stateParams.id}}" ng-if="hasProjectSafe_" class="btn btn-primary pull-right" ui-sref="admin.project.version.create">新增</button>
 
     <h1 class="pull-left m0">
         项目
-        <project-show pid="{{$stateParams.id}}"></project-show>
+        <a ui-sref="admin.project.detail({id: $stateParams.id})"> <project-show pid="{{$stateParams.id}}"></project-show></a>
         的版本
-        <sub><a class="small" href="" back-button>返回</a></sub>
+        <sub><a class="small" href="" ui-sref="admin.project">返回</a></sub>
     </h1>
 </div>
 <form class="form-inline" ng-submit="searchForm(s_name)">
@@ -30,13 +30,13 @@
             <td><input type="checkbox" ng-model="ids[version.id]" ng-checked="master" ng-change="checked(version.id, ids[version.id])"></td>
             <td>{{version.id}}</td>
             <td>
-                <a ui-sref="conf.project.version.conf.list({id: version.projectId, vid: version.id, eid: version.envId})">
+                <a ui-sref="admin.project.version.conf.list({id: version.projectId, vid: version.id, eid: version.envId})">
                     <span tooltip="{{version.vs}}">{{version.vs}}</span>
                 </a>
             </td>
             <td><span tooltip="{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}">{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-show="hasProjectSafe_">
-                <a ui-sref="conf.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="admin.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(version.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>
@@ -44,7 +44,7 @@
         <tfoot>
             <tr>
                 <td><a ng-click="deleteBatch()" href="" ng-show="!isEmpty(ids)"><span class="glyphicon glyphicon-trash"></span> </a></td>
-                <td colspan="4">&nbsp;</td>
+                <td colspan="{{hasProjectSafe_?4:3}}">&nbsp;</td>
             </tr>
         </tfoot>
     </table>

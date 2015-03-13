@@ -1,6 +1,6 @@
 <div class="page-header clearfix">
-    <button class="btn btn-primary pull-right" ui-sref="admin.project.edit({id: project.id})">返回</button>
-    <button class="btn btn-primary pull-right" back-button>修改</button>
+    <button class="btn btn-primary pull-right" back-button>返回</button>
+    <button class="btn btn-primary pull-right" ui-sref="admin.project.edit({id: project.id})">修改</button>
     <h1 class="pull-left m0">项目详情</h1>
 </div>
 
@@ -20,7 +20,7 @@
     </tr>
     <tr>
         <td class="text-right col-sm-3">版本数：</td>
-        <td><a ui-sref="conf.project.version({id: project.id})">{{project.subTotal}}</a></td>
+        <td><a ui-sref="admin.project.version({id: project.id})">{{project.subTotal}}</a></td>
     </tr>
     <tr>
         <td class="text-right col-sm-3">最近版本：</td>

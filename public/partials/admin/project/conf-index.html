@@ -1,23 +1,24 @@
 <div class="page-header clearfix">
     <h1 class="pull-left m0">
+        <a ui-sref="admin.project.detail({id: project.id})"> {{project.name}}</a>
         版本
         {{version.vs}}
         配置文件
         <sub>
-            <a class="small" href="" ui-sref="conf.project.version({id: project.id})">返回{{project.name}}</a>
+            <a class="small" href="" ui-sref="admin.project.version({id: project.id})">返回</a>
         </sub>
     </h1>
 </div>
 
 <ul class="nav nav-tabs" role="tablist" >
     <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs">
-        <a ng-if="e.level == 'unsafe'" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}</a>
-        <a ng-if="e.level == 'safe'" has-project-safe="{{project.id}}" ng-if="hasProjectSafe_" ui-sref="conf.project.version.conf.list({eid: e.id})">{{e.name}}
+        <a ng-if="e.level == 'unsafe'" ui-sref="admin.project.version.conf.list({eid: e.id})">{{e.name}}</a>
+        <a ng-if="e.level == 'safe'" has-project-safe="{{project.id}}" ng-if="hasProjectSafe_" ui-sref="admin.project.version.conf.list({eid: e.id})">{{e.name}}
             <sup><i class="star"></i></sup>
         </a>
     </li>
 </ul>
 
-<a ui-sref="conf.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
+<a ui-sref="admin.project.version.conf.list({id: $stateParams.id, vid: $stateParams.vid})" class="btn">返回列表</a>
 
 <div ui-view="conf-info"></div>  <!-- include -->

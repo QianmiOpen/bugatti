@@ -228,34 +228,6 @@ define(['angular'], function(angular) {
         }
     }]);
 
-    /* 环境超级管理员 */
-    app.directive('ad', ['Auth', function(Auth) {
-        return {
-            restrict: 'A',
-            scope: false,
-            link: function($scope, element, attrs) {
-                $scope.isAd = true;
-
-                attrs.$observe('hasProject', function(level) {
-                    updateCSS(level)
-                });
-                function updateCSS(level) {
-                    if (level === 'safe') {
-                        if (Auth.user.role === 'admin' && Auth.user.sa === true) {
-                            $scope.isAd = true;
-                        } else {
-                            $scope.isAd = false;
-                        }
-                    }
-                    else {
-                        $scope.isAd = false;
-                    }
-                }
-            }
-        }
-    }]);
-
-
     /* 判断用户是否为项目成员 */
     app.directive('hasProject', ['Auth', 'ProjectService', function(Auth, ProjectService) {
         return {
@@ -268,7 +240,7 @@ define(['angular'], function(angular) {
                     updateCSS(pid)
                 });
                 function updateCSS(pid) {
-                    if (Auth.user.role === 'admin' && Auth.user.sa === true) {
+                    if (Auth.user.role === 'admin') {
                         $scope.hasProject_ = true;
                     }
                     else {
@@ -295,7 +267,7 @@ define(['angular'], function(angular) {
                     updateCSS(pid)
                 });
                 function updateCSS(pid) {
-                    if (Auth.user.role === 'admin' && Auth.user.sa === true) {
+                    if (Auth.user.role === 'admin') {
                         $scope.hasProjectSafe_ = true;
                     }
                     else {

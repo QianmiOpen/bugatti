@@ -35,7 +35,7 @@
     <tbody >
     <tr ng-repeat-start="c in project.clusters">
         <td width="10%">
-            <a ad="{{env.level}}" class="glyphicon glyphicon-minus-sign" href ng-click="removeCluster(project.id, c.id)"></a>
+            <a class="glyphicon glyphicon-minus-sign" href ng-click="removeCluster(project.id, c.id)"></a>
 
             <span tooltip="{{c.hostIp}}">
                 <get-area ng-if="preAreas.length > 0" aid="{{c.areaId}}" areas="preAreas"></get-area>（{{c.hostIp}}）</span>
