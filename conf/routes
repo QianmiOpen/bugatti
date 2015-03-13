@@ -54,8 +54,8 @@ PUT           /spirit/:id                                         controllers.ad
 
 
 # Project
-GET           /project                                            controllers.admin.ProjectController.index(projectName: Option[String], my: Boolean ?=false, page: Int?=0, pageSize: Int ?=30)
-GET           /project/total                                      controllers.admin.ProjectController.count(projectName: Option[String], my: Boolean ?=false)
+GET           /project                                            controllers.admin.ProjectController.index(projectName: Option[String], page: Int ?=0, pageSize: Int ?=30)
+GET           /project/total                                      controllers.admin.ProjectController.count(projectName: Option[String])
 GET           /project/all                                        controllers.admin.ProjectController.all
 GET           /project/allExceptSelf/:id                          controllers.admin.ProjectController.allExceptSelf(id: Int)
 GET           /project/atts                                       controllers.admin.ProjectController.atts(projectId: Int)

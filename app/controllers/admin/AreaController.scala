@@ -46,7 +46,7 @@ object AreaController extends BaseController {
   def save = AuthAction(RoleEnum.admin) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
-      area =>
+      area => {
         try {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增区域", area))
           val areaId = AreaHelper.create(area)
@@ -55,19 +55,21 @@ object AreaController extends BaseController {
         } catch {
           case un: UniqueNameException => Ok(resultUnique(un.getMessage))
         }
+      }
     )
   }
 
   def update = AuthAction(RoleEnum.admin) { implicit request =>
     areaForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
-      area =>
+      area => {
         try {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改区域", area))
           Ok(Json.toJson(AreaHelper.update(area)))
         } catch {
           case un: UniqueNameException => Ok(resultUnique(un.getMessage))
         }
+      }
     )
   }
 

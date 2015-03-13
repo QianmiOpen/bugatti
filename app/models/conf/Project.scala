@@ -60,33 +60,14 @@ object ProjectHelper extends PlayCache {
     qProject.filter(_.templateId === templateId).length.run
   }
 
-  def count(projectName: Option[String], jobNo: Option[String]): Int = db withSession { implicit session =>
-    jobNo match {
-      case Some(no) =>
-        val queryJoin = (for {
-          p <- qProject
-          m <- qMember if p.id === m.projectId
-        } yield (p, m)).filter(_._2.jobNo === jobNo)
-        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"%${projectName.get}%").query
-        query.length.run
-      case None => qProject.filteredBy(projectName)(_.name like s"${projectName.get}%").query.length.run
-    }
+  def count(projectName: Option[String]): Int = db withSession { implicit session =>
+    qProject.filteredBy(projectName)(_.name like s"${projectName.get}%").query.length.run
   }
 
-  def all(projectName: Option[String], jobNo: Option[String], page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
+  def all(projectName: Option[String], page: Int, pageSize: Int): Seq[Project] = db withSession { implicit session =>
     val offset = pageSize * page
-    jobNo match {
-      case Some(no) =>
-        val queryJoin = (for {
-          p <- qProject
-          m <- qMember if p.id === m.projectId
-        } yield (p, m)).filter(_._2.jobNo === jobNo)
-        val query = (queryJoin.map(_._1)).filteredBy(projectName)(_.name like s"%${projectName.get}%").query
-        query.drop(offset).take(pageSize).list
-      case None =>
-        val query = qProject.filteredBy(projectName)(_.name like s"%${projectName.get}%").query
-        query.drop(offset).take(pageSize).list
-    }
+    val query = qProject.filteredBy(projectName)(_.name like s"%${projectName.get}%").query
+    query.drop(offset).take(pageSize).list
   }
 
   def all(): Seq[Project] = db withSession { implicit session =>

@@ -1,8 +1,5 @@
 package controllers.admin
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-
 import actor.ActorUtils
 import actor.git.UpdateUser
 import controllers.BaseController
@@ -11,7 +8,6 @@ import exceptions.UniqueNameException
 import models.conf._
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
 import utils.SecurityUtil
 

@@ -30,7 +30,6 @@ object ProjectController extends BaseController {
   def msg_task(user: String, ip: String, msg: String, data: Host) =
     Json.obj("mod" -> ModEnum.task.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
-
   val projectForm = Form(
     mapping(
       "id" -> optional(number),
@@ -61,14 +60,12 @@ object ProjectController extends BaseController {
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(projectName: Option[String], my: Boolean, page: Int, pageSize: Int) = AuthAction() { implicit request =>
-    val jobNo = if (my) Some(request.user.jobNo) else None
-    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), jobNo, page, pageSize)))
+  def index(projectName: Option[String], page: Int, pageSize: Int) = AuthAction() { implicit request =>
+    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), page, pageSize)))
   }
 
-  def count(projectName: Option[String], my: Boolean) = AuthAction() { implicit request =>
-    val jobNo = if (my) Some(request.user.jobNo) else None
-    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty), jobNo)))
+  def count(projectName: Option[String]) = AuthAction() { implicit request =>
+    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty))))
   }
 
   def show(id: Int) = Action {
@@ -83,10 +80,29 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.allExceptSelf(id)))
   }
 
+  // 根据权限加载不同环境的项目列表
+  def showAuth(envId: Int) = AuthAction() { implicit request =>
+    val user = request.user
+    if (UserHelper.admin_?(user)) {
+      Ok(Json.toJson(ProjectHelper.all()))
+    } else {
+      val eMember = EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo)
+      if (eMember.isDefined) {
+        Ok(Json.toJson(ProjectHelper.all()))
+      } else {
+        EnvironmentHelper.findById(envId) match {
+          case Some(e) if e.level == LevelEnum.safe =>
+            Ok(Json.toJson(ProjectMemberHelper.findSafeProjectsByJobNo(user.jobNo)))
+          case _ =>
+            Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(user.jobNo)))
+        }
+      }
+    }
+  }
+
   def delete(id: Int) = AuthAction() { implicit request =>
     if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
-    else
-      ProjectHelper.findById(id) match {
+    else ProjectHelper.findById(id) match {
         case Some(project) => project.subTotal match {
           case 0 =>
             // Remove repositories
@@ -142,26 +158,6 @@ object ProjectController extends BaseController {
         } else Forbidden
       }
     )
-  }
-
-  // 根据权限加载不同环境的项目列表
-  def showAuth(envId: Int) = AuthAction() { implicit request =>
-    val user = request.user
-    if (UserHelper.admin_?(user)) {
-      Ok(Json.toJson(ProjectHelper.all()))
-    } else {
-      val eMember = EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo)
-      if (eMember.isDefined) {
-        Ok(Json.toJson(ProjectHelper.all()))
-      } else {
-        EnvironmentHelper.findById(envId) match {
-          case Some(e) if e.level == LevelEnum.safe =>
-            Ok(Json.toJson(ProjectMemberHelper.findSafeProjectsByJobNo(user.jobNo)))
-          case _ =>
-            Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(user.jobNo)))
-        }
-      }
-    }
   }
 
   // ----------------------------------------------------------

@@ -1,5 +1,5 @@
 <div class="page-header clearfix">
-    <button class="btn btn-primary pull-right" ui-sref="conf.spirit.create">新增</button></td>
+    <button class="btn btn-primary pull-right" ui-sref="admin.spirit.create">新增</button></td>
     <h1 class="pull-left m0">网关管理</h1>
 </div>
 
@@ -15,12 +15,12 @@
         </thead>
         <tbody>
         <tr ng-repeat="spirit in spirits">
-            <td><a tooltip="{{spirit.name}}" ui-sref="conf.spirit.detail({id: spirit.id})">{{spirit.name}}</a></td>
+            <td><a tooltip="{{spirit.name}}" ui-sref="admin.spirit.detail({id: spirit.id})">{{spirit.name}}</a></td>
             <td><span tooltip="{{spirit.ip}}">{{spirit.ip}}</span></td>
             <td><span tooltip="{{spirit.info}}">{{spirit.info}}</span></td>
             <td>
                 <a ng-click="refresh(spirit.id)" href="" title="刷新"><span class="glyphicon glyphicon-refresh"></span></a>
-                <a ui-sref="conf.spirit.edit({id: spirit.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="admin.spirit.edit({id: spirit.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                 <a ng-click="delete(spirit.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>

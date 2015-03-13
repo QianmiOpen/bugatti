@@ -14,16 +14,6 @@ define(['angular'], function(angular) {
             data: { access: 'project' }
         });
 
-        $stateProvider.state('admin.project.my', {
-            url: "/my",
-            views: {
-                "@admin": {
-                    templateUrl: "partials/admin/project/project-my.html",
-                    controller: "ProjectCtrl"
-                }
-            }
-        });
-
         $stateProvider.state('admin.project.create', {
             url: "/create",
             views: {

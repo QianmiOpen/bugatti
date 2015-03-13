@@ -5,7 +5,7 @@ define(['angular'], function(angular){
 
     app.controller('OverviewCtrl', ['$scope', 'ProjectService', 'EnvService', 'UserService',
         function($scope, ProjectService, EnvService, UserService) {
-        ProjectService.count('', false, function(data) {
+        ProjectService.count('', function(data) {
             $scope.projectCount = data;
         });
 

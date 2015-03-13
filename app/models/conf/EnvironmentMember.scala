@@ -40,17 +40,16 @@ object EnvironmentMemberHelper extends PlayCache {
     qMember.filter(m => m.envId === envId && m.jobNo === jobNo).firstOption
   }
 
-  def findByJobNo(jobNo: String): Seq[EnvironmentMember] = db withSession{implicit session =>
+  def findByJobNo(jobNo: String): Seq[EnvironmentMember] = db withSession { implicit session =>
     qMember.filter(m => m.jobNo === jobNo).list
   }
 
-  def findEnvsByJobNo(jobNo: String): Seq[Environment] = db withSession{implicit session =>
-    val envList = for{
-      e <- qEnv
-      m <- qMember
-      if(e.id === m.envId && m.jobNo === jobNo)
+  def findEnvsByJobNo(jobNo: String): Seq[Environment] = db withSession { implicit session =>
+    val q = for{
+      (e, m) <- qEnv innerJoin qMember on (_.id === _.envId)
+      if m.jobNo === jobNo
     } yield e
-    envList.list
+    q.list
   }
 
   def create(member: EnvironmentMember) = db withSession { implicit session =>

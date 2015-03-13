@@ -8,10 +8,6 @@ define(['angular'], function(angular) {
         function($scope, $state, $stateParams, $modal, growl, ProjectService, VersionService, EnvService) {
         $scope.currentPage = 1;
         $scope.pageSize = 20;
-        $scope.my = false;
-        if($state.current.name === 'conf.project.my') {
-            $scope.my = true;
-        }
 
         // load env
         EnvService.getAll(function(data) {
@@ -23,12 +19,12 @@ define(['angular'], function(angular) {
 
         $scope.searchForm = function(projectName) {
             // count
-            ProjectService.count(projectName, $scope.my, function(data) {
+            ProjectService.count(projectName, function(data) {
                 $scope.totalItems = data;
             });
 
             // list
-            ProjectService.getPage(projectName, $scope.my, 0, $scope.pageSize, function(data) {
+            ProjectService.getPage(projectName, 0, $scope.pageSize, function(data) {
                 $scope.projects = data;
             });
         }
@@ -37,7 +33,7 @@ define(['angular'], function(angular) {
 
         // page
         $scope.setPage = function (pageNo) {
-            ProjectService.getPage($scope.s_projectName, $scope.my, pageNo - 1, $scope.pageSize, function(data) {
+            ProjectService.getPage($scope.s_projectName, pageNo - 1, $scope.pageSize, function(data) {
                 $scope.projects = data;
             });
         };
@@ -62,7 +58,7 @@ define(['angular'], function(angular) {
                     growl.addWarnMessage('还有版本存在该项目，请删除后再操作。。。');
                 } else {
                     $scope.projects.splice(index, 1);
-                    ProjectService.count($scope.s_projectName, $scope.my, function(num) {
+                    ProjectService.count($scope.s_projectName, function(num) {
                         $scope.totalItems = num;
                     });
                 }
@@ -184,7 +180,7 @@ define(['angular'], function(angular) {
                         $scope.form.name.$invalid = true;
                         $scope.form.name.$error.exists = true;
                     } else {
-                        $state.go("admin.project.my");
+                        $state.go("admin.project.detail", {id: project.id});
                     }
                 });
             };
@@ -323,7 +319,7 @@ define(['angular'], function(angular) {
                         $scope.form.name.$invalid = true;
                         $scope.form.name.$error.exists = true;
                     } else {
-                        $state.go("admin.project.my");
+                        $state.go("admin.project.detail", {id: project.id});
                     }
                 });
 

@@ -1,7 +1,7 @@
 package controllers.admin
 
 import controllers.BaseController
-import enums.{LevelEnum, ModEnum}
+import enums.{RoleEnum, LevelEnum, ModEnum}
 import exceptions.UniqueNameException
 import models.conf._
 import play.api.data.Forms._
@@ -51,6 +51,10 @@ object EnvController extends BaseController {
     Ok(Json.toJson(EnvironmentHelper.count))
   }
 
+  def allScriptVersion = AuthAction() { implicit request =>
+    Ok(Json.toJson(ScriptVersionHelper.allName))
+  }
+
   // 根据权限加载环境列表
   def showAuth = AuthAction() { implicit request =>
     val user = request.user
@@ -59,8 +63,7 @@ object EnvController extends BaseController {
     val seq =
       if (UserHelper.admin_?(request.user) || countSafe > 0) {
         EnvironmentHelper.all()
-      }
-      else {
+      } else {
         //环境成员
         val envs = EnvironmentMemberHelper.findEnvsByJobNo(user.jobNo)
         //非安全环境
@@ -71,7 +74,7 @@ object EnvController extends BaseController {
     Ok(Json.toJson(seq))
   }
 
-  def delete(id: Int) = AuthAction() { implicit request =>
+  def delete(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
     EnvironmentHelper.findById(id) match {
       case Some(env) =>
         ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除环境", env))
@@ -80,11 +83,7 @@ object EnvController extends BaseController {
     }
   }
 
-  def allScriptVersion = AuthAction() { implicit request =>
-    Ok(Json.toJson(ScriptVersionHelper.allName))
-  }
-
-  def save = AuthAction() { implicit request =>
+  def save = AuthAction(RoleEnum.admin) { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
@@ -97,7 +96,7 @@ object EnvController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction() { implicit request =>
+  def update(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
