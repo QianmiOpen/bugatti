@@ -1,5 +1,5 @@
 <div class="page-header clearfix">
-    <button class="btn btn-primary pull-right" ui-sref="conf.relation.create">绑定</button></td>
+    <button class="btn btn-primary pull-right" ui-sref="admin.relation.create">绑定</button></td>
     <h1 class="pull-left m0">关系配置</h1>
 </div>
 
@@ -52,7 +52,7 @@
             <td><span tooltip="{{rel.ip}}">{{rel.ip}}</span></td>
             <td>
                 <a ng-click="unbind(rel.id, $index)" href title="解绑">解绑</a>
-                <a ui-sref="conf.relation.detail({id: rel.id})" title="机器环境变量">环境变量</a>
+                <a ui-sref="admin.relation.detail({id: rel.id})" title="机器环境变量">环境变量</a>
             </td>
         </tr>
         </tbody>

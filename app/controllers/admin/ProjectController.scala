@@ -103,16 +103,16 @@ object ProjectController extends BaseController {
   def delete(id: Int) = AuthAction() { implicit request =>
     if (!UserHelper.hasProjectSafe(id, request.user)) Forbidden
     else ProjectHelper.findById(id) match {
-        case Some(project) => project.subTotal match {
-          case 0 =>
-            // Remove repositories
-            org.apache.commons.io.FileUtils.deleteDirectory(getRepositoryDir(id))
+      case Some(project) => project.subTotal match {
+        case 0 =>
+          // Remove repositories
+          org.apache.commons.io.FileUtils.deleteDirectory(getRepositoryDir(id))
 
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除项目", project))
-            Ok(Json.toJson(ProjectHelper.delete(id)))
-          case _ => Ok(_Exist)
-        }
-        case None => NotFound
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除项目", project))
+          Ok(Json.toJson(ProjectHelper.delete(id)))
+        case _ => Ok(_Exist)
+      }
+      case None => NotFound
     }
   }
 
@@ -296,7 +296,7 @@ object ProjectController extends BaseController {
         if (unbind.size < 1) {
           Ok(_None) // 没有可用机器资源
         } else rel.ip match {
-          case ip if (ip.isEmpty || ip.get.trim.isEmpty) =>
+          case ip if ip.isEmpty || ip.get.trim.isEmpty =>
             val prel = HostHelper.findByEnvId_ProjectId(rel.envId, rel.projectId)
             val prelHosts = prel.groupBy(_.hostIp).map(_._1).toSet
             val fn = unbind.filterNot(ub => prelHosts.contains(ub.hostIp))
@@ -309,8 +309,8 @@ object ProjectController extends BaseController {
               ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, s"增加机器:$result", update2rel))
               Ok(_Success)
             }
-          case Some(ip) if (bind.exists(_.ip == ip)) => Ok(_Exist)
-          case Some(ip) if (unbind.exists(_.ip == ip)) =>
+          case Some(ip) if bind.exists(_.ip == ip) => Ok(_Exist)
+          case Some(ip) if unbind.exists(_.ip == ip) =>
             val update2rel = unbind.find(_.ip == ip).head.copy(projectId = Some(rel.projectId))
             HostHelper.update(update2rel)
             ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "增加机器", update2rel))
@@ -323,11 +323,10 @@ object ProjectController extends BaseController {
 
   def removeCluster(clusterId: Int) = AuthAction() { implicit request =>
     HostHelper.findById(clusterId) match {
-      case Some(rel) => {
+      case Some(rel) =>
         val result = HostHelper.unbind(rel)
         ALogger.info(msg_task(request.user.jobNo, request.remoteAddress, "移除机器", rel))
         Ok(Json.obj("r" -> result))
-      }
       case _ => Ok(Json.obj("r" -> 0))
     }
   }

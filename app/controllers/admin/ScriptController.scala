@@ -6,6 +6,7 @@ import actor.salt.{ConnectedSpirits, RefreshSpiritsActor}
 import akka.pattern.ask
 import akka.util.Timeout
 import controllers.BaseController
+import enums.RoleEnum
 import play.api.libs.json.Json
 
 import scala.concurrent.Await
@@ -20,7 +21,7 @@ object ScriptController extends BaseController {
 
   implicit val timeout = Timeout(30 seconds)
 
-  def refresh = AuthAction() { implicit request =>
+  def refresh = AuthAction(RoleEnum.admin) { implicit request =>
     val result = ActorUtils.scriptGit ? ReloadFormulasTemplate
 
     val future = ActorUtils.spirits ? ConnectedSpirits
