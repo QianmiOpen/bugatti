@@ -170,7 +170,7 @@ object UserHelper extends PlayCache {
     }
   }
 
-  /* 项目委员 */
+  /* 项目成员 */
   def hasProject(projectId: Int, user: User): Boolean = {
     if (admin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
@@ -179,7 +179,7 @@ object UserHelper extends PlayCache {
     }
   }
 
-  /* 项目委员长 */
+  /* 项目管理员 */
   def hasProjectSafe(projectId: Int, user: User): Boolean = {
     if (admin_?(user)) true
     else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
@@ -206,13 +206,17 @@ object UserHelper extends PlayCache {
   /* 环境成员 */
   def hasEnv(envId: Int, user: User): Boolean = {
     if (admin_?(user)) true
-    else EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(user.jobNo) => true
-      case Some(env) if env.jobNo != Some(user.jobNo) =>
-        EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo) match {
-          case Some(_) => true
-          case _ => false
-        }
+    else EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo) match {
+      case Some(member) if member.envId == envId => true
+      case _ => false
+    }
+  }
+
+  /* 环境管理员*/
+  def hasEnvSafe(envId: Int, user: User): Boolean = {
+    if (admin_?(user)) true
+    else EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo) match {
+      case Some(member) if member.envId == envId && member.level == LevelEnum.safe => true
       case _ => false
     }
   }

@@ -13,7 +13,9 @@ requirejs.config({
         "angular-growl": webjars.path('angular-growl', 'angular-growl'),
         "angular-chosen": webjars.path('angular-chosen', 'chosen'),
         "chosen": webjars.path('chosen', 'chosen.jquery.min'),
-        "bindonce": webjars.path('bindonce', 'bindonce')
+        "bindonce": webjars.path('bindonce', 'bindonce'),
+        'icon-identicon': './directive/icon-identicon',
+        'identicon-canvas': './thirdparty/identicon-canvas'
     },
     shim: {
         "angular-ui-ace": [ "angular", "ace"],
@@ -23,7 +25,8 @@ requirejs.config({
         "angular-growl": [ "angular"],
         "chosen": [ "jquery"],
         "angular-chosen": [ "angular", "chosen"],
-        "bindonce": [ "angular"]
+        "bindonce": [ "angular"],
+        "icon-identicon": ["angular"]
     }
 });
 
@@ -32,7 +35,7 @@ require(['jquery', 'angular', 'chosen', './controller/main-controller', './direc
         'ui-bootstrap-tpls', 'angular-sanitize', 'angular-cookies', 'angular-ui-ace',
         'angular-growl', 'angular-chosen', 'bindonce',
         'angular-ui-tree', 'ext-language-tools',
-        './thirdparty/angular-file-upload', 'angular-file-upload-shim'],
+        './thirdparty/angular-file-upload', 'angular-file-upload-shim', 'icon-identicon'],
     function($, angular) {
 
         // Declare app level module which depends on filters, and services
@@ -52,7 +55,8 @@ require(['jquery', 'angular', 'chosen', './controller/main-controller', './direc
             'bugattiApp.filters',
             'bugattiApp.directives',
             'bugattiApp.services',
-            'bugattiApp.controllers'
+            'bugattiApp.controllers',
+            'icon-identicon'
             ]);
 
         module.run(['$rootScope', '$state', '$stateParams', 'Auth', function($rootScope,   $state,   $stateParams, Auth) {

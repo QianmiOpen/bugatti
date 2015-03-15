@@ -26,7 +26,6 @@ object EnvController extends BaseController {
     mapping(
       "id" -> optional(number),
       "name" -> nonEmptyText(maxLength = 30),
-      "jobNo" -> optional(text(maxLength = 16)),
       "remark" -> optional(text(maxLength = 250)),
       "nfServer" -> optional(text(maxLength = 30)),
       "ipRange" -> optional(nonEmptyText(maxLength = 300)),
@@ -86,10 +85,10 @@ object EnvController extends BaseController {
   def save = AuthAction(RoleEnum.admin) { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
-      env =>
+      _envForm =>
         try {
-          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境", env))
-          Ok(Json.toJson(EnvironmentHelper.create(env.copy(jobNo = Some(request.user.jobNo)))))
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境", _envForm))
+          Ok(Json.toJson(EnvironmentHelper.create(_envForm, request.user.jobNo)))
         } catch {
           case un: UniqueNameException => Ok(_Exist)
         }
@@ -114,6 +113,9 @@ object EnvController extends BaseController {
   // ----------------------------------------------------------
   implicit val memberWrites = Json.writes[EnvironmentMember]
 
+  def msg(user: String, ip: String, msg: String, data: EnvironmentMember) =
+    Json.obj("mod" -> ModEnum.member.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
+
   def member(envId: Int, jobNo: String) = Action {
     Ok(Json.toJson(EnvironmentMemberHelper.findByEnvId_JobNo(envId, jobNo.toLowerCase)))
   }
@@ -124,25 +126,35 @@ object EnvController extends BaseController {
 
   def saveMember(envId: Int, jobNo: String) = AuthAction() { implicit request =>
     if (UserHelper.findByJobNo(jobNo) == None) Ok(_None)
-    else EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.admin_?(request.user) =>
-        try {
-          val member = EnvironmentMember(None, envId, jobNo.toLowerCase)
-          Ok(Json.toJson(EnvironmentMemberHelper.create(member)))
-        } catch {
-          case un: UniqueNameException => Ok(_Exist)
-        }
-      case Some(env) if env.jobNo != Some(request.user.jobNo) => Forbidden
-      case _ => NotFound
+    else if (!UserHelper.hasEnvSafe(envId, request.user)) Forbidden
+    else {
+      try {
+        val member = EnvironmentMember(None, envId, LevelEnum.unsafe, jobNo.toLowerCase)
+        val mid = EnvironmentMemberHelper.create(member)
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增环境成员", member.copy(Some(mid))))
+        Ok(Json.toJson(mid))
+      } catch {
+        case un: UniqueNameException => Ok(_Exist)
+      }
     }
   }
 
-  def deleteMember(envId: Int, memberId: Int) = AuthAction() { implicit request =>
-    EnvironmentHelper.findById(envId) match {
-      case Some(env) if env.jobNo == Some(request.user.jobNo) || UserHelper.admin_?(request.user) =>
-        Ok(Json.toJson(EnvironmentMemberHelper.delete(memberId)))
-      case Some(env) if env.jobNo != Some(request.user.jobNo) => Forbidden
-      case _ => NotFound
+  def updateMember(memberId: Int, op: String) = AuthAction() { implicit  request =>
+    EnvironmentMemberHelper.findById(memberId) match {
+      case Some(member) =>
+        if (!UserHelper.hasEnvSafe(member.envId, request.user)) Forbidden
+        else op match {
+          case "up" =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级环境成员", member))
+            Ok(Json.toJson(EnvironmentMemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
+          case "down" =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级环境成员", member))
+            Ok(Json.toJson(EnvironmentMemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
+          case "remove" =>
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "剔除环境成员", member))
+            Ok(Json.toJson(EnvironmentMemberHelper.delete(memberId)))
+        }
+      case None => NotFound
     }
   }
 

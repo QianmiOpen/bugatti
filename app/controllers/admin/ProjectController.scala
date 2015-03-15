@@ -197,7 +197,7 @@ object ProjectController extends BaseController {
       try {
         val member = ProjectMember(None, projectId, LevelEnum.unsafe, jobNo.toLowerCase)
         val mid = ProjectMemberHelper.create(member)
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增成员", member.copy(Some(mid))))
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增项目成员", member.copy(Some(mid))))
         Ok(Json.toJson(mid))
       } catch {
         case un: UniqueNameException => Ok(_Exist)
@@ -211,13 +211,13 @@ object ProjectController extends BaseController {
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
         else op match {
           case "up" =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级成员", member))
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级项目成员", member))
             Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
           case "down" =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级成员", member))
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级项目成员", member))
             Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))
           case "remove" =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "剔除成员", member))
+            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "剔除项目成员", member))
             Ok(Json.toJson(ProjectMemberHelper.delete(memberId)))
           case _ => BadRequest
         }

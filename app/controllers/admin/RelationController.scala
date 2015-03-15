@@ -81,7 +81,8 @@ object RelationController extends BaseController {
 
   implicit val relationFormWrites = Json.writes[EnvRelForm]
 
-  def bind = AuthAction(RoleEnum.admin) { implicit request =>
+  def bind = AuthAction() { implicit request =>
+
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
@@ -94,7 +95,7 @@ object RelationController extends BaseController {
     )
   }
 
-  def unbind(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
+  def unbind(id: Int) = AuthAction() { implicit request =>
     HostHelper.findById(id) match {
       case Some(relation) =>
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,

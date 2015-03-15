@@ -68,96 +68,58 @@
 
 <br/>
 
-<style>
-    .member-list ul {
-        margin-top: -20px;
-        letter-spacing: -0.31em;
-        *letter-spacing: normal;
-        word-spacing: -0.43em;
-        font-size: 0;
-        padding:0;
-    }
-    .member-list .pic {
-        margin-bottom: 5px;
-    }
-    .member-list li {
-        display: inline-block;
-        *display: inline;
-        zoom: 1;
-        width: 75px;
-        margin-top: 20px;
-        text-align: center;
-        font-size: 12px;
-        vertical-align: top;
-        letter-spacing: normal;
-        word-spacing: normal;
-    }
-    .member-list .name {
-        clear: both;
-    }
-    .u_actions { display:inline-block;*display:inline;zoom:1;vertical-align:middle; }
-    .gact a:visited, a.gact:visited {
-        color: #bbb;
-        font-size: 12px;
-        text-decoration: none;
-        text-align: center;
-    }
-</style>
-
 <div ng-if="project.id" has-project-safe="{{project.id}}">
-<div class="panel panel-default">
-    <div class="panel-heading">委员长
-        <sup class="btn-info" href="" tooltip-placement="right" tooltip="“委员长” 一个有趣称呼，即：项目所有人、管理者。【环境】标示为'安全'情况下，仅项目所有人可操作!">?</sup>
-    </div>
-    <div class="panel-body member-list">
-        <ul>
-            <li ng-repeat="m in members" ng-if="m.level == 'safe'">
-                <div class="pic">
-                    <img src="/img/user_star.png" alt="test"/>
-                    <div class="u_actions" ng-show="hasProjectSafe_">
-                        <span class="gact" title="降为成员">
-                            <a href="" ng-click="memberDown(m.id, '真的要把' + m.jobNo + '降为委员？')" title="把{{m.jobNo}}降为委员">v</a>
-                        </span><br/><br/><br/>
+    <div class="panel panel-default">
+        <div class="panel-heading">项目管理员
+            <sup class="btn-info" href="" tooltip-placement="right" tooltip="“项目所有人、管理者。【环境】标示为'安全'情况下，仅项目所有人可操作!">?</sup>
+        </div>
+        <div class="panel-body member-list">
+            <ul>
+                <li ng-repeat="m in members" ng-if="m.level == 'safe'">
+                    <div class="pic">
+                        <img src="/img/user_star.png" alt="test"/>
+                        <div class="u_actions" ng-show="hasProjectSafe_">
+                            <span class="gact" title="降为成员">
+                                <a href="" ng-click="memberDown(m.id, '真的要把' + m.jobNo + '降为成员？')" title="把{{m.jobNo}}降为成员">v</a>
+                            </span><br/><br/><br/>
+                        </div>
                     </div>
-                </div>
-                <div class="name"><uname-show job-no="{{m.jobNo}}"></uname-show>({{m.jobNo}})</div>
-            </li>
+                    <div class="name"><uname-show job-no="{{m.jobNo}}"></uname-show>({{m.jobNo}})</div>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-        </ul>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            项目成员
+            &nbsp;&nbsp;
+            <form ng-submit="addMember(searchMember.jobNo)" ng-if="hasProjectSafe_">
+            <input type="text" ng-model="searchMember.jobNo"/>
+            <button type="submit" class="btn btn-link">+(工号)</button>
+            <span class="has-error">
+                <span ng-show="jobNo$error" class="control-label">{{jobNo$error}}</span>
+            </span>
+            </form>
+        </div>
 
+        <div class="panel-body member-list">
+            <ul>
+                <li ng-repeat="m in members" ng-if="m.level == 'unsafe'">
+                    <div class="pic">
+                        <img src="/img/user_normal.jpg" alt="test"/>
+                        <div class="u_actions" ng-show="hasProjectSafe_">
+                            <span class="gact" title="提升为管理员">
+                                <a href="" ng-click="memberUp(m.id, '真的要把' + m.jobNo + '提升为管理员？')" title="把{{m.jobNo}}提升为管理员">^</a>
+                            </span><br/>
+                            <span class="gact" title="移出项目">
+                                <a href="" ng-click="memberRemove(m.id, '真的要把' + m.jobNo + '移出项目？')" title="把{{m.jobNo}}移出项目">k</a>
+                            </span><br/><br/>
+                        </div>
+                    </div>
+                    <div class="name"><uname-show job-no="{{m.jobNo}}"></uname-show>({{m.jobNo}})</div>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-        委员
-        &nbsp;&nbsp;
-        <form ng-submit="addMember(searchMember.jobNo)" ng-if="hasProjectSafe_">
-        <input type="text" ng-model="searchMember.jobNo"/>
-        <button type="submit" class="btn btn-link">+(工号)</button>
-        <span class="has-error">
-            <span ng-show="jobNo$error" class="control-label">{{jobNo$error}}</span>
-        </span>
-        </form>
-    </div>
-
-    <div class="panel-body member-list">
-        <ul>
-            <li ng-repeat="m in members" ng-if="m.level == 'unsafe'">
-                <div class="pic">
-                    <img src="/img/user_normal.jpg" alt="test"/>
-                    <div class="u_actions" ng-show="hasProjectSafe_">
-                        <span class="gact" title="提升为管理员">
-                            <a href="" ng-click="memberUp(m.id, '真的要把' + m.jobNo + '提升为委员长？')" title="把{{m.jobNo}}提升为委员长">^</a>
-                        </span><br/>
-                        <span class="gact" title="移出项目">
-                            <a href="" ng-click="memberRemove(m.id, '真的要把' + m.jobNo + '移出项目？')" title="把{{m.jobNo}}移出项目">k</a>
-                        </span><br/><br/>
-                    </div>
-                </div>
-                <div class="name"><uname-show job-no="{{m.jobNo}}"></uname-show>({{m.jobNo}})</div>
-            </li>
-
-        </ul>
-    </div>
-</div></div>

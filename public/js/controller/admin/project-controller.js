@@ -105,7 +105,7 @@ define(['angular'], function(angular) {
 
             $scope.addMember = function(jobNo) {
                 $scope.jobNo$error = '';
-                if (!/^of[0-9]{1,10}$/i.test(jobNo)) {
+                if (!/^[A-Za-z0-9]{1,10}$/i.test(jobNo)) {
                     $scope.jobNo$error = '工号格式错误';
                     return;
                 }
@@ -133,7 +133,7 @@ define(['angular'], function(angular) {
                         });
                     }
                 });
-            }
+            };
 
             $scope.memberUp = function(mid, msg) {
                 if (confirm(msg)) {

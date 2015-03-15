@@ -1,6 +1,8 @@
 package models.conf
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import enums.LevelEnum
+import enums.LevelEnum.Level
 import exceptions.UniqueNameException
 import models.PlayCache
 import play.api.Play.current
@@ -12,13 +14,14 @@ import scala.slick.jdbc.JdbcBackend
  *
  * @author of546
  */
-case class EnvironmentMember(id: Option[Int], envId: Int, jobNo: String)
+case class EnvironmentMember(id: Option[Int], envId: Int, level: Level, jobNo: String)
 class EnvironmentMemberTable(tag: Tag) extends Table[EnvironmentMember](tag, "environment_member") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id")
+  def level = column[Level]("level", O.Default(LevelEnum.unsafe)) // 成员级别(对应环境级别)
   def jobNo = column[String]("job_no", O.DBType("VARCHAR(16)"))
 
-  override def * = (id.?, envId, jobNo) <> (EnvironmentMember.tupled, EnvironmentMember.unapply _)
+  override def * = (id.?, envId, level, jobNo) <> (EnvironmentMember.tupled, EnvironmentMember.unapply _)
   def idx = index("idx_eid_no", (envId, jobNo), unique = true)
   def idx_eid = index("idx_eid", envId)
 }

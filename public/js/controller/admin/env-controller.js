@@ -92,11 +92,29 @@ define(['angular'], function(angular) {
                     });
                 }
             });
-        }
+        };
 
+        $scope.memberUp = function(mid, msg) {
+            if (confirm(msg)) {
+                EnvService.updateMember(mid, "up", function(data) {
+                    EnvService.members($stateParams.id, function(data) {
+                        $scope.members = data;
+                    });
+                });
+            }
+        };
+        $scope.memberDown = function(mid, msg) {
+            if (confirm(msg)) {
+                EnvService.updateMember(mid, "down", function(data) {
+                    EnvService.members($stateParams.id, function(data) {
+                        $scope.members = data;
+                    });
+                });
+            }
+        };
         $scope.memberRemove = function(mid, msg) {
             if (confirm(msg)) {
-                EnvService.deleteMember($stateParams.id, mid, function(rd) {
+                EnvService.updateMember(mid, "remove", function(data) {
                     EnvService.members($stateParams.id, function(data) {
                         $scope.members = data;
                     });

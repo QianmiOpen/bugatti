@@ -40,7 +40,12 @@
                         <li ng-show="user.username"><a ui-sref="profile.index" tooltip-placement="bottom" tooltip="Profile settings"><i ng-class="{'fa fa-user': true}"></i></a></li>
                         <li ng-show="user.username"><a href="" tooltip-placement="bottom" tooltip="Logout" ng-click="logout()"><i ng-class="{'fa fa-sign-out': true}"></i></a></li>
                         <li ng-hide="user.username"><a ui-sref="login" tooltip-placement="bottom" tooltip="Login" ><i ng-class="{'fa fa-sign-in': true}"></i></a></li>
-                        <li ng-show="user.username"><a ui-sref="u" tooltip-placement="bottom" tooltip="{{user.username}}" ng-class="{'profile-pic': true}"><img ng-src="/img/avatar.png"></a></li>
+
+                        <li ng-show="user.username">
+                            <a ui-sref="u" tooltip-placement="bottom" tooltip="{{user.username}}" ng-class="{'profile-pic': true}">
+                                <icon-identicon code="{{user.username}}" title="{{user.username}}" size="26"></icon-identicon>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

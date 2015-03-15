@@ -127,7 +127,7 @@ object Application extends Controller with Security with SystemSettingsService {
         admin.routes.javascript.EnvController.member,
         admin.routes.javascript.EnvController.members,
         admin.routes.javascript.EnvController.saveMember,
-        admin.routes.javascript.EnvController.deleteMember,
+        admin.routes.javascript.EnvController.updateMember,
 
         // spirit
         admin.routes.javascript.SpiritController.all,

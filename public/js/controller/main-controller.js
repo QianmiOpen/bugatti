@@ -57,4 +57,8 @@ define(['angular',
         };
     }]);
 
+    app.controller('UCtrl', ['$scope', '$location', 'Auth', function($scope, $location, Auth) {
+        $scope.user = Auth.user;
+
+    }]);
 });

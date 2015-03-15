@@ -179,12 +179,12 @@ object AppTestData {
     ).foreach(VersionHelper.create)
 
     val seq = Seq(
-      Environment(None, "pytest", None, Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
-      Environment(None, "dev", None, Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
-      Environment(None, "test", None, Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
-      Environment(None, "内测", None, Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master)
+      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
+      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
+      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
+      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master)
     )
-    seq.foreach(EnvironmentHelper.create)
+    seq.foreach(EnvironmentHelper.create(_, ""))
 
     // 初始化环境关系表
     Seq(

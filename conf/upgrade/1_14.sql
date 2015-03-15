@@ -8,3 +8,12 @@ VALUES ('root', 'root', 'admin', 'dc76e9f0c0006e8f919e0c515c66dbba3982f785', 'n'
 DROP TABLE `permission`;
 
 UPDATE `app_user` SET `role` = 'user' WHERE `job_no` != 'root';
+
+ALTER TABLE `environment_member` ADD COLUMN `level` INT NOT NULL DEFAULT 0 COMMENT '环境成员级别,1:safe,0:unsafe' AFTER `env_id`;
+
+INSERT INTO environment_member(`env_id`, `level`, `job_no`)
+  SELECT `id`, 1, `job_no`
+  FROM `environment`
+  WHERE `job_no` is not NULL;
+
+ALTER TABLE `environment` DROP `job_no`;

@@ -11,18 +11,17 @@ import scala.slick.driver.MySQLDriver.simple._
  *
  * @author of546
  */
-case class Environment(id: Option[Int], name: String, jobNo: Option[String], remark: Option[String], nfServer: Option[String], ipRange: Option[String], level: Level, scriptVersion: String = ScriptVersionHelper.Master)
+case class Environment(id: Option[Int], name: String, remark: Option[String], nfServer: Option[String], ipRange: Option[String], level: Level, scriptVersion: String = ScriptVersionHelper.Master)
 class EnvironmentTable(tag: Tag) extends Table[Environment](tag, "environment") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name", O.DBType("VARCHAR(30)"))
-  def jobNo = column[String]("job_no", O.Nullable, O.DBType("VARCHAR(16)")) // 创建人
   def nfServer = column[String]("nfs_server", O.Nullable, O.DBType("VARCHAR(30)"))
   def ipRange = column[String]("ip_range", O.Nullable, O.DBType("VARCHAR(300)"))
   def remark = column[String]("remark", O.Nullable)
   def level = column[Level]("level", O.Default(LevelEnum.unsafe)) // 项目安全级别，默认为公共的。
   def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master), O.DBType("VARCHAR(60)")) // 环境使用salt script的版本
 
-  override def * = (id.?, name, jobNo.?, remark.?, nfServer.?, ipRange.?, level, scriptVersion) <> (Environment.tupled, Environment.unapply _)
+  override def * = (id.?, name, remark.?, nfServer.?, ipRange.?, level, scriptVersion) <> (Environment.tupled, Environment.unapply _)
   def idx = index("idx_name", name, unique = true)
 }
 object EnvironmentHelper {
@@ -59,7 +58,7 @@ object EnvironmentHelper {
   }
 
   @throws[UniqueNameException]
-  def create(environment: Environment) = db withSession { implicit session =>
+  def create(environment: Environment, jobNo: String) = db withSession { implicit session =>
     try {
       qEnvironment.returning(qEnvironment.map(_.id)).insert(environment)
     } catch {

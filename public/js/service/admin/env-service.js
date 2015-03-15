@@ -45,8 +45,8 @@ define(['angular'], function(angular) {
             saveMember: function(envId, jobNo, callback) {
                 $http.post(PlayRoutes.controllers.admin.EnvController.saveMember(envId, jobNo).url).success(callback);
             },
-            deleteMember: function(envId, memberId, callback) {
-                $http(PlayRoutes.controllers.admin.EnvController.deleteMember(envId, memberId)).success(callback);
+            updateMember: function(memberId, op, callback) {
+                $http.put(PlayRoutes.controllers.admin.EnvController.updateMember(memberId, op).url).success(callback);
             }
         }
     });

@@ -64,6 +64,7 @@ define(['angular',
         $stateProvider.state('u', {
             url: "/u",
             templateUrl: "partials/u.html",
+            controller: "UCtrl",
             data: { access: 'anon' }
         });
 

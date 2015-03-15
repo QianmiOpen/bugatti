@@ -42,7 +42,7 @@ POST          /env/auth                                           controllers.ad
 GET           /env/:envId/members                                 controllers.admin.EnvController.members(envId: Int)
 GET           /env/:envId/member/:jobNo                           controllers.admin.EnvController.member(envId: Int, jobNo: String)
 POST          /env/:envId/member                                  controllers.admin.EnvController.saveMember(envId: Int, jobNo: String)
-DELETE        /env/member/:memberId                               controllers.admin.EnvController.deleteMember(envId: Int, memberId: Int)
+PUT           /env/member/:memberId                               controllers.admin.EnvController.updateMember(memberId: Int, op: String)
 
 # Spirit
 GET           /spirit                                             controllers.admin.SpiritController.all
