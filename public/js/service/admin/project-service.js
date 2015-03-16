@@ -12,6 +12,9 @@ define(['angular'], function(angular) {
             getAll: function(callback) {
                 $http(PlayRoutes.controllers.admin.ProjectController.all()).success(callback);
             },
+            my: function(jobNo, callback) {
+                $http(PlayRoutes.controllers.admin.ProjectController.my(jobNo)).success(callback);
+            },
             getExceptSelf: function(id, callback) {
                 $http(PlayRoutes.controllers.admin.ProjectController.allExceptSelf(id)).success(callback);
             },

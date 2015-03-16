@@ -1,11 +1,13 @@
 <div class="page-header clearfix">
-    <button has-project-safe="{{$stateParams.id}}" ng-if="hasProjectSafe_" class="btn btn-primary pull-right" ui-sref="admin.project.version.create">新增</button>
+    <button has-project-safe="{{$stateParams.id}}" ng-if="hasProjectSafe_ && $state.includes('admin.project')" class="btn btn-primary pull-right" ui-sref="admin.project.version.create">新增</button>
+    <button has-project-safe="{{$stateParams.id}}" ng-if="hasProjectSafe_ && $state.includes('profile.project')" class="btn btn-primary pull-right" ui-sref="profile.project.version.create">新增</button>
 
     <h1 class="pull-left m0">
         项目
-        <a ui-sref="admin.project.detail({id: $stateParams.id})"> <project-show pid="{{$stateParams.id}}"></project-show></a>
+        <a ng-if="$state.includes('admin.project')" ui-sref="admin.project.detail({id: $stateParams.id})"> <project-show pid="{{$stateParams.id}}"></project-show></a>
+        <a ng-if="$state.includes('profile.project')" ui-sref="profile.project.detail({id: $stateParams.id})"> <project-show pid="{{$stateParams.id}}"></project-show></a>
         的版本
-        <sub><a class="small" href="" ui-sref="admin.project">返回</a></sub>
+        <sub><a class="small" href="" back-button>返回</a></sub>
     </h1>
 </div>
 <form class="form-inline" ng-submit="searchForm(s_name)">
@@ -30,13 +32,17 @@
             <td><input type="checkbox" ng-model="ids[version.id]" ng-checked="master" ng-change="checked(version.id, ids[version.id])"></td>
             <td>{{version.id}}</td>
             <td>
-                <a ui-sref="admin.project.version.conf.list({id: version.projectId, vid: version.id, eid: version.envId})">
+                <a ng-if="$state.includes('admin.project')" ui-sref="admin.project.version.conf.list({id: version.projectId, vid: version.id, eid: version.envId})">
                     <span tooltip="{{version.vs}}">{{version.vs}}</span>
                 </a>
+                <span ng-if="$state.includes('profile.project')"  tooltip="{{version.vs}}">{{version.vs}}</span>
             </td>
             <td><span tooltip="{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}">{{version.updated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
             <td ng-show="hasProjectSafe_">
-                <a ui-sref="admin.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+
+                <a ng-if="$state.includes('admin.project')" ui-sref="admin.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ng-if="$state.includes('profile.project')" ui-sref="profile.project.version.edit({vid: version.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+
                 <a ng-click="delete(version.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>

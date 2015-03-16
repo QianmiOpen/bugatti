@@ -7,8 +7,8 @@
 
     <div class="form-group">
         <label for="vs" class="col-sm-3 control-label">Nexus版本列表：</label>
-        <div class="col-sm-3">
-            <select name="vs" id="vs" class="form-control" ng-model="version.vs" ng-options="v for v in versions" required>
+        <div class="col-sm-4">
+            <select chosen search-contains="true" name="vs" id="vs" class="form-control" ng-model="version.vs" ng-options="v for v in versions" required>
                 <option value="">-- 选择版本 --</option>
             </select>
         </div>

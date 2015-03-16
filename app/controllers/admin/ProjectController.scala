@@ -76,6 +76,10 @@ object ProjectController extends BaseController {
     Ok(Json.toJson(ProjectHelper.all()))
   }
 
+  def my(jobNo: String) = Action {
+    Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(jobNo)))
+  }
+
   def allExceptSelf(id: Int) = Action {
     Ok(Json.toJson(ProjectHelper.allExceptSelf(id)))
   }

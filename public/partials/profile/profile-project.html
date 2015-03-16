@@ -1,3 +1,37 @@
 <div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ui-sref="profile.project.create">新增</button>
     <h1 class="pull-left m0">项目管理</h1>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-fixed">
+        <thead>
+            <tr>
+                <th width="10%">编号</th>
+                <th width="20%">名称</th>
+                <th width="10%">模板</th>
+                <th width="25%">最近版本</th>
+                <th width="25%">最近版本时间</th>
+                <th >操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="project in projects">
+                <td>{{project.id}}</td>
+                <td><a tooltip="{{project.name}}" ui-sref="profile.project.detail({id: project.id})">{{project.name}}</a></td>
+                <td>
+                    <template-show tid="{{project.templateId}}"></template-show>
+                </td>
+                <td >{{project.lastVersion}}
+                    <a ui-sref="profile.project.version({id: project.id})">all
+                        <span ng-if="project.subTotal != 0 ">({{project.subTotal}})</span></a>
+                </td>
+                <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
+                <td>
+                    <a ui-sref="profile.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>

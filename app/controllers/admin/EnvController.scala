@@ -46,6 +46,10 @@ object EnvController extends BaseController {
     Ok(Json.toJson(EnvironmentHelper.all()))
   }
 
+  def my(jobNo: String) = Action {
+    Ok(Json.toJson(EnvironmentMemberHelper.findEnvsByJobNo(jobNo)))
+  }
+
   def count = Action {
     Ok(Json.toJson(EnvironmentHelper.count))
   }

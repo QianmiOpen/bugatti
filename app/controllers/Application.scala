@@ -115,6 +115,7 @@ object Application extends Controller with Security with SystemSettingsService {
         // env
         admin.routes.javascript.EnvController.index,
         admin.routes.javascript.EnvController.all,
+        admin.routes.javascript.EnvController.my,
         admin.routes.javascript.EnvController.count,
         admin.routes.javascript.EnvController.show,
         admin.routes.javascript.EnvController.save,
@@ -140,6 +141,7 @@ object Application extends Controller with Security with SystemSettingsService {
         // project
         admin.routes.javascript.ProjectController.show,
         admin.routes.javascript.ProjectController.all,
+        admin.routes.javascript.ProjectController.my,
         admin.routes.javascript.ProjectController.allExceptSelf,
         admin.routes.javascript.ProjectController.save,
         admin.routes.javascript.ProjectController.index,

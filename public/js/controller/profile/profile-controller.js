@@ -39,5 +39,20 @@ define(['angular'], function(angular){
             });
         };
     }]);
+
+    app.controller('ProfileEnvCtrl', ['$scope', '$filter', 'growl', 'EnvService', function($scope, $filter, growl, EnvService) {
+        EnvService.my($scope.loginUser.username, function(data) {
+            $scope.envs = data;
+        });
+
+    }]);
+
+    app.controller('ProfileProCtrl', ['$scope', '$filter', 'growl', 'ProjectService', function($scope, $filter, growl, ProjectService) {
+        ProjectService.my($scope.loginUser.username, function(data) {
+            $scope.projects = data;
+        });
+
+    }]);
+
 });
 

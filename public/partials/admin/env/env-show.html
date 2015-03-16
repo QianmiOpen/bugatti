@@ -1,6 +1,5 @@
 <div class="page-header clearfix">
     <button class="btn btn-primary pull-right" back-button>返回</button>
-    <button class="btn btn-primary pull-right" ui-sref="admin.env.edit({id: env.id})">修改</button>
     <h1 class="pull-left m0">环境详情</h1>
 </div>
 
@@ -16,7 +15,7 @@
     </tr>
     <tr>
         <td class="text-right col-sm-3">ip范围：</td>
-        <td>{{env.ipRange}}</td>
+        <td style="max-width:200px;word-wrap:break-word;">{{env.ipRange}}</td>
     </tr>
     <tr>
         <td class="text-right col-sm-3">备注：</td>
@@ -57,7 +56,6 @@
             </ul>
         </div>
     </div>
-
 
     <div class="panel panel-default">
     <div class="panel-heading">

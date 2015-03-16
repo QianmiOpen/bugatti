@@ -32,6 +32,7 @@ DELETE        /area/:id                                           controllers.ad
 GET           /env                                                controllers.admin.EnvController.index(page: Int ?=0, pageSize: Int ?=10)
 GET           /env/total                                          controllers.admin.EnvController.count
 GET           /env/all                                            controllers.admin.EnvController.all
+GET           /env/my                                             controllers.admin.EnvController.my(jobNo: String)
 GET           /env/allScriptVersion                               controllers.admin.EnvController.allScriptVersion
 GET           /env/:id                                            controllers.admin.EnvController.show(id: Int)
 DELETE        /env/:id                                            controllers.admin.EnvController.delete(id: Int)
@@ -52,11 +53,11 @@ DELETE        /spirit/:id                                         controllers.ad
 POST          /spirit                                             controllers.admin.SpiritController.add
 PUT           /spirit/:id                                         controllers.admin.SpiritController.update(id: Int)
 
-
 # Project
 GET           /project                                            controllers.admin.ProjectController.index(projectName: Option[String], page: Int ?=0, pageSize: Int ?=30)
 GET           /project/total                                      controllers.admin.ProjectController.count(projectName: Option[String])
 GET           /project/all                                        controllers.admin.ProjectController.all
+GET           /project/my                                         controllers.admin.ProjectController.my(jobNo: String)
 GET           /project/allExceptSelf/:id                          controllers.admin.ProjectController.allExceptSelf(id: Int)
 GET           /project/atts                                       controllers.admin.ProjectController.atts(projectId: Int)
 GET           /project/vars                                       controllers.admin.ProjectController.vars(projectId: Int, envId: Int)

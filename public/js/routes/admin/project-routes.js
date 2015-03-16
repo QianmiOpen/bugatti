@@ -57,7 +57,6 @@ define(['angular'], function(angular) {
             }
         });
 
-
         $stateProvider.state('admin.project.version.create', {
             url: "/create",
             views: {
@@ -77,6 +76,7 @@ define(['angular'], function(angular) {
                 }
             }
         });
+
         /**
          * 项目依赖
          */

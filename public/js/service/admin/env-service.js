@@ -12,6 +12,9 @@ define(['angular'], function(angular) {
             getAll: function(callback) {
                 $http(PlayRoutes.controllers.admin.EnvController.all()).success(callback);
             },
+            my: function(jobNo, callback) {
+                $http(PlayRoutes.controllers.admin.EnvController.my(jobNo)).success(callback);
+            },
             getAuth: function(callback) {
                 $http(PlayRoutes.controllers.admin.EnvController.showAuth()).success(callback);
             },
