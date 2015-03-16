@@ -4,9 +4,8 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.admin.userModule', []);
 
-    app.controller('UserCtrl', ['$scope', '$stateParams', '$state', '$modal', 'UserService', 'Auth',
-        function($scope, $stateParams, $state, $modal, UserService, Auth) {
-            $scope.loginUser = Auth.user;
+    app.controller('UserCtrl', ['$scope', '$stateParams', '$state', '$modal', 'UserService',
+        function($scope, $stateParams, $state, $modal, UserService) {
             $scope.currentPage = 1;
             $scope.pageSize = 20;
 
@@ -64,8 +63,8 @@ define(['angular'], function(angular) {
         });
     }]);
 
-    app.controller('UserCreateCtrl', ['$scope', '$stateParams', '$state', 'UserService',
-        function($scope, $stateParams, $state, UserService) {
+    app.controller('UserCreateCtrl', ['$scope', '$stateParams', '$state', 'growl', 'UserService',
+        function($scope, $stateParams, $state, growl, UserService) {
             $scope.user = {role: 'user', locked: false}
             $scope.saveOrUpdate = function(user) {
                 UserService.save(angular.toJson(user), function(data) {
@@ -73,6 +72,7 @@ define(['angular'], function(angular) {
                         $scope.form.jobNo.$invalid = true;
                         $scope.form.jobNo.$error.exists = true;
                     } else {
+                        growl.addSuccessMessage("添加成功");
                         $state.go('^');
                     }
                 });
@@ -80,9 +80,8 @@ define(['angular'], function(angular) {
 
         }]);
 
-    app.controller('UserUpdateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'UserService', 'Auth',
-        function($scope, $filter, $stateParams, $state, UserService, Auth) {
-            $scope.loginUser = Auth.user;
+    app.controller('UserUpdateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'growl', 'UserService',
+        function($scope, $filter, $stateParams, $state, growl, UserService) {
             $scope.user, $scope.master = {};
 
             UserService.get($stateParams.id, function(data) {
@@ -104,6 +103,7 @@ define(['angular'], function(angular) {
                         $scope.form.jobNo.$invalid = true;
                         $scope.form.jobNo.$error.exists = true;
                     } else {
+                        growl.addSuccessMessage("修改成功");
                         $state.go('^');
                     }
                 });

@@ -15,7 +15,7 @@ define(['angular'], function(angular) {
         $stateProvider.state('profile.keys',{
             url: "/keys",
             templateUrl: "partials/profile/profile-keys.html",
-            controller: 'ProfileCtrl'
+            controller: 'ProfileKeysCtrl'
         });
 
         $stateProvider.state('profile.env',{

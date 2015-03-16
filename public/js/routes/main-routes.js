@@ -50,7 +50,7 @@ define(['angular',
             url: "/admin",
             templateUrl: "partials/admin.html",
             controller: function($scope, $state, Auth) {
-                $scope.user = Auth.user;
+                $scope.loginUser = Auth.user;
             },
             data: { access: 'anon' }
         });
@@ -58,6 +58,9 @@ define(['angular',
         $stateProvider.state('profile', {
             url: "/profile",
             templateUrl: "partials/profile.html",
+            controller: function($scope, Auth) {
+                $scope.loginUser = Auth.user;
+            },
             data: { access: 'anon' }
         });
 

@@ -1,3 +1,19 @@
 <div class="page-header clearfix">
     <h1 class="pull-left m0">密钥设置</h1>
 </div>
+
+<form name="form" class="form-horizontal" novalidate>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label">SSH Keys：</label>
+        <div class="col-sm-6">
+            <textarea class="form-control" name="sshKey" id="sshKey" cols="50" rows="8" ng-model="user.sshKey" placeholder="~/.ssh/id_rsa.pub 内容"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-5">
+            <button class="btn btn-success" ng-click="saveOrUpdate(user)" ng-disabled="form.$invalid"> 保 存 </button>
+        </div>
+    </div>
+</form>
