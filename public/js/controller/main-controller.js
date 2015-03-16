@@ -15,7 +15,8 @@ define(['angular',
     './admin/system-controller',
     './admin/script-controller',
     './admin/logs-controller',
-    './home/task-controller'
+    './home/task-controller',
+    './profile/profile-controller'
 ], function(angular) {
 
     /* Controllers */
@@ -32,7 +33,8 @@ define(['angular',
         'bugattiApp.controller.admin.systemModule',
         'bugattiApp.controller.admin.scriptModule',
         'bugattiApp.controller.admin.logsModule',
-        'bugattiApp.controller.home.taskModule'
+        'bugattiApp.controller.home.taskModule',
+        'bugattiApp.controller.profile.profileModule'
     ]);
 
     // Auth

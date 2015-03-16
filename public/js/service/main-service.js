@@ -36,7 +36,6 @@ define(['angular',
 
     app.value('version', '0.1');
 
-
     // Auth
     app.factory('Auth', ['$http', '$cookieStore', '$cookies', function ($http, $cookieStore, $cookies) {
         var currentUser = {username: '', role: ''};

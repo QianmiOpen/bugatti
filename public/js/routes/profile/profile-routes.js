@@ -9,25 +9,25 @@ define(['angular'], function(angular) {
         $stateProvider.state('profile.index',{
             url: "/index",
             templateUrl: "partials/profile/profile-index.html",
-            controller: 'TemplateCtrl'
+            controller: 'ProfileCtrl'
         });
 
         $stateProvider.state('profile.keys',{
             url: "/keys",
             templateUrl: "partials/profile/profile-keys.html",
-            controller: 'TemplateCtrl'
+            controller: 'ProfileCtrl'
         });
 
         $stateProvider.state('profile.env',{
             url: "/env",
             templateUrl: "partials/profile/profile-env.html",
-            controller: 'TemplateCtrl'
+            controller: 'ProfileCtrl'
         });
 
         $stateProvider.state('profile.project',{
             url: "/project",
             templateUrl: "partials/profile/profile-project.html",
-            controller: 'TemplateCtrl'
+            controller: 'ProfileCtrl'
         });
 
 
