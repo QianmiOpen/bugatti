@@ -40,15 +40,15 @@ define(['angular',
     // Auth
     app.controller('NavCtrl', ['$rootScope', '$scope', '$location', 'Auth',
         function($rootScope, $scope, $location, Auth) {
-        $scope.user = Auth.user;
+            $scope.loginUser = Auth.user;
 
-        $scope.logout = function() {
-            Auth.logout(function() {
-                $location.path('/');
-            }, function() {
-                $rootScope.error = "Failed to logout";
-            });
-        };
+            $scope.logout = function() {
+                Auth.logout(function() {
+                    $location.path('/');
+                }, function() {
+                    $rootScope.error = "Failed to logout";
+                });
+            };
     }]);
 
     app.controller('LoginCtrl', ['$scope', '$location', 'Auth', function($scope, $location, Auth) {
@@ -59,8 +59,33 @@ define(['angular',
         };
     }]);
 
-    app.controller('UCtrl', ['$scope', '$location', 'Auth', function($scope, $location, Auth) {
-        $scope.user = Auth.user;
+    app.controller('UCtrl', ['$scope', '$location', '$filter', 'Auth', 'EnvService', 'ProjectService', 'LogsService',
+        function($scope, $location, $filter, Auth, EnvService, ProjectService, LogsService) {
+            $scope.loginUser = Auth.user;
 
-    }]);
+            EnvService.my($scope.loginUser.username, function(data) {
+                $scope.envs = data;
+            });
+
+            ProjectService.my($scope.loginUser.username, function(data) {
+                $scope.projects = data;
+            });
+
+            // logs
+            $scope.start = 0;
+            $scope.pageSize = 20;
+
+            var date = new Date();
+            $scope.logs = {
+                startTime: $filter('date')(date.setYear(date.getFullYear() - 1), 'yyyy-MM-dd') + ' 00:00:00',
+                endTime: $filter('date')(new Date(), "yyyy-MM-dd") + ' 23:59:59',
+                jobNo: $scope.loginUser.username
+            };
+
+            LogsService.search(angular.toJson($scope.logs), $scope.start, $scope.pageSize, function(data) {
+                $scope.logData = data;
+            });
+
+
+        }]);
 });

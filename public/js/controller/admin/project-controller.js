@@ -164,8 +164,8 @@ define(['angular'], function(angular) {
             };
     }]);
 
-    app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'ProjectService', 'TemplateService', 'EnvService',
-        function($scope, $stateParams, $state, ProjectService, TemplateService, EnvService) {
+    app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'growl', 'ProjectService', 'TemplateService', 'EnvService',
+        function($scope, $stateParams, $state, growl, ProjectService, TemplateService, EnvService) {
 
             $scope.saveOrUpdate = function(project) {
 
@@ -180,7 +180,12 @@ define(['angular'], function(angular) {
                         $scope.form.name.$invalid = true;
                         $scope.form.name.$error.exists = true;
                     } else {
-                        $state.go("admin.project.detail", {id: project.id});
+                        growl.addSuccessMessage("创建成功");
+                        if ($state.includes('admin.project')) {
+                            $state.go("admin.project");
+                        } else {
+                            $state.go("profile.project");
+                        }
                     }
                 });
             };
@@ -302,8 +307,8 @@ define(['angular'], function(angular) {
 
         }]);
 
-    app.controller('ProjectUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'ProjectService', 'TemplateService', 'EnvService',
-        function($scope, $stateParams, $filter, $state, ProjectService, TemplateService, EnvService) {
+    app.controller('ProjectUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'growl', 'ProjectService', 'TemplateService', 'EnvService',
+        function($scope, $stateParams, $filter, $state, growl, ProjectService, TemplateService, EnvService) {
 
             // update
             $scope.saveOrUpdate = function(project) {
@@ -319,7 +324,12 @@ define(['angular'], function(angular) {
                         $scope.form.name.$invalid = true;
                         $scope.form.name.$error.exists = true;
                     } else {
-                        $state.go("admin.project.detail", {id: project.id});
+                        growl.addSuccessMessage("修改成功");
+                        if ($state.includes('admin.project')) {
+                            $state.go("admin.project");
+                        } else {
+                            $state.go("profile.project");
+                        }
                     }
                 });
 

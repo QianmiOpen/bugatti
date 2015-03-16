@@ -2,13 +2,11 @@
 
     <div class="col-md-8">
         <h3 class="page-title m0">
-            <icon-identicon class="avatar" code="{{user.username}}" title="{{user.username}}" size="90"></icon-identicon>
+            <icon-identicon class="avatar" code="{{loginUser.username}}" title="{{loginUser.username}}" size="90"></icon-identicon>
             name
-
-
             <div class="pull-right">
-                <a class="btn" href="/profile"><i class="fa fa-pencil-square-o"></i>
-                    Edit Profile settings
+                <a class="btn" ui-sref="profile.index"><i class="fa fa-pencil-square-o"></i>
+                    修改个人配置
                 </a>
             </div>
             <br/>
@@ -19,7 +17,32 @@
         <div class="clearfix"></div>
 
         <br/>
-        <h4>User Activity:</h4>
+        <h4>最新动态:</h4>
+
+
+        <table class="table table-striped table-hover table-fixed">
+            <thead>
+            <tr>
+                <th width="15%">时间</th>
+                <th width="10%">模块</th>
+                <th width="10%">用户</th>
+                <th width="10%">ip</th>
+                <th width="10%">事件</th>
+                <th>数据</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="d in logData">
+                <td>{{d.time | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td>{{d.info | info2json: 'mod'}}</td>
+                <td>{{d.info | info2json: 'user'}}</td>
+                <td>{{d.info | info2json: 'ip'}}</td>
+                <td>{{d.info | info2json: 'msg'}}</td>
+                <td><span tooltip-placement="left" tooltip="{{d.info | info2json: 'data'}}">{{d.info | info2json: 'data'}}</span></td>
+            </tr>
+            </tbody>
+        </table>
+
         <!--<div class="event-block event-item">-->
             <!---->
             <!--<div class="event-item-timestamp">-->
@@ -51,25 +74,27 @@
     </div>
 
     <div class="col-md-4">
-        <div class="panel panel-default">
+        <div class="panel panel-default" ng-if="projects">
             <div class="panel-heading">项目</div>
             <div class="panel-body">
                 <ui class="well-list">
-                    <li>Member</li>
-                    <li></li>
-                    <li></li>
+                    <li ng-repeat="project in projects|limitTo: 5">
+                        <a ui-sref="profile.project.detail({id: project.id})">{{project.name}}</a>
+                    </li>
+                    <li ng-if="projects.length > 5"><a ui-sref="profile.project">...</a></li>
                 </ui>
             </div>
 
         </div>
 
-        <div class="panel panel-default">
+        <div class="panel panel-default" ng-if="envs">
             <div class="panel-heading">环境</div>
             <div class="panel-body">
                 <ui class="well-list">
-                    <li>Member</li>
-                    <li></li>
-                    <li></li>
+                    <li ng-repeat="env in envs | limitTo:5">
+                        <a ui-sref="profile.env.detail({id: env.id})">{{env.name}}</a>
+                    </li>
+                    <li ng-if="envs.length > 5"><a ui-sref="profile.env">...</a></li>
                 </ui>
             </div>
 

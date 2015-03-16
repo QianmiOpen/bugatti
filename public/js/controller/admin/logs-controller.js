@@ -40,8 +40,8 @@ define(['angular'], function(angular){
 
         $scope.submit = function(pageNo) {
             var paramLogs = angular.copy($scope.logs)
-            paramLogs.startTime = paramLogs.startTime + ' 00:00:00'
-            paramLogs.endTime = paramLogs.endTime + ' 23:59:59'
+            paramLogs.startTime = paramLogs.startTime + ' 00:00:00';
+            paramLogs.endTime = paramLogs.endTime + ' 23:59:59';
             var start = angular.isUndefined(pageNo) ? 0 : pageNo - 1;
             LogsService.count(angular.toJson(paramLogs), function(data) {
                 $scope.totalItems = data;
