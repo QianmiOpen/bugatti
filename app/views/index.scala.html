@@ -31,7 +31,7 @@
                     <a class="navbar-brand" ui-sref="home" ui-sref-opts="{reload: true}">Bugatti <span class="header-version">@appVersion</span></a>
                     <span class="separator"></span>
                 </div>
-                <h1 class="title" ng-bind="'Admin area'"></h1>
+                <h1 class="title" ng-bind="app.breadcrumb"></h1>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         <li><a ui-sref="help" tooltip-placement="bottom" tooltip="help"><i ng-class="{'fa fa-question-circle': true}"></i></a></li>

@@ -6,6 +6,7 @@ define(['angular'], function(angular) {
 
     app.controller('UserCtrl', ['$scope', '$stateParams', '$state', '$modal', 'UserService',
         function($scope, $stateParams, $state, $modal, UserService) {
+            $scope.app.breadcrumb='用户管理';
             $scope.currentPage = 1;
             $scope.pageSize = 20;
 

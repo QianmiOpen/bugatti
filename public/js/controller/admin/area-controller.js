@@ -4,6 +4,7 @@ define(['angular'], function(angular){
     var app = angular.module('bugattiApp.controller.admin.areaModule', []);
 
     app.controller('AreaCtrl', ['$scope', '$modal', 'AreaService', function($scope, $modal, AreaService){
+        $scope.app.breadcrumb='区域管理';
         AreaService.getAll(function(data){
            $scope.areas = data;
         });

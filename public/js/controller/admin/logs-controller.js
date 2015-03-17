@@ -4,6 +4,7 @@ define(['angular'], function(angular){
     var app = angular.module('bugattiApp.controller.admin.logsModule', []);
 
     app.controller('LogsCtrl', ['$scope', '$filter', '$modal', 'LogsService', function($scope, $filter, $modal, LogsService){
+        $scope.app.breadcrumb='日志查看';
         $scope.currentPage = 1;
         $scope.pageSize = 20;
 

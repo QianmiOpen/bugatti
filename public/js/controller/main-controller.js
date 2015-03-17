@@ -52,6 +52,8 @@ define(['angular',
     }]);
 
     app.controller('LoginCtrl', ['$scope', '$location', 'Auth', function($scope, $location, Auth) {
+        $scope.app.breadcrumb='登录';
+
         $scope.login = function(user) {
             Auth.login(user, function() {
                 $location.path('/');
@@ -61,6 +63,8 @@ define(['angular',
 
     app.controller('UCtrl', ['$scope', '$location', '$filter', 'Auth', 'EnvService', 'ProjectService', 'LogsService', 'UserService',
         function($scope, $location, $filter, Auth, EnvService, ProjectService, LogsService, UserService) {
+            $scope.app.breadcrumb='用户中心';
+
             $scope.loginUser = Auth.user;
 
             EnvService.my($scope.loginUser.username, function(data) {

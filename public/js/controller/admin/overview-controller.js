@@ -5,6 +5,7 @@ define(['angular'], function(angular){
 
     app.controller('OverviewCtrl', ['$scope', 'ProjectService', 'EnvService', 'UserService',
         function($scope, ProjectService, EnvService, UserService) {
+            $scope.app.breadcrumb='综合概况';
         ProjectService.count('', function(data) {
             $scope.projectCount = data;
         });

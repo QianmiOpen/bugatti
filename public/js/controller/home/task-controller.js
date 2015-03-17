@@ -13,7 +13,7 @@ define(['angular'], function(angular) {
 
     app.controller('TaskCtrl', ['$scope', '$state', '$stateParams', "$interval", "Auth", 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
         function($scope, $state, $stateParams, $interval, Auth, EnvService, ProjectService, AreaService, TaskService) {
-
+        $scope.app.breadcrumb='任务中心';
         keepSession($scope, $interval, Auth);
 
         // init

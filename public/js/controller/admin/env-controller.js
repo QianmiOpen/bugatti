@@ -5,6 +5,7 @@ define(['angular'], function(angular) {
     var app = angular.module('bugattiApp.controller.admin.envModule', []);
 
     app.controller('EnvCtrl', ['$scope', '$modal', 'EnvService', function($scope, $modal, EnvService) {
+        $scope.app.breadcrumb='环境管理';
         $scope.currentPage = 1;
         $scope.pageSize = 10;
 

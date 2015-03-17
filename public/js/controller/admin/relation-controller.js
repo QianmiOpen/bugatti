@@ -6,6 +6,7 @@ define(['angular'], function(angular) {
 
     app.controller('RelationCtrl', ['$scope', '$modal', 'RelationService', 'ProjectService', 'EnvService',
         function($scope, $modal, RelationService, ProjectService, EnvService) {
+            $scope.app.breadcrumb='关系设置';
             $scope.currentPage = 1;
             $scope.pageSize = 10;
 

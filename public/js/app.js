@@ -63,6 +63,8 @@ require(['jquery', 'angular', 'chosen', './controller/main-controller', './direc
                 $rootScope.$state = $state;
                 $rootScope.$stateParams = $stateParams;
 
+                $rootScope.app = {breadcrumb: ''};
+
                 $rootScope.$on("$stateChangeStart", function (event, toState) {
                     Auth.ping(function() {
                         if (toState.data.access === 'anon') {

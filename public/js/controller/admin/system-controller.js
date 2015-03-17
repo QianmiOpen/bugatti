@@ -3,8 +3,8 @@
 define(['angular'], function(angular){
     var app = angular.module('bugattiApp.controller.admin.systemModule', []);
 
-    app.controller('SystemCtrl', ['$scope', 'growl', 'SystemService',
-        function($scope, growl, SystemService) {
+    app.controller('SystemCtrl', ['$scope', 'growl', 'SystemService', function($scope, growl, SystemService) {
+        $scope.app.breadcrumb='系统配置';
         $scope.ldapAuthentication = false;
 
         SystemService.load(function(data) {

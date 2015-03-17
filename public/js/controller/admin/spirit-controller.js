@@ -5,6 +5,7 @@ define(['angular'], function(angular) {
     var app = angular.module('bugattiApp.controller.admin.spiritModule', []);
 
     app.controller('SpiritCtrl', ['$scope', '$modal', 'SpiritService', function($scope, $modal, SpiritService) {
+        $scope.app.breadcrumb='网关管理';
         SpiritService.getAll(function(data){
             $scope.spirits = data;
         });

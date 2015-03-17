@@ -6,6 +6,7 @@ define(['angular'], function(angular) {
 
     app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
         function($scope, $state, $stateParams, $modal, growl, ProjectService, VersionService, EnvService) {
+            $scope.app.breadcrumb='项目管理';
         $scope.currentPage = 1;
         $scope.pageSize = 20;
 

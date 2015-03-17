@@ -5,6 +5,7 @@ define(['angular'], function(angular) {
     var app = angular.module('bugattiApp.controller.admin.templateModule', []);
 
     app.controller('TemplateCtrl', ['$scope', '$modal', 'growl', 'TemplateService', function($scope, $modal, growl, TemplateService) {
+        $scope.app.breadcrumb='模板管理';
         $scope.currentPage = 1;
         $scope.pageSize = 1000;
 
