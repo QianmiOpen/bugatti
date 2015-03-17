@@ -16,7 +16,6 @@ define(['angular'], function(angular) {
 
         keepSession($scope, $interval, Auth);
 
-            console.log('task...');
         // init
         $scope.env = {};
         $scope.envs = [];
@@ -99,10 +98,7 @@ define(['angular'], function(angular) {
         }
 
         $scope.closeWS = function(){
-            console.log("[in TaskInfoCtrl] $scope.closeWS is invoked")
-            console.log($scope.taskSocket)
             if($scope.taskSocket){
-                console.log("[in TaskInfoCtrl] $scope.taskSocket is closing")
                 $scope.taskSocket.close();
             }
         }

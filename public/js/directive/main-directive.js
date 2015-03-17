@@ -723,7 +723,6 @@ define(['angular'], function(angular) {
             templateUrl: 'partials/home/his-tabs.html',
             controller: function($scope){
                 $scope.isHisShow = function(sTab, sIndex){
-                    console.log($scope.sTab, sTab, $scope.chooseIndex, sIndex)
                     return $scope.sTab == sTab && $scope.chooseIndex == sIndex && $scope.hisTabStatus[$scope.chooseIndex + "_" + $scope.sTab];
                 }
             }
