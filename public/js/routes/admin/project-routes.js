@@ -10,8 +10,7 @@ define(['angular'], function(angular) {
         $stateProvider.state('admin.project', {
             url: "/project",
             templateUrl: "partials/admin/project/project-index.html",
-            controller: "ProjectCtrl",
-            data: { access: 'project' }
+            controller: "ProjectCtrl"
         });
 
         $stateProvider.state('admin.project.create', {

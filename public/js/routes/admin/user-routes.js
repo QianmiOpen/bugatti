@@ -10,8 +10,7 @@ define(['angular'], function(angular) {
         $stateProvider.state('admin.user', {
             url: "/user",
             templateUrl: "partials/admin/user/user-index.html",
-            controller: "UserCtrl",
-            data: { access: 'user' }
+            controller: "UserCtrl"
         });
 
         $stateProvider.state('admin.user.create', {

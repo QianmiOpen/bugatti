@@ -10,8 +10,7 @@ define(['angular'], function(angular) {
         $stateProvider.state('admin.env', {
             url: "/env",
             templateUrl: "partials/admin/env/env-index.html",
-            controller: "EnvCtrl",
-            data: { access: 'env' }
+            controller: "EnvCtrl"
         });
 
         $stateProvider.state('admin.env.create', {

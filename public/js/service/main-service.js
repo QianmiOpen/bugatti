@@ -47,8 +47,8 @@ define(['angular',
         return {
             authorize: function(access) {
                 if (currentUser.role === 'admin') return true;
-                else if (access === 'admin' && access != currentUser.role) return false;
-                return true;
+                else if (currentUser.role === 'user' && access === 'user') return true;
+                return false;
             },
             ping: function(success, error) {
                 $http.get('/ping').success(function(r) {

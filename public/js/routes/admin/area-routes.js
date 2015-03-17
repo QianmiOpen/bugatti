@@ -9,8 +9,7 @@ define(['angular'], function(angular) {
         $stateProvider.state("admin.area", {
             url: "/area",
             templateUrl: "partials/admin/area/area-index.html",
-            controller: "AreaCtrl",
-            data: { access: 'area' }
+            controller: "AreaCtrl"
         });
 
         $stateProvider.state("admin.area.create", {

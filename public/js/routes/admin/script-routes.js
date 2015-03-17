@@ -9,8 +9,8 @@ define(['angular'], function(angular) {
         $stateProvider.state("admin.script", {
             url: "/script",
             templateUrl: "partials/admin/script/script-index.html",
-            controller: "ScriptCtrl",
-            data: { access: 'script' }
+            controller: "ScriptCtrl"
         });
     }]);
+
 });

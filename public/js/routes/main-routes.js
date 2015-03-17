@@ -43,7 +43,7 @@ define(['angular',
             url: "/",
             templateUrl: "partials/home/task.html",
             controller: "TaskCtrl",
-            data: { access: 'task' }
+            data: { access: 'user' }
         });
 
         $stateProvider.state('admin', {
@@ -52,7 +52,14 @@ define(['angular',
             controller: function($scope, $state, Auth) {
                 $scope.loginUser = Auth.user;
             },
-            data: { access: 'anon' }
+            data: { access: 'admin' }
+        });
+
+        $stateProvider.state('admin.logs', {
+            url: "/logs",
+            templateUrl: "partials/admin/logs-index.html",
+            controller: "LogsCtrl",
+            data: { access: 'admin' }
         });
 
         $stateProvider.state('profile', {
@@ -61,14 +68,14 @@ define(['angular',
             controller: function($scope, Auth) {
                 $scope.loginUser = Auth.user;
             },
-            data: { access: 'anon' }
+            data: { access: 'user' }
         });
 
         $stateProvider.state('u', {
             url: "/u",
             templateUrl: "partials/u.html",
             controller: "UCtrl",
-            data: { access: 'anon' }
+            data: { access: 'user' }
         });
 
         $stateProvider.state('api', {
@@ -89,14 +96,6 @@ define(['angular',
             controller: "LoginCtrl",
             data: { access: 'anon' }
         });
-
-        $stateProvider.state('logs', {
-            url: "/logs",
-            templateUrl: "partials/admin/logs-index.html",
-            controller: "LogsCtrl",
-            data: { access: 'anon' }
-        });
-
 
     }]);
 

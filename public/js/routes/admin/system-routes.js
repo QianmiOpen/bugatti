@@ -9,8 +9,7 @@ define(['angular'], function(angular) {
         $stateProvider.state("admin.system", {
             url: "/system",
             templateUrl: "partials/admin/system/system-index.html",
-            controller: "SystemCtrl",
-            data: { access: 'system' }
+            controller: "SystemCtrl"
         });
     }]);
 });

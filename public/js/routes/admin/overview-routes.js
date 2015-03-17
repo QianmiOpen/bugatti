@@ -9,8 +9,7 @@ define(['angular'], function(angular) {
         $stateProvider.state("admin.overview", {
             url: "/overview",
             templateUrl: "partials/admin/overview-index.html",
-            controller: "OverviewCtrl",
-            data: { access: 'admin' }
+            controller: "OverviewCtrl"
         });
 
     }]);

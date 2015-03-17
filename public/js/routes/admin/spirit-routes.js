@@ -10,8 +10,7 @@ define(['angular'], function(angular) {
         $stateProvider.state('admin.spirit', {
             url: "/spirit",
             templateUrl: "partials/admin/spirit/spirit-index.html",
-            controller: "SpiritCtrl",
-            data: { access: 'spirit' }
+            controller: "SpiritCtrl"
         });
 
         $stateProvider.state('admin.spirit.create', {
