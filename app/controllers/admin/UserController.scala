@@ -101,7 +101,11 @@ object UserController extends BaseController {
                 _userForm.copy(sshKey = Some(SecurityUtil.encryptUK(key)))
               case None => _userForm
             }
-            Ok(Json.toJson(UserHelper.update(jobNo, update2user.copy(jobNo = _userForm.jobNo.toLowerCase))))
+            if (request.user.role == RoleEnum.user) { // Prohibition modify user role
+              Ok(Json.toJson(UserHelper.update(jobNo, update2user.copy(jobNo = _userForm.jobNo.toLowerCase, role = RoleEnum.user))))
+            } else {
+              Ok(Json.toJson(UserHelper.update(jobNo, update2user.copy(jobNo = _userForm.jobNo.toLowerCase))))
+            }
           } catch {
             case un: UniqueNameException => Ok(_Exist)
           }

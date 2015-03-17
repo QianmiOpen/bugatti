@@ -1,102 +1,59 @@
 <div class="container mt20">
 
-    <div class="col-md-8">
+    <div class="col-md-8 mb20">
         <h3 class="page-title m0">
             <icon-identicon class="avatar" code="{{loginUser.username}}" title="{{loginUser.username}}" size="90"></icon-identicon>
-            name
+            {{user.name}}
             <div class="pull-right">
                 <a class="btn" ui-sref="profile.index"><i class="fa fa-pencil-square-o"></i>
                     修改个人配置
                 </a>
             </div>
             <br/>
-            <span class="user-show-username">of546</span>
+            <span class="user-show-username">{{user.jobNo}}</span>
             <br/>
-            <small>member since Dec 15, 2014</small>
+            <small>{{user.role | role}}</small>
         </h3>
         <div class="clearfix"></div>
 
         <br/>
         <h4>最新动态:</h4>
 
-
-        <table class="table table-striped table-hover table-fixed">
-            <thead>
-            <tr>
-                <th width="15%">时间</th>
-                <th width="10%">模块</th>
-                <th width="10%">用户</th>
-                <th width="10%">ip</th>
-                <th width="10%">事件</th>
-                <th>数据</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="d in logData">
-                <td>{{d.time | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                <td>{{d.info | info2json: 'mod'}}</td>
-                <td>{{d.info | info2json: 'user'}}</td>
-                <td>{{d.info | info2json: 'ip'}}</td>
-                <td>{{d.info | info2json: 'msg'}}</td>
-                <td><span tooltip-placement="left" tooltip="{{d.info | info2json: 'data'}}">{{d.info | info2json: 'data'}}</span></td>
-            </tr>
-            </tbody>
-        </table>
-
-        <!--<div class="event-block event-item">-->
-            <!---->
-            <!--<div class="event-item-timestamp">-->
-                <!--<time class="time_ago" data-placement="top" data-toggle="tooltip" datetime="2015-03-09T09:19:26Z" title="" data-original-title="Mar 09, 2015 9:19am">2 days ago</time>-->
-            <!--</div>-->
-            <!--<img alt="" class="avatar s24" src="http://git.dev.qianmi.com//uploads/user/avatar/2/resize600.jpg">-->
-            <!--<div class="event-title">-->
-                <!--<span class="author_name"><a href="/u/OF546">mysoko</a></span>-->
-                <!--<span class="event_label pushed">pushed to branch</span>-->
-                <!--<a href="/cicode/salt-keys/commits/master"><strong>master</strong>-->
-                <!--</a>at-->
-                <!--<a href="/cicode/salt-keys"><span class="namespace-name">cicode / </span><span class="project-name">salt-keys</span></a>-->
-            <!--</div>-->
-            <!--<div class="event-body">-->
-                <!--<ul class="well-list event_commits">-->
-                    <!--<li class="commit">-->
-                        <!--<div class="commit-row-title">-->
-                            <!--<a alt="" class="commit_short_id" href="/cicode/salt-keys/commit/6146b271743aa1109ba05a1b2b95c1242fe4e5e3">6146b271</a>-->
-                            <!--&nbsp;-->
-                            <!--Add Users.-->
-                        <!--</div>-->
-                    <!--</li>-->
-
-                <!--</ul>-->
-            <!--</div>-->
-
-        <!--</div>-->
-
+        <div class="event-block event-item" ng-repeat="d in logData">
+            <div class="event-item-timestamp">{{d.time | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+            <div class="event-title">
+                {{d.info | info2json: 'user'}}
+                <span class="small">在</span>
+                {{d.info | info2json: 'ip'}}
+                <span class="small">机器上执行</span>
+                {{d.info | info2json: 'msg'}}
+            </div>
+            <div class="event-body">
+                {{d.info | info2json: 'data'}}
+            </div>
+        </div>
     </div>
 
     <div class="col-md-4">
         <div class="panel panel-default" ng-if="projects">
-            <div class="panel-heading">项目</div>
-            <div class="panel-body">
-                <ui class="well-list">
-                    <li ng-repeat="project in projects|limitTo: 5">
-                        <a ui-sref="profile.project.detail({id: project.id})">{{project.name}}</a>
-                    </li>
-                    <li ng-if="projects.length > 5"><a ui-sref="profile.project">...</a></li>
-                </ui>
-            </div>
+            <div class="panel-heading">项目（{{projects.length}}）</div>
+            <ui class="well-list">
+                <li ng-repeat="project in projects|limitTo: 5">
+                    <a ui-sref="profile.project.detail({id: project.id})">{{project.name}}</a>
+                </li>
+                <li ng-if="projects.length > 5"><a ui-sref="profile.project">...</a></li>
+            </ui>
 
         </div>
 
         <div class="panel panel-default" ng-if="envs">
-            <div class="panel-heading">环境</div>
-            <div class="panel-body">
-                <ui class="well-list">
-                    <li ng-repeat="env in envs | limitTo:5">
-                        <a ui-sref="profile.env.detail({id: env.id})">{{env.name}}</a>
-                    </li>
-                    <li ng-if="envs.length > 5"><a ui-sref="profile.env">...</a></li>
-                </ui>
-            </div>
+            <div class="panel-heading">环境（{{envs.length}}）</div>
+            <ui class="well-list">
+                <li ng-repeat="env in envs | limitTo:5">
+                    <a ui-sref="profile.env.detail({id: env.id})">{{env.name}}</a>
+                </li>
+                <li ng-if="envs.length > 5"><a ui-sref="profile.env">...</a></li>
+            </ui>
 
         </div>
 

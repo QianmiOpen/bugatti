@@ -59,8 +59,8 @@ define(['angular',
         };
     }]);
 
-    app.controller('UCtrl', ['$scope', '$location', '$filter', 'Auth', 'EnvService', 'ProjectService', 'LogsService',
-        function($scope, $location, $filter, Auth, EnvService, ProjectService, LogsService) {
+    app.controller('UCtrl', ['$scope', '$location', '$filter', 'Auth', 'EnvService', 'ProjectService', 'LogsService', 'UserService',
+        function($scope, $location, $filter, Auth, EnvService, ProjectService, LogsService, UserService) {
             $scope.loginUser = Auth.user;
 
             EnvService.my($scope.loginUser.username, function(data) {
@@ -69,6 +69,10 @@ define(['angular',
 
             ProjectService.my($scope.loginUser.username, function(data) {
                 $scope.projects = data;
+            });
+
+            UserService.get($scope.loginUser.username, function(data) {
+                $scope.user = data;
             });
 
             // logs

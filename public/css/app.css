@@ -185,6 +185,22 @@ header .navbar-nav>li>a {
     position: static;
 }
 
+.well-list{margin:0;padding:0;list-style:none}
+.well-list li{padding:10px 15px;min-height:20px;border-bottom:1px solid #eee;border-bottom:1px solid rgba(0,0,0,0.05)}
+.well-list li:after{content:" ";display:table;clear:both}
+.well-list li.disabled{color:#888}
+.well-list li.unstyled:hover{background:none}
+.well-list li.warning-row{background-color:#fcf8e3;border-color:#faebcc;color:#8a6d3b}
+.well-list li.smoke{background-color:#f5f5f5}
+.well-list li:hover{background:#ffecdb;border-bottom:1px solid #ffd1a8}
+.well-list li:last-child{border-bottom:none}
+.well-list li:last-child.bottom{background:#f5f5f5}
+
+.event-item{padding:12px 0px;border-bottom:1px solid #eee}
+.event-item:last-child {border: none;  }
+.event-item .event-item-timestamp{float:right;color:#999;line-height:22px}
+.event-item .event-title{display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:top;white-space:nowrap;max-width:72%;color:#333;font-weight:normal;font-size:14px}
+.event-item .event-body{margin-left:35px;margin-right:100px; color:#666; word-wrap:break-word; }
 /* growl*/
 .growl {
     position: fixed;
