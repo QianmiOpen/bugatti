@@ -16,6 +16,7 @@ define(['angular'], function(angular) {
 
         keepSession($scope, $interval, Auth);
 
+            console.log('task...');
         // init
         $scope.env = {};
         $scope.envs = [];
@@ -57,23 +58,36 @@ define(['angular'], function(angular) {
             });
             return r;
         }
+        function in_projects(projects, pid) {
+            var find = false;
+            angular.forEach(projects, function(p) {
+                if (!find && p.id == pid) {
+                    find = true;
+                }
+            });
+            return find;
+        }
 
         $scope.activeEnv = function(e) {
             $scope.env = e;
             // load projects
             $scope.load.is = true;
-            $scope.projects = []
+            $scope.projects = [];
             ProjectService.getAuth(e.id, function(data) {
                 $scope.projects = data;
                 $scope.load.is = false;
-                if (angular.isDefined($state.params.pid) && $state.params.pid in $scope.projects) {
+                if (angular.isDefined($state.params.pid) && in_projects($scope.projects, $state.params.pid)) {
                     $state.go('home.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
                 } else {
-                    $state.go('home.list', { eid: e.id });
+                    if ($scope.projects.length > 0 && $scope.projects[0].id > 0) {
+                        $state.go('home.list.info', { eid: e.id, pid: $scope.projects[0].id, top: $state.params.top});
+                    } else {
+                        $state.go('home.list', { eid: e.id });
+                    }
                 }
             });
 
-            $scope.scriptVersion = e.scriptVersion
+            $scope.scriptVersion = e.scriptVersion;
             $scope.getTemplates();
         };
 

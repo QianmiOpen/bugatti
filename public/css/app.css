@@ -135,7 +135,7 @@ header .tooltip-inner {
 
 header .title{border-left: 1px solid #575D67;position:relative;float:left;margin:0;padding-left:15px;color:#fff;font-size:16px;line-height:50px;font-weight:normal;display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:top;white-space:nowrap;max-width:37%}
 header .profile-pic{position:relative;top:-1px;padding-right:0px !important}
-header .profile-pic icon-identicon canvas{width:26px;height:26px;border-radius: 4px; vertical-align:middle;}
+header .profile-pic icon-identicon canvas{width:26px; height:26px; vertical-align:middle;}
 header .navbar-nav.navbar-right:last-child {
     margin-right:0px;
 }
