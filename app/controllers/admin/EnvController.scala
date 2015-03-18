@@ -58,25 +58,6 @@ object EnvController extends BaseController {
     Ok(Json.toJson(ScriptVersionHelper.allName))
   }
 
-  // 根据权限加载环境列表
-  def showAuth = AuthAction() { implicit request =>
-    val user = request.user
-    // 管理员 & 委员长 显示所有环境
-    val countSafe = ProjectMemberHelper.count(request.user.jobNo, LevelEnum.safe)
-    val seq =
-      if (UserHelper.admin_?(request.user) || countSafe > 0) {
-        EnvironmentHelper.all()
-      } else {
-        //环境成员
-        val envs = EnvironmentMemberHelper.findEnvsByJobNo(user.jobNo)
-        //非安全环境
-        val unEnvs = EnvironmentHelper.findByUnsafe()
-        //merge
-        unEnvs ++ envs.filterNot(t => unEnvs.contains(t))
-      }
-    Ok(Json.toJson(seq))
-  }
-
   def delete(id: Int) = AuthAction() { implicit request =>
     if (!UserHelper.hasEnvSafe(id, request.user)) Forbidden
     else EnvironmentHelper.findById(id) match {

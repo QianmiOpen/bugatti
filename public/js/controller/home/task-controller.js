@@ -30,7 +30,7 @@ define(['angular'], function(angular) {
         }
 
         // load envs
-        EnvService.getAuth(function(data) {
+        EnvService.getAll(function(data) {
             if (data == null || data.length == 0) {
                 return;
             }

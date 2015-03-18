@@ -38,7 +38,6 @@ GET           /env/:id                                            controllers.ad
 DELETE        /env/:id                                            controllers.admin.EnvController.delete(id: Int)
 POST          /env                                                controllers.admin.EnvController.save
 PUT           /env/:id                                            controllers.admin.EnvController.update(id: Int)
-POST          /env/auth                                           controllers.admin.EnvController.showAuth
 # Environment member
 GET           /env/:envId/members                                 controllers.admin.EnvController.members(envId: Int)
 GET           /env/:envId/member/:jobNo                           controllers.admin.EnvController.member(envId: Int, jobNo: String)
@@ -61,11 +60,11 @@ GET           /project/my                                         controllers.ad
 GET           /project/allExceptSelf/:id                          controllers.admin.ProjectController.allExceptSelf(id: Int)
 GET           /project/atts                                       controllers.admin.ProjectController.atts(projectId: Int)
 GET           /project/vars                                       controllers.admin.ProjectController.vars(projectId: Int, envId: Int)
+GET           /project/auth                                       controllers.admin.ProjectController.showAuth(envId: Int)
 GET           /project/:id                                        controllers.admin.ProjectController.show(id: Int)
 DELETE        /project/:id                                        controllers.admin.ProjectController.delete(id: Int)
 POST          /project                                            controllers.admin.ProjectController.save
 PUT           /project/:projectId                                 controllers.admin.ProjectController.update(projectId: Int, envId: Int)
-POST          /project/auth                                       controllers.admin.ProjectController.showAuth(envId: Int)
 POST          /project/addCluster                                 controllers.admin.ProjectController.addCluster
 DELETE        /project/removeCluster/:clusterId                   controllers.admin.ProjectController.removeCluster(clusterId: Int)
 # Project member

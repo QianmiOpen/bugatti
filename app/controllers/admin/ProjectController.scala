@@ -86,20 +86,14 @@ object ProjectController extends BaseController {
 
   // 根据权限加载不同环境的项目列表
   def showAuth(envId: Int) = AuthAction() { implicit request =>
-    val user = request.user
-    if (UserHelper.admin_?(user)) {
+    if (UserHelper.hasEnvSafe(envId, request.user)) {
       Ok(Json.toJson(ProjectHelper.all()))
     } else {
-      val eMember = EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo)
-      if (eMember.isDefined) {
-        Ok(Json.toJson(ProjectHelper.all()))
-      } else {
-        EnvironmentHelper.findById(envId) match {
-          case Some(e) if e.level == LevelEnum.safe =>
-            Ok(Json.toJson(ProjectMemberHelper.findSafeProjectsByJobNo(user.jobNo)))
-          case _ =>
-            Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(user.jobNo)))
-        }
+      EnvironmentHelper.findById(envId) match {
+        case Some(e) if e.level == LevelEnum.safe =>
+          Ok(Json.toJson(ProjectMemberHelper.findSafeProjectsByJobNo(request.user.jobNo)))
+        case _ =>
+          Ok(Json.toJson(ProjectMemberHelper.findProjectsByJobNo(request.user.jobNo)))
       }
     }
   }
