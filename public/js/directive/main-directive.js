@@ -878,7 +878,6 @@ define(['angular'], function(angular) {
                 function($scope, TaskService){
                     $scope.delayLoadCatalinaLog = function(){
                         $scope.catalinaMessage = "正在努力加载中,请稍后..."
-                        var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
                         $scope.logType = "CATALINA";
                         if($scope.ltab == 1){
                             $scope.logType = "CATALINA";
@@ -887,22 +886,12 @@ define(['angular'], function(angular) {
                         } else if($scope.ltab == 3){
                             $scope.logType = "APP_LOG";
                         }
+                        $scope.catalinaLogSockets = [];
                         TaskService.getCatalinaWS($scope.env.id, function(data){
+                            console.log(data);
                             if($scope.hostName != undefined){
-                                var indexofdot = $scope.hostName.lastIndexOf(".");
-                                var path =
-                                    data
-//                                    "ws://localhost:3232"
-                                    + "/"
-                                    + $scope.hostName.substring(0, indexofdot == -1 ?  $scope.hostName.length : indexofdot)
-                                    + "/"
-                                    + $scope.logType
-
-                                $scope.closeWSCatalina();
-                                $scope.catalinaLogSocket = new WS(path);
-                                $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina;
-                                $scope.catalinaLogSocket.onerror = $scope.errorCatalina;
-                                $scope.catalinaLogSocket.onclose = $scope.closeCatalina;
+                                $scope.closeCatalinaLogSockets();
+                                data.forEach($scope.connect2WS);
                                 $scope.catalinaMessage = "";
                             }
                         })
@@ -912,9 +901,26 @@ define(['angular'], function(angular) {
                         console.log("websocket is closed !")
                     }
 
+                    $scope.connect2WS = function(url){
+                        var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
+                        var indexofdot = $scope.hostName.lastIndexOf(".");
+                        var path =
+                            url
+                            + "/"
+                            + $scope.hostName.substring(0, indexofdot == -1 ?  $scope.hostName.length : indexofdot)
+                            + "/"
+                            + $scope.logType;
+                        console.log(path);
+                        var catalinaLogSocket = new WS(path);
+                        catalinaLogSocket.onmessage = $scope.receiveCatalina;
+                        catalinaLogSocket.onerror = $scope.errorCatalina;
+                        catalinaLogSocket.onclose = $scope.closeCatalina;
+                        $scope.catalinaLogSockets.push(catalinaLogSocket);
+                    }
+
                     $scope.errorCatalina = function(err){
                         console.log(err)
-                        $scope.catalinaMessage = err.srcElement.URL + "连接失败";
+                        $scope.catalinaMessage = $scope.catalinaMessage + "logstash负载[" + err.srcElement.URL + "]连接失败\n";
                     }
                     $scope.receiveCatalina = function(event){
                         $scope.catalinaMessage = $scope.catalinaMessage + event.data + "\n";
@@ -950,6 +956,15 @@ define(['angular'], function(angular) {
                             console.log("$scope.catalinaLogSocket is closing")
                             $scope.catalinaLogSocket.close();
                         }
+                    }
+                    $scope.closeCatalinaLogSockets = function(){
+                        $scope.catalinaLogSockets.forEach($scope.closeCatalinaLogSocket);
+                        $scope.catalinaLogSockets = [];
+                    }
+
+                    $scope.closeCatalinaLogSocket = function(data){
+                        console.log(data);
+                        data.close();
                     }
 
                     $scope.delayLoadCatalinaLog();

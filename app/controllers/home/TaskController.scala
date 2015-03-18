@@ -221,14 +221,17 @@ object TaskController extends BaseController {
   }
 
   def findCatalinaWSUrl(envId: Int) = Action{
-    var ip = "172.19.0.0"
+    var ips = Seq("172.19.0.0")
     TemplateHelper.findByName("logstash") match {
       case Some(template) =>
         val projects = ProjectHelper.allByTemplateId(template.id.get)
         if(!projects.isEmpty){
           val rels = HostHelper.findByEnvId_ProjectId(envId, projects(0).id.get)
           if(!rels.isEmpty){
-            ip = rels(0).ip
+            ips = rels.map {
+              r =>
+                s"ws://${r.ip}:3232"
+            }
           }else {
             Logger.error("获取不到logstash机器")
           }
@@ -238,7 +241,7 @@ object TaskController extends BaseController {
       case _ =>
         Logger.error("获取不到logstash模板")
     }
-    Ok(s"ws://${ip}:3232")
+    Ok(Json.toJson(ips))
   }
 
 }
