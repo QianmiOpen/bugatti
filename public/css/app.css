@@ -142,7 +142,9 @@ header .navbar-nav.navbar-right:last-child {
 header .navbar-nav>li>a {
     padding: 0 10px 0 10px;
     line-height: 50px;
+    vertical-align: middle;
 }
+
 .member-list ul {
     margin-top: -20px;
     letter-spacing: -0.31em;

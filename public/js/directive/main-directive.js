@@ -282,6 +282,61 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    /* 判断用户是否为环境成员 */
+    app.directive('hasEnv', ['Auth', 'EnvService', function(Auth, EnvService) {
+        return {
+            restrict: 'A',
+            scope: false,
+            link: function($scope, element, attrs) {
+                $scope.hasEnv_ = false;
+
+                attrs.$observe('hasEnv', function(eid) {
+                    updateCSS(eid)
+                });
+                function updateCSS(eid) {
+                    if (Auth.user.role === 'admin') {
+                        $scope.hasEnv_ = true;
+                    }
+                    else {
+                        EnvService.member(eid, Auth.user.username, function(member) {
+                            if (member != null && member != 'null') {
+                                $scope.hasEnv_ = true;
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }]);
+
+
+    /* 判断用户是否为环境管理员 */
+    app.directive('hasEnvSafe', ['Auth', 'EnvService', function(Auth, EnvService) {
+        return {
+            restrict: 'A',
+            scope: false,
+            link: function($scope, element, attrs) {
+                $scope.hasEnvSafe_ = false;
+
+                attrs.$observe('hasEnvSafe', function(eid) {
+                    updateCSS(eid)
+                });
+                function updateCSS(eid) {
+                    if (Auth.user.role === 'admin') {
+                        $scope.hasEnvSafe_ = true;
+                    }
+                    else {
+                        EnvService.member(eid, Auth.user.username, function(member) {
+                            if (member != null && member.level == 'safe') {
+                                $scope.hasEnvSafe_ = true;
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }]);
+
     /* diff比较内容 */
     app.directive('diffShow', [function() {
         if (angular.isUndefined(window.difflib)) {

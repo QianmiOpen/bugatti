@@ -35,7 +35,7 @@
 
 <br/>
 
-<div ng-if="env.id">
+<div ng-if="env.id" has-env-safe="{{env.id}}">
     <div class="panel panel-default">
         <div class="panel-heading">环境管理员
             <sup class="btn-info" href="" tooltip-placement="right" tooltip="“环境所有人、管理者。">?</sup>
@@ -45,7 +45,7 @@
                 <li ng-repeat="m in members" ng-if="m.level == 'safe'">
                     <div class="pic">
                         <img src="/img/user_star.png" alt="test"/>
-                        <div class="u_actions" >
+                        <div class="u_actions" ng-show="hasEnvSafe_">
                             <span class="gact" title="降为成员">
                                 <a href="" ng-click="memberDown(m.id, '真的要把' + m.jobNo + '降为成员？')" title="把{{m.jobNo}}降为成员">v</a>
                             </span><br/><br/><br/>
@@ -61,7 +61,7 @@
     <div class="panel-heading">
         环境成员
         &nbsp;&nbsp;
-        <form ng-submit="addMember(searchMember.jobNo)" >
+        <form ng-submit="addMember(searchMember.jobNo)" ng-if="hasEnvSafe_">
             <input type="text" ng-model="searchMember.jobNo"/>
             <button type="submit" class="btn btn-link">+(工号)</button>
             <span class="has-error">
@@ -75,7 +75,7 @@
             <li ng-repeat="m in members" ng-if="m.level == 'unsafe'">
                 <div class="pic">
                     <img src="/img/user_normal.jpg" alt="test"/>
-                    <div class="u_actions" >
+                    <div class="u_actions" ng-show="hasEnvSafe_">
                         <span class="gact" title="提升为管理员">
                             <a href="" ng-click="memberUp(m.id, '真的要把' + m.jobNo + '提升为管理员？')" title="把{{m.jobNo}}提升为管理员">^</a>
                         </span><br/>

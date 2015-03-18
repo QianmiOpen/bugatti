@@ -25,7 +25,7 @@
                 <td><span tooltip="{{env.scriptVersion}}">{{env.scriptVersion}}</span></td>
                 <td><span tooltip="{{env.ipRange}}">{{env.ipRange}}</span></td>
                 <td><span tooltip="{{env.remark}}">{{env.remark}}</span></td>
-                <td>
+                <td ng-if="env.id" has-env-safe="{{env.id}}" ng-show="hasEnvSafe_">
                     <a ui-sref="profile.env.edit({id: env.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                     <a ng-click="delete(env.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
                 </td>

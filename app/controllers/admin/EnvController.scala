@@ -77,16 +77,17 @@ object EnvController extends BaseController {
     Ok(Json.toJson(seq))
   }
 
-  def delete(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
-    EnvironmentHelper.findById(id) match {
-      case Some(env) =>
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除环境", env))
-        Ok(Json.toJson(EnvironmentHelper.delete(id)))
-      case None => NotFound
+  def delete(id: Int) = AuthAction() { implicit request =>
+    if (!UserHelper.hasEnvSafe(id, request.user)) Forbidden
+    else EnvironmentHelper.findById(id) match {
+        case Some(env) =>
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除环境", env))
+          Ok(Json.toJson(EnvironmentHelper.delete(id)))
+        case None => NotFound
     }
   }
 
-  def save = AuthAction(RoleEnum.admin) { implicit request =>
+  def save = AuthAction() { implicit request =>
     envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       _envForm =>
@@ -99,8 +100,9 @@ object EnvController extends BaseController {
     )
   }
 
-  def update(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
-    envForm.bindFromRequest.fold(
+  def update(id: Int) = AuthAction() { implicit request =>
+    if (!UserHelper.hasEnvSafe(id, request.user)) Forbidden
+    else envForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       env =>
         try {

@@ -60,7 +60,9 @@ object EnvironmentHelper {
   @throws[UniqueNameException]
   def create(environment: Environment, jobNo: String) = db withSession { implicit session =>
     try {
-      qEnvironment.returning(qEnvironment.map(_.id)).insert(environment)
+      val eid = qEnvironment.returning(qEnvironment.map(_.id)).insert(environment)
+      EnvironmentMemberHelper._create(EnvironmentMember(None, eid, LevelEnum.safe, jobNo))
+      eid
     } catch {
       case x: MySQLIntegrityConstraintViolationException => throw new UniqueNameException
     }
