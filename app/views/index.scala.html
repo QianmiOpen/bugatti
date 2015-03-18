@@ -34,12 +34,12 @@
                 <h1 class="title" ng-bind="app.breadcrumb"></h1>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a ui-sref="help" tooltip-placement="bottom" tooltip="help"><i ng-class="{'fa fa-question-circle': true}"></i></a></li>
+                        <li><a ui-sref="help" tooltip-placement="bottom" tooltip="帮助文档"><i ng-class="{'fa fa-question-circle': true}"></i></a></li>
                         @*<li><a href="" tooltip-placement="bottom" tooltip="Explore"><i ng-class="{'fa fa-globe': true}"></i></a></li>*@
-                        <li ng-show="loginUser.role == 'admin'"><a ui-sref="admin.overview" tooltip-placement="bottom" tooltip="Admin area"><i ng-class="{'fa fa-cogs': true}"></i></a></li>
-                        <li ng-show="loginUser.username"><a ui-sref="profile.index" tooltip-placement="bottom" tooltip="Profile settings"><i ng-class="{'fa fa-user': true}"></i></a></li>
-                        <li ng-show="loginUser.username"><a href="" tooltip-placement="bottom" tooltip="Logout" ng-click="logout()"><i ng-class="{'fa fa-sign-out': true}"></i></a></li>
-                        <li ng-hide="loginUser.username"><a ui-sref="login" tooltip-placement="bottom" tooltip="Login" ><i ng-class="{'fa fa-sign-in': true}"></i></a></li>
+                        <li ng-show="loginUser.role == 'admin'"><a ui-sref="admin.overview" tooltip-placement="bottom" tooltip="管理功能"><i ng-class="{'fa fa-cogs': true}"></i></a></li>
+                        <li ng-show="loginUser.username"><a ui-sref="profile.index" tooltip-placement="bottom" tooltip="个人配置"><i ng-class="{'fa fa-user': true}"></i></a></li>
+                        <li ng-show="loginUser.username"><a href="" tooltip-placement="bottom" tooltip="退出" ng-click="logout()"><i ng-class="{'fa fa-sign-out': true}"></i></a></li>
+                        <li ng-hide="loginUser.username"><a ui-sref="login" tooltip-placement="bottom" tooltip="登录" ><i ng-class="{'fa fa-sign-in': true}"></i></a></li>
                         <li ng-show="loginUser.username">
                             <a ui-sref="u" tooltip-placement="bottom" tooltip="{{loginUser.username}}" ng-class="{'profile-pic': true}">
                                 <icon-identicon code="{{loginUser.username}}" title="{{loginUser.username}}" size="26"></icon-identicon>

@@ -1,4 +1,13 @@
-<h3>自动同步项目打包版本信息的pom配置。需要配置在war工程中，不要配置在项目顶层pom中：</h3>
+<div class="container mt15">
+
+    <div class="row row-offcanvas row-offcanvas-right">
+
+        <div class="col-xs-12 col-sm-9">
+
+            <div class="bs-callout bs-callout-danger">
+                <h1>工程POM设置</h1>
+                <hr/>
+                <h3>package war -> pom.xml配置添加</h3>
 <pre>
 &lt;plugin&gt;
     &lt;groupId&gt;com.ofpay&lt;/groupId&gt;
@@ -18,16 +27,31 @@
     &lt;/executions&gt;
 &lt;/plugin&gt;
 </pre>
+                <h3>线上服务器情况</h3>
+                1、使用tomcat用户和tomcat组运行web项目
+                2、tomcat用户目录在/home/tomcat下
+                3、/home/tomcat目录下有一个tomcat的链接，指向安装的tomcat版本，后续tomcat升级会修改该超链接。
+                4、CATALINA_HOME指向/home/tomcat/tomcat
+                5、web项目统一安装在/home/tomcat/tomcat/webapps下，通过server.war超链接连上最新的war包或目录。
+                6、web项目可以选择解压或不解压。不解压则/home/tomcat/tomcat/webapps/server.war链接指向最新的web文件，否则指向解压后的目录。
+                <h3>项目名称约束，不支持中划线</h3>
+                遵守两条简单的规则：
+                第一个字符必须是字母、下划线（_）或美元符号（$）
+                余下的字符可以是下划线、美元符号或任何字母或数字字符
+            </div>
 
-<h3>一、线上服务器情况：</h3>
-1、使用tomcat用户和tomcat组运行web项目
-2、tomcat用户目录在/home/tomcat下
-3、/home/tomcat目录下有一个tomcat的链接，指向安装的tomcat版本，后续tomcat升级会修改该超链接。
-4、CATALINA_HOME指向/home/tomcat/tomcat
-5、web项目统一安装在/home/tomcat/tomcat/webapps下，通过server.war超链接连上最新的war包或目录。
-6、web项目可以选择解压或不解压。不解压则/home/tomcat/tomcat/webapps/server.war链接指向最新的web文件，否则指向解压后的目录。
+        </div><!--/span-->
 
-<h3>二、项目名称已经约束，不支持中划线：</h3>
-遵守两条简单的规则：
-第一个字符必须是字母、下划线（_）或美元符号（$）
-余下的字符可以是下划线、美元符号或任何字母或数字字符
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            <h4>帮助文档</h4>
+            <hr class="m0" style="margin-bottom: 5px;"/>
+            <p>
+                <a ui-sref="api">版本推送接口</a><br/>
+                <a ui-sref="help">pom配置</a><br/>
+            </p>
+        </div><!--/span-->
+    </div><!--/row-->
+
+</div><!--/.container-->
+
+
