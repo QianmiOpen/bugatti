@@ -706,10 +706,11 @@ define(['angular'], function(angular) {
 
                     $scope.clusterTabStatus = {}
 
-                    $scope.chooseClusterTab = function(cTab, chooseIndex, taskId){
+                    $scope.chooseClusterTab = function(cTab, chooseIndex, taskId, hostName){
                         $scope.cTab = cTab;
                         $scope.chooseIndex = chooseIndex;
                         $scope.taskId = taskId;
+                        $scope.hostName = hostName;
                         $scope.clusterTabStatus[chooseIndex + "_" + cTab] = !$scope.clusterTabStatus[chooseIndex + "_" + cTab]
                     }
 
@@ -735,6 +736,7 @@ define(['angular'], function(angular) {
                 c: "=",
                 project: "=",
                 env: "=",
+                hostName: "=",
                 clusterTabStatus: "=",
                 chooseIndex: "="
             },
@@ -877,15 +879,15 @@ define(['angular'], function(angular) {
                     $scope.delayLoadCatalinaLog = function(){
                         $scope.catalinaMessage = "正在努力加载中,请稍后..."
                         var WS = window['MozWebSocket'] ? MozWebSocket: WebSocket;
-                        $scope.logType = "catalina";
+                        $scope.logType = "CATALINA";
                         if($scope.ltab == 1){
-                            $scope.logType = "catalina";
+                            $scope.logType = "CATALINA";
                         } else if($scope.ltab == 2) {
-                            $scope.logType = "intflog";
+                            $scope.logType = "INTF_LOG";
                         } else if($scope.ltab == 3){
-                            $scope.logType = "applog";
+                            $scope.logType = "APP_LOG";
                         }
-                        TaskService.getCatalinaWS($scope.activeEnv, function(data){
+                        TaskService.getCatalinaWS($scope.env.id, function(data){
                             if($scope.hostName != undefined){
                                 var indexofdot = $scope.hostName.lastIndexOf(".");
                                 var path =
@@ -897,11 +899,11 @@ define(['angular'], function(angular) {
                                     + $scope.logType
 
                                 $scope.closeWSCatalina();
-                                $scope.catalinaLogSocket = new WS(path)
-                                $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina
-                                $scope.catalinaLogSocket.onerror = $scope.errorCatalina
-                                $scope.catalinaLogSocket.onclose = $scope.closeCatalina
-                                $scope.catalinaMessage = ""
+                                $scope.catalinaLogSocket = new WS(path);
+                                $scope.catalinaLogSocket.onmessage = $scope.receiveCatalina;
+                                $scope.catalinaLogSocket.onerror = $scope.errorCatalina;
+                                $scope.catalinaLogSocket.onclose = $scope.closeCatalina;
+                                $scope.catalinaMessage = "";
                             }
                         })
                     }
@@ -915,20 +917,13 @@ define(['angular'], function(angular) {
                         $scope.catalinaMessage = err.srcElement.URL + "连接失败";
                     }
                     $scope.receiveCatalina = function(event){
-                        var messageJson = angular.fromJson(event.data)
-                        $scope.catalinaMessage = $scope.catalinaMessage +
-                        messageJson["@timestamp"] +
-                        " [" + messageJson.thread_name + "] " +
-                        messageJson.level +
-                        " " +
-                        $scope.getLog(messageJson) +
-                        "\n"
+                        $scope.catalinaMessage = $scope.catalinaMessage + event.data + "\n";
                     }
 
                     $scope.getLog = function(messageJson){
-                        if($scope.logType == "catalina"){
-                            return messageJson["logger_name"] + " - " + messageJson.message ;
-                        } else if($scope.logType == "intflog"){
+                        if($scope.logType == "CATALINA"){
+                            return messageJson["logger"] + " - " + messageJson.message ;
+                        } else if($scope.logType == "INTF_LOG"){
                             return messageJson["methodName"] + " - " +
                                 messageJson["paramTypes"] + " - " +
                                 messageJson["paramValues"] + " - " +
@@ -939,7 +934,7 @@ define(['angular'], function(angular) {
                                 messageJson["source"] + " - " +
                                 messageJson["srvGroup"] + " - " +
                                 messageJson["message"] + " - "
-                        } else if($scope.logType == "applog"){
+                        } else if($scope.logType == "APP_LOG"){
                             return messageJson["source"] + " - " +
                                 messageJson["caller_class_name"] + " - " +
                                 "line " + messageJson["caller_line_number"] + " - " +
@@ -957,19 +952,10 @@ define(['angular'], function(angular) {
                         }
                     }
 
+                    $scope.delayLoadCatalinaLog();
+
                 }],
             link: function postLink(scope, iElement, iAttrs){
-                scope.$watch('ltab', function(){
-                    scope.delayLoadCatalinaLog();
-                })
-
-                scope.$watch('catalina_ctab', function(){
-                    if(scope.ctab == 4 && scope.c_index == scope.$index){
-                        scope.delayLoadCatalinaLog();
-                    }else {
-                        scope.closeWSCatalina();
-                    }
-                })
             }
         }
     });

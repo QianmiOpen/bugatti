@@ -65,7 +65,7 @@
             </div>
         </td>
         <td>
-            <a ng-show="false" title="catalina日志" href="" ng-click="chooseClusterTab(4, $index, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
+            <a ng-show="true" title="日志" href="" ng-click="chooseClusterTab(4, $index, c.task.id, c.name)"><span class="glyphicon glyphicon-eye-open"></span></a>
             <a ng-show="showTaskProgress(c.task.status)" title="终止本次任务" href="" ng-click="forceTerminate(project.id, c.name)"><span class="glyphicon glyphicon-remove"></span></a>
         </td>
         <td class="show">
@@ -106,7 +106,7 @@
 
     <tr ng-repeat-end ng-if="isTrShow($index)">
         <td colspan="6">
-            <cluster-tabs c-tab="cTab" c-index="$index" choose-index="chooseIndex" c="c" project="project" env="env" cluster-tab-status="clusterTabStatus"></cluster-tabs>
+            <cluster-tabs c-tab="cTab" c-index="$index" choose-index="chooseIndex" c="c" project="project" env="env" cluster-tab-status="clusterTabStatus" host-name="hostName"></cluster-tabs>
         </td>
     </tr>
     </tbody>
