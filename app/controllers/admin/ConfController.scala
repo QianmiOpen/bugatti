@@ -191,7 +191,7 @@ object ConfController extends BaseController {
     mapping(
       "target_eid" -> number,
       "target_vid" -> number,
-      "envId" -> number, // 原环境编号
+      "envId" -> number,     // 原环境编号
       "versionId" -> number, // 原版本编号
       "projectId" -> number, // 原项目编号
       "ovr" -> default(boolean, false),

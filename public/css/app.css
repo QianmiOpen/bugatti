@@ -212,6 +212,7 @@ header .navbar-nav>li>a {
     right: 10px;
     float: right;
     width: 250px;
+    z-index: 10000;
 }
 
 .growl-item.ng-enter,
