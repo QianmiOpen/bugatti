@@ -86,7 +86,7 @@ object ProjectController extends BaseController {
 
   // 根据权限加载不同环境的项目列表
   def showAuth(envId: Int) = AuthAction() { implicit request =>
-    if (UserHelper.hasEnvSafe(envId, request.user)) {
+    if (UserHelper.hasEnv(envId, request.user)) {
       Ok(Json.toJson(ProjectHelper.all()))
     } else {
       EnvironmentHelper.findById(envId) match {
