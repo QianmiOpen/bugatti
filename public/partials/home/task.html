@@ -1,7 +1,7 @@
 <div class="col-md-offset-0 main ">
 
     <div style="position: absolute;top: 10px; left: 280px;z-index: 10000;">
-        <select id="sel_env" ng-model="env" ng-class="{red: env.level === 'safe'}" ng-options="e as e.name group by getGarageName(e.level) for e in envs| orderBy:'label'" ng-change="activeEnv(env)" class="form-control width300" >
+        <select id="sel_env" ng-model="env" ng-class="{red: env.level === 'safe'}" ng-options="e as e.name group by getGarageName(e.level) for e in envs" ng-change="activeEnv(env)" class="form-control width300" >
         </select>
     </div>
 

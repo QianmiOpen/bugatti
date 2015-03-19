@@ -11,8 +11,8 @@ define(['angular'], function(angular) {
         $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     }
 
-    app.controller('TaskCtrl', ['$scope', '$state', '$stateParams', "$interval", "Auth", 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
-        function($scope, $state, $stateParams, $interval, Auth, EnvService, ProjectService, AreaService, TaskService) {
+    app.controller('TaskCtrl', ['$scope', '$state', '$stateParams', "$interval", "$filter", "Auth", 'EnvService', 'ProjectService', 'AreaService', 'TaskService',
+        function($scope, $state, $stateParams, $interval, $filter, Auth, EnvService, ProjectService, AreaService, TaskService) {
         $scope.app.breadcrumb='任务中心';
         keepSession($scope, $interval, Auth);
 
@@ -34,8 +34,8 @@ define(['angular'], function(angular) {
             if (data == null || data.length == 0) {
                 return;
             }
-            $scope.envs = data;
 
+            $scope.envs = $filter('orderBy')(data, ['label']);
             if (angular.isUndefined($state.params.eid)) { // 第一次访问任务页面
                 $scope.activeEnv($scope.envs[0]);
             } else {                                      // F5刷新保持当前URL
