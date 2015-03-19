@@ -67,26 +67,36 @@ define(['angular'], function(angular) {
             return find;
         }
 
+        $scope.getGarageName = function(level) {
+            if (level === 'safe') {
+                return '安全环境';
+            } else {
+                return '普通环境';
+            }
+        };
         $scope.activeEnv = function(e) {
+            if (angular.isUndefined(e) || e == null) {
+                return;
+            }
             $scope.env = e;
             // load projects
             $scope.load.is = true;
             $scope.projects = [];
-            ProjectService.getAuth(e.id, function(data) {
+            ProjectService.getAuth($scope.env.id, function(data) {
                 $scope.projects = data;
                 $scope.load.is = false;
                 if (angular.isDefined($state.params.pid) && in_projects($scope.projects, $state.params.pid)) {
-                    $state.go('home.list.info', { eid: e.id, pid: $state.params.pid, top: $state.params.top});
+                    $state.go('home.list.info', { eid: $scope.env.id, pid: $state.params.pid, top: $state.params.top});
                 } else {
                     if ($scope.projects.length > 0 && $scope.projects[0].id > 0) {
-                        $state.go('home.list.info', { eid: e.id, pid: $scope.projects[0].id, top: $state.params.top});
+                        $state.go('home.list.info', { eid: $scope.env.id, pid: $scope.projects[0].id, top: $state.params.top});
                     } else {
-                        $state.go('home.list', { eid: e.id });
+                        $state.go('home.list', { eid: $scope.env.id });
                     }
                 }
             });
 
-            $scope.scriptVersion = e.scriptVersion;
+            $scope.scriptVersion = $scope.env.scriptVersion;
             $scope.getTemplates();
         };
 

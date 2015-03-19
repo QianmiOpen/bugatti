@@ -76,14 +76,17 @@ define(['angular'], function(angular) {
         return {
             restrict: 'A',
             require: '^resizable',
+            scope: {
+                ih:'@ignoreHeight'
+            },
             link: function ($scope, element, attrs, parentCtrl) {
                 $scope.$watch(
                     function() {
                         return parentCtrl.getwindowHeight();
                     },
                     function(value) {
-                        element.css('height', value+'px');
-                        //element.height(value);
+                        $scope.ih = $scope.ih ? $scope.ih: 0;
+                        element.css('height', (value - $scope.ih)+'px');
                     }
                 );
             }

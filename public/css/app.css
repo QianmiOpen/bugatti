@@ -52,6 +52,7 @@ code {
     margin: 0;
 }
 .b0 { border: none}
+.pt10{ padding-top: 10px;}
 .m15 { margin: 15px;}
 .mt15{ margin-top: 15px;}
 .mt20{ margin-top: 20px;}
@@ -63,6 +64,7 @@ code {
 .blue { color: #428bca}
 .red {color: #ff0000}
 .fwn{ font-weight: normal;}
+.width300 { width: 300px;}
 span.header-version {
     font-size: small;
 }
