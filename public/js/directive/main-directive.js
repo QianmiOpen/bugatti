@@ -757,6 +757,8 @@ define(['angular'], function(angular) {
             restrict: 'E',
             templateUrl: 'partials/home/logs-tabs.html',
             controller: function($scope){
+                //$scope.catalinaLogSockets = []; //用于存放应用日志websocket
+
                 $scope.ltab = 1;
                 $scope.isLogSet = function(ltab){
                     return $scope.ltab == ltab;
@@ -875,7 +877,6 @@ define(['angular'], function(angular) {
     app.directive('catalinaLog', function(){
         return {
             restrict: 'E',
-//            require: '^projectBalance',
             templateUrl: 'partials/home/catalina-log.html',
             controller: ['$scope', 'TaskService',
                 function($scope, TaskService){
@@ -891,9 +892,7 @@ define(['angular'], function(angular) {
                         }
                         $scope.catalinaLogSockets = [];
                         TaskService.getCatalinaWS($scope.env.id, function(data){
-                            console.log(data);
                             if($scope.hostName != undefined){
-                                $scope.closeCatalinaLogSockets();
                                 data.forEach($scope.connect2WS);
                                 $scope.catalinaMessage = "";
                             }
@@ -953,24 +952,20 @@ define(['angular'], function(angular) {
                         }
                     }
 
-                    $scope.closeWSCatalina = function(){
-                        console.log("$scope.closeWSCatalina is invoked")
-                        if($scope.catalinaLogSocket){
-                            console.log("$scope.catalinaLogSocket is closing")
-                            $scope.catalinaLogSocket.close();
-                        }
-                    }
                     $scope.closeCatalinaLogSockets = function(){
                         $scope.catalinaLogSockets.forEach($scope.closeCatalinaLogSocket);
                         $scope.catalinaLogSockets = [];
                     }
 
                     $scope.closeCatalinaLogSocket = function(data){
-                        console.log(data);
                         data.close();
                     }
 
                     $scope.delayLoadCatalinaLog();
+
+                    $scope.$on("$destroy", function(){
+                        $scope.closeCatalinaLogSockets();
+                    })
 
                 }],
             link: function postLink(scope, iElement, iAttrs){
