@@ -9,6 +9,8 @@ import play.api.data._
 import play.api.libs.json._
 import play.api.mvc._
 
+import scala.collection.immutable.TreeSet
+
 /**
  * 环境管理
  *
@@ -30,6 +32,7 @@ object EnvController extends BaseController {
       "nfServer" -> optional(text(maxLength = 30)),
       "ipRange" -> optional(nonEmptyText(maxLength = 300)),
       "level" -> enums.form.enum(LevelEnum),
+      "locked" -> boolean,
       "scriptVersion" -> nonEmptyText(maxLength = 30)
     )(Environment.apply)(Environment.unapply)
   )
@@ -42,8 +45,14 @@ object EnvController extends BaseController {
     Ok(Json.toJson(EnvironmentHelper.all(page, pageSize)))
   }
 
-  def all = Action {
-    Ok(Json.toJson(EnvironmentHelper.all()))
+  def all = AuthAction() { implicit request =>
+    if (UserHelper.admin_?(request.user)) {
+      Ok(Json.toJson(EnvironmentHelper.all()))
+    } else {
+      val lockEnvs = EnvironmentHelper.all().filterNot(_.locked)
+      val myEnvs = EnvironmentMemberHelper.findEnvsByJobNo(request.user.jobNo)
+      Ok(Json.toJson((lockEnvs ++ myEnvs).toSet.toSeq.sortBy((env: Environment) => env.id).reverse))
+    }
   }
 
   def my(jobNo: String) = Action {

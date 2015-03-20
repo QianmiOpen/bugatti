@@ -191,13 +191,19 @@ object UserHelper extends PlayCache {
   /* 指定环境下，根据安全级别选择委员长或成员访问 */
   def hasProjectInEnv(projectId: Int, envId: Int, user: User): Boolean = {
     if (admin_?(user)) true
-    else ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
-      case Some(member) if member.projectId == projectId =>
-        if (member.level == LevelEnum.safe) true
-        else EnvironmentHelper.findById(envId) match {
-          case Some(env) if env.level == LevelEnum.safe => if (member.level == env.level) true else false
-          case Some(env) if env.level == LevelEnum.unsafe => true
-          case _ => false
+    else EnvironmentHelper.findById(envId) match {
+      case Some(env) if env.locked =>
+        EnvironmentMemberHelper.findByEnvId_JobNo(envId, user.jobNo).nonEmpty
+      case Some(env) if !env.locked =>
+        ProjectMemberHelper.findByProjectId_JobNo(projectId, user.jobNo) match {
+          case Some(member) =>
+            if (member.level == LevelEnum.safe) true
+            else env.level match {
+              case LevelEnum.safe => if (member.level == env.level) true else false
+              case LevelEnum.unsafe => true
+              case _ => false
+            }
+          case None => false
         }
       case _ => false
     }

@@ -67,8 +67,8 @@ object ConfController extends BaseController {
   def delete(id: Int) = AuthAction() { implicit request =>
     ConfHelper.findById(id) match {
       case Some(conf) =>
-        if (UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user) ||
-            UserHelper.hasEnv(conf.envId, request.user)
+        if (UserHelper.hasEnv(conf.envId, request.user) ||
+            UserHelper.hasProjectInEnv(conf.projectId, conf.envId, request.user)
         ) {
           ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除配置文件", conf))
           Ok(Json.toJson(ConfHelper.delete(id)))
@@ -81,8 +81,8 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
-            UserHelper.hasEnv(confForm.envId, request.user)
+        if (UserHelper.hasEnv(confForm.envId, request.user) ||
+            UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)
         ) {
           try {
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增配置文件", confForm.toConf))
@@ -99,8 +99,8 @@ object ConfController extends BaseController {
     confForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       confForm => {
-        if (UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user) ||
-            UserHelper.hasEnv(confForm.envId, request.user)
+        if (UserHelper.hasEnv(confForm.envId, request.user) ||
+            UserHelper.hasProjectInEnv(confForm.projectId, confForm.envId, request.user)
         ) {
           try {
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "修改配置文件", confForm.toConf))
@@ -128,8 +128,8 @@ object ConfController extends BaseController {
     )
     request.body.asMultipartFormData.map { body =>
       reqConfForm.map { _confForm =>
-        if (UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user) ||
-            UserHelper.hasEnv(_confForm.envId, request.user)
+        if (UserHelper.hasEnv(_confForm.envId, request.user) ||
+            UserHelper.hasProjectInEnv(_confForm.projectId, _confForm.envId, request.user)
         ) {
           val result = body.files.filter(f => f.ref.file.length() < maxSizeExceeded).map { tempFile =>
             val filePath = _confForm.path
@@ -203,11 +203,10 @@ object ConfController extends BaseController {
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       copyForm => {
         if (copyForm.target_eid == copyForm.envId && copyForm.target_vid == copyForm.versionId) Ok(_Exist)
-        else if (
-          UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) ||
-          UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.target_eid, request.user) ||
-          UserHelper.hasEnv(copyForm.envId, request.user) ||
-          UserHelper.hasEnv(copyForm.target_eid, request.user)
+        else if (UserHelper.hasEnv(copyForm.envId, request.user) ||
+                 UserHelper.hasEnv(copyForm.target_eid, request.user) ||
+                 UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.envId, request.user) ||
+                 UserHelper.hasProjectInEnv(copyForm.projectId, copyForm.target_eid, request.user)
         ) {
           val targetConfs = ConfHelper.findByEnvId_ProjectId_VersionId(copyForm.target_eid, copyForm.projectId, copyForm.target_vid)
           val currConfs = ConfHelper.findByEnvId_ProjectId_VersionId(copyForm.envId, copyForm.projectId, copyForm.versionId)

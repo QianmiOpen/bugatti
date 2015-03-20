@@ -9,18 +9,23 @@
         <tr>
             <th width="15%">环境</th>
             <th width="10%">级别</th>
+            <th width="10%">锁定?</th>
             <th width="15%">脚本版本</th>
             <th width="20%">ip范围</th>
-            <th width="30%">备注</th>
+            <th width="20%">备注</th>
             <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="env in envs">
             <td><a tooltip="{{env.name}}" ui-sref="admin.env.detail({id: env.id})">{{env.name}}</a></td>
-            <td><span tooltip="{{env.level | level}}">{{env.level | level}}
-                <sup><i ng-if="env.level == 'safe'" class="star"></i></sup>
-            </span>
+            <td>
+                <span tooltip="{{env.level | level}}">{{env.level | level}}
+                <sup><i ng-if="env.level == 'safe'" class="star"></i></sup></span>
+            </td>
+            <td>
+                <i tooltip="锁定" ng-if="env.locked" class="fa fa-lock"></i>
+                <i tooltip="正常" ng-if="!env.locked" class="fa fa-unlock"></i>
             </td>
             <td><span tooltip="{{env.scriptVersion}}">{{env.scriptVersion}}</span></td>
             <td><span tooltip="{{env.ipRange}}">{{env.ipRange}}</span></td>

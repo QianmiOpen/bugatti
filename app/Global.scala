@@ -179,10 +179,10 @@ object AppTestData {
     ).foreach(VersionHelper.create)
 
     val seq = Seq(
-      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe),
-      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe),
-      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe),
-      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, ScriptVersionHelper.Master)
+      Environment(None, "pytest", Option("py测试"), Option("172.19.3.201"), Option("172.17.0.1/24"), LevelEnum.unsafe, false),
+      Environment(None, "dev", Option("开发"), Option("192.168.111.201"), Option("192.168.111.1/24"), LevelEnum.unsafe, false),
+      Environment(None, "test", Option("测试"), Option("172.19.111.201"), Option("172.19.111.1/24"), LevelEnum.unsafe, true),
+      Environment(None, "内测", Option("内测"), Option("192.168.111.210"), Option("172.19.3.1/24"), LevelEnum.unsafe, false, ScriptVersionHelper.Master)
     )
     seq.foreach(EnvironmentHelper.create(_, ""))
 
@@ -243,6 +243,7 @@ object AutoUpdate {
   }
 
   val versions = Seq(
+    Version(1, 15),
     Version(1, 14),
     Version(1, 13),
     Version(1, 12),
