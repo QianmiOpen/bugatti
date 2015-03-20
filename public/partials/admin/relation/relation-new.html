@@ -8,7 +8,7 @@
     <div class="form-group">
         <label for="projectId" class="col-sm-2 control-label">项目：</label>
         <div class="col-sm-5">
-            <select class="form-control" id="projectId" name="projectId" ng-model="project" ng-options="p.name for p in projects" required>
+            <select class="form-control" id="projectId" name="projectId" ng-model="project" ng-options="p.name for p in projects"  chosen search-contains="true" required>
                 <option value="">-- 选择项目 --</option>
             </select>
         </div>
