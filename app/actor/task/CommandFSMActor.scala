@@ -83,48 +83,84 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
         val doif = data.taskDoif(data.order)
         log.info(s"doif is $doif")
         log.info(s"data.force is ${data.force}")
-        data.force match {
-          case TaskExeEnum.TaskExeJudge =>
-            doif match {
-              case d: String if !d.isEmpty  =>
-                val (flagComponent, result) = engine.eval(s"${SALT_COMPONENT}${doif.substring(0, doif.lastIndexOf(".")).replaceAll(".md5sum", "")}")
-                val (flagGrains, resultGrains) = engine.eval(s"${GRAINS_SALT_COMPONENT}${doif}")
-                log.info(s"egine eval :${flagComponent} $result")
-                log.info(s"egine2 eval :${resultGrains} $resultGrains")
-                //重新计算md5sum (scriptVersion + component.md5 + sls)
-                var md5sum4Compare = ""
-                if(flagComponent){
-                  md5sum4Compare = Md5sum.bytes2hex(Md5sum.md5(s"${data.taskObj.env.scriptVersion}${result}${command.command}"))
-                }else {
-                  commandOver(taskInfo.taskId, s"${SALT_COMPONENT}${doif} component md5 eval failed!")
-                  goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
-                }
-                //grains不管是否获取到值都要比较
-                if(md5sum4Compare != resultGrains){//比较MD5
-                  val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", md5sum4Compare)
-                  commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
-                  MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
-                  executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
-                }else {
-                  commandOver(taskInfo.taskId, s"${command}跳过执行,原因:${SALT_COMPONENT}${doif} = ${md5sum4Compare} = ${GRAINS_SALT_COMPONENT}${doif}")
-                  commandOver(taskInfo.taskId, "=====================================华丽分割线=====================================")
-                  //更新taskCommand状态
-                  context.parent ! UpdateCommandStatus(taskInfo.taskId, data.order, TaskEnum.TaskPass)
-                  //执行下一个任务
-                  self ! Execute()
-                }
-              case "" =>
-                val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
-                commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
-                MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
-                executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
-            }
-          case TaskExeEnum.TaskExeForce =>
-            val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
+//        data.force match {
+//          case TaskExeEnum.TaskExeJudge =>
+//            doif match {
+//              case d: String if !d.isEmpty  =>
+//                val (flagComponent, result) = engine.eval(s"${SALT_COMPONENT}${doif.substring(0, doif.lastIndexOf(".")).replaceAll(".md5sum", "")}")
+//                val (flagGrains, resultGrains) = engine.eval(s"${GRAINS_SALT_COMPONENT}${doif}")
+//                log.info(s"egine eval :${flagComponent} $result")
+//                log.info(s"egine2 eval :${resultGrains} $resultGrains")
+//                //重新计算md5sum (scriptVersion + component.md5 + sls)
+//                var md5sum4Compare = ""
+//                if(flagComponent){
+//                  md5sum4Compare = Md5sum.bytes2hex(Md5sum.md5(s"${data.taskObj.env.scriptVersion}${result}${command.command}"))
+//                }else {
+//                  commandOver(taskInfo.taskId, s"${SALT_COMPONENT}${doif} component md5 eval failed!")
+//                  goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
+//                }
+//                //grains不管是否获取到值都要比较
+//                if(md5sum4Compare != resultGrains){//比较MD5
+//                  val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", md5sum4Compare)
+//                  commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+//                  MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+//                  executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
+//                }else {
+//                  commandOver(taskInfo.taskId, s"${command}跳过执行,原因:${SALT_COMPONENT}${doif} = ${md5sum4Compare} = ${GRAINS_SALT_COMPONENT}${doif}")
+//                  commandOver(taskInfo.taskId, "=====================================华丽分割线=====================================")
+//                  //更新taskCommand状态
+//                  context.parent ! UpdateCommandStatus(taskInfo.taskId, data.order, TaskEnum.TaskPass)
+//                  //执行下一个任务
+//                  self ! Execute()
+//                }
+//              case "" =>
+//                val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
+//                commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+//                MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+//                executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
+//            }
+//          case TaskExeEnum.TaskExeForce =>
+//            val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
+//            commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+//            MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+//            executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
+//        }
+
+      doif match {
+        case d: String if !d.isEmpty  =>
+          val (flagComponent, result) = engine.eval(s"${SALT_COMPONENT}${doif.substring(0, doif.lastIndexOf(".")).replaceAll(".md5sum", "")}")
+          val (flagGrains, resultGrains) = engine.eval(s"${GRAINS_SALT_COMPONENT}${doif}")
+          log.info(s"egine eval :${flagComponent} $result")
+          log.info(s"egine2 eval :${resultGrains} $resultGrains")
+          //重新计算md5sum (scriptVersion + component.md5 + sls)
+          var md5sum4Compare = ""
+          if(flagComponent){
+            md5sum4Compare = Md5sum.bytes2hex(Md5sum.md5(s"${data.taskObj.env.scriptVersion}${result}${command.command}"))
+          }else {
+            commandOver(taskInfo.taskId, s"${SALT_COMPONENT}${doif} component md5 eval failed!")
+            goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
+          }
+          //grains不管是否获取到值都要比较
+          if(md5sum4Compare != resultGrains || data.force == TaskExeEnum.TaskExeForce){//比较MD5
+            val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", md5sum4Compare)
             commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
             MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
             executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
-        }
+          }else {
+            commandOver(taskInfo.taskId, s"${command}跳过执行,原因:${SALT_COMPONENT}${doif} = ${md5sum4Compare} = ${GRAINS_SALT_COMPONENT}${doif}")
+            commandOver(taskInfo.taskId, "=====================================华丽分割线=====================================")
+            //更新taskCommand状态
+            context.parent ! UpdateCommandStatus(taskInfo.taskId, data.order, TaskEnum.TaskPass)
+            //执行下一个任务
+            self ! Execute()
+          }
+        case "" =>
+          val cmd = command.command.replaceAll("\\$\\$" + doif + "\\$\\$", "")
+          commandOver(taskInfo.taskId, s"命令(${command.sls}):${cmd}  doIf: ${doif}")
+          MyActor.superviseTaskActor ! ChangeCommandStatus(taskInfo.envId, taskInfo.projectId, data.order, command.sls, command.machine, taskInfo.clusterName)
+          executeSalt(taskInfo.taskId, command.copy(command = cmd), taskInfo.envId, taskInfo.projectId, taskInfo.versionId, data.order, data.json, data.taskObj)
+      }
+
 
         stay using data.copy(order = data.order + 1, jid = "")
       }else {
