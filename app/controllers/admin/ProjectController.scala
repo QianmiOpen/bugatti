@@ -209,8 +209,12 @@ object ProjectController extends BaseController {
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
         else op match {
           case "up" =>
-            ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级项目成员", member))
-            Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
+            if (ProjectMemberHelper.findByProjectId(member.projectId).count(_.level == LevelEnum.safe) >= 3) {
+              Ok(_Exist)
+            } else {
+              ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级项目成员", member))
+              Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.safe))))
+            }
           case "down" =>
             ALogger.info(msg(request.user.jobNo, request.remoteAddress, "降级项目成员", member))
             Ok(Json.toJson(ProjectMemberHelper.update(memberId, member.copy(level = LevelEnum.unsafe))))

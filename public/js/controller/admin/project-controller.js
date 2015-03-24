@@ -67,8 +67,8 @@ define(['angular'], function(angular) {
         };
     }]);
 
-    app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'ProjectService', 'EnvService',
-        function($scope, $stateParams, $modal, ProjectService, EnvService) {
+    app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'growl', 'ProjectService', 'EnvService',
+        function($scope, $stateParams, $modal, growl, ProjectService, EnvService) {
             ProjectService.get($stateParams.id, function(data) {
                 $scope.project = data;
             });
@@ -139,9 +139,14 @@ define(['angular'], function(angular) {
             $scope.memberUp = function(mid, msg) {
                 if (confirm(msg)) {
                     ProjectService.updateMember(mid, "up", function(data) {
-                        ProjectService.members($stateParams.id, function(data) {
-                            $scope.members = data;
-                        });
+                        console.log('data=' + data);
+                        if (data.r == 'exist') {
+                            growl.addWarnMessage('出于安全问题，项目管理员最多3人！请根据实际情况调整。');
+                        } else {
+                            ProjectService.members($stateParams.id, function(data) {
+                                $scope.members = data;
+                            });
+                        }
                     });
                 }
             };

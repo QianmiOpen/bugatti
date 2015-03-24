@@ -78,22 +78,37 @@ define(['angular',
             data: { access: 'user' }
         });
 
+        $stateProvider.state('login', {
+            url: "/login",
+            templateUrl: "partials/login.html",
+            controller: "LoginCtrl",
+            data: { access: 'anon' }
+        });
+
         $stateProvider.state('api', {
             url: "/api",
             templateUrl: "partials/api.html",
+            controller: function($scope) {
+                $scope.app.breadcrumb='API';
+            },
             data: { access: 'anon' }
         });
 
         $stateProvider.state('help', {
             url: "/help",
             templateUrl: "partials/help.html",
+            controller: function($scope) {
+                $scope.app.breadcrumb='文档';
+            },
             data: { access: 'anon' }
         });
 
-        $stateProvider.state('login', {
-            url: "/login",
-            templateUrl: "partials/login.html",
-            controller: "LoginCtrl",
+        $stateProvider.state('license', {
+            url: "/license",
+            templateUrl: "partials/license.html",
+            controller: function($scope) {
+                $scope.app.breadcrumb='LICENSE';
+            },
             data: { access: 'anon' }
         });
 

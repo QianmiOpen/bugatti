@@ -24,8 +24,15 @@ body {
 }
 
 #footer > .container {
-    padding-right: 15px;
-    padding-left: 15px;
+    padding: 3px 0 0 0;
+    color: #999;
+    font-size: 12px;
+}
+#footer .license {
+    float: right;
+}
+#footer a {
+    color: #666;
 }
 
 /* Custom page CSS
@@ -205,6 +212,16 @@ header .navbar-nav>li>a {
 .event-item .event-item-timestamp{float:right;color:#999;line-height:22px}
 .event-item .event-title{display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:top;white-space:nowrap;max-width:72%;color:#333;font-weight:normal;font-size:14px}
 .event-item .event-body{margin-left:35px;margin-right:100px; color:#666; word-wrap:break-word; }
+
+.brand-image {
+    text-align: center;
+}
+.brand-image img {
+    height: 460px;
+}
+.brand_text {
+    text-align: right;
+}
 /* growl*/
 .growl {
     position: fixed;
