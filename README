@@ -38,3 +38,49 @@ slick统计方法：
 */
 
 akka slick
+
+
+登录mysql：
+> mysql -u root -h 127.0.0.1 -p
+Enter password:
+
+创建数据库用户
+-- create user
+create user bugatti identified by 'bugatti';
+
+创建数据库
+create database if not exists bugatti
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci;
+
+-- custom security level
+grant all privileges on bugatti.* to bugatti@"%" identified by 'bugatti';
+grant all privileges on bugatti.* to bugatti@localhost identified by 'bugatti';
+
+-- select db
+use bugatti;
+
+charset utf8;
+
+cookie 作用域
+site.domain=
+
+-- mac建立md5sum
+ln -s /sbin/md5 md5sum
+
+依赖
+git.formulas.url配置脚本git地址，
+1.脚本版本
+2.首次初始化salt模板脚本
+
+系统创建目录
+~/.bugatti
+  version
+
+设置本机dns，访问: 127.0.0.1/
+
+root登录
+root root
+
+
+

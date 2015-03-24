@@ -14,7 +14,7 @@ class TemplateActionStepTable(tag: Tag) extends Table[TemplateActionStep](tag, "
   def templateId = column[Int]("template_id")
   def name = column[String]("name")
   def sls = column[String]("sls", O.DBType("VARCHAR(2000)"))
-  def doIf = column[String]("do_if", O.DBType("VARCHAR(2000)"))
+  def doIf = column[String]("do_if", O.Nullable, O.DBType("VARCHAR(2000)"))
   def seconds = column[Int]("seconds", O.Default(3))
   def orderNum = column[Int]("order_num")
 

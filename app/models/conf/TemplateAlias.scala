@@ -13,7 +13,7 @@ case class TemplateAliasTable(tag: Tag) extends Table[TemplateAlias](tag, "templ
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def templateId = column[Int]("template_id")
   def name = column[String]("name")
-  def value = column[String]("value")
+  def value = column[String]("value", O.DBType("varchar(2048)"))
   def description = column[String]("description")
   def scriptVersion = column[String]("script_version", O.Default(ScriptVersionHelper.Master))
 

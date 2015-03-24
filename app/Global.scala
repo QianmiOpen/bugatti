@@ -60,47 +60,53 @@ object Global extends GlobalSettings {
       } else if (!versions.contains(currentVersion)) {
         Logger.warn(s"Skip migration because ${currentVersion.versionString} is illegal version.")
       } else {
+        play.api.Logger.info(s"currentVersion=${currentVersion}, tailVersion=${lastVersion}")
+        // init
+        if (currentVersion == lastVersion) {
+          _db.withSession { implicit session =>
+            TableQuery[AreaTable] ::
+              TableQuery[AreaEnvironmentRelTable] ::
+              TableQuery[AttributeTable] ::
+              TableQuery[ComponentMd5sumTable] ::
+              TableQuery[ConfTable] ::
+              TableQuery[ConfContentTable] ::
+              TableQuery[ConfLogTable] ::
+              TableQuery[ConfLogContentTable] ::
+              TableQuery[EnvironmentTable] ::
+              TableQuery[EnvironmentMemberTable] ::
+              TableQuery[HostTable] ::
+              TableQuery[ProjectTable] ::
+              TableQuery[ProjectDependencyTable] ::
+              TableQuery[ProjectMemberTable] ::
+              TableQuery[ScriptVersionTable] ::
+              TableQuery[SpiritTable] ::
+              TableQuery[TemplateTable] ::
+              TableQuery[TemplateAliasTable] ::
+              TableQuery[TemplateDependenceTable] ::
+              TableQuery[TemplateItemTable] ::
+              TableQuery[UserTable] ::
+              TableQuery[VariableTable] ::
+              TableQuery[VersionTable] ::
+              TableQuery[TaskTable] ::
+              TableQuery[TaskCommandTable] ::
+              TableQuery[TaskQueueTable] ::
+              TableQuery[TaskSchemeTable] ::
+              TableQuery[TemplateActionTable] ::
+              TableQuery[TemplateActionStepTable] ::
+              Nil foreach { table =>
+              if (MTable.getTables(table.baseTableRow.tableName).list.nonEmpty) table.ddl.drop
+              table.ddl.create
+            }
+          }
+        }
+        // update
         _db.withSession { implicit session =>
           versions.takeWhile(_ != currentVersion).reverse.foreach(_.update)
-          Files.write(versionFile.toPath, headVersion.versionString.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING)
+          Files.write(versionFile.toPath, headVersion.versionString.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE)
           Logger.debug(s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
         }
       }
-    }
 
-    if (app.configuration.getBoolean("sql.db.init").getOrElse(true)) {
-      _db.withSession { implicit session =>
-        TableQuery[ConfLogContentTable] ::
-          TableQuery[ConfLogTable] ::
-          TableQuery[ConfContentTable] ::
-          TableQuery[ConfTable] ::
-          TableQuery[VersionTable] ::
-          TableQuery[EnvironmentTable] ::
-          TableQuery[ProjectMemberTable] ::
-          TableQuery[ProjectTable] ::
-          TableQuery[AttributeTable] ::
-          TableQuery[TemplateItemTable] ::
-          TableQuery[TemplateTable] ::
-          TableQuery[UserTable] ::
-          TableQuery[TemplateActionTable] ::
-          TableQuery[TemplateActionStepTable] ::
-          TableQuery[TaskCommandTable] ::
-          TableQuery[TaskQueueTable] ::
-          TableQuery[TaskSchemeTable] ::
-          TableQuery[TaskTable] ::
-          TableQuery[AreaTable] ::
-          TableQuery[HostTable] ::
-          TableQuery[ScriptVersionTable] ::
-          TableQuery[VariableTable] ::
-          TableQuery[ProjectDependencyTable] ::
-          TableQuery[TemplateAliasTable] ::
-          Nil foreach { table =>
-          if (!MTable.getTables(table.baseTableRow.tableName).list.isEmpty) table.ddl.drop
-          table.ddl.create
-        }
-      }
-
-      AppData.initData
     }
 
     // 初始化spirit
@@ -119,7 +125,7 @@ object Global extends GlobalSettings {
     }
 
     //需要在taskQueue执行之前被初始化
-    MyActor.generateSchedule
+    MyActor.generateSchedule()
 
     //查看队列表中是否有可执行任务
     val set = TaskQueueHelper.findEnvId_ProjectId()
@@ -130,19 +136,6 @@ object Global extends GlobalSettings {
 
     //初始化ConfigureActor中的projectMap
     ConfigureActor.initProjectMap
-  }
-}
-
-object AppData {
-
-  def initData = {
-    // 初始化超级管理员
-    Seq(
-      User("of546", "李允恒", RoleEnum.admin, None,  false, None, None, None),
-      User("of557", "彭毅", RoleEnum.admin, None, false, None, None, None),
-      User("of729", "金卫", RoleEnum.admin, None, false, None, None, None),
-      User("of9999", "龚平", RoleEnum.admin, None, false, None, None, None)
-    ).foreach(UserHelper.create)
   }
 }
 
@@ -243,20 +236,6 @@ object AutoUpdate {
   }
 
   val versions = Seq(
-    Version(1, 15),
-    Version(1, 14),
-    Version(1, 13),
-    Version(1, 12),
-    Version(1, 11),
-    Version(1, 10),
-    Version(1, 9),
-    Version(1, 8),
-    Version(1, 7),
-    Version(1, 6),
-    Version(1, 5),
-    Version(1, 4),
-    Version(1, 3),
-    Version(1, 2),
     Version(1, 1),
     Version(0, 0)
   )
@@ -265,6 +244,10 @@ object AutoUpdate {
    * The head version of Bugatti.
    */
   val headVersion = versions.head
+  /**
+   * Init Bugatti.
+   */
+  val lastVersion = versions.last
 
   /**
    * The version file (BUGATTI_HOME/version).

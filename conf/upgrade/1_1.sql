@@ -36,9 +36,6 @@ CREATE TABLE `logging_event_property` (
   PRIMARY KEY (`event_id`,`mapped_key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
--- add super admin
-ALTER TABLE `app_user` ADD COLUMN super_admin ENUM('y', 'n') NOT NULL DEFAULT 'n'  COMMENT '是否为超级管理员(n:不是，y:是),同role:admin一起使用' AFTER `role`;
 
--- add index
-ALTER TABLE environment_project_rel ADD INDEX idx_ip(ip);
-ALTER TABLE environment_project_rel ADD INDEX idx_eid_pid(env_id, project_id);
+INSERT INTO `app_user`(`job_no`, `name`, `role`, `password`, `locked`, `last_ip`, `last_visit`, `ssh_key`)
+VALUES ('root', 'root', 'admin', 'dc76e9f0c0006e8f919e0c515c66dbba3982f785', 'n', '', now(), NULL);
