@@ -21,3 +21,6 @@ Bugatti解决下列问题
 ---
 下面这张图描述了Bugatti的整个流程：
 ![bugatti自动部署流程图](http://pic.ofcard.com//themes/common/bugatti/flow.png)
+
+
+#ps：周边系统开源及wiki补充中。。。
