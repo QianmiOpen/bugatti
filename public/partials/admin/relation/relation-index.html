@@ -1,16 +1,16 @@
 <div class="page-header clearfix">
-    <button class="btn btn-primary pull-right" ui-sref="admin.relation.create">绑定</button></td>
+    <button ng-if="envs&&projects" class="btn btn-primary pull-right" ui-sref="admin.relation.create">绑定</button></td>
     <h1 class="pull-left m0">关系配置</h1>
 </div>
 
 <form class="form-inline" role="form" ng-submit="searchForm()">
-    <div class="form-group">
+    <div ng-if="envs" class="form-group">
         <select class="form-control" ng-model="s_env" ng-options="e.id as e.name for e in envs">
             <option value="">-- 选择环境 --</option>
         </select>
     </div>
     <div class="form-group">&nbsp;&nbsp;</div>
-    <div class="form-group">
+    <div ng-if="projects" class="form-group">
         <select style="width:180px;" chosen search-contains="true" class="form-control" ng-model="s_project" ng-options="p.id as p.name for p in projects">
             <option value="">-- 选择项目 --</option>
         </select>

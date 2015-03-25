@@ -7,7 +7,7 @@
 
     <div class="form-group">
         <label for="projectId" class="col-sm-2 control-label">项目：</label>
-        <div class="col-sm-5">
+        <div ng-if="projects" class="col-sm-5">
             <select class="form-control" id="projectId" name="projectId" ng-model="project" ng-options="p.name for p in projects"  chosen search-contains="true" required>
                 <option value="">-- 选择项目 --</option>
             </select>
@@ -19,7 +19,7 @@
 
     <div class="form-group">
         <label for="envId" class="col-sm-2 control-label">环境：</label>
-        <div class="col-sm-5">
+        <div ng-if="envs" class="col-sm-5">
             <select class="form-control" id="envId" name="envId" ng-change="selectEnv()" ng-model="env" ng-options="e.name for e in envs" required>
                 <option value="">-- 选择环境 --</option>
             </select>

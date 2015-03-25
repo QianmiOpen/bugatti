@@ -38,13 +38,13 @@ define(['angular',
     ]);
 
     // Auth
-    app.controller('NavCtrl', ['$rootScope', '$scope', '$location', 'Auth',
-        function($rootScope, $scope, $location, Auth) {
+    app.controller('NavCtrl', ['$rootScope', '$scope', '$state', 'Auth',
+        function($rootScope, $scope, $state, Auth) {
             $scope.loginUser = Auth.user;
 
             $scope.logout = function() {
                 Auth.logout(function() {
-                    $location.path('/');
+                    $state.go('login');
                 }, function() {
                     $rootScope.error = "Failed to logout";
                 });
