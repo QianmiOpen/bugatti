@@ -1,6 +1,5 @@
-Deployment and Monitoring Automation Platform
-（部署和监控自动化平台）
----
+![bugatti自动部署流程图logo](http://pic.ofcard.com//themes/common/bugatti/logo.png)
+Deployment and Monitoring Automation Platform（部署和监控自动化平台）
 >解决工程运维的根本问题
 
 Bugatti简介

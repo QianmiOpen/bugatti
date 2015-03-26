@@ -59,6 +59,7 @@ code {
     margin: 0;
 }
 .b0 { border: none}
+.pt0{ padding-top: 0}
 .pt10{ padding-top: 10px;}
 .m15 { margin: 15px;}
 .mt15{ margin-top: 15px;}
@@ -153,6 +154,7 @@ header .navbar-nav>li>a {
     line-height: 50px;
     vertical-align: middle;
 }
+header .logo {height: 50px;}
 
 .member-list ul {
     margin-top: -20px;
