@@ -1,6 +1,10 @@
 ![bugatti自动部署流程图logo](http://pic.ofcard.com//themes/common/bugatti/logo.png)
+
 Deployment and Monitoring Automation Platform（部署和监控自动化平台）
+
 >解决工程运维的根本问题
+
+获取更多Bugatti内容，请移步Bugatti文档 [Wiki](https://github.com/ofpay/bugatti/wiki).
 
 Bugatti简介
 ---
@@ -21,5 +25,3 @@ Bugatti解决下列问题
 ---
 下面这张图描述了Bugatti的整个流程：
 ![bugatti自动部署流程图](http://pic.ofcard.com//themes/common/bugatti/flow.png)
-
-If you want to try the development version of Bugatti, see the documentation for developers at [Wiki](https://github.com/ofpay/bugatti/wiki).
