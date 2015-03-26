@@ -31,7 +31,7 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">模板：</label>
         <div class="col-sm-3">
-            <select ng-change="templateChange(project.templateId)" name="templateId" id="templateId" class="form-control" ng-model="project.templateId" ng-options="o.id as o.name for o in templates" required>
+            <select ng-change="templateChange(project.templateId)" name="templateId" id="templateId" class="form-control" ng-model="project.templateId" ng-options="o.id as o.name for o in templates" chosen search-contains="true" required>
                 <option value="">-- 选择模板 --</option>
             </select>
         </div>
