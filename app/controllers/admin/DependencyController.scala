@@ -24,7 +24,7 @@ object DependencyController extends BaseController{
     }
     val result = Seq(
       DependencyNest(id, project.name, false, "", project.templateId, dependencyNests)
-    )
+    ).sortBy(t => t.id)
     Ok(Json.toJson(result))
   }
 

@@ -1341,6 +1341,7 @@ define(['angular'], function(angular) {
                                     growl.addWarnMessage("修改失败");
                                 } else if(data.r == 1){
                                     growl.addSuccessMessage("修改成功");
+                                    $scope.showDependencies();
                                 }
                             })
                         }
