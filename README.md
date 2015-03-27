@@ -27,4 +27,4 @@ Bugatti解决下列问题
 
 Bugatti License
 ---
-Bugatti is Open Source and available under the BSD License.
+Bugatti is Open Source and available under the BSD (2-clause) License.
