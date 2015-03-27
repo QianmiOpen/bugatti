@@ -24,3 +24,7 @@ Bugatti解决下列问题
 ---
 下面这张图描述了Bugatti的整个流程：
 ![bugatti自动部署流程图](http://pic.ofcard.com//themes/common/bugatti/flow.png)
+
+Bugatti License
+---
+Bugatti is Open Source and available under the BSD License.
