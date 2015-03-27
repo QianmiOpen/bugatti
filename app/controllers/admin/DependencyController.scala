@@ -28,50 +28,54 @@ object DependencyController extends BaseController{
     Ok(Json.toJson(result))
   }
 
-  def removeDependency(parentId: Int, childId: Int) = Action {
+  def removeDependency(parentId: Int, childId: Int) = AuthAction() {
     Ok(Json.toJson(ProjectDependencyHelper.removeByP_C(parentId, childId)))
   }
 
-  def addDependency = Action(parse.json){implicit request =>
-    request.body match {
-      case JsObject(fields) => {
+  def addDependency() = AuthAction() { implicit request =>
+
+    def add(fields: Seq[(String, JsValue)]): Int = {
+      val fieldsJson = Json.toJson(fields.toMap)
+      val p = (fieldsJson \ "parent").as[DependencyNest]
+      val c = (fieldsJson \ "child").as[Project]
+      try{
+        ProjectDependencyHelper.addByP_C(p, c)
+      } catch {
+        case e: Exception => 0
+      }
+    }
+
+    request.body.asJson match {
+      case Some(JsObject(fields)) => {
         Ok(Json.obj("r" -> add(fields)))
       }
       case _ => Ok(Json.obj("r" -> 0))
     }
   }
-  def add(fields: Seq[(String, JsValue)]): Int = {
-    val fieldsJson = Json.toJson(fields.toMap)
-    val p = (fieldsJson \ "parent").as[DependencyNest]
-    val c = (fieldsJson \ "child").as[Project]
-    try{
-      ProjectDependencyHelper.addByP_C(p, c)
-    } catch {
-      case e: Exception => 0
-    }
-  }
 
-  def updateTemplateProject = Action(parse.json){implicit request =>
-    request.body match {
-      case JsObject(fields) => {
+  def updateTemplateProject() = AuthAction() { implicit request =>
+
+    def update(fields: Seq[(String, JsValue)]): Int = {
+      val fieldsJson = Json.toJson(fields.toMap)
+      val p = (fieldsJson \ "parentId").as[Int]
+      val o = (fieldsJson \ "oldId").as[Int]
+      val n = (fieldsJson \ "newId").as[Int]
+
+      try{
+        ProjectDependencyHelper.updateByP_C(p, o, n)
+      } catch {
+        case e: Exception => 0
+      }
+    }
+
+    request.body.asJson match {
+      case Some(JsObject(fields)) => {
         Ok(Json.obj("r" -> update(fields)))
       }
       case _ => Ok(Json.obj("r" -> 0))
     }
   }
 
-  def update(fields: Seq[(String, JsValue)]): Int = {
-    val fieldsJson = Json.toJson(fields.toMap)
-    val p = (fieldsJson \ "parentId").as[Int]
-    val o = (fieldsJson \ "oldId").as[Int]
-    val n = (fieldsJson \ "newId").as[Int]
-
-    try{
-      ProjectDependencyHelper.updateByP_C(p, o, n)
-    } catch {
-      case e: Exception => 0
-    }
-  }
 
   implicit val dnWrites = Json.writes[DependencyNest]
   implicit val dnReads = Json.reads[DependencyNest]

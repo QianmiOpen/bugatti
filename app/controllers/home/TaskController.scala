@@ -3,7 +3,6 @@ package controllers.home
 import actor.task.{ChangeQueues, TaskLog, MyActor}
 import controllers.BaseController
 import enums.{TaskExeEnum, TaskEnum}
-import enums.TaskExeEnum.TaskExeWay
 import org.joda.time.DateTime
 import play.api.mvc.Action
 import models.task._
@@ -69,7 +68,6 @@ object TaskController extends BaseController {
     val envId = (jsons \ "envId").toString.toInt
     val projects = (jsons \ "projects")
     Logger.debug(s"${projects}")
-//    projects.as[JsArray].value
     TaskHelper.findLastStatus(envId, projects).map{
       t => {
         Logger.debug(s"t ==> ${t.taskTemplateId}, ${t.versionId}")
@@ -101,19 +99,13 @@ object TaskController extends BaseController {
     Ok(Json.toJson(result))
   }
 
-//  def joinProcess(taskId: Int) = WebSocket.async[JsValue] { request =>
-//    MyActor.join()
-//  }
-
   def joinProcess(envId: Int, projectId: Int) = WebSocket.async[JsValue] { request =>
     MyActor.join(envId, projectId)
   }
 
-  def createNewTaskQueue = Action(parse.json) {implicit request =>
-    request.body match {
-      case JsObject(fields) => {
-        Ok(Json.toJson(addTaskQueue(fields)))
-      }
+  def createNewTaskQueue = AuthAction() { implicit request =>
+    request.body.asJson match {
+      case Some(JsObject(fields)) => Ok(Json.toJson(addTaskQueue(fields)))
       case _ => Ok(Json.toJson(0))
     }
   }
@@ -153,18 +145,15 @@ object TaskController extends BaseController {
    * @param qid
    * @return
    */
-  def removeTaskQueue(qid: Int) = Action{
+  def removeTaskQueue(qid: Int) = AuthAction() {
     val taskQueue = TaskQueueHelper.findWaitQueueById(qid)
     taskQueue match {
-      case Some(tq) => {
+      case Some(tq) =>
         //1、删除队列；
         TaskQueueHelper.delete(tq)
         //2、调用Actor修改Queue & QueueNum状态；
         MyActor.superviseTaskActor ! ChangeQueues(tq.envId, tq.projectId, tq.clusterName)
-      }
-      case _ => {
-
-      }
+      case _ =>
     }
     Ok
   }
@@ -172,7 +161,7 @@ object TaskController extends BaseController {
   /**
    * 获取所有项目类型的模板
    */
-  def getTemplates(scriptVersion: String) = Action{
+  def getTemplates(scriptVersion: String) = Action {
     var map = Map.empty[Int, Seq[TemplateAction]]
     Logger.debug(s"scriptVersion ==> ${scriptVersion}")
 

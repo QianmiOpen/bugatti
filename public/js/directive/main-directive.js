@@ -1282,9 +1282,7 @@ define(['angular'], function(angular) {
     app.directive('projectDependency', function(){
         return {
             restrict: 'E',
-            require: '^projectTabs',
             scope: {
-                tab: "=activeTab",
                 project: "=expanderProject"
             },
             templateUrl: 'partials/home/project-dependency.html',
@@ -1313,6 +1311,7 @@ define(['angular'], function(angular) {
                             if(data.r == 0){
                                 growl.addWarnMessage("添加失败");
                             }
+                            growl.addSuccessMessage("添加成功");
                             $scope.showDependencies()
                         })
                     };
@@ -1349,11 +1348,7 @@ define(['angular'], function(angular) {
                 }
             ],
             link: function postLink(scope, iElement, iAttrs) {
-                scope.$watch('tab', function () {
-                    if (scope.tab === 4) {
-                        scope.delayLoadDependency();
-                    }
-                });
+                scope.delayLoadDependency();
             }
         }
     });
