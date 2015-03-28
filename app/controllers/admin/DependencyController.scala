@@ -14,6 +14,8 @@ object DependencyController extends BaseController {
   def msg(user: String, ip: String, msg: String, data: ProjectDependency) =
     Json.obj("mod" -> ModEnum.depend.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
+  implicit val dependWrites = Json.writes[ProjectDependency]
+
   def show(id: Int) = Action {
     ProjectHelper.findById(id) match {
       case Some(project) =>
@@ -39,13 +41,6 @@ object DependencyController extends BaseController {
   }
 
   def addDependency() = AuthAction() { implicit request =>
-    request.body.asJson match {
-      case Some(JsObject(fields)) => {
-        Ok(Json.obj("r" -> add(fields)))
-      }
-      case _ => Ok(Json.obj("r" -> 0))
-    }
-
     def add(fields: Seq[(String, JsValue)]): Int = {
       val fieldsJson = Json.toJson(fields.toMap)
       val p = (fieldsJson \ "parent").as[DependencyNest]
@@ -58,16 +53,15 @@ object DependencyController extends BaseController {
         case e: Exception => 0
       }
     }
-  }
-
-  def updateTemplateProject() = AuthAction() { implicit request =>
     request.body.asJson match {
       case Some(JsObject(fields)) => {
-        Ok(Json.obj("r" -> update(fields)))
+        Ok(Json.obj("r" -> add(fields)))
       }
       case _ => Ok(Json.obj("r" -> 0))
     }
+  }
 
+  def updateTemplateProject() = AuthAction() { implicit request =>
     def update(fields: Seq[(String, JsValue)]): Int = {
       val fieldsJson = Json.toJson(fields.toMap)
       val p = (fieldsJson \ "parentId").as[Int]
@@ -80,6 +74,12 @@ object DependencyController extends BaseController {
       } catch {
         case e: Exception => 0
       }
+    }
+    request.body.asJson match {
+      case Some(JsObject(fields)) => {
+        Ok(Json.obj("r" -> update(fields)))
+      }
+      case _ => Ok(Json.obj("r" -> 0))
     }
   }
 

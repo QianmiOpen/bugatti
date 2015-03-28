@@ -1,7 +1,7 @@
 package controllers.admin
 
 import controllers.BaseController
-import enums.{ModEnum, ItemTypeEnum}
+import enums.ItemTypeEnum
 import exceptions.UniqueNameException
 import models.conf._
 import play.api.data.Forms._
@@ -14,11 +14,7 @@ import play.api.mvc._
  *
  * @author of546
  */
-@deprecated("改为自动刷新")
 object TemplateController extends BaseController {
-
-  def msg(user: String, ip: String, msg: String, data: Template) =
-    Json.obj("mod" -> ModEnum.template.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   implicit val templateWrites = Json.writes[Template]
   implicit val templateItemsWrites = Json.writes[TemplateItem]
