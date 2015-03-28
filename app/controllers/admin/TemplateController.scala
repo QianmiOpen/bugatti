@@ -1,7 +1,7 @@
 package controllers.admin
 
 import controllers.BaseController
-import enums.ItemTypeEnum
+import enums.{ModEnum, ItemTypeEnum}
 import exceptions.UniqueNameException
 import models.conf._
 import play.api.data.Forms._
@@ -14,7 +14,11 @@ import play.api.mvc._
  *
  * @author of546
  */
+@deprecated("改为自动刷新")
 object TemplateController extends BaseController {
+
+  def msg(user: String, ip: String, msg: String, data: Template) =
+    Json.obj("mod" -> ModEnum.template.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   implicit val templateWrites = Json.writes[Template]
   implicit val templateItemsWrites = Json.writes[TemplateItem]
@@ -47,7 +51,7 @@ object TemplateController extends BaseController {
     Ok(Json.toJson(TemplateHelper.all))
   }
 
-  def delete(id: Int) = Action {
+  def delete(id: Int) = AuthAction() {
     ProjectHelper.countByTemplateId(id) match {
       case count if count > 0 => Ok(_Exist) // 项目中还存在使用情况
       case _ =>
@@ -55,7 +59,7 @@ object TemplateController extends BaseController {
     }
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction() { implicit request =>
     templateForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       templateFrom => {
@@ -68,7 +72,7 @@ object TemplateController extends BaseController {
     )
   }
 
-  def update(id: Int) = Action { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     templateForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       templateFrom => {

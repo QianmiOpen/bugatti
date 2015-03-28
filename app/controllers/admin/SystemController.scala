@@ -1,7 +1,7 @@
 package controllers.admin
 
 import controllers.BaseController
-import enums.RoleEnum
+import enums.{ModEnum, RoleEnum}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
@@ -47,6 +47,8 @@ object SystemController extends BaseController with SystemSettingsService {
     systemForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       _systemForm => {
+        ALogger.info(Json.obj("mod" -> ModEnum.system.toString, "user" -> request.user.jobNo,
+          "ip" -> request.remoteAddress, "msg" -> "系统配置", "data" -> Json.toJson(_systemForm)).toString)
         saveSystemSettings(_systemForm)
         Ok(_Success)
       }

@@ -89,8 +89,7 @@ object RelationController extends BaseController {
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
           "ip" -> request.remoteAddress, "msg" -> "绑定关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
-        val result = HostHelper.bind(relation)
-        Ok(Json.toJson(result))
+        Ok(Json.toJson(HostHelper.bind(relation)))
       }
     )
   }
@@ -101,8 +100,7 @@ object RelationController extends BaseController {
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
           "ip" -> request.remoteAddress, "msg" -> "解除关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
-        val result = HostHelper.unbind(relation)
-        Ok(Json.toJson(result))
+        Ok(Json.toJson(HostHelper.unbind(relation)))
       case None => NotFound
     }
   }
