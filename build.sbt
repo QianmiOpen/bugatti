@@ -4,7 +4,7 @@ val conf = ConfigFactory.parseFile(new File("conf/application-common.conf")).res
 
 version := conf.getString("app.version")
 
-name := "bugatti2"
+name := "bugatti"
 
 scalaVersion := "2.10.4"
 
