@@ -47,7 +47,7 @@ object TemplateController extends BaseController {
     Ok(Json.toJson(TemplateHelper.all))
   }
 
-  def delete(id: Int) = Action {
+  def delete(id: Int) = AuthAction() {
     ProjectHelper.countByTemplateId(id) match {
       case count if count > 0 => Ok(_Exist) // 项目中还存在使用情况
       case _ =>
@@ -55,7 +55,7 @@ object TemplateController extends BaseController {
     }
   }
 
-  def save = Action { implicit request =>
+  def save = AuthAction() { implicit request =>
     templateForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       templateFrom => {
@@ -68,7 +68,7 @@ object TemplateController extends BaseController {
     )
   }
 
-  def update(id: Int) = Action { implicit request =>
+  def update(id: Int) = AuthAction() { implicit request =>
     templateForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       templateFrom => {

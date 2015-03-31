@@ -1,15 +1,13 @@
 package controllers.admin
 
 import controllers.BaseController
-import enums.{RoleEnum, LevelEnum, ModEnum}
+import enums.{LevelEnum, ModEnum}
 import exceptions.UniqueNameException
 import models.conf._
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json._
 import play.api.mvc._
-
-import scala.collection.immutable.TreeSet
 
 /**
  * 环境管理
@@ -64,7 +62,7 @@ object EnvController extends BaseController {
   }
 
   def allScriptVersion = AuthAction() { implicit request =>
-    Ok(Json.toJson(ScriptVersionHelper.allName))
+    Ok(Json.toJson(ScriptVersionHelper.allName()))
   }
 
   def delete(id: Int) = AuthAction() { implicit request =>

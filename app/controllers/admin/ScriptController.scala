@@ -6,7 +6,7 @@ import actor.salt.{ConnectedSpirits, RefreshSpiritsActor}
 import akka.pattern.ask
 import akka.util.Timeout
 import controllers.BaseController
-import enums.RoleEnum
+import enums.{ModEnum, RoleEnum}
 import play.api.libs.json.Json
 
 import scala.concurrent.Await
@@ -14,7 +14,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**
- * 区域管理
+ * 脚本管理
  * @author of557
  */
 object ScriptController extends BaseController {
@@ -34,6 +34,11 @@ object ScriptController extends BaseController {
     }
 
     Await.result(result, 30 seconds)
+
+    ALogger.info(Json.obj("mod" -> ModEnum.script.toString, "user" -> request.user.jobNo,
+      "ip" -> request.remoteAddress, "msg" -> "脚本刷新", "data" -> Json.toJson("")).toString)
+
     Ok(Json.toJson(0))
   }
+
 }

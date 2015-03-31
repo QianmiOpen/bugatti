@@ -2,7 +2,7 @@ package controllers.home
 
 import actor.task.{ChangeQueues, TaskLog, MyActor}
 import controllers.BaseController
-import enums.{TaskExeEnum, TaskEnum}
+import enums.{ModEnum, TaskExeEnum, TaskEnum}
 import org.joda.time.DateTime
 import play.api.mvc.Action
 import models.task._
@@ -21,6 +21,9 @@ import play.api.libs.json.JsObject
  * @author 729
  */
 object TaskController extends BaseController {
+
+  def msg(user: String, ip: String, msg: String, data: String) =
+    Json.obj("mod" -> ModEnum.task.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val stdFileDir = "/srv/salt"
 
@@ -105,7 +108,10 @@ object TaskController extends BaseController {
 
   def createNewTaskQueue = AuthAction() { implicit request =>
     request.body.asJson match {
-      case Some(JsObject(fields)) => Ok(Json.toJson(addTaskQueue(fields)))
+      case Some(JsObject(fields)) =>
+        val taskQueueId = addTaskQueue(fields)
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "新增队列", s"taskQueueId:${taskQueueId}"))
+        Ok(Json.toJson(taskQueueId))
       case _ => Ok(Json.toJson(0))
     }
   }
@@ -145,10 +151,11 @@ object TaskController extends BaseController {
    * @param qid
    * @return
    */
-  def removeTaskQueue(qid: Int) = AuthAction() {
+  def removeTaskQueue(qid: Int) = AuthAction() { implicit request =>
     val taskQueue = TaskQueueHelper.findWaitQueueById(qid)
     taskQueue match {
       case Some(tq) =>
+        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除队列", s"taskQueueId:${tq.id}"))
         //1、删除队列；
         TaskQueueHelper.delete(tq)
         //2、调用Actor修改Queue & QueueNum状态；

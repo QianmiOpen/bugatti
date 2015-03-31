@@ -27,16 +27,20 @@ define(['angular'], function(angular){
         };
 
         $scope.modes = [
-            {'key': '用户模块', 'val':'user'},
-            {'key': '区域模块', 'val':'area'},
-            {'key': '环境模块', 'val':'env'},
-            {'key': '项目模块', 'val':'project'},
-            {'key': '关系模块', 'val':'relation'},
-            {'key': '任务模块', 'val':'task'},
-            {'key': '项目配置文件模块', 'val':'conf'},
-            {'key': '项目成员模块', 'val':'member'},
-            {'key': '项目模板模块', 'val':'template'},
-            {'key': '项目版本模块', 'val':'version'}
+            {'key': '用户管理', 'val':'user'},
+            {'key': '区域管理', 'val':'area'},
+            {'key': '关系设置', 'val':'relation'},
+            {'key': '系统配置', 'val':'system'},
+            {'key': '网关管理', 'val':'spirit'},
+            {'key': '脚本设置', 'val':'script'},
+            {'key': '任务管理(+负载)', 'val':'task'},
+            {'key': '环境管理', 'val':'env'},
+            {'key': '项目管理(+属性,变量)', 'val':'project'},
+            {'key': '成员管理(=项目,环境)', 'val':'member'},
+            {'key': '项目配置', 'val':'conf'},
+            {'key': '项目模板', 'val':'template'},
+            {'key': '项目版本', 'val':'version'},
+            {'key': '项目依赖', 'val':'depend'}
         ];
 
         $scope.submit = function(pageNo) {

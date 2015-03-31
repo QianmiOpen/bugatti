@@ -27,9 +27,6 @@ object ProjectController extends BaseController {
   def msg(user: String, ip: String, msg: String, data: Project) =
     Json.obj("mod" -> ModEnum.project.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
-  def msg_task(user: String, ip: String, msg: String, data: Host) =
-    Json.obj("mod" -> ModEnum.task.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
-
   val projectForm = Form(
     mapping(
       "id" -> optional(number),
@@ -227,9 +224,9 @@ object ProjectController extends BaseController {
     }
   }
 
-  // ==========================================================
+  // ----------------------------------------------------------
   // open api
-  // ==========================================================
+  // ----------------------------------------------------------
   case class VerForm(projectName: String, groupId: String, artifactId: String, version: String, authToken: String)
   val verForm = Form(
     mapping(
@@ -276,6 +273,12 @@ object ProjectController extends BaseController {
       }
     )
   }
+
+  // ----------------------------------------------------------
+  // 机器
+  // ----------------------------------------------------------
+  def msg_task(user: String, ip: String, msg: String, data: Host) =
+    Json.obj("mod" -> ModEnum.task.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   case class RelForm(projectId: Int, envId: Int, areaId: Int, ip: Option[String])
   val relForm = Form(

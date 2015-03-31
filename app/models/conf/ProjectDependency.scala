@@ -41,21 +41,16 @@ object ProjectDependencyHelper {
     qpd.insertAll(seq: _*)
   }
 
-  def add(pd: ProjectDependency) = db withSession { implicit session =>
-    qpd.insert(pd)
+  def add(depend: ProjectDependency) = db withSession { implicit session =>
+    qpd.insert(depend)
   }
 
-  def removeByP_C(parentId: Int, childId: Int) = db withSession { implicit session =>
-    qpd.filter(t => t.projectId === parentId && t.dependencyId === childId).delete
+  def remove(depend: ProjectDependency) = db withSession { implicit session =>
+    qpd.filter(t => t.projectId === depend.projectId && t.dependencyId === depend.dependencyId).delete
   }
 
-  def addByP_C(parent: DependencyNest, child: Project) = db withSession { implicit session =>
-    val result = qpd.insert(ProjectDependency(None, parent.id, child.id.get, None))
-    result
-  }
-
-  def updateByP_C(parentId: Int, oldId: Int, newId: Int) = db withSession { implicit session =>
-    qpd.filter(t => t.projectId === parentId && t.dependencyId === oldId).map(_.dependencyId).update(newId)
+  def update(depend: ProjectDependency, newId: Int) = db withSession { implicit session =>
+    qpd.filter(t => t.projectId === depend.projectId && t.dependencyId === depend.dependencyId).map(_.dependencyId).update(newId)
   }
 
   def updateAlias(pd: ProjectDependency) = db withSession {implicit session =>

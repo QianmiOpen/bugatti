@@ -84,6 +84,8 @@ object SpiritController extends BaseController {
 
   def refresh(id: Int) = AuthAction() { implicit request =>
     ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshHosts(id)
+    ALogger.info(msg(request.user.jobNo, request.remoteAddress, "刷新网关", Spirit(Some(id), "", "", None)))
     Ok
   }
+
 }

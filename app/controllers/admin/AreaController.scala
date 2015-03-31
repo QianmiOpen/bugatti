@@ -16,11 +16,12 @@ import play.api.mvc._
  * @author of557
  */
 object AreaController extends BaseController {
-  implicit val areaFormat = Json.format[Area]
-  implicit val areaInfoFormat = Json.format[AreaInfo]
 
   def msg(user: String, ip: String, msg: String, data: Area) =
     Json.obj("mod" -> ModEnum.area.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
+
+  implicit val areaFormat = Json.format[Area]
+  implicit val areaInfoFormat = Json.format[AreaInfo]
 
   val areaForm = Form(
     mapping(

@@ -23,6 +23,9 @@ import scala.io.Source
  */
 object ConfController extends BaseController {
 
+  def msg(user: String, ip: String, msg: String, data: Conf) =
+    Json.obj("mod" -> ModEnum.conf.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
+
   implicit val confWrites = Json.writes[Conf]
 
   implicit val writer = new Writes[ConfContent] {
@@ -32,9 +35,6 @@ object ConfController extends BaseController {
       Json.obj("id" -> c.id, "octet" -> c.octet, "content" -> cs)
     }
   }
-
-  def msg(user: String, ip: String, msg: String, data: Conf) =
-    Json.obj("mod" -> ModEnum.conf.toString, "user" -> user, "ip" -> ip, "msg" -> msg, "data" -> Json.toJson(data)).toString
 
   val confForm = Form(
     mapping(
