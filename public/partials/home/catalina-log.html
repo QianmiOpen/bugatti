@@ -1,4 +1,5 @@
 <div class="col-md-offset-0 main" style="height:20%">
     <pre ng-bind="catalinaMessage"></pre>
-    <img src="../../img/ajax-loader.gif"/>
+    <img ng-show="imgShow" src="../../img/ajax-loader.gif"/>
+    <span ng-show="!imgShow">{{timeoutTip}}</span>
 </div>

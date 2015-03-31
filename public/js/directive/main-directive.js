@@ -425,6 +425,7 @@ define(['angular'], function(angular) {
     app.directive('projectBalance', function () {
         return {
             restrict: 'E',
+            require: '^projectTabs',
             scope: {
                 tab: "=activeTab",
                 env: "=",
@@ -732,7 +733,7 @@ define(['angular'], function(angular) {
     app.directive('clusterTabs', function(){
         return {
             restrict: 'E',
-            require: 'projectBalance',
+            require: '^projectBalance',
             scope: {
                 cTab: "=",
                 cIndex: "=",
@@ -874,12 +875,16 @@ define(['angular'], function(angular) {
         }
     });
 
-    app.directive('catalinaLog', function(){
+    app.directive('catalinaLog',function(){
         return {
             restrict: 'E',
+            require: '^clusterTabs',
             templateUrl: 'partials/home/catalina-log.html',
-            controller: ['$scope', 'TaskService',
-                function($scope, TaskService){
+            controller: ['$scope', 'TaskService', '$timeout',
+                function($scope, TaskService, $timeout){
+                    $scope.imgShow = true;
+                    $scope.timeoutTip = "日志查看通道10分钟自动关闭";
+
                     $scope.delayLoadCatalinaLog = function(){
                         $scope.catalinaMessage = "正在努力加载中,请稍后..."
                         $scope.logType = "CATALINA";
@@ -910,6 +915,7 @@ define(['angular'], function(angular) {
                             url
                             + "/"
                             + $scope.hostName.substring(0, indexofdot == -1 ?  $scope.hostName.length : indexofdot)
+                                //+ 'lin-65-9'
                             + "/"
                             + $scope.logType;
                         console.log(path);
@@ -953,6 +959,7 @@ define(['angular'], function(angular) {
                     }
 
                     $scope.closeCatalinaLogSockets = function(){
+                        $scope.imgShow = false;
                         $scope.catalinaLogSockets.forEach($scope.closeCatalinaLogSocket);
                         $scope.catalinaLogSockets = [];
                     }
@@ -964,8 +971,12 @@ define(['angular'], function(angular) {
                     $scope.delayLoadCatalinaLog();
 
                     $scope.$on("$destroy", function(){
+                        console.log("destroy is invoked !")
                         $scope.closeCatalinaLogSockets();
                     })
+
+                    //10分钟超时，关闭$scope.catalinaLogSockets
+                    $timeout($scope.closeCatalinaLogSockets, 600000)
 
                 }],
             link: function postLink(scope, iElement, iAttrs){
