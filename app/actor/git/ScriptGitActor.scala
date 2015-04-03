@@ -248,15 +248,29 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
       }
     }
 
-    // 创建template关联的actions
-    val actions = template.get("actions")
+    // 创建template关联的cluster级别的actions
+    _genActions(template, "actions", templateId, tagName)
+
+    // 创建template关联的project级别的actions
+    _genActions(template, "p_actions", templateId, tagName)
+
+  }
+
+  def _genActions(template: JMap[String, AnyRef], item: String, templateId: Int, tagName: String) = {
+    val actionType = item match {
+      case "actions" => ActionTypeEnum.withName(ActionTypeEnum.host.toString)
+      case "p_actions" => ActionTypeEnum.withName(ActionTypeEnum.project.toString)
+      case _ => ActionTypeEnum.withName(ActionTypeEnum.host.toString)
+    }
+    val actions = template.get(item)
     if (actions != null) {
       actions.asInstanceOf[JList[JMap[String, AnyRef]]].asScala.zipWithIndex.foreach {
         case (action, index) =>
           val taskId = TemplateActionHelper.create(TemplateAction(None, action.get("name").asInstanceOf[String],
             action.get("css").asInstanceOf[String], action.get("versionMenu").asInstanceOf[Boolean],
             templateId, index + 1, tagName,
-            ActionTypeEnum.withName(Option(action.get("actionType")).getOrElse(ActionTypeEnum.project.toString).asInstanceOf[String])))
+            actionType
+          ))
 
           val steps = action.get("steps").asInstanceOf[JList[JMap[String, String]]].asScala
           steps.zipWithIndex.foreach { case (step, index) =>
@@ -266,4 +280,6 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
       }
     }
   }
+
+
 }
