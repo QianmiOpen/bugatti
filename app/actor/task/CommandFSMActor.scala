@@ -378,7 +378,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
           ActorUtils.spirits ! RemoteSpirit(taskObj.cHost.get.spiritId, SaltStatus(hostname, taskObj.cHost.get.ip))
         }
         case "sqlUpdate" => {
-
+          ActorUtils.spirits ! RemoteSpirit(taskObj.cHost.get.spiritId, SaltCommand(commandSeq))
         }
       }
     } else {
