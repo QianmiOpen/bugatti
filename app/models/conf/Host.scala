@@ -28,7 +28,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def syndicName = column[String]("syndic_name")
   def spiritId = column[Int]("spirit_id")
   def name = column[String]("name")
-  def ip = column[String]("ip")
+  def ip = column[String]("ip", O.Nullable, O.DBType("VARCHAR(255)"))
   def state = column[State]("state", O.Default(StateEnum.noKey))
   def containerType = column[Container]("container_type", O.Default(ContainerTypeEnum.vm), O.DBType("ENUM('vm', 'docker')"))
   def hostIp = column[String]("host_ip", O.Nullable)
