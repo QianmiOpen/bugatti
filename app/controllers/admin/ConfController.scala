@@ -118,7 +118,7 @@ object ConfController extends BaseController {
 
   def isOctet_?(filename: String, bytes: Array[Byte]) = defining(FileUtil.getContentType(filename, bytes)) { _contentType =>
     if (_contentType == "application/octet-stream") true
-    else octetFileType.exists(_ == FileUtil.getExtension(filename))
+    else octetFileType.contains(FileUtil.getExtension(filename))
   }
 
   def upload = AuthAction[TemporaryFile]() { implicit request =>
