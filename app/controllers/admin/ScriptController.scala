@@ -41,7 +41,7 @@ object ScriptController extends BaseController {
 
       Ok(_Success)
     } catch {
-      case _: Throwable => Ok(Json.toJson(_Fail))
+      case _: Throwable => Ok(_Fail)
     }
   }
 
