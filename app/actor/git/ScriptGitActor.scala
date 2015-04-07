@@ -252,14 +252,14 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
     _genActions(template, "actions", templateId, tagName)
 
     // 创建template关联的project级别的actions
-    _genActions(template, "p_actions", templateId, tagName)
+    _genActions(template, "actionsProject", templateId, tagName)
 
   }
 
   def _genActions(template: JMap[String, AnyRef], item: String, templateId: Int, tagName: String) = {
     val actionType = item match {
       case "actions" => ActionTypeEnum.withName(ActionTypeEnum.host.toString)
-      case "p_actions" => ActionTypeEnum.withName(ActionTypeEnum.project.toString)
+      case "actionsProject" => ActionTypeEnum.withName(ActionTypeEnum.project.toString)
       case _ => ActionTypeEnum.withName(ActionTypeEnum.host.toString)
     }
     val actions = template.get(item)
