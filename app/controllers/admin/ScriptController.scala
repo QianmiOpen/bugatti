@@ -22,23 +22,27 @@ object ScriptController extends BaseController {
   implicit val timeout = Timeout(30 seconds)
 
   def refresh = AuthAction(RoleEnum.admin) { implicit request =>
-    val result = ActorUtils.scriptGit ? ReloadFormulasTemplate
+    try {
+      val result = ActorUtils.scriptGit ? ReloadFormulasTemplate
 
-    val future = ActorUtils.spirits ? ConnectedSpirits
-    val spiritIds = Await.result(future, timeout.duration).asInstanceOf[Seq[Int]]
+      val future = ActorUtils.spirits ? ConnectedSpirits
+      val spiritIds = Await.result(future, timeout.duration).asInstanceOf[Seq[Int]]
 
-    ALogger.debug(s"Auto refresh server files, spiritIds: ${spiritIds}")
+      ALogger.debug(s"Auto refresh server files, spiritIds: ${spiritIds}")
 
-    spiritIds.foreach { spiritId =>
-      ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshFiles(spiritId)
+      spiritIds.foreach { spiritId =>
+        ActorUtils.spiritsRefresh ! RefreshSpiritsActor.RefreshFiles(spiritId)
+      }
+
+      Await.result(result, 30 seconds)
+
+      ALogger.info(Json.obj("mod" -> ModEnum.script.toString, "user" -> request.user.jobNo,
+        "ip" -> request.remoteAddress, "msg" -> "脚本刷新", "data" -> Json.toJson("")).toString)
+
+      Ok(_Success)
+    } catch {
+      case _: Throwable => Ok(Json.toJson(_Fail))
     }
-
-    Await.result(result, 30 seconds)
-
-    ALogger.info(Json.obj("mod" -> ModEnum.script.toString, "user" -> request.user.jobNo,
-      "ip" -> request.remoteAddress, "msg" -> "脚本刷新", "data" -> Json.toJson("")).toString)
-
-    Ok(Json.toJson(0))
   }
 
 }
