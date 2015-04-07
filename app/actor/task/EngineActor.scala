@@ -107,10 +107,17 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
       taskDoif = taskDoif :+ ""
 
       var errors = Set.empty[String]
+      //用于标示向spirit发送的执行命令
+      var _isSpiritCommand = false
 
       replaceCommand.templateStep.foreach { templateStep =>
         //命令
         var command = templateStep.sls
+
+        if(command == "bugatti sqlUpdate"){
+          _isSpiritCommand = true
+        }
+
         EngineActor.getContentKeys(command).foreach { key =>
           _lastReplaceKey = key
           val (ret, value) = engine.eval(key)
@@ -121,28 +128,12 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
             log.error(value)
           }
         }
-        //doif
-//        var doif = ""
-//        templateStep.doIf match {
-//          case Some(d) =>
-//            doif = d
-//            getContentKeys(doif).foreach { key =>
-//              _lastReplaceKey = key
-//              val (ret, value) = engine.eval(key)
-//              if (ret) {
-//                doif = doif.replaceAll(Pattern.quote(s"{{${key}}}"), value)
-//              } else {
-//                errors += s"${key}: ${value}"
-//                log.error(value)
-//              }
-//            }
-//          case _ =>
-//            doif = ""
-//        }
-//
-//        taskDoif = taskDoif :+ doif
         taskDoif = taskDoif :+ templateStep.doIf.getOrElse("")
         taskCommandSeq = taskCommandSeq :+ TaskCommand(None, taskId, command, hostname, templateStep.name, TaskEnum.TaskWait, templateStep.orderNum)
+      }
+
+      if(_isSpiritCommand){
+        taskCommandSeq = taskCommandSeq.drop(1)
       }
 
       if (errors isEmpty) {
