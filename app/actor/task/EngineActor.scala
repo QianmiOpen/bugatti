@@ -114,7 +114,7 @@ class EngineActor(timeout: Int) extends Actor with ActorLogging {
         //命令
         var command = templateStep.sls
 
-        if(command == "bugatti sqlUpdate"){
+        if(command.startsWith("bugatti sqlUpdate")){
           _isSpiritCommand = true
         }
 
