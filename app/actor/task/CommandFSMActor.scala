@@ -168,54 +168,67 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       commandOver(data.taskInfo.taskId, msg)
       val srResult = sr.result
       val executeTime = sr.excuteMicroseconds
-      val jsonResult = Json.parse(srResult)
-      log.info(s"jsonResult is ${Json.prettyPrint(jsonResult)}")
-      jsonResult.validate[JsObject] match {
-        case s: JsSuccess[JsObject] => {
-          val jResult = s.get
-          val funType = (jResult \ "result" \ "fun").asOpt[String]
-          funType match {
-            case Some(fun) => {
-              val resultLogPath = s"${_baseDir}/result.log"
-              val file = new File(resultLogPath)
-              val exec_command = s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
-              Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.APPEND, StandardOpenOption.SYNC):_*)
-              val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js =>
-                try{
-                  js.as[Boolean]
-                }catch{
-                  case e: Exception =>
-                    false
+
+      if(data.commands(data.order - 1).command.startsWith("bugatti sqlUpdate")){
+        val resultLogPath = s"${_baseDir}/result.log"
+        val file = new File(resultLogPath)
+        val exec_command = s"执行时间：${executeTime} ms\n${srResult.replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
+        Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.APPEND, StandardOpenOption.SYNC):_*)
+        context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskSuccess)
+        (Seq("echo", "\r\n命令执行成功") #>> file lines)
+        self ! Execute()
+        (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
+        stay
+      }else {
+        val jsonResult = Json.parse(srResult)
+        log.info(s"jsonResult is ${Json.prettyPrint(jsonResult)}")
+        jsonResult.validate[JsObject] match {
+          case s: JsSuccess[JsObject] => {
+            val jResult = s.get
+            val funType = (jResult \ "result" \ "fun").asOpt[String]
+            funType match {
+              case Some(fun) => {
+                val resultLogPath = s"${_baseDir}/result.log"
+                val file = new File(resultLogPath)
+                val exec_command = s"执行时间：${executeTime} ms\n${Json.prettyPrint(jResult).replaceAll( """\\n""", "\r\n").replaceAll("""\\t""", "\t")}"
+                Files.write(file.toPath, exec_command.getBytes(StandardCharsets.UTF_8), Seq(StandardOpenOption.APPEND, StandardOpenOption.SYNC):_*)
+                val seqResult: Seq[Boolean] = (jResult \ "result" \ "return" \\ "result").map(js =>
+                  try{
+                    js.as[Boolean]
+                  }catch{
+                    case e: Exception =>
+                      false
+                  }
+                )
+                val exeResult: Seq[Boolean] = (jResult \ "result" \\ "success").map(js => js.as[Boolean])
+                if (!seqResult.contains(false) && !exeResult.contains(false)) {
+                  //命令执行成功
+                  //3、调用commandActor
+                  context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskSuccess)
+                  (Seq("echo", "命令执行成功") #>> file lines)
+                  self ! Execute()
+                  (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
+                  stay
+                } else {
+                  //命令执行失败
+                  context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskFailed)
+                  (Seq("echo", "命令执行失败") #>> file lines)
+                  (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
+                  goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
                 }
-              )
-              val exeResult: Seq[Boolean] = (jResult \ "result" \\ "success").map(js => js.as[Boolean])
-              if (!seqResult.contains(false) && !exeResult.contains(false)) {
-                //命令执行成功
-                //3、调用commandActor
+              }
+              case _ => {
                 context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskSuccess)
-                (Seq("echo", "命令执行成功") #>> file lines)
+                //如果不是state.sls 则直接返回成功
                 self ! Execute()
-                (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
                 stay
-              } else {
-                //命令执行失败
-                context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskFailed)
-                (Seq("echo", "命令执行失败") #>> file lines)
-                (Seq("echo", "=====================================华丽分割线=====================================") #>> file lines)
-                goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
               }
             }
-            case _ => {
-              context.parent ! UpdateCommandStatus(data.taskInfo.taskId, data.order, TaskEnum.TaskSuccess)
-              //如果不是state.sls 则直接返回成功
-              self ! Execute()
-              stay
-            }
           }
-        }
-        case e: JsError =>{
-          log.warning(s"Errors: ${JsError.toFlatJson(e)}")
-          stay
+          case e: JsError =>{
+            log.warning(s"Errors: ${JsError.toFlatJson(e)}")
+            stay
+          }
         }
       }
     }
@@ -378,7 +391,12 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
           ActorUtils.spirits ! RemoteSpirit(taskObj.cHost.get.spiritId, SaltStatus(hostname, taskObj.cHost.get.ip))
         }
         case "sqlUpdate" => {
-          ActorUtils.spirits ! RemoteSpirit(taskObj.cHost.get.spiritId, SaltCommand(commandSeq))
+          //base -> master
+          val commands = commandSeq.last match {
+            case "base" => commandSeq.dropRight(1) :+ "master"
+            case _ => commandSeq
+          }
+          ActorUtils.spirits ! RemoteSpirit(taskObj.cHost.get.spiritId, SaltCommand(commands))
         }
       }
     } else {
