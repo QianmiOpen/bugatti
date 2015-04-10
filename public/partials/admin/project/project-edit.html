@@ -43,9 +43,7 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">环境：</label>
         <div class="col-sm-8">
-            <ul class="nav nav-tabs" role="tablist">
-                <li ng-class="{active: e.id == env.id}" ng-model="env" ng-repeat="e in envs"><a href="" ng-click="envChange(e, project.templateId)">{{e.name}}</a></li>
-            </ul>
+            <select id="sel_env" ng-model="env" ng-options="e as e.name for e in envs" ng-change="envChange(env, project.templateId)" chosen class="form-control width300" ></select>
         </div>
     </div>
 
