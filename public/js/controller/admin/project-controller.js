@@ -2,10 +2,10 @@
 
 define(['angular'], function(angular) {
 
-    var app = angular.module('bugattiApp.controller.admin.projectModule', []);
+    var app = angular.module('bugattiApp.controller.admin.projectModule', ['ngCookies']);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
-        function($scope, $state, $stateParams, $modal, growl, ProjectService, VersionService, EnvService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$cookies', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
+        function($scope, $state, $stateParams, $cookies, $modal, growl, ProjectService, VersionService, EnvService) {
             $scope.app.breadcrumb='项目管理';
             $scope.currentPage = 1;
             $scope.pageSize = 20;
@@ -19,6 +19,17 @@ define(['angular'], function(angular) {
             });
 
             $scope.searchForm = function(projectName) {
+
+                // 保持搜索状态
+                if (angular.isDefined(projectName)) {
+                    $cookies.search_project_name = projectName;
+                } else {
+                    if (angular.isDefined($cookies.search_project_name)) {
+                        $scope.s_projectName = $cookies.search_project_name;
+                        projectName = $cookies.search_project_name;
+                    }
+                }
+
                 // count
                 ProjectService.count(projectName, function(data) {
                     $scope.totalItems = data;
