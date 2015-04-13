@@ -35,9 +35,12 @@ object DependencyController extends BaseController {
   }
 
   def removeDependency(parentId: Int, childId: Int) = AuthAction() { implicit request =>
-    val depend = ProjectDependency(None, parentId, childId, None)
-    ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除依赖", depend))
-    Ok(Json.toJson(ProjectDependencyHelper.remove(depend)))
+    if (!UserHelper.hasProjectSafe(parentId, request.user)) Forbidden
+    else {
+      val depend = ProjectDependency(None, parentId, childId, None)
+      ALogger.info(msg(request.user.jobNo, request.remoteAddress, "删除依赖", depend))
+      Ok(Json.toJson(ProjectDependencyHelper.remove(depend)))
+    }
   }
 
   def addDependency() = AuthAction() { implicit request =>
@@ -45,12 +48,15 @@ object DependencyController extends BaseController {
       val fieldsJson = Json.toJson(fields.toMap)
       val p = (fieldsJson \ "parent").as[DependencyNest]
       val c = (fieldsJson \ "child").as[Project]
-      try {
-        val depend = ProjectDependency(None, p.id, c.id.get, None)
-        ALogger.info(msg(request.user.jobNo, request.remoteAddress, "增加依赖", depend))
-        ProjectDependencyHelper.add(depend)
-      } catch {
-        case e: Exception => 0
+      if (!UserHelper.hasProjectSafe(p.id, request.user)) 0
+      else {
+        try {
+          val depend = ProjectDependency(None, p.id, c.id.get, None)
+          ALogger.info(msg(request.user.jobNo, request.remoteAddress, "增加依赖", depend))
+          ProjectDependencyHelper.add(depend)
+        } catch {
+          case e: Exception => 0
+        }
       }
     }
     request.body.asJson match {

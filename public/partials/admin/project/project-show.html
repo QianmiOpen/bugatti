@@ -51,17 +51,9 @@
     </tr>
 
     <tr>
-        <td class="text-right col-sm-3">项目依赖：</td>
-        <td>
-            <!-- Project dependency -->
-            <project-dependency ng-if="project"  has-project-safe="{{project.id}}" ng-show="hasProjectSafe_" expander-project="project"></project-dependency>
-        </td>
-    </tr>
-
-    <tr>
         <td class="text-right col-sm-3">项目环境变量：</td>
         <td>
-            <select id="sel_env" ng-model="env" ng-options="e as e.name for e in envs" ng-change="envChange(env)" chosen class="form-control width300" ></select>
+            <select id="sel_env" chosen ng-model="env" ng-options="e as e.name for e in envs" ng-change="envChange(env)" class="form-control width300" ></select>
             <table class="table table-striped border-less m0 mt15">
                 <tbody>
                 <tr><th class="col-sm-3">变量名</th><th class="col-sm-3">变量值</th><th>&nbsp;</th></tr>

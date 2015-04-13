@@ -97,6 +97,16 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('profile.project.dependency', {
+            url: "/:id/dependency",
+            views: {
+                "@profile": {
+                    templateUrl: "partials/home/project-dependency.html",
+                    controller: "DependencyCtrl"
+                }
+            }
+        });
+
         // 项目版本
         $stateProvider.state('profile.project.version', {
             url: "/:id/version",
