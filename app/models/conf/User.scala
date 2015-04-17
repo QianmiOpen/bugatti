@@ -64,7 +64,7 @@ object UserHelper extends PlayCache {
   }
 
   def count(jobNo: Option[String]): Int = db withSession { implicit session =>
-    val query = qUser.filteredBy(jobNo)(_.jobNo === jobNo).query
+    val query = qUser.filteredBy(jobNo)(u => (u.jobNo like s"%${jobNo.get}%") || (u.name like s"%${jobNo.get}%")).query
     query.length.run
   }
 
@@ -74,7 +74,7 @@ object UserHelper extends PlayCache {
 
   def all(jobNo: Option[String], page: Int, pageSize: Int): Seq[User] = db withSession { implicit session =>
     val offset = pageSize * page
-    val query = qUser.filteredBy(jobNo)(_.jobNo === jobNo).query
+    val query = qUser.filteredBy(jobNo)(u => (u.jobNo like s"%${jobNo.get}%") || (u.name like s"%${jobNo.get}%")).query
     query.drop(offset).take(pageSize).list
   }
 

@@ -2,69 +2,80 @@
 
 define(['angular'], function(angular) {
 
-    var app = angular.module('bugattiApp.controller.admin.projectModule', []);
+    var app = angular.module('bugattiApp.controller.admin.projectModule', ['ngCookies']);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
-        function($scope, $state, $stateParams, $modal, growl, ProjectService, VersionService, EnvService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$cookies', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
+        function($scope, $state, $stateParams, $cookies, $modal, growl, ProjectService, VersionService, EnvService) {
             $scope.app.breadcrumb='项目管理';
-        $scope.currentPage = 1;
-        $scope.pageSize = 20;
+            $scope.currentPage = 1;
+            $scope.pageSize = 20;
 
-        // load env
-        EnvService.getAll(function(data) {
-            if (data == null || data.length == 0) {
-                return;
-            }
-            $scope.envId = data[0].id;
-        });
-
-        $scope.searchForm = function(projectName) {
-            // count
-            ProjectService.count(projectName, function(data) {
-                $scope.totalItems = data;
-            });
-
-            // list
-            ProjectService.getPage(projectName, 0, $scope.pageSize, function(data) {
-                $scope.projects = data;
-            });
-        }
-
-        $scope.searchForm($scope.s_projectName);
-
-        // page
-        $scope.setPage = function (pageNo) {
-            ProjectService.getPage($scope.s_projectName, pageNo - 1, $scope.pageSize, function(data) {
-                $scope.projects = data;
-            });
-        };
-
-        // remove
-        $scope.delete = function(id, index) {
-            var modalInstance = $modal.open({
-                templateUrl: 'partials/modal.html',
-                controller: function ($scope, $modalInstance) {
-                    $scope.ok = function () {
-                        ProjectService.remove(id, function(data) {
-                            $modalInstance.close(data);
-                        });
-                    };
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
+            // load env
+            EnvService.getAll(function(data) {
+                if (data == null || data.length == 0) {
+                    return;
                 }
+                $scope.envId = data[0].id;
             });
-            modalInstance.result.then(function(data) {
-                if (data.r == 'exist') {
-                    growl.addWarnMessage('还有版本存在该项目，请删除后再操作。。。');
+
+            $scope.searchForm = function(projectName) {
+
+                // 保持搜索状态
+                if (angular.isDefined(projectName)) {
+                    $cookies.search_project_name = projectName;
                 } else {
-                    $scope.projects.splice(index, 1);
-                    ProjectService.count($scope.s_projectName, function(num) {
-                        $scope.totalItems = num;
-                    });
+                    if (angular.isDefined($cookies.search_project_name)) {
+                        $scope.s_projectName = $cookies.search_project_name;
+                        projectName = $cookies.search_project_name;
+                    }
                 }
-            });
-        };
+
+                // count
+                ProjectService.count(projectName, function(data) {
+                    $scope.totalItems = data;
+                });
+
+                // list
+                ProjectService.getPage(projectName, 0, $scope.pageSize, function(data) {
+                    $scope.projects = data;
+                });
+            };
+
+            $scope.searchForm($scope.s_projectName);
+
+            // page
+            $scope.setPage = function (pageNo) {
+                ProjectService.getPage($scope.s_projectName, pageNo - 1, $scope.pageSize, function(data) {
+                    $scope.projects = data;
+                });
+            };
+
+            // remove
+            $scope.delete = function(id, index) {
+                var modalInstance = $modal.open({
+                    templateUrl: 'partials/modal.html',
+                    controller: function ($scope, $modalInstance) {
+                        $scope.ok = function () {
+                            ProjectService.remove(id, function(data) {
+                                $modalInstance.close(data);
+                            });
+                        };
+                        $scope.cancel = function () {
+                            $modalInstance.dismiss('cancel');
+                        };
+                    }
+                });
+                modalInstance.result.then(function(data) {
+                    if (data.r == 'exist') {
+                        growl.addWarnMessage('还有版本存在该项目，请删除后再操作。。。');
+                    } else {
+                        $scope.projects.splice(index, 1);
+                        ProjectService.count($scope.s_projectName, function(num) {
+                            $scope.totalItems = num;
+                        });
+                    }
+                });
+            };
     }]);
 
     app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'growl', 'ProjectService', 'EnvService',
@@ -172,9 +183,7 @@ define(['angular'], function(angular) {
 
     app.controller('ProjectCreateCtrl', ['$scope', '$stateParams', '$state', 'growl', 'ProjectService', 'TemplateService', 'EnvService',
         function($scope, $stateParams, $state, growl, ProjectService, TemplateService, EnvService) {
-
             $scope.saveOrUpdate = function(project) {
-
                 project.items = [];
                 project.variables = angular.copy($scope.vars);
                 angular.forEach($scope.items, function(item) {
@@ -298,7 +307,7 @@ define(['angular'], function(angular) {
                     }
                 });
                 return find;
-            };
+            }
 
             $scope.editVar = function(repeat$scope) {
                 repeat$scope.mode = 'edit';
@@ -315,7 +324,6 @@ define(['angular'], function(angular) {
 
     app.controller('ProjectUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'growl', 'ProjectService', 'TemplateService', 'EnvService',
         function($scope, $stateParams, $filter, $state, growl, ProjectService, TemplateService, EnvService) {
-
             // update
             $scope.saveOrUpdate = function(project) {
                 project.items = [];
@@ -486,7 +494,6 @@ define(['angular'], function(angular) {
                     $scope.vars.splice(index, 1);
                 }
             };
-
         }]);
 
     // ===================================================================
@@ -589,7 +596,6 @@ define(['angular'], function(angular) {
             };
     }]);
 
-
     app.controller('VersionCreateCtrl', ['$scope', '$filter', '$stateParams', '$state', 'VersionService',
         function($scope, $filter, $stateParams, $state, VersionService) {
             $scope.version = {projectId: $stateParams.id, vs: ''}
@@ -611,7 +617,6 @@ define(['angular'], function(angular) {
             });
 
     }]);
-
 
     app.controller('VersionUpdateCtrl', ['$scope', '$stateParams', '$filter', '$state', 'VersionService',
         function($scope, $stateParams, $filter, $state, VersionService) {
@@ -645,35 +650,57 @@ define(['angular'], function(angular) {
             });
     }]);
 
+    // ===================================================================
+    // ------------------------------项目依赖-----------------------------—
+    // ===================================================================
     app.controller('DependencyCtrl', ['$scope', '$stateParams', '$filter', '$state', 'DependencyService', 'ProjectService', 'growl',
-        function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl){
+        function($scope, $stateParams, $filter, $state, DependencyService, ProjectService, growl) {
+            ProjectService.get($stateParams.id, function(data) {
+                $scope.project = data;
+                $scope.delayLoadDependency();
+            });
+
             $scope.showDependencies = function(){
                 DependencyService.get($stateParams.id, function(data){
                     $scope.groups = data
                 })
-            }
-
-
-            ProjectService.getExceptSelf($stateParams.id, function(data){
-                $scope.projects = data
-                $scope.showDependencies()
-            })
+            };
+            $scope.delayLoadDependency = function(){
+                ProjectService.getExceptSelf($stateParams.id, function(data){
+                    $scope.projects = data ;
+                    $scope.showDependencies() ;
+                })
+            };
 
             $scope.removeDependency = function(parent,child){
                 DependencyService.removeDependency(parent.id, child.id, function(data){
-                    $scope.showDependencies()
+                    if (data == 0) {
+                        growl.addWarnMessage("解绑失败");
+                    } else {
+                        growl.addSuccessMessage("解绑成功");
+                        $scope.showDependencies();
+                    }
                 })
-            }
+            };
 
-            $scope.addDependency = function(parent,child){
+            $scope.addDependency = function(parent, child){
+                if (angular.isUndefined(child)) {
+                    growl.addErrorMessage("请选择项目");
+                    return;
+                }
                 DependencyService.addDependency(parent, child, function(data){
-                    $scope.showDependencies()
+                    if(data.r == 0){
+                        growl.addWarnMessage("添加失败");
+                    } else {
+                        growl.addSuccessMessage("添加成功");
+                        $scope.showDependencies()
+                    }
                 })
-            }
+            };
 
             $scope.templateFilter = function(dep){
                 return function(p){return p.templateId == dep.templateId};
-            }
+            };
 
             $scope.getTemplateProject = function(dep){
                 var subTemplateProjects = $scope.projects.map(
@@ -682,11 +709,11 @@ define(['angular'], function(angular) {
                             return p;
                         }
                     }
-                ).filter(function(e){return e})
+                ).filter(function(e){return e});
                 if(subTemplateProjects.length > 0){
                     return subTemplateProjects[0];
                 }
-            }
+            };
 
             $scope.changeTemplateProject = function(parentId, oldId, newId){
                 if(newId != undefined){
@@ -695,10 +722,12 @@ define(['angular'], function(angular) {
                             growl.addWarnMessage("修改失败");
                         } else if(data.r == 1){
                             growl.addSuccessMessage("修改成功");
+                            $scope.showDependencies();
                         }
                     })
                 }
-            }
+            };
+
         }
     ])
 

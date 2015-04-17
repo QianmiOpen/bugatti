@@ -80,13 +80,12 @@ define(['angular'], function(angular) {
          * 项目依赖
          */
         $stateProvider.state('admin.project.dependency', {
-            url: "/dependency/:id",
+            url: "/:id/dependency",
             views: {
                 "@admin": {
-                    templateUrl: "partials/admin/project/dependency-index.html",
+                    templateUrl: "partials/home/project-dependency.html",
                     controller: "DependencyCtrl"
                 }
-
             }
         })
     }]);
