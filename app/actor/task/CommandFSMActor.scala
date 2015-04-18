@@ -73,7 +73,7 @@ class CommandFSMActor extends LoggingFSM[State, CommandStatus] {
       goto(Finish) using data.copy(status = TaskEnum.TaskFailed)
   }
 
-  when(Executing, stateTimeout = 300 second){
+  when(Executing, stateTimeout = 600 second){
     case Event(ec: Execute, data: CommandStatus) =>
       log.info(s"executing taskId:${_taskInfo.taskId}, envId:${_taskInfo.envId}, projectId:${_taskInfo.projectId}, order:${data.order}")
       val engine = data.engine
