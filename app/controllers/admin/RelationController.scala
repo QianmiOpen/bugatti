@@ -7,6 +7,8 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json._
 import play.api.mvc.Action
+import enums.ContainerTypeEnum.Container
+import enums.StateEnum.State
 
 /**
  * 项目于环境关系配置
@@ -14,8 +16,22 @@ import play.api.mvc.Action
  * @author of546
  */
 object RelationController extends BaseController {
+
   implicit val variableWrites = Json.writes[Variable]
   implicit val relationWrites = Json.writes[Host]
+  implicit val relationFormWrites = Json.writes[EnvRelForm]
+
+  case class Ip(a: Int, b: Int, c: Int, d: Int, e: Int)
+  case class HostIp(id: Option[Int], envId: Option[Int], projectId: Option[Int], areaId: Option[Int],
+                  syndicName: String, spiritId: Int, name: String, ip: Ip, state: State,
+                  containerType: Container, hostIp: Option[String], hostName: Option[String],
+                  globalVariable: Seq[Variable]) {
+    val hosts = (ip.d to ip.e) map { i =>
+      val _ip = ip.a + "." + ip.b + "." + ip.c + "." + i
+      Host(id, envId, projectId, areaId, syndicName, spiritId, name = _ip, _ip, state,
+        containerType, hostIp, hostName, globalVariable)
+    }
+  }
 
   val relationForm = Form(
     mapping(
@@ -25,13 +41,13 @@ object RelationController extends BaseController {
     )(EnvRelForm.apply)(EnvRelForm.unapply)
   )
 
-  val varRelForm = Form(
+  val relForm = Form(
     mapping(
       "id" -> optional(number),
       "envId" -> optional(number),
       "projectId" -> optional(number),
       "areaId" -> optional(number),
-      "syndicName" -> text,
+      "syndicName" -> default(text, ""),
       "spiritId" -> number,
       "name" -> text,
       "ip" -> text,
@@ -49,6 +65,38 @@ object RelationController extends BaseController {
         )(Variable.apply)(Variable.unapply)
       )
     )(Host.apply)(Host.unapply)
+  )
+
+  val relIpsForm = Form(
+    mapping(
+      "id" -> optional(number),
+      "envId" -> optional(number),
+      "projectId" -> optional(number),
+      "areaId" -> optional(number),
+      "syndicName" -> default(text, ""),
+      "spiritId" -> number,
+      "name" -> text,
+      "ip" -> mapping(
+        "a" -> number(min = 0, max = 255),
+        "b" -> number(min = 0, max = 255),
+        "c" -> number(min = 0, max = 255),
+        "d" -> number(min = 0, max = 255),
+        "e" -> number(min = 0, max = 255)
+      )(Ip.apply)(Ip.unapply),
+      "state" -> enums.form.enum(StateEnum),
+      "containerType" -> enums.form.enum(ContainerTypeEnum),
+      "hostIp" -> optional(text),
+      "hostName" -> optional(text),
+      "globalVariable" -> seq (
+        mapping(
+          "id" -> optional(number),
+          "envId" -> optional(number),
+          "projectId" -> optional(number),
+          "name" -> text,
+          "value" -> text
+        )(Variable.apply)(Variable.unapply)
+      )
+    )(HostIp.apply)(HostIp.unapply)
   )
 
   def show(id: Int) = Action {
@@ -70,8 +118,36 @@ object RelationController extends BaseController {
     Ok(Json.toJson(HostHelper.findIpsByEnvId(envId)))
   }
 
+  implicit val writerSave = new Writes[(String, Int)] {
+    def writes(c: (String, Int)): JsValue = {
+      Json.obj("ip" -> c._1, "result" -> c._2)
+    }
+  }
+  def saveBatch() = AuthAction(RoleEnum.admin) { implicit request =>
+    relIpsForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
+      relIps => {
+        val result = relIps.hosts.map( host =>
+          (host.ip, HostHelper.create_result(host))
+        )
+        Ok(Json.toJson(result))
+      }
+    )
+  }
+
+  def delete(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
+    HostHelper.findById(id) match {
+      case Some(rel) =>
+        val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
+        "ip" -> request.remoteAddress, "msg" -> "删除关系", "data" -> Json.toJson(rel)).toString
+        ALogger.info(msg)
+        Ok(Json.toJson(HostHelper.delete(rel)))
+      case _ => NotFound
+    }
+  }
+
   def update(id: Int) = AuthAction() { implicit request =>
-    varRelForm.bindFromRequest.fold(
+    relForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
         Ok(Json.toJson(HostHelper.update(relation)))
@@ -79,10 +155,7 @@ object RelationController extends BaseController {
     )
   }
 
-  implicit val relationFormWrites = Json.writes[EnvRelForm]
-
   def bind = AuthAction() { implicit request =>
-
     relationForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {

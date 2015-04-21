@@ -1,15 +1,17 @@
 package models.conf
 
+import java.sql.SQLException
+
 import models.MaybeFilter
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.api.Play.current
 import enums.{StateEnum, ContainerTypeEnum}
 import enums.ContainerTypeEnum.Container
+import enums.StateEnum.State
 import scala.slick.jdbc.JdbcBackend
 import scala.language.postfixOps
 import scala.language.implicitConversions
-import enums.StateEnum.State
 
 /**
  * 环境和项目的关系配置
@@ -96,7 +98,7 @@ object HostHelper {
     var query = qHost
       .filteredBy(envId)(_.envId === envId)
       .filteredBy(projectId)(_.projectId === projectId)
-      .filteredBy(ip)(_.ip === ip).query
+      .filteredBy(ip)(_.ip like s"${ip.get}%").query
     sort match {
       case Some(s) if s == "ip" =>
         query = direction match { case Some(d) if d == "desc" => query.sortBy(_.ip desc); case _ => query.sortBy(_.ip asc)}
@@ -110,12 +112,20 @@ object HostHelper {
     val query = qHost
       .filteredBy(envId)(_.envId === envId)
       .filteredBy(projectId)(_.projectId === projectId)
-      .filteredBy(ip)(_.ip === ip).query
+      .filteredBy(ip)(_.ip like s"${ip.get}%").query
     query.length.run
   }
-  
+
   def create(host: Host) = db withSession { implicit session =>
     qHost.returning(qHost.map(_.id)).insert(host)
+  }
+
+  def create_result(host: Host) = db withSession { implicit session =>
+    try {
+      qHost.insert(host)
+    } catch {
+      case se: SQLException => -1
+    }
   }
 
   def bind(relForm: EnvRelForm): Int = db withSession { implicit session =>
@@ -138,6 +148,10 @@ object HostHelper {
 
   def updateStateBySpiritId_Name(spiritId: Int, name: String, state: State) = db withSession { implicit session =>
     qHost.filter(x => x.spiritId === spiritId && x.name === name).map(_.state).update(state)
+  }
+
+  def delete(host: Host) = db withSession { implicit session =>
+    qHost.filter(_.id === host.id).delete
   }
 
 }

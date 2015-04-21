@@ -57,12 +57,12 @@ object ProjectController extends BaseController {
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(projectName: Option[String], page: Int, pageSize: Int) = AuthAction() { implicit request =>
-    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), page, pageSize)))
+  def index(projectName: Option[String], templateId: Option[Int], page: Int, pageSize: Int) = AuthAction() { implicit request =>
+    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), templateId, page, pageSize)))
   }
 
-  def count(projectName: Option[String]) = AuthAction() { implicit request =>
-    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty))))
+  def count(projectName: Option[String], templateId: Option[Int]) = AuthAction() { implicit request =>
+    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty), templateId)))
   }
 
   def show(id: Int) = Action {
@@ -206,7 +206,8 @@ object ProjectController extends BaseController {
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
         else op match {
           case "up" =>
-            if (ProjectMemberHelper.findByProjectId(member.projectId).count(_.level == LevelEnum.safe) >= 3) {
+            if (!UserHelper.admin_?(request.user) &&
+              ProjectMemberHelper.findByProjectId(member.projectId).count(_.level == LevelEnum.safe) >= 3) {
               Ok(_Exist)
             } else {
               ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级项目成员", member))

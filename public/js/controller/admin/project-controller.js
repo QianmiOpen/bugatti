@@ -4,8 +4,8 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.admin.projectModule', ['ngCookies']);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$cookies', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
-        function($scope, $state, $stateParams, $cookies, $modal, growl, ProjectService, VersionService, EnvService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$cookies', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService', 'TemplateService',
+        function($scope, $state, $stateParams, $cookies, $modal, growl, ProjectService, VersionService, EnvService, TemplateService) {
             $scope.app.breadcrumb='项目管理';
             $scope.currentPage = 1;
             $scope.pageSize = 20;
@@ -17,9 +17,16 @@ define(['angular'], function(angular) {
                 }
                 $scope.envId = data[0].id;
             });
+            TemplateService.all(function(data) {
+                $scope.templates = data;
+            });
 
-            $scope.searchForm = function(projectName) {
+            $scope.tempSelect = function(e) {
+                e = e == null ? undefined : e;
+                $scope.s_template = e;
+            };
 
+            $scope.searchForm = function(projectName, templateId) {
                 // 保持搜索状态
                 if (angular.isDefined(projectName)) {
                     $cookies.search_project_name = projectName;
@@ -31,21 +38,21 @@ define(['angular'], function(angular) {
                 }
 
                 // count
-                ProjectService.count(projectName, function(data) {
+                ProjectService.count(projectName, templateId, function(data) {
                     $scope.totalItems = data;
                 });
 
                 // list
-                ProjectService.getPage(projectName, 0, $scope.pageSize, function(data) {
+                ProjectService.getPage(projectName, templateId, 0, $scope.pageSize, function(data) {
                     $scope.projects = data;
                 });
             };
 
-            $scope.searchForm($scope.s_projectName);
+            $scope.searchForm($scope.s_projectName, $scope.s_template);
 
             // page
             $scope.setPage = function (pageNo) {
-                ProjectService.getPage($scope.s_projectName, pageNo - 1, $scope.pageSize, function(data) {
+                ProjectService.getPage($scope.s_projectName, $scope.s_template, pageNo - 1, $scope.pageSize, function(data) {
                     $scope.projects = data;
                 });
             };
@@ -76,6 +83,8 @@ define(['angular'], function(angular) {
                     }
                 });
             };
+
+
     }]);
 
     app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'growl', 'ProjectService', 'EnvService',
@@ -275,7 +284,7 @@ define(['angular'], function(angular) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
-                };
+                }
                 if (v.name.trim().length < 1 && v.value.trim().length < 1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varValue.$invalid = true;
@@ -451,7 +460,7 @@ define(['angular'], function(angular) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
-                };
+                }
                 if (v.name.trim().length < 1 && v.value.trim().length < 1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varValue.$invalid = true;

@@ -21,11 +21,11 @@ define(['angular'], function(angular) {
             getAuth: function(envId, callback) {
                 $http(PlayRoutes.controllers.admin.ProjectController.showAuth(envId)).success(callback);
             },
-            getPage: function(projectName, page, pageSize, callback) {
-                $http(PlayRoutes.controllers.admin.ProjectController.index(projectName, page, pageSize)).success(callback);
+            getPage: function(projectName, templateId, page, pageSize, callback) {
+                $http(PlayRoutes.controllers.admin.ProjectController.index(projectName, templateId, page, pageSize)).success(callback);
             },
-            count: function(projectName, callback) {
-                $http(PlayRoutes.controllers.admin.ProjectController.count(projectName)).success(callback);
+            count: function(projectName, templateId, callback) {
+                $http(PlayRoutes.controllers.admin.ProjectController.count(projectName, templateId)).success(callback);
             },
             save: function(project, callback) {
                 $http.post(PlayRoutes.controllers.admin.ProjectController.save().url, project).success(callback)
