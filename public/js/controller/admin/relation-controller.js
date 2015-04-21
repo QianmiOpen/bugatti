@@ -259,7 +259,7 @@ define(['angular'], function(angular) {
                 {id: 'docker', name: 'docker'}
             ];
 
-            $scope.save = function() {
+            $scope.saveBatch = function() {
                 $scope.rel.ip = $scope.ip;
                 RelationService.saveBatch($scope.rel, function(data) {
                     $scope.results = [];
@@ -269,10 +269,20 @@ define(['angular'], function(angular) {
                         }
                     });
                     if ($scope.results.length > 0) {
-                        growl.addWarnMessage('增加有错误');
+                        growl.addWarnMessage('增加失败');
                     } else {
                         growl.addSuccessMessage("增加成功");
                         $state.go('admin.relation');
+                    }
+                });
+            };
+
+            $scope.save = function() {
+                RelationService.save($scope.rel, function(data) {
+                    if (data > 0) {
+                        growl.addSuccessMessage("增加成功");
+                    } else {
+                        growl.addWarnMessage('增加失败');
                     }
                 });
             }

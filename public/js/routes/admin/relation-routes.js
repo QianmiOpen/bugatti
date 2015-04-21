@@ -23,6 +23,16 @@ define(['angular'], function(angular) {
             }
         });
 
+        $stateProvider.state('admin.relation.adds', {
+            url: "/adds",
+            views: {
+                "@admin": {
+                    templateUrl: "partials/admin/relation/relation-adds.html",
+                    controller: "RelationAddCtrl"
+                }
+            }
+        });
+
         $stateProvider.state('admin.relation.add', {
             url: "/add",
             views: {

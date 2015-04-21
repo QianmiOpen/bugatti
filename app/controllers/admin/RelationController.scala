@@ -135,6 +135,15 @@ object RelationController extends BaseController {
     )
   }
 
+  def save() = AuthAction(RoleEnum.admin) { implicit request =>
+    relForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(formWithErrors.errorsAsJson),
+      rel => {
+        Ok(Json.toJson(HostHelper.create_result(rel)))
+      }
+    )
+  }
+
   def delete(id: Int) = AuthAction(RoleEnum.admin) { implicit request =>
     HostHelper.findById(id) match {
       case Some(rel) =>

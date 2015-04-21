@@ -33,6 +33,9 @@ define(['angular'], function(angular) {
             update: function(id, relation, callback) {
                 $http.put(PlayRoutes.controllers.admin.RelationController.update(id).url, relation).success(callback)
             },
+            save: function(rels, callback) {
+                $http.post(PlayRoutes.controllers.admin.RelationController.save().url, rels).success(callback)
+            },
             saveBatch: function(rels, callback) {
                 $http.post(PlayRoutes.controllers.admin.RelationController.saveBatch().url, rels).success(callback)
             },
