@@ -163,6 +163,8 @@ define(['angular'], function(angular) {
 
     app.controller('RelationCreateCtrl', ['$scope', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService',
         function($scope, $state, $modal, RelationService, ProjectService, EnvService) {
+            $scope.env = ''; $scope.project = '';
+
             // init
             EnvService.getAll(function(data) {
                 $scope.envs = data;
@@ -172,11 +174,15 @@ define(['angular'], function(angular) {
                 $scope.projects = data;
             });
 
-            $scope.selectEnv = function() {
-                var env = $scope.env || {};
-                if (env.id != undefined) {
+            $scope.selectProject = function(p) {
+                $scope.project = p;
+            };
+
+            $scope.selectEnv = function(e) {
+                $scope.env = e;
+                if (e != undefined) {
                     $scope.load = true;
-                    RelationService.ips(env.id, function(data) {
+                    RelationService.ips(e, function(data) {
                         $scope.ips = data;
                         $scope.load = false;
                     })
@@ -185,13 +191,13 @@ define(['angular'], function(angular) {
 
             $scope.refresh = function() {
                 var valid = false;
-                if ($scope.project == undefined || $scope.project.id == undefined) {
+                if ($scope.project == undefined ) {
                     $scope.form.projectId.$dirty = true;
                     $scope.form.projectId.$invalid = true;
                     $scope.form.projectId.$error.required = true;
                     valid = true;
                 }
-                if ($scope.env == undefined || $scope.env.id == undefined) {
+                if ($scope.env == undefined ) {
                     $scope.form.envId.$dirty = true;
                     $scope.form.envId.$invalid = true;
                     $scope.form.envId.$error.required = true;
@@ -202,21 +208,22 @@ define(['angular'], function(angular) {
 
             // insert
             $scope.save = function() {
-                var relation = { ids: []};
+                var relation = { ids: [] };
 
                 angular.forEach($scope.ck_ips, function(value, key) {
                     if (typeof value === 'boolean' && value === true) {
                         relation.ids.push(key);
                     }
                 });
+
                 $scope.ips.$error = false;
                 if (relation.ids.length < 1) {
                     $scope.ips.$error = true;
                     return;
                 }
 
-                relation.envId = $scope.env.id;
-                relation.projectId = $scope.project.id;
+                relation.envId = $scope.env;
+                relation.projectId = $scope.project;
 
                 RelationService.bind(angular.toJson(relation), function(data) {
                     $state.go("^");

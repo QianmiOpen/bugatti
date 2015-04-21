@@ -130,6 +130,9 @@ object RelationController extends BaseController {
         val result = relIps.hosts.map( host =>
           (host.ip, HostHelper.create_result(host))
         )
+        val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
+          "ip" -> request.remoteAddress, "msg" -> "批量增加关系", "data" -> Json.toJson(result)).toString
+        ALogger.info(msg)
         Ok(Json.toJson(result))
       }
     )
@@ -139,7 +142,11 @@ object RelationController extends BaseController {
     relForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       rel => {
-        Ok(Json.toJson(HostHelper.create_result(rel)))
+        val result = HostHelper.create_result(rel)
+        val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
+          "ip" -> request.remoteAddress, "msg" -> "增加关系", "data" -> Json.toJson((rel.ip, result))).toString
+        ALogger.info(msg)
+        Ok(Json.toJson(result))
       }
     )
   }
@@ -159,6 +166,9 @@ object RelationController extends BaseController {
     relForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       relation => {
+        val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
+          "ip" -> request.remoteAddress, "msg" -> "修改关系", "data" -> Json.toJson(relation)).toString
+        ALogger.info(msg)
         Ok(Json.toJson(HostHelper.update(relation)))
       }
     )
