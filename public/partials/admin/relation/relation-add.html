@@ -57,7 +57,7 @@
     <div class="form-group">
         <label for="spiritId" class="col-sm-3 control-label">Spirit：</label>
         <div ng-if="spirits" class="col-sm-5">
-            <select class="form-control" id="spiritId" name="spiritId" ng-model="rel.spiritId" ng-options="s.id as s.name for s in spirits" required>
+            <select class="form-control" id="spiritId" name="spiritId" ng-model="rel.spiritId" ng-options="s.id as s.info for s in spirits" required>
                 <option value="">-- 选择Spirit --</option>
             </select>
         </div>
