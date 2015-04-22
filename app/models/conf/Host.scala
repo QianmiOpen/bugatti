@@ -16,7 +16,7 @@ import scala.language.implicitConversions
 /**
  * 环境和项目的关系配置
  */
-case class Host(id: Option[Int], envId: Option[Int], projectId: Option[Int], areaId: Option[Int],
+case class Host(id: Option[Int], envId: Option[Int], projectId: Option[Int], preProjectId: Option[Int], areaId: Option[Int],
                                  syndicName: String, spiritId: Int, name: String, ip: String, state: State,
                                  containerType: Container, hostIp: Option[String], hostName: Option[String],
                                  globalVariable: Seq[Variable])
@@ -26,6 +26,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def envId = column[Int]("env_id", O.Nullable)
   def projectId = column[Int]("project_id", O.Nullable)
+  def preProjectId = column[Int]("pre_project_id", O.Nullable)
   def areaId = column[Int]("area_id", O.Nullable)
   def syndicName = column[String]("syndic_name")
   def spiritId = column[Int]("spirit_id")
@@ -40,7 +41,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
   ))
 
-  override def * = (id.?, envId.?, projectId.?, areaId.?, syndicName, spiritId, name, ip, state, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
+  override def * = (id.?, envId.?, projectId.?, preProjectId.?, areaId.?, syndicName, spiritId, name, ip, state, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
   index("idx_eid_pid", (envId, projectId))
   index("idx_ip", ip, unique = true)
 }
@@ -130,16 +131,24 @@ object HostHelper {
 
   def bind(relForm: EnvRelForm): Int = db withSession { implicit session =>
     relForm.ids.map { id =>
-      qHost.filter(_.id === id).map(_.projectId).update(relForm.projectId)
-    }.size
+      findById(id) match {
+        case Some(host) =>
+          if (host.preProjectId.nonEmpty && host.preProjectId.get == relForm.projectId) {
+            qHost.filter(_.id === id).map(_.projectId).update(relForm.projectId)
+          } else {
+            qHost.filter(_.id === id).map(h => (h.projectId, h.globalVariable)).update((relForm.projectId, List.empty[Variable]))
+          }
+        case _ => 0
+      }
+    }.sum
   }
 
   def _unbindByProjectId(projectId: Option[Int])(implicit session: JdbcBackend#Session) = {
-    qHost.filter(_.projectId === projectId).map(_.projectId.?).update(None)(session)
+    qHost.filter(_.projectId === projectId).map(h => (h.projectId.?, h.preProjectId.?)).update((None, projectId))
   }
 
   def unbind(host: Host) = db withTransaction { implicit session =>
-    qHost.filter(_.id === host.id).update(host.copy(projectId = None))
+    qHost.filter(_.id === host.id).update(host.copy(projectId = None, preProjectId = host.projectId))
   }
 
   def update(host: Host) = db withSession { implicit session =>

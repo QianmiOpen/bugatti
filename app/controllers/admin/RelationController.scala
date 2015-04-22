@@ -22,13 +22,13 @@ object RelationController extends BaseController {
   implicit val relationFormWrites = Json.writes[EnvRelForm]
 
   case class Ip(a: Int, b: Int, c: Int, d: Int, e: Int)
-  case class HostIp(id: Option[Int], envId: Option[Int], projectId: Option[Int], areaId: Option[Int],
+  case class HostIp(id: Option[Int], envId: Option[Int], projectId: Option[Int], preProjectId: Option[Int], areaId: Option[Int],
                   syndicName: String, spiritId: Int, name: String, ip: Ip, state: State,
                   containerType: Container, hostIp: Option[String], hostName: Option[String],
                   globalVariable: Seq[Variable]) {
     val hosts = (ip.d to ip.e) map { i =>
       val _ip = ip.a + "." + ip.b + "." + ip.c + "." + i
-      Host(id, envId, projectId, areaId, syndicName, spiritId, name = _ip, _ip, state,
+      Host(id, envId, projectId, preProjectId, areaId, syndicName, spiritId, name = _ip, _ip, state,
         containerType, hostIp, hostName, globalVariable)
     }
   }
@@ -46,6 +46,7 @@ object RelationController extends BaseController {
       "id" -> optional(number),
       "envId" -> optional(number),
       "projectId" -> optional(number),
+      "preProjectId" -> optional(number),
       "areaId" -> optional(number),
       "syndicName" -> default(text, ""),
       "spiritId" -> number,
@@ -72,6 +73,7 @@ object RelationController extends BaseController {
       "id" -> optional(number),
       "envId" -> optional(number),
       "projectId" -> optional(number),
+      "preProjectId" -> optional(number),
       "areaId" -> optional(number),
       "syndicName" -> default(text, ""),
       "spiritId" -> number,
