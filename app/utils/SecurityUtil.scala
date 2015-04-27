@@ -1,5 +1,6 @@
 package utils
 
+import play.api.Logger
 import play.api.libs.Crypto
 
 /**
@@ -16,13 +17,29 @@ object SecurityUtil {
    * @param value 无密内容
    * @return
    */
-  def encryptUK(value: String): String = Crypto.encryptAES(value, u_ssh_key)
+  def encryptUK(value: String): String = {
+    try {
+      Crypto.encryptAES(value, u_ssh_key)
+    } catch {
+      case e: Exception =>
+        Logger.error("encrypt uk error")
+        value
+    }
+  }
 
   /**
    * 解密用户KEY
    * @param value 加密内容
    * @return
    */
-  def decryptUK(value: String): String = Crypto.decryptAES(value, u_ssh_key)
+  def decryptUK(value: String): String = {
+    try {
+      Crypto.decryptAES(value, u_ssh_key)
+    } catch {
+      case e: Exception =>
+        Logger.error("decrypt uk error")
+        value
+    }
+  }
 
 }

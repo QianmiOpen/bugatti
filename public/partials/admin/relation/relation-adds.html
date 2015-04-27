@@ -67,6 +67,14 @@
     </div>
 
     <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">name：</label>
+        <div class="col-sm-9">
+            <input class="width250" type="text" id="name" name="name" ng-model="rel.name" maxlength="200" required/>
+           使用<b>%d</b>提取ip范围值，例如：lin-salt-14-%d.localdomain
+        </div>
+    </div>
+
+    <div class="form-group">
         <label for="ipa" class="col-sm-3 control-label">ip：</label>
         <div class="col-sm-9">
             <input id="ipa" name="ipa" ng-model="ip.a" type="text" class="width-ip" numbers-only min="0" max="255" maxlength="3" required/>
@@ -74,7 +82,7 @@
             <input id="ipc" name="ipc" ng-model="ip.c" type="text" class="width-ip" numbers-only min="0" max="255" maxlength="3" required/>
             <input id="ipd" name="ipd" ng-model="ip.d" type="text" class="width-ip" numbers-only min="0" max="255" maxlength="3" required/>
             ~
-            <input id="ipe" ng-model="ip.e" type="text" class="width-ip" numbers-only min="0" max="255" maxlength="3" required/>
+            <input id="ipe" ng-model="ip.e" type="text" class="width-ip" numbers-only min="0" max="255" maxlength="3" tooltip="ip范围值" tooltip-placement="right" required/>
         </div>
     </div>
 

@@ -28,7 +28,7 @@ object RelationController extends BaseController {
                   globalVariable: Seq[Variable]) {
     val hosts = (ip.d to ip.e) map { i =>
       val _ip = ip.a + "." + ip.b + "." + ip.c + "." + i
-      Host(id, envId, projectId, preProjectId, areaId, syndicName, spiritId, name = _ip, _ip, state,
+      Host(id, envId, projectId, preProjectId, areaId, syndicName, spiritId, name = name.format(i), _ip, state,
         containerType, hostIp, hostName, globalVariable)
     }
   }
