@@ -28,7 +28,7 @@
             </td>
             <td width="22%">
                 <span ng-if="d.canRemove">{{d.name}}</span>
-                <select ng-change="changeTemplateProject(group.id, d.id, templateProject.id)" ng-if="!d.canRemove" class="form-control" ng-init="templateProject = getTemplateProject(d)" ng-model="templateProject" ng-options="p.name + ' -- ' + p.description for p in projects | filter: templateFilter(d)">
+                <select ng-really-message="修改依赖会影响项目在各个环境中部署，确认这么做？" ng-really-change="changeTemplateProject(group.id, d.id, templateProject.id)" ng-if="!d.canRemove" class="form-control" ng-init="templateProject = getTemplateProject(d)" ng-model="templateProject" ng-options="p.name + ' -- ' + p.description for p in projects | filter: templateFilter(d)">
                     <option value="">-- 选择项目 --</option>
                 </select>
             </td>

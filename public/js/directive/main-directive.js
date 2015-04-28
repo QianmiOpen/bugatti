@@ -163,6 +163,21 @@ define(['angular'], function(angular) {
         }
     }]);
 
+    // change
+    app.directive('ngReallyChange', [function() {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                element.bind('change', function() {
+                    var message = attrs.ngReallyMessage;
+                    if (message && confirm(message)) {
+                        scope.$apply(attrs.ngReallyChange);
+                    }
+                });
+            }
+        }
+    }]);
+
     // 模板名称显示
     app.directive('templateShow', ['TemplateService', function(TemplateService) {
         return {
