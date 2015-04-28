@@ -1,7 +1,7 @@
 package controllers.admin
 
 import controllers.BaseController
-import enums.{RoleEnum, ContainerTypeEnum, ModEnum, StateEnum}
+import enums._
 import models.conf._
 import play.api.data.Forms._
 import play.api.data._
@@ -62,7 +62,8 @@ object RelationController extends BaseController {
           "envId" -> optional(number),
           "projectId" -> optional(number),
           "name" -> text,
-          "value" -> text
+          "value" -> text,
+          "level" -> enums.form.enum(LevelEnum)
         )(Variable.apply)(Variable.unapply)
       )
     )(Host.apply)(Host.unapply)
@@ -95,7 +96,8 @@ object RelationController extends BaseController {
           "envId" -> optional(number),
           "projectId" -> optional(number),
           "name" -> text,
-          "value" -> text
+          "value" -> text,
+          "level" -> enums.form.enum(LevelEnum)
         )(Variable.apply)(Variable.unapply)
       )
     )(HostIp.apply)(HostIp.unapply)

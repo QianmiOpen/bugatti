@@ -51,7 +51,8 @@ object ProjectController extends BaseController {
           "envId" -> optional(number),
           "projectId" -> optional(number),
           "name" -> nonEmptyText,
-          "value" -> nonEmptyText
+          "value" -> nonEmptyText,
+          "level" -> enums.form.enum(LevelEnum)
         )(Variable.apply)(Variable.unapply)
       )
     )(ProjectForm.apply)(ProjectForm.unapply)

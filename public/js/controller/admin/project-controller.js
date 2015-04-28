@@ -104,6 +104,8 @@ define(['angular'], function(angular) {
                 }
                 $scope.envs = data;
                 $scope.envChange(data[0]);
+
+                console.log('data111=', data);
             });
 
             // select env
@@ -112,6 +114,7 @@ define(['angular'], function(angular) {
 
                 // load init variable
                 ProjectService.vars($stateParams.id, $scope.env.id, function(data) {
+                    console.log('data=', data);
                     $scope.vars = data;
                 });
 
@@ -247,7 +250,7 @@ define(['angular'], function(angular) {
                     });
                     _vars = _vars.filter(function(e){return e}); // clear null
                     angular.forEach(data, function(d) {
-                        _vars.unshift({name: d.itemName, value: '', envId: $scope.env.id});  // first add
+                        _vars.unshift({name: d.itemName, value: '', level: d.level, envId: $scope.env.id});  // first add
                     });
                     $scope.vars = _vars;
                 });
@@ -304,26 +307,21 @@ define(['angular'], function(angular) {
                 }
 
                 $scope.vars.push(angular.copy(v));
-                v.name = "", v.value = ""; // clear input value
+                v.name = ""; v.value = ""; v.level = 'unsafe'; // clear input value
             };
 
             function findInVars(vars, v) {
                 var find = -1;
                 angular.forEach(vars, function(_v, index) {
-                    if (_v.name == v.name && _v.envId == v.envId) {
+                    if (find < 0 && _v.name == v.name && _v.envId == v.envId) {
                         find = index;
-                        return;
                     }
                 });
                 return find;
             }
 
-            $scope.editVar = function(repeat$scope) {
-                repeat$scope.mode = 'edit';
-            };
-
             $scope.deleteVar = function(v) {
-                var index = findInVars($scope.vars, v)
+                var index = findInVars($scope.vars, v);
                 if (index != -1) {
                     $scope.vars.splice(index, 1);
                 }
@@ -423,13 +421,13 @@ define(['angular'], function(angular) {
                     ProjectService.vars($stateParams.id, $scope.env.id, function(project_vars) {
                         if (project_vars.length < 1) {
                             angular.forEach(item_vars, function(iv) {
-                                _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                                _vars.push({name: iv.itemName, value: '', level:'unsafe', envId: $scope.env.id});  // first add
                             });
                         }
                         else {
                             angular.forEach(project_vars, function(pv) {
                                 if (findInVars(_vars, pv) === -1) {
-                                    _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                    _vars.unshift({name: pv.name, value: pv.value, level: pv.level, envId: $scope.env.id});  // first add
                                 }
                             });
                         }
@@ -479,23 +477,18 @@ define(['angular'], function(angular) {
                     return;
                 }
                 $scope.vars.push(angular.copy(v));
-                v.name = "", v.value = ""; // clear input value
+                v.name = ""; v.value = ""; v.level='unsafe'; // clear input value
             };
 
             function findInVars(vars, v) {
                 var find = -1;
                 angular.forEach(vars, function(_v, index) {
-                    if (_v.name == v.name && _v.envId == v.envId) {
+                    if (find < 0 && _v.name == v.name && _v.envId == v.envId) {
                         find = index;
-                        return;
                     }
                 });
                 return find;
-            };
-
-            $scope.editVar = function(repeat$scope) {
-                repeat$scope.mode = 'edit';
-            };
+            }
 
             $scope.deleteVar = function(v) {
                 var index = findInVars($scope.vars, v)

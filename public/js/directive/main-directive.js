@@ -1105,23 +1105,18 @@ define(['angular'], function(angular) {
                         }
 
                         $scope.vars.push(angular.copy(v));
-                        v.name = "", v.value = ""; // clear input value
+                        v.name = ""; v.value = ""; v.level = 'unsafe'; // clear input value
                     };
 
                     function findInVars(vars, v) {
                         var find = -1;
                         angular.forEach(vars, function(_v, index) {
-                            if (_v.name == v.name && _v.envId == v.envId) {
+                            if (find < 0 && _v.name == v.name && _v.envId == v.envId) {
                                 find = index;
-                                return;
                             }
                         });
                         return find;
                     }
-
-                    $scope.editVar = function(repeat$scope) {
-                        repeat$scope.mode = 'edit';
-                    };
 
                     $scope.deleteVar = function(v) {
                         var index = findInVars($scope.vars, v)
@@ -1161,12 +1156,12 @@ define(['angular'], function(angular) {
                             ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
                                 if (project_vars.length < 1) {
                                     angular.forEach(item_vars, function(iv) {
-                                        _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                                        _vars.push({name: iv.itemName, value: '', level:'unsafe', envId: $scope.env.id});  // first add
                                     });
                                 }
                                 else if (item_vars.length < 1) {
                                     angular.forEach(project_vars, function(pv) {
-                                        _vars.push({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                        _vars.push({name: pv.name, value: pv.value, level: pv.level, envId: $scope.env.id});  // first add
                                     });
                                 }
                                 else {
@@ -1175,11 +1170,11 @@ define(['angular'], function(angular) {
                                         project_vars.map(function(pv){
                                             if(pv.name == iv.itemName && pv.envId == $scope.env.id){
                                                 replaceFlag = true;
-                                                _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});
+                                                _vars.unshift({name: pv.name, value: pv.value, level: pv.level, envId: $scope.env.id});
                                             }
-                                        })
+                                        });
                                         if(!replaceFlag){
-                                            _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});
+                                            _vars.push({name: iv.itemName, value: '', level:'unsafe', envId: $scope.env.id});
                                         }
                                     });
                                 }
