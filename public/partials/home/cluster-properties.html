@@ -12,9 +12,19 @@
             </td>
             <td >
                 <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="100" placeholder="{{v.meta}}">
+                <input type="hidden" ng-model="v.level"/>
             </td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td ng-if="project.id && env.id" has-project-safe="{{project.id}}" has-env="{{env.id}}">
+                <button ng-show="hasProjectSafe_ || hasEnv_" class="btn btn-success" ng-click="saveOrUpdateProperties(vars)" ng-disabled="form.$invalid"> 保 存 </button>
+                <div ng-hide="hasProjectSafe_ || hasEnv_"class="alert alert-warning" role="alert">暂无修改属性权限</div>
+            </td>
+        </tr>
+        </tfoot>
     </table>
-    <button class="btn btn-success" ng-click="saveOrUpdateProperties(vars)" ng-disabled="form.$invalid"> 保 存 </button>
+
+
 </form>

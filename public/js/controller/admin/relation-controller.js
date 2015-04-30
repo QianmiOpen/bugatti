@@ -296,8 +296,8 @@ define(['angular'], function(angular) {
 
         }]);
 
-    app.controller('RelationShowCtrl', ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService',
-        function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService) {
+    app.controller('RelationShowCtrl', ['$scope', '$stateParams', '$state', '$modal', '$filter', 'growl', 'RelationService', 'ProjectService', 'EnvService',
+        function($scope, $stateParams, $state, $modal, $filter, growl, RelationService, ProjectService, EnvService) {
             RelationService.get($stateParams.id, function(data) {
                 $scope.relation = data;
                 if ($scope.relation) {
@@ -305,6 +305,7 @@ define(['angular'], function(angular) {
                         return;
                     }
                     ProjectService.vars($scope.relation.projectId, $scope.relation.envId, function(project_vars) {
+                        //$scope.vars = $scope.vars = $filter('filter')(project_vars, {level: 'unsafe'});
                         $scope.vars = project_vars;
                         angular.forEach($scope.vars, function(pv) {
                             pv.meta = pv.value;
@@ -325,7 +326,6 @@ define(['angular'], function(angular) {
                 angular.forEach(vars, function(_v, index) {
                     if (_v.name == v.name) {
                         find = _v.value;
-                        return;
                     }
                 });
                 return find;
@@ -334,10 +334,15 @@ define(['angular'], function(angular) {
             $scope.saveOrUpdate = function(vars) {
                 $scope.relation.globalVariable = [];
                 angular.forEach(vars, function(v) {
-                    $scope.relation.globalVariable.push({name: v.name, value: v.value})
+                    $scope.relation.globalVariable.push({name: v.name, value: v.value, level: v.level})
                 });
 
                 RelationService.update($stateParams.id, $scope.relation, function(data) {
+                    if(data == 1){
+                        growl.addSuccessMessage("修改成功")
+                    }else {
+                        growl.addErrorMessage("修改失败");
+                    }
                     $state.go("admin.relation");
                 });
             };

@@ -173,7 +173,20 @@ object RelationController extends BaseController {
         val msg = Json.obj("mod" -> ModEnum.relation.toString, "user" -> request.user.jobNo,
           "ip" -> request.remoteAddress, "msg" -> "修改关系", "data" -> Json.toJson(relation)).toString
         ALogger.info(msg)
-        Ok(Json.toJson(HostHelper.update(relation)))
+        UserHelper.admin_?(request.user) match {
+          case true =>
+            Ok(Json.toJson(HostHelper.update(relation)))
+          case false =>
+            HostHelper.findById(id) match {
+              case Some(host) if host.projectId.nonEmpty && host.envId.nonEmpty =>
+                if (UserHelper.hasProjectSafe(host.projectId.get, request.user) ||
+                  UserHelper.hasEnv(host.envId.get, request.user)) {
+                  Ok(Json.toJson(HostHelper.update(relation)))
+                } else Forbidden
+              case None => NotFound
+              case _ => BadRequest
+            }
+        }
       }
     )
   }

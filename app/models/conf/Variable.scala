@@ -4,6 +4,7 @@ import models.PlayCache
 import play.api.Play.current
 import enums.LevelEnum
 import enums.LevelEnum.Level
+import utils.SecurityUtil
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend
@@ -35,25 +36,23 @@ object VariableHelper extends PlayCache {
 
   val qVariable = TableQuery[VariableTable]
 
-  def findById(id: Int): Option[Variable] = db withSession { implicit session =>
-    qVariable.filter(_.id === id).firstOption
-  }
-
-  def findByEnvId(envId: Int): Seq[Variable] = db withSession { implicit session =>
-    qVariable.filter(_.envId === envId).list
-  }
-
-  def findByProjectId(projectId: Int): Seq[Variable] = db withSession { implicit session =>
-    qVariable.filter(_.projectId === projectId).list
-  }
-
   def findByEnvId_ProjectId(envId: Int, projectId: Int): Seq[Variable] = db withSession { implicit session =>
-    qVariable.filter(v => v.envId === envId && v.projectId === projectId).list
+    qVariable.filter(v => v.envId === envId && v.projectId === projectId).list.map { v =>
+      v.level match {
+        case LevelEnum.safe => v.copy(value = SecurityUtil.decryptUK(v.value))
+        case _ => v
+      }
+    }
   }
 
   def _create(variables: Seq[Variable])(implicit session: JdbcBackend#Session) = {
-
-    qVariable.insertAll(variables: _*)(session)
+    val _variables = variables.map { v =>
+      v.level match {
+        case LevelEnum.safe => v.copy(value = SecurityUtil.encryptUK(v.value))
+        case _ => v
+      }
+    }
+    qVariable.insertAll(_variables: _*)(session)
   }
 
   def create(variables: Seq[Variable]) = db withSession{ implicit session =>

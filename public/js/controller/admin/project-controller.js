@@ -105,7 +105,6 @@ define(['angular'], function(angular) {
                 $scope.envs = data;
                 $scope.envChange(data[0]);
 
-                console.log('data111=', data);
             });
 
             // select env
@@ -114,7 +113,6 @@ define(['angular'], function(angular) {
 
                 // load init variable
                 ProjectService.vars($stateParams.id, $scope.env.id, function(data) {
-                    console.log('data=', data);
                     $scope.vars = data;
                 });
 
@@ -162,7 +160,6 @@ define(['angular'], function(angular) {
             $scope.memberUp = function(mid, msg) {
                 if (confirm(msg)) {
                     ProjectService.updateMember(mid, "up", function(data) {
-                        console.log('data=' + data);
                         if (data.r == 'exist') {
                             growl.addWarnMessage('出于安全问题，项目管理员最多3人！请根据实际情况调整。');
                         } else {

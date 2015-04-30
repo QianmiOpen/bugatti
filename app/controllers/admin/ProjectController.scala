@@ -159,15 +159,25 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   // 项目属性
   // ----------------------------------------------------------
-  def atts(projectId: Int) = Action {
+  def atts(projectId: Int) = AuthAction() { implicit request =>
     Ok(Json.toJson(AttributeHelper.findByProjectId(projectId)))
   }
 
   // ----------------------------------------------------------
   // 项目环境变量
   // ----------------------------------------------------------
-  def vars(projectId: Int, envId: Int) = Action {
-    Ok(Json.toJson(VariableHelper.findByEnvId_ProjectId(envId, projectId)))
+  def vars(projectId: Int, envId: Int) = AuthAction() { implicit request =>
+    val _vars = VariableHelper.findByEnvId_ProjectId(envId, projectId)
+    if (UserHelper.hasProjectSafe(projectId, request.user) || UserHelper.hasEnv(envId, request.user)) {
+      Ok(Json.toJson(_vars))
+    } else {
+      Ok(Json.toJson(_vars.map { v =>
+        v.level match {
+          case LevelEnum.safe => v.copy(value = "*" * 8)
+          case _ => v
+        }
+      }))
+    }
   }
 
   // ----------------------------------------------------------

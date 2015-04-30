@@ -857,8 +857,8 @@ define(['angular'], function(angular) {
                 c: "="
             },
             templateUrl: 'partials/home/cluster-properties.html',
-            controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
-                function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
+            controller: ['$scope', '$stateParams', '$state', '$modal', '$filter', 'RelationService', 'ProjectService', 'EnvService', 'growl',
+                function($scope, $stateParams, $state, $modal, $filter, RelationService, ProjectService, EnvService, growl) {
                     $scope.delayLoadProperties = function(){
                         RelationService.get($scope.c.id, function(data) {
                             $scope.relation = data;
@@ -867,6 +867,7 @@ define(['angular'], function(angular) {
                                     return;
                                 }
                                 ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
+                                    //$scope.vars = $filter('filter')(project_vars, {level: 'unsafe'});
                                     $scope.vars = project_vars;
                                     angular.forEach($scope.vars, function(pv) {
                                         pv.meta = pv.value;
@@ -897,7 +898,7 @@ define(['angular'], function(angular) {
                     $scope.saveOrUpdateProperties = function(vars) {
                         $scope.relation.globalVariable = [];
                         angular.forEach(vars, function(v) {
-                            $scope.relation.globalVariable.push({name: v.name, value: v.value})
+                            $scope.relation.globalVariable.push({name: v.name, value: v.value, level: v.level})
                         });
                         RelationService.update($scope.c.id, $scope.relation, function(data) {
                             if(data == 1){

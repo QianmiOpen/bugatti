@@ -36,6 +36,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def containerType = column[Container]("container_type", O.Default(ContainerTypeEnum.vm), O.DBType("ENUM('vm', 'docker')"))
   def hostIp = column[String]("host_ip", O.Nullable)
   def hostName = column[String]("host_name", O.Nullable)
+  // 覆盖项目属性，仅记录key\value普通键值对
   def globalVariable = column[Seq[Variable]]("global_variable", O.DBType("text"))(MappedColumnType.base[Seq[Variable], String](
     _.filter(!_.value.isEmpty).map(v => s"${v.name}:${v.value}").mkString(","),
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList

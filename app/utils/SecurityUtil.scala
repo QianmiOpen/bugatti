@@ -13,7 +13,7 @@ object SecurityUtil {
   val u_ssh_key = app.configuration.getString("user.ssh_key").getOrElse("i4Epmvt3p?dG2si8")
 
   /**
-   * 加密用户KEY
+   * 加密KEY
    * @param value 无密内容
    * @return
    */
@@ -28,7 +28,7 @@ object SecurityUtil {
   }
 
   /**
-   * 解密用户KEY
+   * 解密KEY
    * @param value 加密内容
    * @return
    */

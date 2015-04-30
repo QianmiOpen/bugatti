@@ -4,7 +4,6 @@
 </div>
 
 <form name="form" class="form-horizontal" novalidate>
-
     <div class="form-group">
         <label for="name" class="col-sm-3 control-label">项目名称：</label>
         <div class="col-sm-5">
@@ -59,71 +58,71 @@
  </form>
 
  <form class="form-horizontal" name="varForm" novalidate>
- <div class="form-group">
-     <label class="col-sm-3 control-label">项目环境变量：</label>
-     <div class="col-sm-8">
+     <div class="form-group">
+         <label class="col-sm-3 control-label">项目环境变量：</label>
+         <div class="col-sm-8">
 
-         <table class="table table-striped border-less m0">
-             <tbody>
-             <tr ng-repeat="vs in vars | filter: {envId: env.id}" ng-class="{warning: vs.name.indexOf('t_') === 0}">
-                 <td class="col-sm-4" style="vertical-align: middle">
-                     <input class="form-control" ng-disabled="vs.name.indexOf('t_') === 0" ng-model="vs.name" name="{{vs.name}}" maxlength="200" required/>
-                 </td>
-                 <td class="col-sm-4" style="vertical-align: middle">
-                     <input class="form-control" ng-model="vs.value" name="{{vs.value}}" maxlength="200" required/>
-                 </td>
-                 <td class="col-sm-3" style="vertical-align: middle">
-                     <label tooltip="公开key"><input type="radio" ng-model="vs.level" value="unsafe"/> unsafe</label>
-                     <label tooltip="私密key"><input type="radio" ng-model="vs.level" value="safe"/> safe</label>
-                 </td>
-                 <td>
-                     <button ng-if="vs.name.indexOf('t_') !== 0" ng-click="deleteVar(vs)"><span class="glyphicon glyphicon-remove"></span></button>
-                 </td>
-             </tr>
-             </tbody>
-             <tfoot ng-init="v = { name: '', value: '', level: 'unsafe', envId: env.id}">
-                 <tr>
-                     <td class="text-right col-sm-4" style="padding-left: 0">
-                         <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t_).*$/i" >
+             <table class="table table-striped border-less m0">
+                 <tbody>
+                 <tr ng-repeat="vs in vars | filter: {envId: env.id}" ng-class="{warning: vs.name.indexOf('t_') === 0}">
+                     <td class="col-sm-4" style="vertical-align: middle">
+                         <input class="form-control" ng-disabled="vs.name.indexOf('t_') === 0" ng-model="vs.name" name="{{vs.name}}" maxlength="200" required/>
                      </td>
-                     <td class="col-sm-4" >
-                         <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="200" placeholder="变量值">
+                     <td class="col-sm-4" style="vertical-align: middle">
+                         <input class="form-control" ng-model="vs.value" name="{{vs.value}}" maxlength="200" required/>
                      </td>
-                     <td class="col-sm-3 pl0">
-                         <label tooltip="公开key"><input type="radio" ng-model="v.level" value="unsafe"/> unsafe</label>
-                         <label tooltip="私密key"><input type="radio" ng-model="v.level" value="safe"/> safe</label>
+                     <td class="col-sm-3" style="vertical-align: middle">
+                         <label tooltip="公开属性"><input type="radio" ng-model="vs.level" value="unsafe"/> unsafe</label>
+                         <label tooltip="私密属性"><input type="radio" ng-model="vs.level" value="safe"/> safe</label>
                      </td>
                      <td>
-                         <button ng-if="env" type="button" ng-click="addVar(v)"  ng-disabled="varForm.$invalid" class="btn btn-success glyphicon glyphicon-saved"></button>
+                         <button ng-if="vs.name.indexOf('t_') !== 0" ng-click="deleteVar(vs)" class="btn btn-danger btn-xs glyphicon glyphicon-minus" tooltip="删减属性"></button>
                      </td>
                  </tr>
-                 <tr>
-                     <td class="col-sm-4">
-                         <div ng-show="varForm.varName.$invalid" class="has-error mt-16">
-                             <span ng-show="varForm.varName.$error.required" class="control-label">请输入变量名</span>
-                             <span ng-show="varForm.varName.$error.unique" class="control-label">变量名重复</span>
-                             <span ng-show="varForm.varName.$error.maxlength" class="control-label">变量名超过长度</span>
-                             <span ng-show="varForm.varName.$error.pattern" class="control-label">变量名格式错误</span>
-                         </div>
-                     </td>
-                     <td class="col-sm-4">
-                         <div ng-show="varForm.varValue.$invalid" class="has-error mt-16">
-                             <span ng-show="varForm.varValue.$error.required" class="control-label">请输入变量值</span>
-                             <span ng-show="varForm.varValue.$error.maxlength" class="control-label">变量值超过长度</span>
-                             <span ng-show="varForm.varValue.$error.pattern" class="control-label">变量值不能有冒号和逗号</span>
-                         </div>
-                     </td>
-                     <td>&nbsp;</td>
-                 </tr>
-             </tfoot>
-         </table>
+                 </tbody>
+                 <tfoot ng-init="v = { name: '', value: '', level: 'unsafe', envId: env.id}">
+                     <tr>
+                         <td class="text-right col-sm-4" style="padding-left: 0">
+                             <input type="text" class="form-control" name="varName" ng-model="v.name" ng-maxlength="200" placeholder="变量名" ng-pattern="/^(?!t_).*$/i" >
+                         </td>
+                         <td class="col-sm-4" >
+                             <input type="text" class="form-control" name="varValue" ng-model="v.value" ng-maxlength="200" placeholder="变量值">
+                         </td>
+                         <td class="col-sm-3 pl0">
+                             <label tooltip="公开属性"><input type="radio" ng-model="v.level" value="unsafe"/> unsafe</label>
+                             <label tooltip="私密属性"><input type="radio" ng-model="v.level" value="safe"/> safe</label>
+                         </td>
+                         <td>
+                             <button ng-if="env" type="button" ng-click="addVar(v)"  ng-disabled="varForm.$invalid" class="btn btn-warning btn-xs glyphicon glyphicon-plus" tooltip="增加属性"></button>
+                         </td>
+                     </tr>
+                     <tr>
+                         <td class="col-sm-4">
+                             <div ng-show="varForm.varName.$invalid" class="has-error mt-16">
+                                 <span ng-show="varForm.varName.$error.required" class="control-label">请输入变量名</span>
+                                 <span ng-show="varForm.varName.$error.unique" class="control-label">变量名重复</span>
+                                 <span ng-show="varForm.varName.$error.maxlength" class="control-label">变量名超过长度</span>
+                                 <span ng-show="varForm.varName.$error.pattern" class="control-label">变量名格式错误</span>
+                             </div>
+                         </td>
+                         <td class="col-sm-4">
+                             <div ng-show="varForm.varValue.$invalid" class="has-error mt-16">
+                                 <span ng-show="varForm.varValue.$error.required" class="control-label">请输入变量值</span>
+                                 <span ng-show="varForm.varValue.$error.maxlength" class="control-label">变量值超过长度</span>
+                                 <span ng-show="varForm.varValue.$error.pattern" class="control-label">变量值不能有冒号和逗号</span>
+                             </div>
+                         </td>
+                         <td>&nbsp;</td>
+                     </tr>
+                 </tfoot>
+             </table>
+         </div>
      </div>
- </div>
  </form>
 
 <div class="form-group">
     <div class="col-sm-offset-3 col-sm-5 pl0">
-        <button class="btn btn-success" ng-click="saveOrUpdate(project)" ng-disabled="form.$invalid || varForm.$invalid"> 保 存 </button>
+        <button class="btn btn-success" ng-click="saveOrUpdate(project)" ng-disabled="form.$invalid || varForm.$invalid||v.name.trim().length > 0||v.value.trim().length > 0"> 保 存 </button>
         <button ng-if="$stateParams.id" class="btn btn-link" ng-click="reset()" ng-disabled="isUnchanged(project)" >重置</button>
     </div>
 </div>
