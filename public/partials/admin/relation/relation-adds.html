@@ -87,6 +87,13 @@
     </div>
 
     <div class="form-group">
+        <label for="ipClash" class="col-sm-3 control-label">ipClash：</label>
+        <div class="col-sm-2">
+            <input class="form-control" id="ipClash" name="ipClash" ng-model="rel.ipClash" type="text" maxlength="20" required/>
+        </div>
+    </div>
+
+    <div class="form-group">
         <label for="state" class="col-sm-3 control-label">state：</label>
         <div class="col-sm-5">
             <select class="form-control" id="state" name="state" ng-model="rel.state" ng-options="s.id as s.name for s in states" required>

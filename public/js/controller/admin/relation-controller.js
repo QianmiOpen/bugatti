@@ -237,7 +237,7 @@ define(['angular'], function(angular) {
             $scope.ip = {a: '', b: '', c: '', d: '', e: ''};
 
             $scope.rel = {envId: '', projectId: '', areaId: '', syndicName: '', spiritId: '',
-                name: '', ip: '', state: 'no salt key', containerType: 'vm', hostIp: '', hostName: ''};
+                name: '', ip: '', ipClash: 0, state: 'no salt key', containerType: 'vm', hostIp: '', hostName: ''};
 
             EnvService.getAll(function(data) {
                 $scope.envs = data;

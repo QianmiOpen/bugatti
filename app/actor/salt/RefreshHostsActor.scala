@@ -88,7 +88,7 @@ class RefreshHostsActor(spiritId: Int, realSender: ActorRef) extends LoggingFSM[
         if (ssr.mmInfo.nonEmpty) {
           val ip = getIpFromRet(ssr)
           if (ip != null) {
-            HostHelper.create(Host(None, None, None, None, None, "", spiritId, ssr.hostName, ip, state, ContainerTypeEnum.vm, None, None, Seq.empty))
+            HostHelper.create(Host(None, None, None, None, None, "", spiritId, ssr.hostName, ip, 0, state, ContainerTypeEnum.vm, None, None, Seq.empty))
           }
         } else {
           log.warning("Try to get, but no mminfo.")

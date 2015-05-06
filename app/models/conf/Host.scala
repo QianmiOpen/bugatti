@@ -17,10 +17,22 @@ import scala.language.implicitConversions
  * 环境和项目的关系配置
  */
 case class Host(id: Option[Int], envId: Option[Int], projectId: Option[Int], preProjectId: Option[Int], areaId: Option[Int],
-                                 syndicName: String, spiritId: Int, name: String, ip: String, state: State,
+                                 syndicName: String, spiritId: Int, name: String, ip: String, ipClash: Int, state: State,
                                  containerType: Container, hostIp: Option[String], hostName: Option[String],
                                  globalVariable: Seq[Variable])
 case class EnvRelForm(envId: Int, projectId: Int, ids: Seq[Int])
+
+case class Ip(a: Int, b: Int, c: Int, d: Int, e: Int)
+case class HostIp(id: Option[Int], envId: Option[Int], projectId: Option[Int], preProjectId: Option[Int], areaId: Option[Int],
+                  syndicName: String, spiritId: Int, name: String, ip: Ip, ipClash: Int, state: State,
+                  containerType: Container, hostIp: Option[String], hostName: Option[String],
+                  globalVariable: Seq[Variable]) {
+  val hosts = (ip.d to ip.e) map { i =>
+    val _ip = ip.a + "." + ip.b + "." + ip.c + "." + i
+    Host(id, envId, projectId, preProjectId, areaId, syndicName, spiritId, name = name.format(i), _ip, ipClash, state,
+      containerType, hostIp, hostName, globalVariable)
+  }
+}
 
 class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -32,6 +44,7 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
   def spiritId = column[Int]("spirit_id")
   def name = column[String]("name")
   def ip = column[String]("ip")
+  def ipClash = column[Int]("ip_clash", O.Default(0))
   def state = column[State]("state", O.Default(StateEnum.noKey))
   def containerType = column[Container]("container_type", O.Default(ContainerTypeEnum.vm), O.DBType("ENUM('vm', 'docker')"))
   def hostIp = column[String]("host_ip", O.Nullable)
@@ -42,17 +55,18 @@ class HostTable(tag: Tag) extends Table[Host](tag, "host") {
     _.split(",").filterNot(_.trim.isEmpty).map(_.split(":") match { case Array(name, value) => new Variable(name, value) }).toList
   ))
 
-  override def * = (id.?, envId.?, projectId.?, preProjectId.?, areaId.?, syndicName, spiritId, name, ip, state, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
+  override def * = (id.?, envId.?, projectId.?, preProjectId.?, areaId.?, syndicName, spiritId, name, ip, ipClash, state, containerType, hostIp.?, hostName.?, globalVariable) <> (Host.tupled, Host.unapply _)
   index("idx_eid_pid", (envId, projectId))
-  index("idx_ip", ip, unique = true)
+  index("idx_ip", (ip, ipClash), unique = true)
 }
 
 object HostHelper {
-  implicit def maybeFilterConversor[X,Y](q:Query[X,Y,Seq]) = new MaybeFilter(q)
   import models.AppDB._
   val qHost = TableQuery[HostTable]
   val qEnv = TableQuery[EnvironmentTable]
   val qProject = TableQuery[ProjectTable]
+
+  implicit def maybeFilterConversor[X,Y](q:Query[X,Y,Seq]) = new MaybeFilter(q)
 
   def findById(id: Int): Option[Host] = db withSession { implicit session =>
     qHost.filter(_.id === id).firstOption

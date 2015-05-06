@@ -7,8 +7,6 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json._
 import play.api.mvc.Action
-import enums.ContainerTypeEnum.Container
-import enums.StateEnum.State
 
 /**
  * 项目于环境关系配置
@@ -20,18 +18,6 @@ object RelationController extends BaseController {
   implicit val variableWrites = Json.writes[Variable]
   implicit val relationWrites = Json.writes[Host]
   implicit val relationFormWrites = Json.writes[EnvRelForm]
-
-  case class Ip(a: Int, b: Int, c: Int, d: Int, e: Int)
-  case class HostIp(id: Option[Int], envId: Option[Int], projectId: Option[Int], preProjectId: Option[Int], areaId: Option[Int],
-                  syndicName: String, spiritId: Int, name: String, ip: Ip, state: State,
-                  containerType: Container, hostIp: Option[String], hostName: Option[String],
-                  globalVariable: Seq[Variable]) {
-    val hosts = (ip.d to ip.e) map { i =>
-      val _ip = ip.a + "." + ip.b + "." + ip.c + "." + i
-      Host(id, envId, projectId, preProjectId, areaId, syndicName, spiritId, name = name.format(i), _ip, state,
-        containerType, hostIp, hostName, globalVariable)
-    }
-  }
 
   val relationForm = Form(
     mapping(
@@ -52,6 +38,7 @@ object RelationController extends BaseController {
       "spiritId" -> number,
       "name" -> text,
       "ip" -> text,
+      "ipClash" -> default(number, 0),
       "state" -> enums.form.enum(StateEnum),
       "containerType" -> enums.form.enum(ContainerTypeEnum),
       "hostIp" -> optional(text),
@@ -86,6 +73,7 @@ object RelationController extends BaseController {
         "d" -> number(min = 0, max = 255),
         "e" -> number(min = 0, max = 255)
       )(Ip.apply)(Ip.unapply),
+      "ipClash" -> default(number, 0),
       "state" -> enums.form.enum(StateEnum),
       "containerType" -> enums.form.enum(ContainerTypeEnum),
       "hostIp" -> optional(text),
