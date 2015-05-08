@@ -1,0 +1,10 @@
+import _ "github.com/tbud/seeds/present/tasks"
+
+TaskConfig("present", Config{
+        "theme":    "njagile",
+        "httpAddr": "127.0.0.1:4001",
+})
+
+UseTasks("present")
+
+Task("default", Tasks("present.run"))
