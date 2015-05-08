@@ -21,6 +21,9 @@ define(['angular'], function(angular) {
             count: function(ip, envId, projectId, callback) {
                 $http(PlayRoutes.controllers.admin.RelationController.count(ip, envId, projectId)).success(callback);
             },
+            remove: function(id, callback) {
+                $http(PlayRoutes.controllers.admin.RelationController.delete(id)).success(callback);
+            },
             unbind: function(id, callback) {
                 $http(PlayRoutes.controllers.admin.RelationController.unbind(id)).success(callback);
             },
@@ -29,6 +32,12 @@ define(['angular'], function(angular) {
             },
             update: function(id, relation, callback) {
                 $http.put(PlayRoutes.controllers.admin.RelationController.update(id).url, relation).success(callback)
+            },
+            save: function(rels, callback) {
+                $http.post(PlayRoutes.controllers.admin.RelationController.save().url, rels).success(callback)
+            },
+            saveBatch: function(rels, callback) {
+                $http.post(PlayRoutes.controllers.admin.RelationController.saveBatch().url, rels).success(callback)
             },
             hosts: function(envId, areaId, callback) {
                 $http(PlayRoutes.controllers.admin.RelationController.hosts(envId, areaId)).success(callback)

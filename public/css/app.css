@@ -54,6 +54,7 @@ code {
 }
 .lead{margin-bottom:18px;font-size:14px;font-weight:200;line-height:1.4}
 .p0 {padding: 0}
+.pl0{padding-left: 0px;}
 .pl8{padding-left: 8px;}
 .m0 {
     margin: 0;
@@ -73,6 +74,8 @@ code {
 .red {color: #ff0000}
 .fwn{ font-weight: normal;}
 .width300 { width: 300px;}
+.width250 { width: 250px;}
+.width-ip { width: 50px; }
 span.header-version {
     font-size: small;
 }

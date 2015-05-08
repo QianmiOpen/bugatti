@@ -53,8 +53,8 @@ POST          /spirit                                             controllers.ad
 PUT           /spirit/:id                                         controllers.admin.SpiritController.update(id: Int)
 
 # Project
-GET           /project                                            controllers.admin.ProjectController.index(projectName: Option[String], page: Int ?=0, pageSize: Int ?=30)
-GET           /project/total                                      controllers.admin.ProjectController.count(projectName: Option[String])
+GET           /project                                            controllers.admin.ProjectController.index(projectName: Option[String], templateId: Option[Int], page: Int ?=0, pageSize: Int ?=30)
+GET           /project/total                                      controllers.admin.ProjectController.count(projectName: Option[String], templateId: Option[Int])
 GET           /project/all                                        controllers.admin.ProjectController.all
 GET           /project/my                                         controllers.admin.ProjectController.my(jobNo: String)
 GET           /project/allExceptSelf/:id                          controllers.admin.ProjectController.allExceptSelf(id: Int)
@@ -125,8 +125,11 @@ GET           /relation/ips                                       controllers.ad
 GET           /relation/hosts                                     controllers.admin.RelationController.hosts(envId: Int, areaId: Int)
 GET           /relation/:id                                       controllers.admin.RelationController.show(id: Int)
 POST          /relation                                           controllers.admin.RelationController.bind
+POST          /relation/save                                      controllers.admin.RelationController.save
+POST          /relation/save_batch                                controllers.admin.RelationController.saveBatch
 PUT           /relation/:id                                       controllers.admin.RelationController.update(id: Int)
 DELETE        /relation/:id                                       controllers.admin.RelationController.unbind(id: Int)
+DELETE        /relation/:id/remove                                controllers.admin.RelationController.delete(id: Int)
 
 # System
 GET           /system                                             controllers.admin.SystemController.index

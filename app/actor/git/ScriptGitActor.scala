@@ -233,7 +233,7 @@ class ScriptGitActor(gitInfo: GitInfo) extends Actor with ActorLogging {
                       e =>
                         val seq = VariableHelper.findByEnvId_ProjectId(e.id.get, p.id.get).filter(s => s.name == itemName)
                         if (seq.size == 0) {
-                          VariableHelper.create(Seq(Variable(None, e.id, p.id, itemName, default)))
+                          VariableHelper.create(Seq(Variable(None, e.id, p.id, itemName, default, enums.LevelEnum.unsafe)))
                         }
                     }
                   }else {

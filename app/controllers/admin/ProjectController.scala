@@ -51,18 +51,19 @@ object ProjectController extends BaseController {
           "envId" -> optional(number),
           "projectId" -> optional(number),
           "name" -> nonEmptyText,
-          "value" -> nonEmptyText
+          "value" -> nonEmptyText,
+          "level" -> enums.form.enum(LevelEnum)
         )(Variable.apply)(Variable.unapply)
       )
     )(ProjectForm.apply)(ProjectForm.unapply)
   )
 
-  def index(projectName: Option[String], page: Int, pageSize: Int) = AuthAction() { implicit request =>
-    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), page, pageSize)))
+  def index(projectName: Option[String], templateId: Option[Int], page: Int, pageSize: Int) = AuthAction() { implicit request =>
+    Ok(Json.toJson(ProjectHelper.all(projectName.filterNot(_.isEmpty), templateId, page, pageSize)))
   }
 
-  def count(projectName: Option[String]) = AuthAction() { implicit request =>
-    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty))))
+  def count(projectName: Option[String], templateId: Option[Int]) = AuthAction() { implicit request =>
+    Ok(Json.toJson(ProjectHelper.count(projectName.filterNot(_.isEmpty), templateId)))
   }
 
   def show(id: Int) = Action {
@@ -158,15 +159,25 @@ object ProjectController extends BaseController {
   // ----------------------------------------------------------
   // 项目属性
   // ----------------------------------------------------------
-  def atts(projectId: Int) = Action {
+  def atts(projectId: Int) = AuthAction() { implicit request =>
     Ok(Json.toJson(AttributeHelper.findByProjectId(projectId)))
   }
 
   // ----------------------------------------------------------
   // 项目环境变量
   // ----------------------------------------------------------
-  def vars(projectId: Int, envId: Int) = Action {
-    Ok(Json.toJson(VariableHelper.findByEnvId_ProjectId(envId, projectId)))
+  def vars(projectId: Int, envId: Int) = AuthAction() { implicit request =>
+    val _vars = VariableHelper.findByEnvId_ProjectId(envId, projectId)
+    if (UserHelper.hasProjectSafe(projectId, request.user) || UserHelper.hasEnv(envId, request.user)) {
+      Ok(Json.toJson(_vars))
+    } else {
+      Ok(Json.toJson(_vars.map { v =>
+        v.level match {
+          case LevelEnum.safe => v.copy(value = "*" * 8)
+          case _ => v
+        }
+      }))
+    }
   }
 
   // ----------------------------------------------------------
@@ -206,7 +217,8 @@ object ProjectController extends BaseController {
         if (!UserHelper.hasProjectSafe(member.projectId, request.user)) Forbidden
         else op match {
           case "up" =>
-            if (ProjectMemberHelper.findByProjectId(member.projectId).count(_.level == LevelEnum.safe) >= 3) {
+            if (!UserHelper.admin_?(request.user) &&
+              ProjectMemberHelper.findByProjectId(member.projectId).count(_.level == LevelEnum.safe) >= 3) {
               Ok(_Exist)
             } else {
               ALogger.info(msg(request.user.jobNo, request.remoteAddress, "升级项目成员", member))

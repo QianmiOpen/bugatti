@@ -4,8 +4,8 @@ define(['angular'], function(angular) {
 
     var app = angular.module('bugattiApp.controller.admin.projectModule', ['ngCookies']);
 
-    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$cookies', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService',
-        function($scope, $state, $stateParams, $cookies, $modal, growl, ProjectService, VersionService, EnvService) {
+    app.controller('ProjectCtrl', ['$scope', '$state', '$stateParams', '$cookies', '$modal', 'growl', 'ProjectService', 'VersionService', 'EnvService', 'TemplateService',
+        function($scope, $state, $stateParams, $cookies, $modal, growl, ProjectService, VersionService, EnvService, TemplateService) {
             $scope.app.breadcrumb='项目管理';
             $scope.currentPage = 1;
             $scope.pageSize = 20;
@@ -17,9 +17,16 @@ define(['angular'], function(angular) {
                 }
                 $scope.envId = data[0].id;
             });
+            TemplateService.all(function(data) {
+                $scope.templates = data;
+            });
 
-            $scope.searchForm = function(projectName) {
+            $scope.tempSelect = function(e) {
+                e = e == null ? undefined : e;
+                $scope.s_template = e;
+            };
 
+            $scope.searchForm = function(projectName, templateId) {
                 // 保持搜索状态
                 if (angular.isDefined(projectName)) {
                     $cookies.search_project_name = projectName;
@@ -31,21 +38,21 @@ define(['angular'], function(angular) {
                 }
 
                 // count
-                ProjectService.count(projectName, function(data) {
+                ProjectService.count(projectName, templateId, function(data) {
                     $scope.totalItems = data;
                 });
 
                 // list
-                ProjectService.getPage(projectName, 0, $scope.pageSize, function(data) {
+                ProjectService.getPage(projectName, templateId, 0, $scope.pageSize, function(data) {
                     $scope.projects = data;
                 });
             };
 
-            $scope.searchForm($scope.s_projectName);
+            $scope.searchForm($scope.s_projectName, $scope.s_template);
 
             // page
             $scope.setPage = function (pageNo) {
-                ProjectService.getPage($scope.s_projectName, pageNo - 1, $scope.pageSize, function(data) {
+                ProjectService.getPage($scope.s_projectName, $scope.s_template, pageNo - 1, $scope.pageSize, function(data) {
                     $scope.projects = data;
                 });
             };
@@ -76,6 +83,8 @@ define(['angular'], function(angular) {
                     }
                 });
             };
+
+
     }]);
 
     app.controller('ProjectShowCtrl', ['$scope', '$stateParams', '$modal', 'growl', 'ProjectService', 'EnvService',
@@ -95,6 +104,7 @@ define(['angular'], function(angular) {
                 }
                 $scope.envs = data;
                 $scope.envChange(data[0]);
+
             });
 
             // select env
@@ -150,7 +160,6 @@ define(['angular'], function(angular) {
             $scope.memberUp = function(mid, msg) {
                 if (confirm(msg)) {
                     ProjectService.updateMember(mid, "up", function(data) {
-                        console.log('data=' + data);
                         if (data.r == 'exist') {
                             growl.addWarnMessage('出于安全问题，项目管理员最多3人！请根据实际情况调整。');
                         } else {
@@ -238,7 +247,7 @@ define(['angular'], function(angular) {
                     });
                     _vars = _vars.filter(function(e){return e}); // clear null
                     angular.forEach(data, function(d) {
-                        _vars.unshift({name: d.itemName, value: '', envId: $scope.env.id});  // first add
+                        _vars.unshift({name: d.itemName, value: '', level: d.level, envId: $scope.env.id});  // first add
                     });
                     $scope.vars = _vars;
                 });
@@ -275,7 +284,7 @@ define(['angular'], function(angular) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
-                };
+                }
                 if (v.name.trim().length < 1 && v.value.trim().length < 1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varValue.$invalid = true;
@@ -295,26 +304,21 @@ define(['angular'], function(angular) {
                 }
 
                 $scope.vars.push(angular.copy(v));
-                v.name = "", v.value = ""; // clear input value
+                v.name = ""; v.value = ""; v.level = 'unsafe'; // clear input value
             };
 
             function findInVars(vars, v) {
                 var find = -1;
                 angular.forEach(vars, function(_v, index) {
-                    if (_v.name == v.name && _v.envId == v.envId) {
+                    if (find < 0 && _v.name == v.name && _v.envId == v.envId) {
                         find = index;
-                        return;
                     }
                 });
                 return find;
             }
 
-            $scope.editVar = function(repeat$scope) {
-                repeat$scope.mode = 'edit';
-            };
-
             $scope.deleteVar = function(v) {
-                var index = findInVars($scope.vars, v)
+                var index = findInVars($scope.vars, v);
                 if (index != -1) {
                     $scope.vars.splice(index, 1);
                 }
@@ -414,13 +418,13 @@ define(['angular'], function(angular) {
                     ProjectService.vars($stateParams.id, $scope.env.id, function(project_vars) {
                         if (project_vars.length < 1) {
                             angular.forEach(item_vars, function(iv) {
-                                _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                                _vars.push({name: iv.itemName, value: '', level:'unsafe', envId: $scope.env.id});  // first add
                             });
                         }
                         else {
                             angular.forEach(project_vars, function(pv) {
                                 if (findInVars(_vars, pv) === -1) {
-                                    _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                    _vars.unshift({name: pv.name, value: pv.value, level: pv.level, envId: $scope.env.id});  // first add
                                 }
                             });
                         }
@@ -451,7 +455,7 @@ define(['angular'], function(angular) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varName.$error.unique = true;
                     return;
-                };
+                }
                 if (v.name.trim().length < 1 && v.value.trim().length < 1) {
                     $scope.varForm.varName.$invalid = true;
                     $scope.varForm.varValue.$invalid = true;
@@ -470,23 +474,18 @@ define(['angular'], function(angular) {
                     return;
                 }
                 $scope.vars.push(angular.copy(v));
-                v.name = "", v.value = ""; // clear input value
+                v.name = ""; v.value = ""; v.level='unsafe'; // clear input value
             };
 
             function findInVars(vars, v) {
                 var find = -1;
                 angular.forEach(vars, function(_v, index) {
-                    if (_v.name == v.name && _v.envId == v.envId) {
+                    if (find < 0 && _v.name == v.name && _v.envId == v.envId) {
                         find = index;
-                        return;
                     }
                 });
                 return find;
-            };
-
-            $scope.editVar = function(repeat$scope) {
-                repeat$scope.mode = 'edit';
-            };
+            }
 
             $scope.deleteVar = function(v) {
                 var index = findInVars($scope.vars, v)

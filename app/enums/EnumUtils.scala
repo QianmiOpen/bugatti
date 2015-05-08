@@ -19,6 +19,21 @@ object EnumUtils {
       }
     }
 
+  def enumReadsId[E <: Enumeration](enum: E): Reads[E#Value] =
+    new Reads[E#Value] {
+      def reads(json: JsValue): JsResult[E#Value] = json match {
+        case JsNumber(s) => {
+          try {
+            JsSuccess(enum(s.toInt))
+          } catch {
+            case _: NoSuchElementException =>
+              JsError(s"Enumeration expected of type: '${enum.getClass}', but it does not appear to contain the value: '$s'")
+          }
+        }
+        case _ => JsError("String value expected")
+      }
+    }
+
   implicit def enumWrites[E <: Enumeration]: Writes[E#Value] =
     new Writes[E#Value] {
       def writes(v: E#Value): JsValue = JsString(v.toString)

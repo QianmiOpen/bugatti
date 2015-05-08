@@ -213,7 +213,10 @@ object Application extends Controller with Security with SystemSettingsService {
         admin.routes.javascript.RelationController.hosts,
         admin.routes.javascript.RelationController.count,
         admin.routes.javascript.RelationController.ips,
+        admin.routes.javascript.RelationController.delete,
         admin.routes.javascript.RelationController.bind,
+        admin.routes.javascript.RelationController.save,
+        admin.routes.javascript.RelationController.saveBatch,
         admin.routes.javascript.RelationController.unbind,
         admin.routes.javascript.RelationController.update,
 

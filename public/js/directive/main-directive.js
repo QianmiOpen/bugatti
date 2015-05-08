@@ -36,6 +36,28 @@ define(['angular'], function(angular) {
         };
     }]);
 
+    app.directive('numbersOnly', function(){
+        return {
+            require: 'ngModel',
+            link: function(scope, element, attrs, modelCtrl) {
+                modelCtrl.$parsers.push(function (inputValue) {
+                    // this next if is necessary for when using ng-required on your input.
+                    // In such cases, when a letter is typed first, this parser will be called
+                    // again, and the 2nd time, the value will be undefined
+                    if (inputValue == undefined) return ''
+                    var transformedInput = inputValue.replace(/[^0-9]/g, '');
+                    if (transformedInput!=inputValue) {
+                        modelCtrl.$setViewValue(transformedInput);
+                        modelCtrl.$render();
+                    }
+
+                    return transformedInput;
+                });
+            }
+        };
+    });
+
+
     // 动态获取页面窗体高度和宽度
     app.directive('resizable', function($window) {
         return {
@@ -135,6 +157,21 @@ define(['angular'], function(angular) {
                     var message = attrs.ngReallyMessage;
                     if (message && confirm(message)) {
                         scope.$apply(attrs.ngReallyClick);
+                    }
+                });
+            }
+        }
+    }]);
+
+    // change
+    app.directive('ngReallyChange', [function() {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                element.bind('change', function() {
+                    var message = attrs.ngReallyMessage;
+                    if (message && confirm(message)) {
+                        scope.$apply(attrs.ngReallyChange);
                     }
                 });
             }
@@ -820,8 +857,8 @@ define(['angular'], function(angular) {
                 c: "="
             },
             templateUrl: 'partials/home/cluster-properties.html',
-            controller: ['$scope', '$stateParams', '$state', '$modal', 'RelationService', 'ProjectService', 'EnvService', 'growl',
-                function($scope, $stateParams, $state, $modal, RelationService, ProjectService, EnvService, growl) {
+            controller: ['$scope', '$stateParams', '$state', '$modal', '$filter', 'RelationService', 'ProjectService', 'EnvService', 'growl',
+                function($scope, $stateParams, $state, $modal, $filter, RelationService, ProjectService, EnvService, growl) {
                     $scope.delayLoadProperties = function(){
                         RelationService.get($scope.c.id, function(data) {
                             $scope.relation = data;
@@ -830,6 +867,7 @@ define(['angular'], function(angular) {
                                     return;
                                 }
                                 ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
+                                    //$scope.vars = $filter('filter')(project_vars, {level: 'unsafe'});
                                     $scope.vars = project_vars;
                                     angular.forEach($scope.vars, function(pv) {
                                         pv.meta = pv.value;
@@ -860,7 +898,7 @@ define(['angular'], function(angular) {
                     $scope.saveOrUpdateProperties = function(vars) {
                         $scope.relation.globalVariable = [];
                         angular.forEach(vars, function(v) {
-                            $scope.relation.globalVariable.push({name: v.name, value: v.value})
+                            $scope.relation.globalVariable.push({name: v.name, value: v.value, level: v.level})
                         });
                         RelationService.update($scope.c.id, $scope.relation, function(data) {
                             if(data == 1){
@@ -1068,23 +1106,18 @@ define(['angular'], function(angular) {
                         }
 
                         $scope.vars.push(angular.copy(v));
-                        v.name = "", v.value = ""; // clear input value
+                        v.name = ""; v.value = ""; v.level = 'unsafe'; // clear input value
                     };
 
                     function findInVars(vars, v) {
                         var find = -1;
                         angular.forEach(vars, function(_v, index) {
-                            if (_v.name == v.name && _v.envId == v.envId) {
+                            if (find < 0 && _v.name == v.name && _v.envId == v.envId) {
                                 find = index;
-                                return;
                             }
                         });
                         return find;
                     }
-
-                    $scope.editVar = function(repeat$scope) {
-                        repeat$scope.mode = 'edit';
-                    };
 
                     $scope.deleteVar = function(v) {
                         var index = findInVars($scope.vars, v)
@@ -1124,12 +1157,12 @@ define(['angular'], function(angular) {
                             ProjectService.vars($scope.project.id, $scope.env.id, function(project_vars) {
                                 if (project_vars.length < 1) {
                                     angular.forEach(item_vars, function(iv) {
-                                        _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});  // first add
+                                        _vars.push({name: iv.itemName, value: '', level:'unsafe', envId: $scope.env.id});  // first add
                                     });
                                 }
                                 else if (item_vars.length < 1) {
                                     angular.forEach(project_vars, function(pv) {
-                                        _vars.push({name: pv.name, value: pv.value, envId: $scope.env.id});  // first add
+                                        _vars.push({name: pv.name, value: pv.value, level: pv.level, envId: $scope.env.id});  // first add
                                     });
                                 }
                                 else {
@@ -1138,11 +1171,11 @@ define(['angular'], function(angular) {
                                         project_vars.map(function(pv){
                                             if(pv.name == iv.itemName && pv.envId == $scope.env.id){
                                                 replaceFlag = true;
-                                                _vars.unshift({name: pv.name, value: pv.value, envId: $scope.env.id});
+                                                _vars.unshift({name: pv.name, value: pv.value, level: pv.level, envId: $scope.env.id});
                                             }
-                                        })
+                                        });
                                         if(!replaceFlag){
-                                            _vars.push({name: iv.itemName, value: '', envId: $scope.env.id});
+                                            _vars.push({name: iv.itemName, value: '', level:'unsafe', envId: $scope.env.id});
                                         }
                                     });
                                 }

@@ -1,0 +1,136 @@
+<div class="page-header clearfix">
+    <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button>
+    <h1 class="pull-left m0">关系添加</h1>
+</div>
+
+<form name="form" class="form-horizontal" novalidate>
+    <div class="form-group">
+        <label for="tab" class="col-sm-3 control-label"></label>
+        <div class="col-sm-9">
+            <ul class="nav nav-tabs" id="tab">
+                <li role="presentation"><a ui-sref="admin.relation.adds">批量添加</a></li>
+                <li role="presentation" class="active"><a ui-sref="admin.relation.add">添加一条(自定义ip)</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="envId" class="col-sm-3 control-label">环境：</label>
+        <div ng-if="envs" class="col-sm-5">
+            <select class="form-control" id="envId" name="envId" chosen search-contains="true" ng-model="rel.envId" ng-options="e.id as e.name for e in envs" required>
+                <option value="">-- 选择环境 --</option>
+            </select>
+        </div>
+        <div ng-show="form.envId.$dirty && form.envId.$invalid" class="has-error">
+            <span ng-show="form.envId.$error.required" class="control-label">请选择环境</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="projectId" class="col-sm-3 control-label">项目：</label>
+        <div ng-if="projects" class="col-sm-5">
+            <select class="form-control" id="projectId" name="projectId" chosen search-contains="true" ng-model="rel.projectId" ng-options="p.id as p.name for p in projects" >
+                <option value="">-- 选择项目 --</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="areaId" class="col-sm-3 control-label">区域：</label>
+        <div ng-if="areas" class="col-sm-5">
+            <select class="form-control" id="areaId" name="areaId" chosen search-contains="true" ng-model="rel.areaId" ng-options="a.id as a.name for a in areas" required>
+                <option value="">-- 选择区域 --</option>
+            </select>
+        </div>
+        <div ng-show="form.areaId.$dirty && form.areaId.$invalid" class="has-error">
+            <span ng-show="form.areaId.$error.required" class="control-label">请选择区域</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="syndic_name" class="col-sm-3 control-label">SyndicName：</label>
+        <div class="col-sm-4">
+            <input id="syndic_name" type="text" class="form-control" ng-model="rel.syndicName"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="spiritId" class="col-sm-3 control-label">Spirit：</label>
+        <div ng-if="spirits" class="col-sm-5">
+            <select class="form-control" id="spiritId" name="spiritId" ng-model="rel.spiritId" ng-options="s.id as s.info for s in spirits" required>
+                <option value="">-- 选择Spirit --</option>
+            </select>
+        </div>
+        <div ng-show="form.spiritId.$dirty && form.spiritId.$invalid" class="has-error">
+            <span ng-show="form.spiritId.$error.required" class="control-label">请选择Spirit</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">name：</label>
+        <div class="col-sm-5">
+            <input class="form-control" id="name" name="name" ng-model="rel.name" type="text" maxlength="200" required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="ip" class="col-sm-3 control-label">ip：</label>
+        <div class="col-sm-5">
+            <input class="form-control" id="ip" name="ip" ng-model="rel.ip" type="text" maxlength="200" required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="ipClash" class="col-sm-3 control-label">ipClash：</label>
+        <div class="col-sm-2">
+            <input class="form-control" id="ipClash" name="ipClash" ng-model="rel.ipClash" type="text" maxlength="20" required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="state" class="col-sm-3 control-label">state：</label>
+        <div class="col-sm-5">
+            <select class="form-control" id="state" name="state" ng-model="rel.state" ng-options="s.id as s.name for s in states" required>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="containerType" class="col-sm-3 control-label">容器类型：</label>
+        <div class="col-sm-5">
+            <select class="form-control" id="containerType" name="containerType" ng-model="rel.containerType" ng-options="c.id as c.name for c in containerTypes" required>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="host_ip" class="col-sm-3 control-label">主机ip：</label>
+        <div class="col-sm-4">
+            <input id="host_ip" type="text" class="form-control" ng-model="rel.hostIp"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="host_name" class="col-sm-3 control-label">主机名：</label>
+        <div class="col-sm-4">
+            <input id="host_name" type="text" class="form-control" ng-model="rel.hostName"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-5">
+            <button class="btn btn-success" ng-click="save()" ng-disabled="form.$invalid"> 保 存 </button>
+        </div>
+
+    </div>
+
+    <div class="panel panel-danger" ng-if="results">
+        <div class="panel-heading">失败ip：</div>
+        <div class="panel-body">
+            <ul>
+                <li ng-repeat="r in results">ip: {{r.ip}}, result: {{r.result == 0?'添加错误':'ip冲突'}}</li>
+            </ul>
+        </div>
+    </div>
+
+</form>

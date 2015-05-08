@@ -181,7 +181,7 @@ object AppTestData {
 
     // 初始化环境关系表
     Seq(
-      Host(None, Option(4), Option(1), Option(1), "t-syndic", 1, "d6a597315b01", "172.19.3.134", StateEnum.noKey, ContainerTypeEnum.vm
+      Host(None, Option(4), Option(1), Option(1), Option(1), "t-syndic", 1, "d6a597315b01", "172.19.3.134", 0, StateEnum.noKey, ContainerTypeEnum.vm
         , Option(""), Option("") ,Seq.empty[Variable])
       //EnvironmentProjectRel(None, Option(4), Option(1), "t-syndic", "8e6499e6412a", "172.19.3.134")
     ).foreach(HostHelper.create)
@@ -236,6 +236,9 @@ object AutoUpdate {
   }
 
   val versions = Seq(
+    Version(1, 5),
+    Version(1, 4),
+    Version(1, 3),
     Version(1, 2),
     Version(1, 1),
     Version(0, 0)

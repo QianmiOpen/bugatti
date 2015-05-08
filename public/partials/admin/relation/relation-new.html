@@ -1,6 +1,6 @@
 <div class="page-header clearfix">
     <button class="btn btn-primary pull-right" ng-click="$state.go('^')">返回</button>
-    <h1 class="pull-left m0">关系绑定</h1>
+    <h1 class="pull-left m0">关系设置</h1>
 </div>
 
 <form name="form" class="form-horizontal" novalidate>
@@ -8,7 +8,7 @@
     <div class="form-group">
         <label for="projectId" class="col-sm-2 control-label">项目：</label>
         <div ng-if="projects" class="col-sm-5">
-            <select class="form-control" id="projectId" name="projectId" ng-model="project" ng-options="p.name for p in projects"  chosen search-contains="true" required>
+            <select class="form-control" id="projectId" name="projectId" chosen search-contains="true" ng-model="project" ng-change="selectProject(project)" ng-options="p.id as p.name for p in projects"  required>
                 <option value="">-- 选择项目 --</option>
             </select>
         </div>
@@ -20,7 +20,7 @@
     <div class="form-group">
         <label for="envId" class="col-sm-2 control-label">环境：</label>
         <div ng-if="envs" class="col-sm-5">
-            <select class="form-control" id="envId" name="envId" ng-change="selectEnv()" ng-model="env" ng-options="e.name for e in envs" required>
+            <select class="form-control" id="envId" name="envId" chosen search-contains="true" ng-change="selectEnv(env)" ng-model="env" ng-options="e.id as e.name for e in envs" required>
                 <option value="">-- 选择环境 --</option>
             </select>
         </div>

@@ -3,9 +3,16 @@
     <h1 class="pull-left m0">项目管理</h1>
 </div>
 
-<form class="form-inline" role="form" ng-submit="searchForm(s_projectName)" >
+<form class="form-inline" role="form" ng-submit="searchForm(s_projectName, s_template)" >
+
     <div class="form-group">
         <input type="text" ng-model="s_projectName" class="form-control" placeholder="项目名称">
+    </div>
+
+    <div ng-if="templates" class="form-group">
+        <select style="width: 200px;" class="form-control" chosen ng-model="s_template" ng-change="tempSelect(s_template)" ng-options="t.id as t.name for t in templates">
+            <option value="">-- 选择模板 --</option>
+        </select>
     </div>
 
     <button type="submit" class="btn btn-default">搜索</button>
@@ -18,8 +25,8 @@
                 <th width="10%">编号</th>
                 <th width="20%">名称</th>
                 <th width="10%">模板</th>
-                <th width="25%">最近版本</th>
-                <th width="25%">最近版本时间</th>
+                <th width="20%">最近版本</th>
+                <th width="20%">最近版本时间</th>
                 <th >操作</th>
             </tr>
         </thead>
@@ -36,7 +43,7 @@
                 </td>
                 <td><span tooltip="{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}">{{project.lastUpdated | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
                 <td>
-                    <a ui-sref="admin.project.dependency({id: project.id})">依赖</a>&nbsp;
+                    <a ui-sref="admin.project.dependency({id: project.id})" title="依赖"><span class="glyphicon glyphicon-random"></span></a>&nbsp;
                     <a ui-sref="admin.project.edit({id: project.id})" title="修改"><span class="glyphicon glyphicon-edit"></span></a>
                     <a ng-click="delete(project.id, $index)" href="" title="删除"><span class="glyphicon glyphicon-remove"></span></a>
                 </td>
