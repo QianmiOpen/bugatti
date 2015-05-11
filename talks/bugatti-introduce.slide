@@ -1,0 +1,407 @@
+分布式混合云DevOps实践
+千米网Bugatti系统的起源，发展与未来
+
+彭毅
+pengyi@qianmi.com
+
+* why build bugatti
+
+- 2012年以前，我们只有30-40个开发人员，公司处于startup状态。
+- 初期没有CI，没有版本Release，大部分模块上线由模块负责人使用class或jsp替换线上服务器完成。
+- 我们2012年配备第一套测试环境，测试环境的搭建和调测花费了10多个人，陆续约1周半的时间。
+- 模块负责人维护着共80台左右的虚拟机
+- 这种不规范的工程实践方式带来很大隐患
+
+* why build bugatti
+
+- 2012-2013年，逐渐从30多开发人员迅速膨胀到80人左右的研发团队
+- 初步建立了CI、版本发布，但依然由人工部署上线。
+- 因业务需要，出现了第二，第三套测试环境，但维护代价很高，新测试环境的搭建依然缓慢。
+- 由于SOA化和模块解耦重构的工作不断开展，生产环境虚拟机迅速增加到200-300台。
+- 由于部署时，很多配置文件的修改都是人工在线上服务器操作，导致环境的再部署非常困难，且依然只能由熟悉的人来完成。
+
+* why build bugatti
+
+- 2013年后，研发团队达到到110人左右
+- 90%以上的模块具备CI能力
+- 新测试环境搭建和测试环境维护依然费时费力
+- SOA改造初步完成，生产环境虚拟机达到500-600台的规模，出现了一些无人认领的主机。
+- 依然由专人进行系统部署，且往往部署时丢三落四，导致扩容和故障点迁移时间很长。为了解决这个问题，后来甚至形成了新员工转正需要考核本模块部署的“上机考试文化”。
+
+*显然，环境部署问题已经严重阻碍业务发展，需要CD能力。*
+
+* 自动部署流程的选择
+
+- 不可能像startup团队一样，由开发人员自己写自动部署脚本完成上线。
+- 也不希望和一些大公司一样，将开发和部署分两个部门，之间的需求传递通过文档完成。
+- 更不可能仅提供一套工具，由各业务部门完成自动部署脚本的开发。
+
+* 我们选择的部署流程形态
+*我们需要一套工具，利于开发人员理解和使用。开发人员的输出可以很自然的衔接上运维人员写的脚本，从而完成自动部署。即如何更快速的以第二种形态进行工作，而不会有太多沟通成本。*
+
+.image bugatti-introduce/process_flow.png 450 _
+
+* 这套系统承载的诉求
+
+- 资源管理和环境隔离
+- 新环境的快速搭建
+- 数据库脚本的版本化
+- 现有部署形态向CD的演进
+
+*最终以业务的高可用为目标，DevOps需求整合的平台*
+
+* 寻找可行的方案
+
+- 通过jenkins Pipelines方式完成自动部署。
+	业界有较成熟的自动测试+自动部署的实践，但对资源管理偏弱。
+- 编写script脚本完成自动部署。
+	不具备大型bash类script脚本编程经验，其实现和维护成本相对较高。
+- 资源管理是否用openstack或cloudstack
+	初步试用上的感觉较重，注重资源管理，结合其他软件实现部署，暂不引入。
+- 现有deploy框架的使用，如puppet、salt等
+	基于dsl方式puppet的和使用yaml格式基于申明方式的salt做了比较，salt的学习曲线较低。
+	结合考虑了puppet的开发语言ruby和salt的开发语言python，综合公司技术栈（python），最终选择了salt。
+
+* 初期方案
+
+- 使用salt脚本作为后端脚本进行自动部署
+- 通过一套简单的界面调用salt的脚本完成部署
+
+* 初期成果
+
+- 使用scala的playframework与简单的html表单完成对salt-master的调用
+- 用salt完成了一个项目的自动部署
+
+.image bugatti-introduce/first-architecture.png
+
+*Lessons*
+
+- 内部系统也是人在用，没人忍受那么简单的界面
+
+* 第一次重构
+
+- 将用户操作抽象成工作流，step by step填写部署参数，参数传递给salt脚本完成部署。
+- 以资源管理角度出发抽象和规划功能
+- 使用bootstrap+backbone+coffeescript进行前端开发，后端使用playframework+Anorm。
+
+* 第一次重构结果
+
+初步完成规划功能的30%，进行初步推广试用
+
+*Lessons*
+
+- 界面有所改观，操作比较繁琐，继续被喷。
+- salt脚本与程序本身存在耦合，脚本的变动影响到操作界面代码编写，不利于脚本快速迭代开发和快速bugfix。
+- 开始在开发环境进行部署试用，无法支撑复杂环境。
+	公司生产环境分5个区域（杭州联通机房，杭州万网机房，南京软件大道，南京凤凰机房，杭州阿里云）
+	机房之间做了必要隔离，且之间连接的网络带宽不高，不能仅通过一套salt-master管理所有机房主机。
+- 在大并发情况下，salt-master调用会挂起执行线程，导致程序异常
+
+* 思考几个问题
+
+- 从软件使用者角度出发重新思考界面操作问题
+- salt脚本与bugatti软件耦合度高，如何解耦？
+- salt自带syndic分布式方案在文件传输上有问题，如何处理多环境下的配置文件传输？
+- salt的同步调用如何转换为异步调用，如何获取返回值？
+- 服务的配置文件渲染（根据环境、ip、不同组网等有不同配置要求）如何实现？是否用salt自带的渲染方式？
+
+* 重新设计
+
+- 以项目而不是资源为维度进行建模，从软件使用角度出发简化操作，灵感来源于iTunes等软件播放器。
+- 抽象一个中间层spirit
+
+	spirit封装salt的一些实现细节，中间层spirit与bugatti之间以标准协议进行通讯
+	spirit起到网关作用，替代salt syndic实现分布式组网
+
+- 抽象一套模板，用于隔离salt脚本变化与bugatti软件变化
+- 屏蔽salt渲染方式，抽象一个部署meta对象，使用javascript引擎对配置文件进行渲染
+
+* 精益创业开发——重构持续进行
+
+.image bugatti-introduce/dev.png 500 _
+
+* 组网与典型场景
+
+* 分布式组网图
+
+.image bugatti-introduce/bugatti-network.png 500 _
+
+* 典型场景-部署
+
+.image bugatti-introduce/bugatti-scene.png _ 1000
+
+* 典型场景-salt脚本开发
+
+.image bugatti-introduce/salt-script-dev.png 500 _
+
+* 典型场景-日志
+
+.image bugatti-introduce/log.png _ 1000
+
+* 典型场景-自动测试
+
+.image bugatti-introduce/autotest.png _ 1000
+
+* 典型场景-数据库版本管理
+
+.image bugatti-introduce/database.png _ 1000
+
+* 软件功能介绍
+
+* 网关、区域、环境的关系
+- 网关与地域组网相关
+- 区域为资源所在地的标识和集合
+- 环境为逻辑隔离单元，可以横跨1-n个区域
+
+.image bugatti-introduce/environment_proxy_area.jpg 400 _
+
+* 环境
+
+- 环境与实际网络的3层隔离情况无关，只与配置的逻辑掩码有关
+- 不同分支salt脚本可以配置到不同环境，方便salt脚本开发验证，版本回退等
+- 环境分普通和安全，分别对应不同权限需求
+
+.image bugatti-introduce/environment.jpg _ 1000
+
+* 权限系统
+
+- 支持ldap绑定登录和非绑定登录。
+- 环境分普通和安全（对应到线上生产环境）两个级别
+- 分环境和项目两个维度设置权限，分别都有管理员和成员。
+- 项目管理员（成员）可以管理所有环境下该项目（成员不能操作安全环境）。
+- 环境管理员和成员可以管理该环境下所有项目。
+- 环境管理员可以锁定该环境，防止项目成员修改该环境中项目信息。
+
+* 项目维度的操作体验
+
+- 负载为该网元下绑定的环境资源（机器）
+- 属性为该项目所属模板需要填写的参数（属性由模板定义）
+- 配置为项目按版本的配置文件
+- 成员为项目下相关成员
+- 界面中按钮动作来源于模板
+- Queue（提供了一个动作队列，salt本身不支持队列）
+
+.image bugatti-introduce/project.jpg _ 1000
+
+
+* 项目模板定义
+
+分别抽象了模板依赖、别名、属性、动作和步骤等
+
+	name: webapi
+	remark: 用于dubbo项目的自动部署，即api类项目
+	dependences:
+	  - name: "$logServer"
+	    type: nfs
+	    description: 日志服务器
+	    default: LogServer
+	aliass:
+	  - 
+	items:
+	  - 
+	actions:
+	  - name: 安装应用
+	    css: glyphicon glyphicon-upload
+	    versionMenu: True
+	    steps:
+	      - name: 安装java
+	      - name: 安装tomcat
+	      - name: 检测war包是否就绪
+	      - name: 停止dubbo接口
+
+*下面以常用的webapi模板为例说明项目模板定义*
+
+* webapi模板项目依赖定义
+
+	dependences:
+	  - name: "$logServer"
+	    type: nfs
+	    description: 日志服务器
+	    default: LogServer
+	  - name: "$dubboRegister"
+	    type: zookeeper
+	    description: dubbo注册中心
+	    default: ZookeeperRegister
+	  - name: "$logredis"
+	    type: redis
+	    description: 日志服务器
+	    default: LogstashRedis
+	  - name: "$dubboadmin"
+	    type: dubboadmin
+	    description: DubboAdmin服务器
+	    default: DubboAdmin
+
+* webapi模板项目依赖界面
+
+- 带别名的，可以通过下拉框选择的，不可以删除的是模板依赖
+- 不带别名，可以删除的，是项目后期添加的相关依赖
+
+.image bugatti-introduce/template_dependence.jpg 400 _
+
+* webapi模板属性定义
+
+	items:
+	  - itemName: t_groupId
+	    itemDesc: groupId
+	  - itemName: t_artifactId
+	    itemDesc: artifactId
+	  - itemName: t_mountDir
+	    itemDesc: 日志绑定目录
+	  - itemName: t_jdkversion
+	    itemDesc: jdk版本
+	    default: 'jdk7'
+	  - itemName: t_unpacked
+	    itemDesc: 自动解压
+	    default: 'False'
+
+* webapi模板属性界面
+
+- 项目属性为必填项，如果参数为空，则在执行时的检查中会提示错误。
+- 项目环境变量是项目负责人抽象出来的针对环境维度的变量
+- 另还有一个机器属性变量的概念，机器属性变量概念实现相同环境不同机器需要不同取值的需求
+
+.image bugatti-introduce/template_items.jpg _ 800
+
+* 机器属性变量
+
+- 通过点击项目负载界面中主机名称展开该功能界面
+- 机器属性变量只能修改项目环境变量定义的参数，不能定义新的变量，不修改默认使用项目环境变量。
+
+.image bugatti-introduce/template_host_items.jpg _ 800
+
+* webapi模板动作定义
+
+	actions:
+	  - name: 安装应用
+	    css: glyphicon glyphicon-upload
+	    versionMenu: True
+	    steps:
+	      - name: 安装java
+	        sls: "salt {{cHost.name}} state.sls saltenv='{{env.scriptVersion}}' java.install pillar='{java: {version: {{attrs.t_jdkversion}}, md5sum: {install: $$java.md5sum.install$$}}}'"
+	        md5Check: "java.md5sum.install"
+	  - name: 启动应用
+	    css: glyphicon glyphicon-play
+	    steps:
+	      - name: 启动应用
+	        sls: "salt {{cHost.name}} state.sls saltenv='{{env.scriptVersion}}' tomcat.startup"
+	      - name: 启用dubbo接口
+	        sls: "salt {{cHost.name}} state.sls saltenv='{{env.scriptVersion}}' webapp.dubboup pillar='{webapp: {dubboAdminIp: {{dependence.$dubboadmin.hosts[0].ip}}, dubboRootPasswd: {{dependence.$dubboadmin.attrs.t_rootPassword}}}}'"
+	  - name: jstack
+	    css: glyphicon glyphicon-camera
+	    actionType: host
+	    steps:
+	      - name: jstack
+	        sls: "salt {{cHost.name}} state.sls saltenv='{{env.scriptVersion}}' webapp.jstack"
+
+
+* webapi模板动作界面
+
+.image bugatti-introduce/template_actions.jpg _ 1000
+
+- 操作界面上的按钮都由模板的actions段定义而成
+- action的name对应按钮界面浮动提示
+- action的css使用glyphicon库的图标来定义按钮样式
+- versionMenu表示是否显示项目版本菜单
+- steps为对应需要执行的salt脚本动作，由bugatti按顺序发送给客户端
+- steps中“{{}}”表示取meta对象值，通过javascript引擎渲染
+
+* webapi模板别名定义
+
+- 别名的出现是为了方便项目的配置文件中更方便的使用变量绑定资源进行配置文件渲染
+- 别名定义中的aliasValue支持javascript渲染，即可以通过定义js代码块实现不同的使用场景需要
+
+	aliass:
+	  - aliasName: AuthUsers
+	    aliasValue: "function(project){if(this.env.level == 'safe'){return this.leaders.join()}else{return (this.leaders.concat(this.members)).join()}}.call(this, project)" 
+	    aliasDesc: "获取用户列表，以','分割"
+	  - aliasName: LogServerVIp
+	    aliasValue: "dependence.$logServer.attrs.t_virtualIp"
+	    aliasDesc: "获取zookeeper register项目当前环境机器列表，以','分割"
+	  - aliasName: ZookeeperRegisterIps
+	    aliasValue: "dependence.$dubboRegister.alias.IPs"
+	    aliasDesc: "获取zookeeper register项目当前环境机器列表，以','分割"
+	  - aliasName: CATALINA_HOME
+	    aliasValue: "'/home/tomcat/tomcat'"
+	    aliasDesc: "获取CATALINA_HOME"
+	  - aliasName: HOME
+	    aliasValue: "'/home/tomcat'"
+	    aliasDesc: "获取HOME"
+
+* 模板定义和salt脚本组织原则
+
+- salt root工作目录下约定templates为模板目录
+- templates目录下".yaml"后缀为模板文件
+- salt目录按照功能内聚划分目录
+- 由模板的steps来按照不同项目需要组合部署不同功能
+- 为了减少系统复杂度：开发人员通过界面操作完成工作；DevOps人员尽量使用命令行完成操作。
+
+.image bugatti-introduce/template_dir1.jpg _ 1000
+
+.image bugatti-introduce/template_dir2.jpg _ 1000
+
+* 项目文件配置界面
+
+.image bugatti-introduce/config_file_1.jpg _ 1000
+
+.image bugatti-introduce/config_file_2.jpg _ 1000
+
+* 项目文件配置界面
+
+.image bugatti-introduce/config_file_3.jpg _ 1000
+
+- 配置文件中的“{{}}”为变量
+- 右边列举了meta对象所有属性，可以通过搜索查询
+- 图中可以看到已经依赖的项目的ip列表和在本环境下的值
+
+* 内部meta对象简单介绍
+
+	id -> 项目id编号
+	templateId -> 模板id编号
+	name -> 项目名称
+	hosts -> 项目在该环境下绑定的主机列表
+	attrs -> 项目属性列表
+	alias -> 项目别名列表
+	leaders -> 项目leader工号列表
+	members -> 项目成员工号列表
+	dependence -> 依赖关系列表
+	env -> 环境信息
+	taskId -> 任务id编号
+	version -> 当前安装业务版本号
+	cHost -> 当前主机信息
+	grains -> 对应主机的salt grains信息对象,
+
+
+* salt的一些坑
+
+- 使用gitfs进行脚本管理时，当版本分支（或tag）过多时，会导致新分支（或tag）无法生效的问题
+- 当目标主机上有动作在执行时，下个动作会失败，没有任务执行队列的说法，任务队列在bugatti软件中实现
+
+* salt-master同步转异步调用
+
+*salt异步调用返回方法*
+在salt工作目录下的_returners目录中，我们定制了一个spirit_return，通过该returner将salt-minion的返回发送到spirit。
+
+需要通过下面命令将该文件同步到服务器上。
+	
+	salt <hostname> saltutil.sync_returners
+
+
+* 基于salt-syndic的文件传输问题
+
+[[https://groups.google.com/forum/#!topic/salt-users/-IAamZP7t38][Using the file server functionality with salt-syndic]]
+
+.image bugatti-introduce/salt-syndic-file-copy.jpg _ 1000
+
+* 未来
+
+- 业务自动测试的普及以及手动触发部署向自动部署的转变
+- 集成业务告警、日志分析、安全等数据实现自动运维
+- 进行必要的重构，支持插件扩展
+- 集成更多方便开发、测试、运维的系统
+
+* 开源项目地址
+
+- bugatti项目 - [[https://github.com/ofpay/bugatti][https://github.com/ofpay/bugatti]]
+- spirit网关 - [[https://github.com/ofpay/spirit][https://github.com/ofpay/spirit]]
+- salt-formulas脚本样例 - [[https://github.com/ofpay/salt-formulas][https://github.com/ofpay/salt-formulas]]
+- salt-pkgs安装包样例 - [[https://github.com/ofpay/salt-pkgs][https://github.com/ofpay/salt-pkgs]]
