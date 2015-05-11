@@ -50,7 +50,7 @@ object ProjectMemberHelper extends PlayCache {
       (m, p) <- qMember innerJoin qProject on (_.projectId === _.id)
       if m.jobNo === jobNo
     } yield p
-    q.list
+    q.sortBy(_.name).list
   }
 
   def findSafeProjectsByJobNo(jobNo: String): Seq[Project] = db withSession { implicit session =>
@@ -58,7 +58,7 @@ object ProjectMemberHelper extends PlayCache {
       (m, p) <- qMember innerJoin qProject on (_.projectId === _.id)
       if m.jobNo === jobNo && m.level === LevelEnum.safe
     } yield p
-    q.list
+    q.sortBy(_.name).list
   }
 
   def count(jobNo: String, level: Level): Int = db withSession { implicit session =>

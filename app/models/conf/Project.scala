@@ -70,11 +70,11 @@ object ProjectHelper extends PlayCache {
     val query = qProject
       .filteredBy(projectName)(_.name like s"%${projectName.get}%")
       .filteredBy(templateId)(_.templateId === templateId).query
-    query.drop(offset).take(pageSize).list
+    query.drop(offset).take(pageSize).sortBy(_.name).list
   }
 
   def all(): Seq[Project] = db withSession { implicit session =>
-    qProject.list
+    qProject.sortBy(_.name).list
   }
 
   def allExceptSelf(id: Int): Seq[Project] = db withSession { implicit session =>
